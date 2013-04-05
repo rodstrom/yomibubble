@@ -95,7 +95,7 @@ void PlayState::Enter(){
 		std::cout << line << "\n";
 	}*/
 	m_physics_engine->ShowDebugDraw(false);
-	m_scene_manager->setSkyDome(true, "Examples/CloudySky");
+	m_scene_manager->setSkyDome(true, "CloudySky");
 
 
 }

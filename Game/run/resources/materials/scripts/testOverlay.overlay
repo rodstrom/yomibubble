@@ -1,0 +1,25 @@
+// The name of the overlay comes first
+testOverlay
+{
+    zorder 200
+
+    container Panel(MyOverlayElements/TestPanel)
+    {
+        // Center it horizontally, put it at the top
+        left 0.25
+        top 0
+        width 0.5
+        height 0.1
+        material Examples/Clouds
+
+        // Another panel nested in this one
+        //container Panel(MyOverlayElements/AnotherPanel)
+        //{
+          //   left 0
+           //  top 0
+           //  width 0.1
+           //  height 0.1
+           //  material MyMaterials/NestedPanel
+        //}
+    }
+}

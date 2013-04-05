@@ -13,6 +13,20 @@ material Examples/Ninja
 	}
 }
 
+material Examples/Clouds
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture clouds.jpg
+			}
+		}
+	}
+}
+
 material Examples/BeachStones
 {
 	technique
@@ -45,7 +59,7 @@ material Examples/SpaceSkyBox
 		}
 	}
 }
-material Examples/CloudySky
+material CloudySky
 {
 	technique
 	{
