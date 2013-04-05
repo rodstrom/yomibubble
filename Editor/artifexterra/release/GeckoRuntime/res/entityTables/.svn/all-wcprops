@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/!svn/ver/36/trunk/Dependencies/win32/astral/runtime/release/GeckoRuntime/res/entityTables
+END
+html40Special.properties
+K 25
+svn:wc:ra_dav:version-url
+V 119
+/svn/!svn/ver/36/trunk/Dependencies/win32/astral/runtime/release/GeckoRuntime/res/entityTables/html40Special.properties
+END
+htmlEntityVersions.properties
+K 25
+svn:wc:ra_dav:version-url
+V 124
+/svn/!svn/ver/36/trunk/Dependencies/win32/astral/runtime/release/GeckoRuntime/res/entityTables/htmlEntityVersions.properties
+END
+transliterate.properties
+K 25
+svn:wc:ra_dav:version-url
+V 119
+/svn/!svn/ver/36/trunk/Dependencies/win32/astral/runtime/release/GeckoRuntime/res/entityTables/transliterate.properties
+END
+html40Latin1.properties
+K 25
+svn:wc:ra_dav:version-url
+V 118
+/svn/!svn/ver/36/trunk/Dependencies/win32/astral/runtime/release/GeckoRuntime/res/entityTables/html40Latin1.properties
+END
+html40Symbols.properties
+K 25
+svn:wc:ra_dav:version-url
+V 119
+/svn/!svn/ver/36/trunk/Dependencies/win32/astral/runtime/release/GeckoRuntime/res/entityTables/html40Symbols.properties
+END

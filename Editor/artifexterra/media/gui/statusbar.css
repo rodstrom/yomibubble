@@ -1,0 +1,39 @@
+			.start_button{
+				position:absolute; top:4px; left:8px;
+				width:58px;
+				height:58px;
+				display:block;				
+				background-image:url(images/start_button2.png);
+				background-position: 0px 0px;
+				font-family: Arial;
+				font-size:6pt;
+				color: #AAAAAA;							
+				padding-top:0px;
+				padding-left:0px;
+			}
+			.start_button_h{
+				position:absolute; top:4px; left:8px;
+				width:58px;
+				height:58px;
+				display:block;				
+				background-image:url(images/start_button2_h.png);
+				background-position: 0px 0px;
+				font-family: Arial;
+				font-size:6pt;
+				color: #AAAAAA;							
+				padding-top:0px;
+				padding-left:0px;
+			}	
+			.start_button_a{
+				position:absolute; top:4px; left:8px;
+				width:58px;
+				height:58px;
+				display:block;				
+				background-image:url(images/start_button2_a.png);
+				background-position: 0px 0px;
+				font-family: Arial;
+				font-size:6pt;
+				color: #AAAAAA;							
+				padding-top:0px;
+				padding-left:0px;
+			}

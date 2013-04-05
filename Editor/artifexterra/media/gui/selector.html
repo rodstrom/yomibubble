@@ -1,0 +1,78 @@
+<html>
+<head>
+<script type="text/javascript" src="Navi.js"></script>
+<script>
+ function selector(choice) {
+	var nSelectorData = new NaviData("selectorData");
+	nSelectorData.add({selector: choice});
+	nSelectorData.send();
+	delete nSelectorData;
+ }
+ </script>
+ <link rel="stylesheet" type="text/css" href="styles_collar.css">
+
+ <style type="text/css">
+			body
+			{
+				overflow-y: hidden;
+				overflow-x: hidden;
+				margin: 1;
+				width:316px;
+				height: 40px;
+				border:1px solid #404040;			
+				border-right: 1px solid #303030;
+				border-bottom: 1px solid #303030;
+				background-color: black;
+				font-family: Verdana, Arial;
+				font-size:7pt;
+				color: #FFFFFF;
+			}
+			.small
+			{
+				font-family: Verdana, Arial;
+				font-size:6pt;
+				font-weight:bold;
+				color: #FFFFFF;
+			}
+</style> 
+</head>
+<body>
+<span onclick="selector('quickbrush');" 
+	id="selQB" class="ctrlText" 
+	style="position:absolute; top:9px; left:90px;"
+>QuickBrush</span>
+<span onclick="selector('texturepicker');" 
+	id="selTP" class="ctrlText" 
+	style="color:#606060; position:absolute; top:25px; left:90px;"
+>TexturePicker</span>
+<span onclick="selector('colorpicker');" 
+	id="selCP" class="ctrlText" 
+	style="position:absolute; top:9px; left:170px;"
+>ColourPicker</span>
+<!--span onclick="selector('colortools');" 
+	id="selCT" class="ctrlText" 
+	style="color:#606060; position:absolute; top:25px; left:170px;"
+>ColourTools</span-->
+<span onclick="javascript:document.location.href='selector.html?'+Math.random()" 
+	id="selCT" class="ctrlText" 
+	style="position:absolute; top:9px; left:240px;"
+>Reload</span>
+<span onclick="selector('texturestudio');" 
+	id="selTS" class="ctrlText" 
+	style="position:absolute; top:25px; left:10px;"
+>TextureStudio</span>
+<span onclick="selector('filemenu');" 
+	id="selFM" class="ctrlText" 
+	style="position:absolute; top:9px; left:10px;"
+>FileMenu</span>
+<span onclick="selector('help');" 
+	id="selHLP" class="ctrlText" 
+	style="position:absolute; top:25px; left:170px;"
+>Help/Manual</span>
+<span onclick="selector('quit');" 
+	id="selQT" class="ctrlText" 
+	style="position:absolute; top:25px; left:240px;"
+>Program Exit</span>
+</body>
+</html>
+ 

@@ -1,0 +1,190 @@
+vertex_program triPlanarMaterial2_vs cg
+{
+   source triplanarTexture2.cg                              
+   entry_point triplanar2_OS_vs                        
+   profiles vs_2_0                              
+   default_params
+   {                                                   
+      param_named_auto worldviewproj worldviewproj_matrix
+   }   
+}
+
+fragment_program triPlanarMaterial2_ps cg 
+{
+   source triplanarTexture2.cg
+   entry_point triplanar2_OS_ps
+   profiles ps_2_0 
+}
+
+vertex_program VSLodMorph4 cg
+{
+  source VSLodMorph4.cg
+  entry_point terrain_vp
+  profiles vs_2_0 
+ 
+  default_params
+  {
+    param_named_auto worldViewProj worldviewproj_matrix
+  }
+}
+
+material ETTerrainMaterial 
+{
+   technique
+        {
+                pass
+                {				
+						
+                        vertex_program_ref triPlanarMaterial2_vs
+                        {
+                        }
+						
+                        fragment_program_ref triPlanarMaterial2_ps
+                        {
+							param_named splatScaleX float 64
+							param_named splatScaleZ float 64
+                        }
+						
+						texture_unit
+						{
+							//texture ETcoverage.0.png
+							texture ETSplatting0
+						}
+											
+	
+						texture_unit
+                        {
+                                //texture splatting0.png 
+                                texture Splatting0
+                        }
+                        texture_unit
+                        {
+                                //texture splatting1.png
+                                texture Splatting1
+                        }						
+						texture_unit
+                        {
+                                //texture splatting2.png
+                                texture Splatting2
+                        }										
+											
+                }
+				
+				pass
+                {				
+						scene_blend add
+						
+                        vertex_program_ref triPlanarMaterial2_vs
+                        {
+                        }
+						
+                        fragment_program_ref triPlanarMaterial2_ps
+                        {
+							param_named splatScaleX float 64
+							param_named splatScaleZ float 64
+                        }
+						
+						texture_unit
+						{
+							//texture ETcoverage.1.png
+							texture ETSplatting1
+						}
+											
+	
+						texture_unit
+                        {
+                                //texture splatting3.png 
+                                texture Splatting3
+                        }
+                        texture_unit
+                        {
+                                //texture splatting4.png
+                                texture Splatting4
+                        }						
+						texture_unit
+                        {
+                                //texture splatting5.png
+                                texture Splatting5
+                        }										
+											
+                }
+				
+				pass
+                {				
+						scene_blend add
+						
+                        vertex_program_ref triPlanarMaterial2_vs
+                        {
+                        }
+						
+                        fragment_program_ref triPlanarMaterial2_ps
+                        {
+							param_named splatScaleX float 64
+							param_named splatScaleZ float 64
+                        }
+						
+						texture_unit
+						{
+							//texture ETcoverage.2.png
+							texture ETSplatting2
+						}
+											
+	
+						texture_unit
+                        {
+							//texture splatting6.png 
+							texture Splatting6
+                        }
+                        texture_unit
+                        {
+							//texture splatting7.png
+							texture Splatting7
+                        }						
+						texture_unit
+                        {
+							//texture splatting8.png
+							texture Splatting8
+                        }										
+											
+                }
+				
+				 pass
+				{
+				  // lightmap texture pass
+				  
+					scene_blend modulate
+
+
+					vertex_program_ref VSLodMorph4
+					{
+					}	
+					fragment_program_ref ET/Programs/PSLighting
+					{
+					}
+						
+
+					texture_unit
+					{
+						// dynamically created
+						texture ETLightmap
+					}	  
+				  
+				}
+				
+				pass
+                {
+						scene_blend modulate
+										
+						vertex_program_ref VSLodMorph4
+						{
+						}						 
+						
+						texture_unit 
+						{			
+							texture ArtifexTerra3D_ColourMap
+						}
+                }
+			 
+
+        }
+}

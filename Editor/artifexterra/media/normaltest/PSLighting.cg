@@ -1,0 +1,10 @@
+void main
+(
+  float2 iTexCoord0 : TEXCOORD0, 
+  out float4 oColor : COLOR, 
+  uniform sampler2D lightMap
+) 
+{
+  oColor = tex2D(lightMap, iTexCoord0);
+}
+

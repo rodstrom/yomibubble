@@ -1,0 +1,94 @@
+body {
+	margin: 0px;
+	background-color: #303030;
+	font-family: Verdana, Arial;
+	font-size:7pt;
+	color: #FFFFFF;
+	overflow: hidden;
+}
+#ctrl_body
+{
+	display:block;
+	overflow-y: auto;
+	overflow-x: hidden;
+	margin: 0px;
+	width:256px;
+	height: 214px;
+	background-color: #303030;
+	font-family: Verdana, Arial;
+	font-size:7pt;
+	color: #FFFFFF;
+}
+.hintbox {
+	width:220px;
+	background:black; 
+	padding:2px; 
+	margin-left:1px;
+	border:#204000 1px solid;
+	border-bottom:#305000 1px solid;
+	border-right:#305000 1px solid;
+}
+.qbtable {
+	width: 225px; 
+	margin:2px;
+	margin-bottom:0px;
+	padding:3px; 
+	border:1px dotted #A0C000;
+	background-color:#000000;
+}
+.small
+{
+	font-family: Arial;
+	font-size:7pt;
+	color: #FFFFFF;
+}
+.qblink
+{
+	display: block;
+	padding: 2px;
+	font-family: Verdana, Arial;
+	font-size:6pt;
+	color: #DDDDDD;	
+	width:25px;
+	height:10px;
+	text-align:center;
+	background: transparent;
+}
+.qblink:hover
+{
+	font-weight:bold;
+	color: #DDDDDD;	
+	background: #404040;
+}
+.qblink:active
+{
+	color: #808080;	
+	background: #404060;
+}
+.qbbrush
+{
+	display: block;
+	padding: 2px;
+	font-family: Verdana, Arial;
+	font-size:6pt;
+	color: #DDDDDD;	
+	width:29px;
+	height:29px;
+	text-align:center;
+	background: transparent;
+}
+.qbbrush:hover
+{
+	font-weight:bold;
+	color: #DDDDDD;	
+	background: #404040;
+}
+.qbbrush:active
+{
+	color: #808080;	
+	background: #404060;
+}
+.brushimg {
+	margin:1px;
+	border:1px solid #cccccc;
+}

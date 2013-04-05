@@ -1,0 +1,13 @@
+material tower.01.mat/SOLID/TEX/tower.01.jpg/VertCol
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture tower.01.jpg
+			}
+		}
+	}
+}

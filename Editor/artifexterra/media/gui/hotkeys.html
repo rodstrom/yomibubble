@@ -1,0 +1,293 @@
+<html>
+<head>
+<title>ArtifexTerra3D - Manual</title>
+<script type="text/javascript" src="Navi.js"></script>
+<script>
+	function hideWindow() {
+		var nHideData = new NaviData("hlpHideData");
+		nHideData.send();
+		delete nHideData;
+	}
+</script>
+<link rel="stylesheet" type="text/css" href="styles_collar.css">
+<link rel="stylesheet" type="text/css" href="styles_help.css">
+<style type="text/css">			
+</style>
+<body>
+<div align="left" id="main">
+	<div style="width:600px;"><a name="doctop"><br></a>
+		<table width="600px" border="0px" cellspacing="0px" cellpadding="0px">
+		<tr>
+			<td>
+				<img src="images/artifex_logo.2.png"><br>
+			</td>
+			<td align="right" valign="bottom">		
+				<span id="id_manual"
+					onclick="javascript:document.location.href='intro.html';" 
+					onmouseout="document.getElementById(this.id).style.color='#707070';" 
+					onmouseover="document.getElementById(this.id).style.color='#C0E020';" 
+					class="link4">[ Intro ]
+				</span>
+				<span id="id_hotkeys"
+					onclick="javascript:document.location.href='manual.html';" 
+					onmouseout="document.getElementById(this.id).style.color='#707070';" 
+					onmouseover="document.getElementById(this.id).style.color='#C0E020';" 
+					class="link4">[ Manual ]
+				</span>
+				<span id="id_reload"
+					onclick="javascript:document.location.href=document.location.href+'?'+Math.random()" 
+					onmouseout="document.getElementById(this.id).style.color='#707070';" 
+					onmouseover="document.getElementById(this.id).style.color='#C0E020';" 
+					class="link4">[ Reload ]
+				</span>
+				<span id="id_close" 
+					onclick="hideWindow();" 
+					onmouseout="document.getElementById(this.id).style.color='#707070';" 
+					onmouseover="document.getElementById(this.id).style.color='#C0E020';" 
+					class="link4">[ F1 to Close ]
+				</span>
+			</td>
+		</tr>
+		</table>
+		<hr width="600px" color="#404040" style="line-height:3px; padding-top:3px; margin-top:4px;">
+		<br>
+	<table width="100%" border="0px" cellspacing="10px" cellpadding="0px">
+	<tr>
+		<td align="left" valign="top" width="50%">
+			<table border="0">					
+			<tr>
+				<td colspan="3" align="left">
+					<font class="subheadline">Navigate</font><br>
+					<hr width="100%" color="#606060">
+				</td>
+			</tr>
+			<tr><td width="30%">[Left] [Right]</td><td width="5%">&#151;</td><td>Turn left/right</td></tr>
+			<tr><td class="td_dot">[A] [D]</td><td class="td_dot"><br></td><td class="td_dot"><br></td></tr>
+			<tr><td>[Up] [Down]</td><td>&#151;</td><td>Move Forw./Backw.</td></tr>
+			<tr><td class="td_dot">[W] [S]</td><td class="td_dot"><br></td><td class="td_dot"><br></td></tr>
+			<tr><td>[PgUp/Dn]</td><td>&#151;</td><td>Look Up/Down</td></tr>
+			<tr><td class="td_dot">[Q] [E]</td><td class="td_dot"><br></td><td class="td_dot"><br></td></tr>
+			<tr><td class="td_dot">[Shift]+ [Left/Right]</td><td class="td_dot">&#151;</td><td class="td_dot">Move Left/Right</td></tr>
+			<tr><td class="td_dot">[F3]</td><td class="td_dot">&#151;</td><td class="td_dot">Change Movespeed</td></tr>
+			<tr><td class="td_dot" >MouseWheel</td><td class="td_dot" >&#151;</td><td class="td_dot" >Zoom In/Out</td></tr>
+			<tr><td class="td_dot" >[Alt+G]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Toggle Gravity</td></tr>
+			<tr><td>[Alt+C]</td><td>&#151;</td><td>Toggle Gravity and vertical object collision</td></tr>			
+			<tr>
+				<td colspan="3">
+					<div align="right"><a href="#doctop" class="uplink">[ Up ]</a></div>
+					<hr width="100%" color="#404040">
+					<br>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3" align="left">
+					<font class="subheadline">Object mode</font><br>
+					<hr width="100%" color="#606060">
+				</td>
+			</tr>
+			<tr><td colspan="3"><b><u>General:</u></b><br></td></tr>
+			<tr><td class="td_dot" >[Ctrl+O]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Object mode</td></tr>
+			<tr><td class="td_dot" >[Ctrl]</td><td class="td_dot" >&#151;</td><td class="td_dot" >for slow and more exact action</td></tr>
+			<tr><td class="td_dot" >[Shift]</td><td class="td_dot" >&#151;</td><td class="td_dot" >snap to steprate grid</td></tr>
+			<tr><td class="td_dot" >RMB</td><td class="td_dot" >&#151;</td><td class="td_dot" >modify value</td></tr>
+			<tr><td>[F2]</td><td>&#151;</td><td>Change StepRate</td></tr>	
+			
+			<tr><td colspan="3"><br><b><u>Place objects:</u></b><br></td></tr>
+			<tr><td class="td_dot" >LMB</td><td class="td_dot" >&#151;</td><td class="td_dot" >Place object</td></tr>
+			<tr><td class="td_dot" >RMB</td><td class="td_dot" >&#151;</td><td class="td_dot" >Rotate, change height (Y-pos.)</td></tr>
+			<tr><td class="td_dot" >RMB+[Alt]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Scale, change height (Y-pos.)</td></tr>
+			<tr><td>[Space]</td><td>&#151;</td><td>Rotate randomly, Y-axis</td></tr>
+			<tr><td colspan="3"><br><b><u>Edit objects:</u></b><br></td></tr>
+			<tr><td class="td_dot" >LMB</td><td class="td_dot" >&#151;</td><td class="td_dot" >Select object</td></tr>
+			<tr><td class="td_dot" >[Del]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Delete object</td></tr>
+			<tr><td class="td_dot" >[Alt]+RMB</td><td class="td_dot" >&#151;</td><td class="td_dot" >Move Y <br>(Move, Scale, Rotate modes)</td></tr>
+			<tr><td>[Ctrl+Up/Dn]</td><td>&#151;</td><td>Move Y steprated</td></tr>
+			<tr><td class="td_dot" ><b>Moving:</b><br></td></tr>
+			<tr><td>RMB</td><td>&#151;</td><td>Drag object</td></tr>		
+			
+			<tr><td><b>Rotation:</b><br></td></tr>		
+			<tr><td class="td_dot" >[Alt+R]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Rotation Mode:</td></tr>
+			<tr><td class="td_dot" >[Alt+X]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Rotate X-Axis</td></tr>
+			<tr><td class="td_dot" >[Alt+Y]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Rotate Y-Axis</td></tr>
+			<tr><td class="td_dot" >[Alt+Z]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Rotate Z-Axis</td></tr>
+			<tr><td>[Ctrl+0]</td><td>&#151;</td><td>Reset Axis</td></tr>
+			<tr><td><b>Scaling:</b><br></td></tr>
+			<tr><td class="td_dot" >[Alt+S]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Scale mode:</td></tr>
+			<tr><td>[+][-]</td><td>&#151;</td><td>Inc/Dec Size by Steprate</td></tr>
+			<tr><td><b>Hiding:</b><br></td></tr>
+			<tr><td class="td_dot" >[Ctrl+H]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Hide object</td></tr>
+			<tr><td>[Alt+H]</td><td>&#151;</td><td>Unhide ALL objects</td></tr>
+			<tr><td><br></td></tr>
+			<tr>
+				<td colspan="3">
+					<div align="right"><a href="#doctop" class="uplink">[ Up ]</a></div>
+					<hr width="100%" color="#404040">
+					<br>
+				</td>
+			</tr>
+			
+			<tr>
+				<td colspan="3" align="left">
+					<font class="subheadline">Colortools</font><br>
+					<hr width="100%" color="#606060">
+				</td>
+			</tr>
+			<tr><td>[ALT+1]</td><td>&#151;</td><td>Enable ColorTools, starts with blur filter</td></tr>
+			<tr><td colspan="3"><b>Enabled ColorTools:</b><br></td></tr>
+			<tr><td class="td_dot" >[1]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Lighten</td></tr>
+			<tr><td class="td_dot" >[2]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Darken</td></tr>
+			<tr><td class="td_dot" >[3]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Contrast++</td></tr>
+			<tr><td class="td_dot" >[4]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Contrast--</td></tr>
+			<tr><td class="td_dot" >[5]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Blur</td></tr>
+			<tr><td class="td_dot" >[6]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Sharpen</td></tr>
+			<tr><td>[7]</td><td>&#151;</td><td>Noise</td></tr>			
+			<tr>
+				<td colspan="3">
+					<div align="right"><a href="#doctop" class="uplink">[ Up ]</a></div>
+					<hr width="100%" color="#404040">
+					<br>
+				</td>
+			</tr>	
+			<tr>
+				<td colspan="3" align="left">
+					<font class="subheadline">Filter & Actions</font><br>
+					<hr width="100%" color="#606060">
+				</td>
+			</tr>
+			<tr><td class="td_dot" >[Ctrl+F5]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Backblend baked Overlay</td></tr>			
+			<tr><td class="td_dot" >[F6]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Smooth Terrain</td></tr>
+			<tr><td>[F7]</td><td>&#151;</td><td>EdgyBlur Terrain</td></tr>			
+			<tr>
+				<td colspan="3">
+					<div align="right"><a href="#doctop" class="uplink">[ Up ]</a></div>
+					<hr width="100%" color="#404040">
+					<br>
+				</td>
+			</tr>
+			</table>		
+			<br>		
+		</td>
+		<td align="left" valign="top" width="50%">	
+			<table>
+			<tr>
+				<td colspan="3" align="left">
+					<font class="subheadline">Edit Modes</font><br>
+					<hr width="100%" color="#606060">
+				</td>
+			</tr>
+			<tr><td class="td_dot" >[ESC]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Idle mode / Defocus</td></tr>
+			<tr><td class="td_dot" >[Ctrl+T]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Terraform</td></tr>
+			<tr><td class="td_dot" >[Ctrl+P]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Plane mode</td></tr>
+			<tr><td class="td_dot" >[Ctrl+B]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Blur mode</td></tr>
+			<tr><td class="td_dot" >[Alt+B]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Flatblur mode</td></tr>
+			<tr><td class="td_dot" >[Ctrl+N]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Boil mode</td></tr>
+			<tr><td class="td_dot" >[Ctrl+1-9]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Texture Paint mode Tex-Nr.</td></tr>
+			<tr><td class="td_dot" >[Ctrl+C]</td><td class="td_dot" >&#151;</td><td class="td_dot" >ColourPaint mode</td></tr>		
+			<tr><td class="td_dot" >[Ctrl+O]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Object mode</td></tr>
+			<tr><td>[Ctrl+G]</td><td>&#151;</td><td>GrassPaint mode</td></tr>
+			<tr>
+				<td colspan="3">				
+					<div align="right"><a href="#doctop" class="uplink">[ Up ]</a></div>
+					<hr width="100%" color="#404040">
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3" align="left">
+					<font class="subheadline">Loading - Saving</font><br>
+					<hr width="100%" color="#606060">
+				</td>
+			</tr>
+			<tr><td class="td_dot" >[Ctrl+F]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Toggle ProjectManager</td></tr>
+			<tr><td class="td_dot" >[Ctrl+L]</td><td class="td_dot" >&#151;</td><td class="td_dot" >ReLoad Scene</td></tr>
+			<tr><td class="td_dot" >[Ctrl+W]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Save Scene</td></tr>
+			<tr><td>[Alt+W]</td><td>&#151;</td><td>Save Minimaps, baked splatting map</td></tr>
+			<tr>
+				<td colspan="3">
+					<div align="right"><a href="#doctop" class="uplink">[ Up ]</a></div>
+					<hr width="100%" color="#404040">
+					<br>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3" align="left">
+					<font class="subheadline">Generic</font><br>
+					<hr width="100%" color="#606060">
+				</td>
+			</tr>
+			<tr><td colspan="3"><b><u>Artpad:</u></b><br></td></tr>
+			<tr><td class="td_dot" >[Ctrl+S]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Toggle Stylus Pressure</td></tr>
+			<tr><td colspan="3"><br><b><u>GUI:</u></b><br></td></tr>
+			<tr><td class="td_dot" >[Ctrl+Enter]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Toggle Central Menu</td></tr>
+			<tr><td class="td_dot" >[Enter]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Toggle Quick Brush</td></tr>
+			<tr><td class="td_dot" >[Ctrl+Backspace]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Toggle Colour Picker</td></tr>
+			<tr><td class="td_dot" >[Shift+T]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Toggle Tool Bar</td></tr>
+			<tr><td class="td_dot" >[Ctrl+F]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Toggle ProjectManager</td></tr>
+			<tr><td class="td_dot" >[F9]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Toggle Object Properties</td></tr>
+			<tr><td>[TAB]</td><td>&#151;</td><td>Hide/Show UI</td></tr>
+			<!-- -->
+			<tr><td colspan="3"><br><b><u>Cursor:</u></b><br></td></tr>
+			<tr><td class="td_dot" >[F4]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Toggle Decal-Cursor</td></tr>
+			<tr><td>[CTRL+F4]</td><td>&#151;</td><td>Additional bubble cursor</td></tr>			
+			<!-- -->
+			<tr><td colspan="3"><br><b><u>Miscellanous:</u></b><br></td></tr>
+			<tr><td class="td_dot" >[Ctrl+U]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Undo</td></tr>
+			<tr><td class="td_dot" >[Ctrl+V]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Toggle Wireframe</td></tr>
+			<tr><td class="td_dot" >[Ctrl+A]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Toggle Water</td></tr>
+			<tr><td class="td_dot" >[Ctrl+I]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Toggle Lightmap</td></tr>
+			<tr><td>[Alt/Shift+I]</td><td>&#151;</td><td>+- Lghtmp. Brightness</td></tr>		
+			<tr><td class="td_dot" >[F12]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Screenshot</td></tr>
+			<tr><td class="td_dot" >[Ctrl+Q]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Quit ArtifexTerra3D</td></tr>
+			<tr><td class="td_dot" >[Shift+G]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Toggle Grass</td></tr>
+			<tr><td>[CTRL+X]</td><td>&#151;</td><td>Switch fore- and backgroundcolor</td></tr>			
+			<tr>
+				<td colspan="3">
+					<div align="right"><a href="#doctop" class="uplink">[ Up ]</a></div>
+					<hr width="100%" color="#404040">
+					<br>
+				</td>
+			</tr>		
+			<tr>
+				<td colspan="3" align="left">
+					<font class="subheadline">Brushes</font><br>
+					<hr width="100%" color="#606060">
+				</td>
+			</tr>
+			<tr><td class="td_dot" >[Enter]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Toggle Quickbrush Menu</td></tr>
+			<tr><td class="td_dot" >[+][-]</td><td class="td_dot"  width="5%">&#151;</td><td class="td_dot" >Change brushsize</td></tr>
+			<tr><td class="td_dot" >[Home] [End]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Change brush</td></tr>
+			<tr><td class="td_dot" >[Ctrl]+ [PgUp/Dn]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Change pressure</td></tr>
+			<tr><td class="td_dot" >[Ctrl]+ [Left/Right]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Change angle</td></tr>
+			<tr><td class="td_dot" >[Ctrl]+ [Up/Dn]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Change angle</td></tr>
+			<tr><td class="td_dot" >[Space]</td><td class="td_dot" >&#151;</td><td class="td_dot" >Random angle</td></tr>		
+			<tr><td>[Ctrl+Space]</td><td>&#151;</td><td>Flip brush</td></tr>	
+			<tr>
+				<td colspan="3">
+					<div align="right"><a href="#doctop" class="uplink">[ Up ]</a></div>
+					<hr width="100%" color="#404040">
+					<br>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3" align="left">
+					<font class="subheadline">Documentation</font><br>
+					<hr width="100%" color="#606060">
+				</td>
+			</tr>
+			<tr><td>[F1]</td><td>&#151;</td><td>Show Manual</td></tr>
+			<tr>
+				<td colspan="3">
+					<div align="right"><a href="#doctop" class="uplink">[ Up ]</a></div>
+					<hr width="100%" color="#404040">
+					<br>
+				</td>
+			</tr>
+			</table>			
+		</td>
+	</tr>
+	</table>
+	<hr width="600px" color="#404040" style="line-height:3px; padding-top:3px; margin-top:4px;">
+	<br>
+	</div>
+</div>
+</body>
+</html>

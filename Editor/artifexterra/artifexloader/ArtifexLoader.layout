@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Release" />
+	<File name="Headers\InputManager.h" open="1" top="0" tabpos="4">
+		<Cursor position="212" topLine="0" />
+	</File>
+	<File name="Headers\Loader\ArtifexLoader.h" open="1" top="0" tabpos="6">
+		<Cursor position="104" topLine="0" />
+	</File>
+	<File name="Headers\Loader\CppSQLite3.h" open="1" top="0" tabpos="8">
+		<Cursor position="1569" topLine="21" />
+	</File>
+	<File name="Headers\Loader\CustomTypes.h" open="1" top="0" tabpos="5">
+		<Cursor position="0" topLine="0" />
+	</File>
+	<File name="Headers\Loader\DBManager.h" open="1" top="0" tabpos="9">
+		<Cursor position="755" topLine="0" />
+	</File>
+	<File name="Headers\Loader\StaticUtils.h" open="1" top="0" tabpos="7">
+		<Cursor position="104" topLine="0" />
+	</File>
+	<File name="Headers\Loader\sqlite3.h" open="1" top="0" tabpos="15">
+		<Cursor position="0" topLine="0" />
+	</File>
+	<File name="Headers\Loader\sqlite3ext.h" open="1" top="0" tabpos="16">
+		<Cursor position="0" topLine="0" />
+	</File>
+	<File name="Headers\SampleApp.h" open="1" top="1" tabpos="1">
+		<Cursor position="1150" topLine="0" />
+	</File>
+	<File name="Source\InputManager.cpp" open="1" top="0" tabpos="11">
+		<Cursor position="2417" topLine="44" />
+	</File>
+	<File name="Source\Loader\ArtifexLoader.cpp" open="1" top="0" tabpos="12">
+		<Cursor position="977" topLine="0" />
+	</File>
+	<File name="Source\Loader\ArtifexLoaderEnvironment.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="2007" topLine="23" />
+	</File>
+	<File name="Source\Loader\ArtifexLoaderObjects.cpp" open="1" top="0" tabpos="14">
+		<Cursor position="7993" topLine="272" />
+	</File>
+	<File name="Source\Loader\DBManager.cpp" open="1" top="0" tabpos="13">
+		<Cursor position="2882" topLine="49" />
+	</File>
+	<File name="Source\Loader\sqlite3.c" open="0" top="0" tabpos="0">
+		<Cursor position="2249455" topLine="65921" />
+	</File>
+	<File name="Source\Main.cpp" open="1" top="0" tabpos="10">
+		<Cursor position="995" topLine="0" />
+	</File>
+	<File name="Source\SampleApp.cpp" open="1" top="0" tabpos="3">
+		<Cursor position="7049" topLine="252" />
+	</File>
+</CodeBlocks_layout_file>

@@ -1,0 +1,261 @@
+<html>
+<head>
+	<link rel="stylesheet" type="text/css" href="styles_collar.css">
+	<link rel="stylesheet" type="text/css" href="projectmanager.css">
+	<script type="text/javascript" src="Navi.js"></script>
+	<!--script type="text/javascript" src="resources/js/jquery-1.2.6.min.js"></script-->
+	
+	<script type="text/javascript">
+		function loaded() {
+			var nOnLoadData = new NaviData("pmLoadedData");
+			nOnLoadData.send();
+			delete nOnLoadData;
+		 }
+		 function quit() {
+			var nQuitData = new NaviData("pmQuitData");
+			nQuitData.send();
+			delete nQuitData;
+		 }
+		 function hideWindow() {
+			var nHideData = new NaviData("pmCloseData");
+			nHideData.send();
+			delete nHideData;
+		 }
+		 function inputFocus() {
+			var nFocusData = new NaviData("pmFocusData");
+			nFocusData.add({focus: 'gained'});
+			nFocusData.send();
+			delete nFocusData;
+		 }
+		 function inputBlur() {
+			var nFocusData = new NaviData("pmFocusData");
+			nFocusData.add({focus: 'lost'});
+			nFocusData.send();
+			delete nFocusData;
+		 }		
+		function load (what) {
+			var nLoadData = new NaviData("pmLoadData");
+			nLoadData.add({what: what});
+			nLoadData.send();
+			delete nLoadData;
+		}
+		function save (what) {
+			var nSaveData = new NaviData("pmSaveData");
+			nSaveData.add({what: what});
+			nSaveData.send();
+			delete nSaveData;
+		}
+		function unload () {
+			var nUnLoadData = new NaviData("pmUnLoadData");
+			nUnLoadData.send();
+			delete nUnLoadData;
+		}
+		function naviEvent(wEvent, arg0, arg1, arg2) {
+			switch(wEvent) {
+				//case 'showFileDialog':
+				//case 'hideWindow':
+				default:
+					var neData = new NaviData('pmNewProjectData');
+					neData.add({wEventData: wEvent, wProjectMode: arg0});
+					neData.send();
+					delete neData;
+					break;
+			}
+		}		
+	</script>
+	
+</head>
+<body>
+	<div style="position:absolute; top:0px; left:0px;" align="left">
+		<table class="uibar" width="150px" height="20px" border="0px" cellspacing="0px" cellpadding="0px">
+			<tr>
+				<td align="left" valign="center" style="padding-left:0px; width:12px; height:20px;">
+					<br>
+				</td>
+				<td align="left" valign="center" style="padding-left:5px;">
+					<font class="uibarlink"> P R O J E C T - M A N A G E R </font>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div id="texturectrl" class="windowBody" style="position:absolute; top:20px; left:5px; width:410px; height:382px;"><br></div>
+	<span 
+	onclick="hideWindow()" class="windowcloser" 
+	style="position:absolute; top:4px; left:404px;"
+	onMouseout="this.style.backgroundImage='url(images/closer.gif)';"
+	onMouseover="this.style.backgroundImage='url(images/closer_.gif)';"
+	></span>
+	<span onclick="javascript:document.location.href='projectmanager.html?'+Math.random()"  
+	 class="ctrlText" style="color: #404040; position:absolute; top:5px; left:349px;"
+	 onmouseup="this.style.color='#404040';" 
+	 onmousedown="this.style.color='#406000';" 
+	 onmouseout="this.style.color='#404040';" 
+	 onmouseover="this.style.color='#80A000';"
+	>[ Reload ]</span> 	
+
+	<div id="contentpane" >
+	<table border="0px" cellspacing="0px" cellpadding="0px">
+	<tbody>
+	<tr>
+		<td class="ctrlgroup">
+			<div  class="special_intro" style="margin-bottom:2px;">Create a new project with:</div>
+			<br>
+			<!--span class="button3" 
+				onclick="naviEvent('showFileDialog', 0);"				
+				onmouseup="this.className='button3_h';" 
+				onmousedown="this.className='button3_a';" 
+				onmouseout="this.className='button3';" 
+				onmouseover="this.className='button3_h';"
+			> Classic ETM with 6 Textures</span>				
+			<span class="button3" 
+				onclick="naviEvent('showFileDialog', 1);"				
+				onmouseup="this.className='button3_h';" 
+				onmousedown="this.className='button3_a';" 
+				onmouseout="this.className='button3';" 
+				onmouseover="this.className='button3_h';"
+			> ETM with 9 Textures</span>	
+			<span class="button3" 
+				onclick="naviEvent('showFileDialog', 2);"			
+				onmouseup="this.className='button3_h';" 
+				onmousedown="this.className='button3_a';" 
+				onmouseout="this.className='button3';" 
+				onmouseover="this.className='button3_h';"
+			> ETM + Normalmapping 6 Textures</span-->	
+			<span class="button3" 
+				onclick="naviEvent('showFileDialog', 3);"				
+				onmouseup="this.className='button3_h';" 
+				onmousedown="this.className='button3_a';" 
+				onmouseout="this.className='button3';" 
+				onmouseover="this.className='button3_h';"
+			> 9 Textures + Normalmapping.</span>
+		</td>
+		<td width="10px"><img src="images/dot.gif" height="10px" width="10px"></td>
+		<td class="ctrlgroup" width="150px" valign="top" rowspan="3">
+			<div class="special_intro" style="margin-bottom:2px;">Save what you created:</div>
+			<br>
+			<span class="button3" 
+				onclick="save(0);"				
+				onmouseup="this.className='button3_h';" 
+				onmousedown="this.className='button3_a';" 
+				onmouseout="this.className='button3';" 
+				onmouseover="this.className='button3_h';"
+			> Save the entire current project.</span>
+			<!--span class="button3" 
+				onclick="save(1);"				
+				onmouseup="this.className='button3_h';" 
+				onmousedown="this.className='button3_a';" 
+				onmouseout="this.className='button3';" 
+				onmouseover="this.className='button3_h';"
+			> Save the current project as...</span-->	
+			<br>
+			<div class="special_intro" style="margin-bottom:2px;">... or parts of it:</div>
+			<br>
+			<span class="button3" 
+				onclick="save(2);"				
+				onmouseup="this.className='button3_h';" 
+				onmousedown="this.className='button3_a';" 
+				onmouseout="this.className='button3';" 
+				onmouseover="this.className='button3_h';"
+			> Save the "zonesettings.cfg" only.</span>	
+			<span class="button3" 
+				onclick="save(3);"				
+				onmouseup="this.className='button3_h';" 
+				onmousedown="this.className='button3_a';" 
+				onmouseout="this.className='button3';" 
+				onmouseover="this.className='button3_h';"
+			> Save the objects only.</span>
+			<img style="padding:10px; padding-top:5px; padding-bottom:7px;" src="images/fancy_line_2.gif" width="140px" height="3px" border="0px"><br>			
+			<span class="button3" 
+				onclick="save(4);"				
+				onmouseup="this.className='button3_h';" 
+				onmousedown="this.className='button3_a';" 
+				onmouseout="this.className='button3';" 
+				onmouseover="this.className='button3_h';"
+			> Save the terrain only.</span>
+			<span class="button3"
+				onclick="save(7);"				
+				onmouseup="this.className='button3_h';" 
+				onmousedown="this.className='button3_a';" 
+				onmouseout="this.className='button3';" 
+				onmouseover="this.className='button3_h';"
+			> Save the "terrain.cfg" (TSM) only.</span>			
+			<!--span class="ctrlHint">Warning: pressing one
+			of the "save" buttons will save im- medeatly and
+			previously saved data will be overwritten.</span-->			
+		</td>
+	</tr>
+	<tr>
+		<td><img src="images/dot.gif" height="10px" width="10px"></td>
+	</tr>
+	<tr>
+		<td class="ctrlgroup">
+			<div class="special_intro" style="margin-bottom:2px;">Open an existing project:</div>
+			<br>
+			<span class="button3" 
+				onclick="load('../media/normaltest');"				
+				onmouseup="this.className='button3_h';" 
+				onmousedown="this.className='button3_a';" 
+				onmouseout="this.className='button3';" 
+				onmouseover="this.className='button3_h';"
+			> Load the demo-scene.</span>		
+			<img style="padding:10px; padding-top:5px; padding-bottom:7px;" src="images/fancy_line_2.gif" width="140px" height="3px" border="0px"><br>
+			<span class="button3" 
+				onclick="load('');"				
+				onmouseup="this.className='button3_h';" 
+				onmousedown="this.className='button3_a';" 
+				onmouseout="this.className='button3';" 
+				onmouseover="this.className='button3_h';"
+			> Choose a scene to load.</span>
+		</td>
+	</tr>
+	<tr>
+		<td><img src="images/dot.gif" height="10px" width="10px"></td>
+	</tr>
+	<tr>
+		<td class="ctrlgroup">
+			<div class="special_intro" style="margin-bottom:2px;">Export:</div>			
+			<br>
+			<span class="button3" 
+				onclick="save(5);"				
+				onmouseup="this.className='button3_h';" 
+				onmousedown="this.className='button3_a';" 
+				onmouseout="this.className='button3';" 
+				onmouseover="this.className='button3_h';"
+			> Export baked splatt- & mini-map.</span>
+			<img style="padding:10px; padding-top:5px; padding-bottom:7px;" src="images/fancy_line_1.gif" width="140px" height="3px" border="0px"><br>			
+			<span class="button3"
+				onclick="save(6);"				
+				onmouseup="this.className='button3_h';" 
+				onmousedown="this.className='button3_a';" 
+				onmouseout="this.className='button3';" 
+				onmouseover="this.className='button3_h';"
+			> Export the terrain as PNG.</span>
+		</td>
+		<td><br></td>
+		<td class="ctrlgroup">
+			<div class="special_intro" style="margin-bottom:2px;">Other:</div>			
+			<br>
+			<span class="button3" 
+				onclick="quit();"				
+				onmouseup="this.className='button3_h';" 
+				onmousedown="this.className='button3_a';" 
+				onmouseout="this.className='button3';" 
+				onmouseover="this.className='button3_h';"
+			> Exit Artifex.</span>
+		</td>
+	</tr>
+	<tr>
+		<td><img src="images/dot.gif" height="10px" width="10px"></td>
+	</tr>
+	<tr>
+		<td colspan="3" style="padding-top:8px">
+			<div id="pm_message" class="statusbar"><br></div>
+		</td>
+	</tr>
+	</tbody>
+	</table>
+	</div>
+</body>
+</html>
+
+

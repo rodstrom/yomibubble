@@ -1,0 +1,201 @@
+   // Expand a range-compressed vector
+float3 expand(float3 v)
+{
+   return (v - 0.5) * 2;
+}
+
+void ETAmbient_VS
+(
+         float4      position   : POSITION,
+         float      delta      : BLENDWEIGHT,
+
+   uniform   float4x4   worldViewProj,
+   uniform   float4      ambient,
+   uniform float      morphFactor,
+       
+   out      float4      oPosition   : POSITION,
+   out      float4      oColor      : COLOR
+)
+{
+   position.y = position.y + (delta.x * morphFactor);
+   oPosition = mul(worldViewProj, position);
+   oColor = ambient;
+}
+
+void ETDynLighting_vp
+(
+            float4      position   : POSITION,
+            float3      normal      : NORMAL,
+            float      delta      : BLENDWEIGHT,
+      
+      uniform float4      lightPosition,
+      uniform float3      eyePosition,
+      uniform float4x4   worldviewproj,
+      uniform float      morphFactor,
+      uniform float4      atten,
+
+      out      float4      oWorldPos   : POSITION,
+
+      out      float3      oNorm      : TEXCOORD0,
+      out      float3      oLightDir   : TEXCOORD1,         
+      out      float3      oEyeDir      : TEXCOORD2,
+      out      float      oLumin      : TEXCOORD3
+)
+{
+   position.y = position.y + (delta.x * morphFactor);
+   oWorldPos = mul(worldviewproj, position);
+   oNorm = normal;
+   
+   oLightDir = lightPosition.xyz - (position.xyz * lightPosition.w);
+   
+   float dist = length(oLightDir);
+   oLumin = 1 / (atten.y + atten.z * dist + atten.w * dist * dist);
+   oLumin = min(oLumin, 1.0);
+   
+   oEyeDir = normalize(eyePosition - position.xyz);
+   oLightDir = normalize(oLightDir);
+}
+
+void ETDynLighting_fp
+(
+            float3   normal      : TEXCOORD0,
+            float3   lightDir   : TEXCOORD1,
+            float3   eyeDir      : TEXCOORD2,
+            float   lumin      : TEXCOORD3,
+
+      uniform float4   lightDiffuse,
+      uniform float4   lightSpecular,
+      uniform float   exponent,
+
+      out      float4   oColor      : COLOR
+)
+{
+   normal = normalize(normal);
+
+   lightDir = normalize(lightDir);
+   eyeDir = normalize(eyeDir);
+   float3 halfAngle = normalize(lightDir + eyeDir);
+
+   float NdotL = dot(lightDir, normal);
+   float NdotH = dot(halfAngle, normal);
+   float4 Lit = lit(NdotL, NdotH, exponent);
+
+   oColor = lumin * (lightDiffuse * Lit.y + lightSpecular * Lit.z * Lit.y);
+}
+
+
+void ETDynLightingNM_vp
+(
+            float4      position   : POSITION,
+            float3      normal      : NORMAL,
+            float3      tangent      : TANGENT,
+            float3      binormal   : BINORMAL,
+            float2      uv         : TEXCOORD0,
+            float      delta      : BLENDWEIGHT,
+      
+      uniform float4      lightPosition,
+      uniform float3      eyePosition,
+      uniform float4x4   worldviewproj,
+      uniform float      morphFactor,
+      uniform float4      atten,
+
+      out      float4      oWorldPos   : POSITION,
+
+      out      float2      oUV         : TEXCOORD0,
+      out      float3      oNorm      : TEXCOORD1,
+      out      float3      oTangent   : TEXCOORD2,
+      out      float3      oBinormal   : TEXCOORD3,
+      out      float3      oLightDir   : TEXCOORD4,         
+      out      float3      oEyeDir      : TEXCOORD5,
+      out      float      oLumin      : TEXCOORD6
+)
+{
+   position.y = position.y + (delta.x * morphFactor);
+   oWorldPos = mul(worldviewproj, position);
+   oUV = uv;
+   oNorm = normal;
+   oTangent = tangent;
+   oTangent = -float3(abs(normal.y) + abs(normal.z), abs(normal.x), 0);
+   oBinormal = binormal;
+   oBinormal = normalize(cross(oTangent, normal));
+
+   oLightDir = lightPosition.xyz - (position.xyz * lightPosition.w);
+   
+   float dist = length(oLightDir);
+   oLumin = 1 / (atten.y + atten.z * dist + atten.w * dist * dist);
+   oLumin = min(oLumin, 1.0);
+   
+   oEyeDir = normalize(eyePosition - position.xyz);
+   oLightDir = normalize(oLightDir);
+}
+
+void ETDynLightingNM_fp
+(
+            float2   uv         : TEXCOORD0,
+            float3   normal      : TEXCOORD1,
+            float3   tangent      : TEXCOORD2,
+            float3   binormal   : TEXCOORD3,
+            float3   lightDir   : TEXCOORD4,
+            float3   eyeDir      : TEXCOORD5,
+            float   lumin      : TEXCOORD6,
+            
+      uniform sampler2D covMap1,
+      uniform sampler2D covMap2,
+	  uniform sampler2D covMap3,
+      uniform sampler2D splat1,
+      uniform sampler2D splat2,
+      uniform sampler2D splat3,
+      uniform sampler2D splat4,
+      uniform sampler2D splat5,
+      uniform sampler2D splat6,
+	  uniform sampler2D splat7,
+      uniform sampler2D splat8,
+      uniform sampler2D splat9,
+
+      uniform float splatScaleX,
+      uniform float splatScaleZ,
+ 
+      uniform float4   lightDiffuse,
+      uniform float4   lightSpecular,
+      uniform float   exponent,
+
+      out      float4   oColor      : COLOR
+)
+{
+   float3 cov1 = tex2D(covMap1, uv).rgb;
+   float3 cov2 = tex2D(covMap2, uv).rgb;
+   float3 cov3 = tex2D(covMap3, uv).rgb;
+   uv.x *= splatScaleX;
+   uv.y *= splatScaleZ;
+   float3 normModifier = tex2D(splat1, uv) * cov1.x
+                  + tex2D(splat2, uv) * cov1.y
+                  + tex2D(splat3, uv) * cov1.z
+                  + tex2D(splat4, uv) * cov2.x
+                  + tex2D(splat5, uv) * cov2.y
+                  + tex2D(splat6, uv) * cov2.z
+				  + tex2D(splat7, uv) * cov3.x
+                  + tex2D(splat8, uv) * cov3.y
+                  + tex2D(splat9, uv) * cov3.z;
+                  
+   normModifier = normalize(expand(normModifier.xzy));
+
+      // Form a rotation matrix out of the vectors
+   tangent = normalize(tangent);
+   binormal = normalize(binormal);
+   normal = normalize(normal);
+   float3x3 rotation = float3x3(tangent, normal, binormal);
+   
+   normModifier = mul(rotation, normModifier);
+   normModifier = normalize(normModifier);
+   
+   lightDir = normalize(lightDir);
+   eyeDir = normalize(eyeDir);
+   float3 halfAngle = normalize(lightDir + eyeDir);
+
+   float NdotL = dot(lightDir, normModifier);
+   float NdotH = dot(halfAngle, normModifier);
+   float4 Lit = lit(NdotL, NdotH, exponent);
+
+   oColor = lumin * (lightDiffuse * Lit.y + lightSpecular * Lit.z * Lit.y);
+   oColor = lightDiffuse * Lit.y + lightSpecular * Lit.z * Lit.y;   
+}

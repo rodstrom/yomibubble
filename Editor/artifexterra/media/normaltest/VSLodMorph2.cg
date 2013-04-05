@@ -1,0 +1,15 @@
+    void terrain_vp(
+	    float4 position : POSITION,
+	    float2 uv1   	: TEXCOORD0,
+	    float delta     : BLENDWEIGHT,
+
+	    out float4 oPosition : POSITION,
+	    out float2 oUv1		 : TEXCOORD0,
+	    uniform float4x4 worldViewProj,
+	    uniform float morphFactor
+	    )
+    {
+	    position.y = position.y + (delta.x * morphFactor);
+	    oPosition = mul(worldViewProj, position);
+	    oUv1 = uv1;
+    }

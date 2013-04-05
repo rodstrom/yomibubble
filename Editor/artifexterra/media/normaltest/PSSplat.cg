@@ -1,0 +1,22 @@
+void main
+(
+  float2 iTexCoord0 : TEXCOORD0,
+  float2 iTexCoord1 : TEXCOORD1,
+  float2 iTexCoord2 : TEXCOORD2,
+  float2 iTexCoord3 : TEXCOORD3,
+ 
+  out float4 oColor : COLOR,
+ 
+  uniform sampler2D covMap,
+  uniform sampler2D splat1,
+  uniform sampler2D splat2,
+  uniform sampler2D splat3  
+) 
+{
+  float3 cov = tex2D(covMap, iTexCoord0).rgb;
+  
+  oColor = tex2D(splat1, iTexCoord1) * cov.x
+          + tex2D(splat2, iTexCoord2) * cov.y
+          + tex2D(splat3, iTexCoord3) * cov.z;
+}
+

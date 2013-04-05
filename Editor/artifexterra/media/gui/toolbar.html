@@ -1,0 +1,250 @@
+<html>
+<head>
+<script type="text/javascript" src="Navi.js"></script>
+<script>
+function loaded() {
+	var nOnLoadData = new NaviData("onLoadData");
+	nOnLoadData.send();
+	delete nOnLoadData;
+}
+function toolbar(val) {
+ 	var nSetEditModeData = new NaviData("tbSetEditModeData");	
+	id = val.substr(3);
+	nSetEditModeData.add({what: id});
+	nSetEditModeData.send();
+	delete nSetEditModeData;
+}
+function hideWindow() {
+	var nHideData = new NaviData("tbCloseData");
+	nHideData.send();
+	delete nHideData;
+}
+function setHighLight(num) {
+	var y=434;
+	switch (num) {
+		case 1:
+			y=24;
+			break;
+		case 2:
+			y=65;
+			break;
+		case 3:
+			y=106;
+			break;
+		case 4:
+			y=147;
+			break;
+		case 5:
+			y=188;
+			break;
+		case 6:
+			y=229;
+			break;
+		case 7:
+			y=270;
+			break;
+		case 8:
+			y=311;
+			break;
+		case 9:
+			y=352;
+			break;
+		case 10:
+			y=434;
+			break;
+		case 11:
+			y=500;
+			break;
+		default:
+			y=434;
+	}
+	$('toolbar_highlight').style.top = y;		
+}
+</script>
+<link rel="stylesheet" type="text/css" href="styles_collar.css">
+<link rel="stylesheet" type="text/css" href="toolbar.css">
+</head>
+<body>
+<div align="center">
+<table class="uibar" style="width:48px;" width="48px" height="20px" border="0px" cellspacing="0px" cellpadding="0px">
+<tr>
+	<td align="left" valign="center" style="padding-left:0px; width:12px; height:20px;">
+		<br>
+	</td>
+	<td align="left" valign="center" style="padding-left:5px;">
+		<font class="uibarlink"></font>
+	</td>
+</tr>
+</table>
+<table width="36px" border="0px" cellspacing="0px" cellpadding="0px">
+<tbody>
+<tr>
+	<td><img src="images/dot.gif" class="tb_spacer"></td>
+</tr>
+<tr>
+	<td><span id="id_editobjects" class="tb_button"
+			onclick="setHighLight(1);toolbar(this.id);"
+			onmouseup="this.style.border='1px solid #608000'" 
+			onmousedown="this.style.border='1px solid #406000'" 
+			onmouseout="this.style.border='1px solid #808080'" 
+			onmouseover="this.style.border='1px solid #A0C010'"
+		><img src="images/tb_editobjects.jpg" width="34px" height="34px" border="0px">
+	</span>
+	</td>
+</tr>
+<tr>
+	<td><img src="images/dot.gif" class="tb_spacer"></td>
+</tr>
+<tr>
+	<td><span id="id_texturepaint" class="tb_button"
+			onclick="setHighLight(2);toolbar(this.id)"
+			onmouseup="this.style.border='1px solid #608000'" 
+			onmousedown="this.style.border='1px solid #406000'" 
+			onmouseout="this.style.border='1px solid #808080'" 
+			onmouseover="this.style.border='1px solid #A0C010'"
+		><img src="images/tb_texturepaint.jpg" width="34px" height="34px" border="0px">
+	</span>
+	</td>
+</tr>
+<tr>
+	<td><img src="images/dot.gif" class="tb_spacer"></td>
+</tr>
+<tr>
+	<td><span id="id_colourpaint" class="tb_button"
+			onclick="setHighLight(3);toolbar(this.id)"
+			onmouseup="this.style.border='1px solid #608000'" 
+			onmousedown="this.style.border='1px solid #406000'" 
+			onmouseout="this.style.border='1px solid #808080'" 
+			onmouseover="this.style.border='1px solid #A0C010'"
+		><img src="images/tb_colourpaint.jpg" width="34px" height="34px" border="0px">
+	</span>
+	</td>
+</tr>
+<tr>
+	<td><img src="images/dot.gif" class="tb_spacer"></td>
+</tr>
+<tr>
+	<td><span id="id_colourtools" class="tb_button"
+			onclick="setHighLight(4);toolbar(this.id)"
+			onmouseup="this.style.border='1px solid #608000'" 
+			onmousedown="this.style.border='1px solid #406000'" 
+			onmouseout="this.style.border='1px solid #808080'" 
+			onmouseover="this.style.border='1px solid #A0C010'"
+		><img src="images/tb_colourtools.jpg" width="34px" height="34px" border="0px">
+	</span>
+	</td>
+</tr>
+<tr>
+	<td><img src="images/dot.gif" class="tb_spacer"></td>
+</tr>
+<tr>
+	<td><span id="id_terraform" class="tb_button"
+			onclick="setHighLight(5);toolbar(this.id)"
+			onmouseup="this.style.border='1px solid #608000'" 
+			onmousedown="this.style.border='1px solid #406000'" 
+			onmouseout="this.style.border='1px solid #808080'" 
+			onmouseover="this.style.border='1px solid #A0C010'"
+		><img src="images/tb_terraform.jpg" width="34px" height="34px" border="0px">
+	</span>
+	</td>
+</tr>
+<tr>
+	<td><img src="images/dot.gif" class="tb_spacer"></td>
+</tr>
+<tr>
+	<td><span id="id_blur" class="tb_button"
+			onclick="setHighLight(6);toolbar(this.id)"
+			onmouseup="this.style.border='1px solid #608000'" 
+			onmousedown="this.style.border='1px solid #406000'" 
+			onmouseout="this.style.border='1px solid #808080'" 
+			onmouseover="this.style.border='1px solid #A0C010'"
+		><img src="images/tb_blur.jpg" width="34px" height="34px" border="0px">
+	</span>
+	</td>
+</tr>
+<tr>
+	<td><img src="images/dot.gif" class="tb_spacer"></td>
+</tr>
+<tr>
+	<td><span id="id_flatblur" class="tb_button"
+			onclick="setHighLight(7);toolbar(this.id)"
+			onmouseup="this.style.border='1px solid #608000'" 
+			onmousedown="this.style.border='1px solid #406000'" 
+			onmouseout="this.style.border='1px solid #808080'" 
+			onmouseover="this.style.border='1px solid #A0C010'"
+		><img src="images/tb_flatblur.jpg" width="34px" height="34px" border="0px">
+	</span>
+	</td>
+</tr>
+<tr>
+	<td><img src="images/dot.gif" class="tb_spacer"></td>
+</tr>
+<tr>
+	<td><span id="id_plane" class="tb_button"
+			onclick="setHighLight(8);toolbar(this.id)"
+			onmouseup="this.style.border='1px solid #608000'" 
+			onmousedown="this.style.border='1px solid #406000'" 
+			onmouseout="this.style.border='1px solid #808080'" 
+			onmouseover="this.style.border='1px solid #A0C010'"
+		><img src="images/tb_plane.jpg" width="34px" height="34px" border="0px">
+	</span>
+	</td>
+</tr>
+<tr>
+	<td><img src="images/dot.gif" class="tb_spacer"></td>
+</tr>
+<tr>
+	<td><span id="id_boil" class="tb_button"
+			onclick="setHighLight(9);toolbar(this.id)"
+			onmouseup="this.style.border='1px solid #608000'" 
+			onmousedown="this.style.border='1px solid #406000'" 
+			onmouseout="this.style.border='1px solid #808080'" 
+			onmouseover="this.style.border='1px solid #A0C010'"
+		><img src="images/tb_boil.jpg" width="34px" height="34px" border="0px">
+	</span>
+	</td>
+</tr>
+<tr>
+	<td><img src="images/dot.gif" class="tb_spacer"></td>
+</tr>
+<tr>
+	<td><img src="images/dot.gif" width="36px" height="36px"></td>
+</tr>
+<tr>
+	<td><img src="images/dot.gif" class="tb_spacer"></td>
+</tr>
+<tr>
+	<td><span id="id_idle" class="tb_button"
+			onclick="setHighLight(10);toolbar(this.id)"
+			onmouseup="this.style.border='1px solid #608000'" 
+			onmousedown="this.style.border='1px solid #406000'" 
+			onmouseout="this.style.border='1px solid #808080'" 
+			onmouseover="this.style.border='1px solid #A0C010'"
+		><img src="images/tb_idle.jpg" width="34px" height="34px" border="0px">
+	</span>
+	</td>
+</tr>
+</tbody>
+</table>
+<span onclick="javascript:document.location.href='toolbar.html?'+Math.random()"  
+ class="ctrlText" style="font-size:6pt; color: #404040;"
+ onmouseup="this.style.color='#404040';" 
+ onmousedown="this.style.color='#406000';" 
+ onmouseout="this.style.color='#404040';" 
+ onmouseover="this.style.color='#80A000';"
+>Reload</span>
+</div>
+<span 
+	onclick="hideWindow()" class="windowcloser" 
+	style="position:absolute; top:4px; left:30px;"
+	onMouseout="this.style.backgroundImage='url(images/closer.gif)';"
+	onMouseover="this.style.backgroundImage='url(images/closer_.gif)';"
+></span>
+<img id="toolbar_highlight" 
+	style="position:absolute; left:5px; top:434px;"
+	src="images/tb_highlight.png" border="0px" width="38px" height="38px">
+</body>
+<script>
+	setHighLight(10);
+</script>
+</html>
