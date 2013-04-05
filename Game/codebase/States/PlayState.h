@@ -4,6 +4,7 @@
 #include "State.h"
 #include "..\PhysicsEngine.h"
 
+class Gui;
 class ComponentMessenger;
 class GameObject;
 class PhysicsEngine;
@@ -37,6 +38,8 @@ private:
 	PhysicsEngine*				m_physics_engine;
 	GameObject*					m_sinbad;
 	ComponentMessenger*			m_messenger;
+
+	Gui*						m_gui;
 };
 
 #endif // _PLAY_STATE_H_

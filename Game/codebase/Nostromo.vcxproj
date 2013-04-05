@@ -39,7 +39,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
     <IntDir>..\obj\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)_d</TargetName>
     <OutDir>..\run\bin\debug\</OutDir>
@@ -91,6 +91,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BillboardGUI.cpp" />
     <ClCompile Include="BubbleAdventure.cpp" />
     <ClCompile Include="BtOgre.cpp" />
     <ClCompile Include="Components\ComponentMessenger.cpp" />
@@ -98,6 +99,7 @@
     <ClCompile Include="Components\GameObject.cpp" />
     <ClCompile Include="Components\PlayerController.cpp" />
     <ClCompile Include="Core.cpp" />
+    <ClCompile Include="Gui.cpp" />
     <ClCompile Include="InputSystem.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Managers\InputManager.cpp" />
@@ -112,6 +114,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BillboardGUI.h" />
     <ClInclude Include="BubbleAdventure.h" />
     <ClInclude Include="BtOgreExtras.h" />
     <ClInclude Include="BtOgreGP.h" />
@@ -124,6 +127,7 @@
     <ClInclude Include="Components\PlayerController.h" />
     <ClInclude Include="Convert.h" />
     <ClInclude Include="Core.h" />
+    <ClInclude Include="Gui.h" />
     <ClInclude Include="InputPrereq.h" />
     <ClInclude Include="InputSystem.h" />
     <ClInclude Include="Managers\InputManager.h" />

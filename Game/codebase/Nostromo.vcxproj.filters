@@ -31,6 +31,12 @@
     <Filter Include="Source Files\Components">
       <UniqueIdentifier>{116edac0-f4d7-49c4-a806-263d58bb1f4b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\GUI">
+      <UniqueIdentifier>{dc0b9e1f-8a84-46dd-bf3a-a148b1a0756a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GUI">
+      <UniqueIdentifier>{08dbbceb-b08d-47d0-b7e7-389f25c4eabb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -82,6 +88,12 @@
       <Filter>Source Files\Components</Filter>
     </ClCompile>
     <ClCompile Include="BubbleAdventure.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BillboardGUI.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Gui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -159,6 +171,12 @@
       <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="BubbleAdventure.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BillboardGUI.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Gui.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

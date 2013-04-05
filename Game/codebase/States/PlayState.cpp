@@ -7,6 +7,7 @@
 #include "..\Components\Components.h"
 #include "..\Components\ComponentMessenger.h"
 #include "..\Components\PlayerController.h"
+#include "..\Gui.h"
 
 PlayState::PlayState(void) : m_physics_engine(NULL){}
 PlayState::~PlayState(void){}
@@ -16,6 +17,8 @@ void PlayState::Enter(){
 	m_physics_engine = new PhysicsEngine;
 	m_physics_engine->Init();
 	m_physics_engine->SetDebugDraw(m_scene_manager);
+	m_gui = new Gui;
+	m_gui->createGui(m_scene_manager);
 	m_camera = m_scene_manager->createCamera("Camera");
 	m_camera->setPosition(Ogre::Vector3(0,0,50));
 	m_camera->lookAt(Ogre::Vector3(0,0,0));
@@ -93,6 +96,8 @@ void PlayState::Enter(){
 	}*/
 	m_physics_engine->ShowDebugDraw(false);
 	m_scene_manager->setSkyDome(true, "Examples/CloudySky");
+
+
 }
 
 void PlayState::Exit(){
