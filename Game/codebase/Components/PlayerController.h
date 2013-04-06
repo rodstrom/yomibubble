@@ -6,7 +6,7 @@
 class InputManager;
 class PlayerController : public Component, public IComponentUpdateable, public IComponentObserver{
 public:
-	PlayerController(void){}
+	PlayerController(void){ m_type = COMPONENT_PLAYER_CONTROLLER; }
 	virtual ~PlayerController(void){}
 	virtual void Update(float deltatime);
 	virtual void Notify(int type, void* message);

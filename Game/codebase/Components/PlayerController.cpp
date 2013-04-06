@@ -42,7 +42,7 @@ void PlayerController::Update(float deltatime){
 		m_messenger->Notify(MSG_ANIMATION_PAUSE, &msg);
 	}
 
-	if (m_input_manager->IsButtonPressed(BTN_A)){
+	/*if (m_input_manager->IsButtonPressed(BTN_A)){
 		AnimationMsg msg;
 		msg.index = 1;
 		msg.id = "RunTop";
@@ -53,7 +53,7 @@ void PlayerController::Update(float deltatime){
 		msg.index = 1;
 		msg.id = "1";
 		m_messenger->Notify(MSG_ANIMATION_PAUSE, &msg);
-	}
+	}*/
 
 }
 

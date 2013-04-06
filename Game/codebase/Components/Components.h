@@ -4,10 +4,10 @@
 #include "ComponentsPrereq.h"
 #include "..\BtOgrePG.h"
 
-class Transform : public Component, public IComponentObserver{
+class TransformComponent : public Component, public IComponentObserver{
 public:
-	Transform(void) : m_position(Ogre::Vector3::ZERO), m_orientation(Ogre::Quaternion::IDENTITY), m_scale(Ogre::Vector3::UNIT_SCALE){}
-	virtual ~Transform(void){}
+	TransformComponent(void) : m_position(Ogre::Vector3::ZERO), m_orientation(Ogre::Quaternion::IDENTITY), m_scale(Ogre::Vector3::UNIT_SCALE){ m_type = COMPONENT_TRANSFORM; }
+	virtual ~TransformComponent(void){}
 	virtual void Notify(int type, void* message);
 
 	const Ogre::Vector3& GetPosition() const { return m_position; }
@@ -22,10 +22,10 @@ protected:
 	Ogre::Quaternion	m_orientation;
 };
 
-class Renderer : public Component, public IComponentObserver {
+class RenderComponent : public Component, public IComponentObserver {
 public:
-	Renderer(void) : m_node(NULL), m_entity(NULL), m_scene_manager(NULL){}
-	virtual ~Renderer(void){}
+	RenderComponent(void) : m_node(NULL), m_entity(NULL), m_scene_manager(NULL){ m_type = COMPONENT_RENDERER; }
+	virtual ~RenderComponent(void){}
 	virtual void Notify(int type, void* message);
 	virtual void Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager);
 	Ogre::SceneNode* GetSceneNode() const { return m_node; }
@@ -39,10 +39,10 @@ protected:
 	Ogre::SceneManager* m_scene_manager;
 };
 
-class Animation : public Renderer, public IComponentUpdateable{
+class AnimationComponent : public RenderComponent, public IComponentUpdateable{
 public:
-	Animation(void){}
-	virtual ~Animation(void){}
+	AnimationComponent(void){ m_type = COMPONENT_ANIMATION; }
+	virtual ~AnimationComponent(void){}
 	virtual void Update(float deltatime);
 	virtual void Notify(int type, void* message);
 	virtual void Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager);
@@ -55,14 +55,15 @@ protected:
 };
 
 class PhysicsEngine;
-class Rigidbody : public Component, public IComponentObserver{
+class RigidbodyComponent : public Component, public IComponentObserver{
 public:
-	Rigidbody(void) : m_rigidbody(NULL), m_rigidbody_state(NULL), m_shape(NULL){}
-	virtual ~Rigidbody(void){}
+	RigidbodyComponent(void) : m_rigidbody(NULL), m_rigidbody_state(NULL), m_shape(NULL){ m_type = COMPONENT_RIGIDBODY; }
+	virtual ~RigidbodyComponent(void){}
 	virtual void Notify(int type, void* message);
-	virtual void Init(Ogre::Entity* entity, Ogre::SceneNode* node, PhysicsEngine* physics_engine);
+	virtual void Init(Ogre::Entity* entity, Ogre::SceneNode* node, PhysicsEngine* physics_engine, btScalar p_mass, int collider_type);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
+	btRigidBody* GetRigidbody() { return m_rigidbody; }
 
 protected:
 	btRigidBody*			m_rigidbody;
@@ -71,10 +72,10 @@ protected:
 	PhysicsEngine*			m_physics_engine;
 };
 
-class Collider : public Component, public IComponentObserver{
+class ColliderComponent : public Component, public IComponentObserver{
 public:
-	Collider(void){}
-	virtual ~Collider(void){}
+	ColliderComponent(void){ m_type = COMPONENT_COLLIDER; }
+	virtual ~ColliderComponent(void){}
 	virtual void Notify(int type, void* message){}
 	virtual void Shut(){}
 	virtual void SetMessenger(ComponentMessenger* messenger){}

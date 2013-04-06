@@ -2,7 +2,9 @@
 #include "GameObject.h"
 #include "Components.h"
 
-GameObject::GameObject(void){}
+GameObject::GameObject(void){
+	m_messenger = new ComponentMessenger;
+}
 GameObject::~GameObject(void){}
 
 void GameObject::Update(float deltatime){
@@ -26,6 +28,8 @@ Component* GameObject::GetComponent(int type){
 
 void GameObject::AddComponent(Component* component){
 	m_components.push_back(component);
+	component->SetOwner(this);
+	component->SetMessenger(m_messenger);
 }
 
 void GameObject::AddUpdateable(IComponentUpdateable* updateable){
@@ -44,5 +48,15 @@ void GameObject::Shut(){
 		}
 		m_components.clear();
 	}
+	if (m_messenger){
+		delete m_messenger;
+		m_messenger = NULL;
+	}
 }
 
+bool GameObject::DoUpdate(){
+	if (!m_updateables.empty()){
+		return true;
+	}
+	return false;
+}

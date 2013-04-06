@@ -1,12 +1,13 @@
 #include "..\stdafx.h"
 #include "PlayState.h"
 #include "..\Managers\InputManager.h"
-#include "..\InputSystem.h"
+//#include "..\InputSystem.h"
 #include "..\PhysicsEngine.h"
-#include "..\Components\GameObject.h"
+#include "..\Managers\GameObjectManager.h"
+/*#include "..\Components\GameObject.h"
 #include "..\Components\Components.h"
 #include "..\Components\ComponentMessenger.h"
-#include "..\Components\PlayerController.h"
+#include "..\Components\PlayerController.h"*/
 
 PlayState::PlayState(void) : m_physics_engine(NULL){}
 PlayState::~PlayState(void){}
@@ -23,6 +24,10 @@ void PlayState::Enter(){
 	Ogre::Viewport* viewport = m_render_window->addViewport(m_camera);
 	viewport->setBackgroundColour(Ogre::ColourValue(0.0,0.0,1.0));
 	m_camera->setAspectRatio(Ogre::Real(viewport->getActualWidth()) / Ogre::Real(viewport->getActualHeight()));
+	m_game_object_manager = new GameObjectManager;
+	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager);
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(0,0,0), NULL);
+
 	Ogre::Light* light = m_scene_manager->createLight("light1");
 	light->setType(Ogre::Light::LT_DIRECTIONAL);
 	light->setDirection(Ogre::Vector3(1,-1,0));
@@ -39,7 +44,7 @@ void PlayState::Enter(){
 	m_plane_body = new btRigidBody(0, m_ground_motion_state, m_plane_shape, btVector3(0,0,0));
 	m_physics_engine->AddRigidBody(m_plane_body);
 
-	m_messenger = new ComponentMessenger;
+	/*m_messenger = new ComponentMessenger;
 	m_sinbad = new GameObject;
 
 	Animation* renderer = new Animation;
@@ -47,7 +52,7 @@ void PlayState::Enter(){
 	renderer->SetOwner(m_sinbad);
 	renderer->SetMessenger(m_messenger);
 	renderer->Init("sinbad.mesh", m_scene_manager);
-	renderer->AddAnimationStates(2);
+	renderer->AddAnimationStates(1);
 	m_sinbad->AddComponent(renderer);
 	m_sinbad->AddUpdateable(renderer);
 	Rigidbody* body = new Rigidbody;
@@ -67,7 +72,7 @@ void PlayState::Enter(){
 	transform->SetType(COMPONENT_NONE);
 	transform->SetOwner(m_sinbad);
 	transform->SetMessenger(m_messenger);
-	m_sinbad->AddComponent(transform);
+	m_sinbad->AddComponent(transform);*/
 
 	/*Ogre::Vector3 pos = Ogre::Vector3(0,200,0);
 	Ogre::Quaternion rot = Ogre::Quaternion::IDENTITY;
@@ -110,11 +115,11 @@ void PlayState::Exit(){
 	m_plane_shape->getMeshInterface();
 	delete m_plane_shape;
 
-	m_sinbad->Shut();
+	/*m_sinbad->Shut();
 	delete m_sinbad;
 	m_sinbad = NULL;
 	delete m_messenger;
-	m_messenger = NULL;
+	m_messenger = NULL;*/
 
 	m_physics_engine->CloseDebugDraw();
 	m_physics_engine->Shut();
@@ -124,12 +129,10 @@ void PlayState::Exit(){
 	m_scene_manager = NULL;
 }
 
-bool PlayState::frameStarted(const Ogre::FrameEvent& evt){
-	return true;
-}
+
 
 bool PlayState::frameRenderingQueued(const Ogre::FrameEvent& evt){
-	m_sinbad->Update(evt.timeSinceLastFrame);
+	m_game_object_manager->Update(evt.timeSinceLastFrame);
 	float cameraMovementSpeed = 50.0f;
 	Ogre::Vector3 translateCamera(0,0,0);
 	if (m_input_manager->IsButtonDown(BTN_W))
