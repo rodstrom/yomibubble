@@ -1,0 +1,238 @@
+<html>
+<head>
+<script type="text/javascript" src="Navi.js"></script>
+<script>
+ function hideWindow() {
+	var nHideData = new NaviData("qbCloseData");
+	nHideData.send();
+	delete nHideData;
+ }
+ function changeBrushSize(size) {
+	var nBrushSizeData = new NaviData("brushSizeData");
+	nBrushSizeData.add({brushsize: size});
+	nBrushSizeData.send();
+	delete nBrushSizeData;
+ }
+  function changePressure(press) {
+	var nPressureData = new NaviData("pressureData");
+	nPressureData.add({pressure: press});
+	nPressureData.send();
+	delete nPressureData;
+ }
+  function changeBrush(brush) {
+	switch (brush) {
+		case "01": bn=1;
+			break;
+		case "02": bn=2;
+			break;
+		case "03": bn=3;
+			break;
+		case "04": bn=4;
+			break;
+		case "05": bn=5;
+			break;
+		case "06": bn=6;
+			break;
+		case "07": bn=7;
+			break;
+		case "08": bn=8;
+			break;
+		case "09": bn=9;
+			break;
+		case "10": bn=10;
+			break;
+		default: bn=1;			
+	}
+	selectBrush("brush_"+bn);
+	var nBrushData = new NaviData("brushData");
+	nBrushData.add({brush: brush});
+	nBrushData.send();
+	delete nBrushData;
+ }
+ function selectBrush(brush) {
+	for (a=1;a<=10;a++) {
+		document.getElementById("brush_"+a).style.border="1px solid #CCCCCC;";
+	}
+	document.getElementById(brush).style.border="1px solid #A0C000;";
+ }
+ function hlSize(n) {
+	document.getElementById("s"+n).style.background="#204000;";
+ }
+ function clSizes() {
+	for(a=1;a<=12;a++) {
+		document.getElementById("s"+a).style.background="transparent;";
+	}
+ }
+  function hlPrss(n) {
+	document.getElementById("p"+n).style.background="#204000;";
+ }
+ function clPrss() {
+	for(a=1;a<=12;a++) {
+		document.getElementById("p"+a).style.background="transparent;";
+	}
+ }
+</script>
+<link rel="stylesheet" type="text/css" href="styles_collar.css">
+<link rel="stylesheet" type="text/css" href="quickbrush.css">
+</head>
+<body style="margin:0px">
+<div align="left" id="ctrl_body">
+<table class="uibar" width="250px" height="20px" border="0px" cellspacing="0px" cellpadding="0px">
+<tr>
+	<td align="left" valign="center" style="width:150px; height:20px; padding-left:20px;" nowrap>
+		<font class="uibarlink"> Q U I C K B R U S H - M E N U</font>
+	</td>
+	<td align="right" width="73px" style="padding-right:5px;" nowrap>
+		<span onclick="javascript:document.location.href='quickbrush.html?'+Math.random()"  
+			 class="ctrlText" style="color: #404040;"
+			 onmouseup="this.style.color='#404040';" 
+			 onmousedown="this.style.color='#406000';" 
+			 onmouseout="this.style.color='#404040';" 
+			 onmouseover="this.style.color='#80A000';"
+		>[ Reload ]</span>	
+	</td>
+	<td align="right" width="25px">
+		<span 
+			onclick="hideWindow()" class="windowcloser" 
+			onMouseout="this.style.backgroundImage='url(images/closer.gif)';"
+			onMouseover="this.style.backgroundImage='url(images/closer_.gif)';"
+		></span>		
+	</td>
+</tr>
+</table>
+<table class="qbtable" border="0px" cellspacing="0px" cellpadding="0px">
+<tr>
+	<td align="left" valign="middle" style="padding:2px;" colspan="2">
+		<font class="small" style="color:#a0c000;">Brushsize:</font><br>
+	</td>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span id="s1" onclick="javascript:changeBrushSize(10);" onmousedown="hlSize(1);" onmouseup="clSizes();" class="qblink">10</span>
+	</td>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span id="s2" onclick="javascript:changeBrushSize(25);" onmousedown="hlSize(2);" onmouseup="clSizes();" class="qblink">25</span>
+	</td>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span id="s3" onclick="javascript:changeBrushSize(50);" onmousedown="hlSize(3);" onmouseup="clSizes();" class="qblink">50</span>
+	</td>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span id="s4" onclick="javascript:changeBrushSize(75);" onmousedown="hlSize(4);" onmouseup="clSizes();" class="qblink">75</span>
+	</td>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span id="s5" onclick="javascript:changeBrushSize(100);" onmousedown="hlSize(5);" onmouseup="clSizes();" class="qblink">100</span>
+	</td>
+</tr>
+<tr>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span id="s6" onclick="javascript:changeBrushSize(125);" onmousedown="hlSize(6);" onmouseup="clSizes();" class="qblink">125</span>
+	</td>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span id="s7" onclick="javascript:changeBrushSize(150);" onmousedown="hlSize(7);" onmouseup="clSizes();" class="qblink">150</span>
+	</td>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span id="s8" onclick="javascript:changeBrushSize(175);" onmousedown="hlSize(8);" onmouseup="clSizes();" class="qblink">175</span>
+	</td>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span id="s9" onclick="javascript:changeBrushSize(200);" onmousedown="hlSize(9);" onmouseup="clSizes();" class="qblink">200</span>
+	</td>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span id="s10" onclick="javascript:changeBrushSize(250);" onmousedown="hlSize(10);" onmouseup="clSizes();" class="qblink">250</span>
+	</td>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span id="s11" onclick="javascript:changeBrushSize(300);" onmousedown="hlSize(11);" onmouseup="clSizes();" class="qblink">300</span>
+	</td>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span id="s12" onclick="javascript:changeBrushSize(500);" onmousedown="hlSize(12);" onmouseup="clSizes();" class="qblink">500</span>
+	</td>	
+</tr>
+</table>
+<table class="qbtable" border="0px" cellspacing="0px" cellpadding="0px">
+<tr>
+	<td align="left" valign="middle" style="padding:2px;" colspan="2">
+		<font class="small" style="color:#a0c000;">Pressure:</font><br>
+	</td>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span id="p1" onclick="javascript:changePressure(0.002);" onmousedown="hlPrss(1);" onmouseup="clPrss();" class="qblink">10%</span>
+	</td>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span id="p2" onclick="javascript:changePressure(0.004);" onmousedown="hlPrss(2);" onmouseup="clPrss();" class="qblink">20%</span>
+	</td>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span id="p3" onclick="javascript:changePressure(0.006);" onmousedown="hlPrss(3);" onmouseup="clPrss();" class="qblink">30%</span>
+	</td>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span id="p4" onclick="javascript:changePressure(0.008);" onmousedown="hlPrss(4);" onmouseup="clPrss();" class="qblink">40%</span>
+	</td>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span id="p5" onclick="javascript:changePressure(0.010);" onmousedown="hlPrss(5);" onmouseup="clPrss();" class="qblink">50%</span>
+	</td>
+</tr>
+<tr>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span id="p6" onclick="javascript:changePressure(0.012);" onmousedown="hlPrss(6);" onmouseup="clPrss();" class="qblink">60%</span>
+	</td>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span id="p7" onclick="javascript:changePressure(0.014);" onmousedown="hlPrss(7);" onmouseup="clPrss();" class="qblink">70%</span>
+	</td>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span id="p8" onclick="javascript:changePressure(0.016);" onmousedown="hlPrss(8);" onmouseup="clPrss();" class="qblink">80%</span>
+	</td>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span id="p9" onclick="javascript:changePressure(0.018);" onmousedown="hlPrss(9);" onmouseup="clPrss();" class="qblink">90%</span>
+	</td>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span id="p10" onclick="javascript:changePressure(0.020);" onmousedown="hlPrss(10);" onmouseup="clPrss();" class="qblink">100%</span>
+	</td>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span id="p11" onclick="javascript:changePressure(0.030);" onmousedown="hlPrss(11);" onmouseup="clPrss();" class="qblink">150%</span>
+	</td>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span id="p12" onclick="javascript:changePressure(0.040);" onmousedown="hlPrss(12);" onmouseup="clPrss();" class="qblink">200%</span>
+	</td>	
+</tr>
+</table>
+<table class="qbtable" border="0px" cellspacing="0px" cellpadding="0px">
+<tr>
+	<td align="left" valign="middle" style="padding:2px;padding-right:0px;" rowspan="2">
+		<font class="small" style="color:#a0c000;">Brushes:</font><br>
+	</td>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span onclick="javascript:changeBrush('01');" class="qbbrush"><img id="brush_1" src="brush_01.png" width="25px" height="25px" class="brushimg"></span>
+	</td>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span onclick="javascript:changeBrush('02');" class="qbbrush"><img id="brush_2" src="brush_02.png" width="25px" height="25px" class="brushimg"></span>
+	</td>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span onclick="javascript:changeBrush('03');" class="qbbrush"><img id="brush_3" src="brush_03.png" width="25px" height="25px" class="brushimg"></span>
+	</td>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span onclick="javascript:changeBrush('04');" class="qbbrush"><img id="brush_4" src="brush_04.png" width="25px" height="25px" class="brushimg"></span>
+	</td>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span onclick="javascript:changeBrush('05');" class="qbbrush"><img id="brush_5" src="brush_05.png" width="25px" height="25px" class="brushimg"></span>
+	</td>	
+</tr>
+<tr>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span onclick="javascript:changeBrush('06');" class="qbbrush"><img id="brush_6" src="brush_06.png" width="25px" height="25px" class="brushimg"></span>
+	</td>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span onclick="javascript:changeBrush('07');" class="qbbrush"><img id="brush_7" src="brush_07.png" width="25px" height="25px" class="brushimg"></span>
+	</td>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span onclick="javascript:changeBrush('08');" class="qbbrush"><img id="brush_8" src="brush_08.png" width="25px" height="25px" class="brushimg"></span>
+	</td>
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span onclick="javascript:changeBrush('09');" class="qbbrush"><img id="brush_9" src="brush_09.png" width="25px" height="25px" class="brushimg"></span>
+	</td>	
+	<td align="left" valign="top" style="border:1px dotted #cccccc">
+		<span onclick="javascript:changeBrush('10');" class="qbbrush"><img id="brush_10" src="brush_10.png" width="25px" height="25px" class="brushimg"></span>
+	</td>	
+</tr>
+</table>
+<div class="hintbox" align="center">
+<font class="ctrlHint">[Ctrl+Arrows] rotate, [Space] random, <br> [Ctrl+Space] flip</font><br>	
+</div>
+<br>
+</div>
+</body>
+</html>

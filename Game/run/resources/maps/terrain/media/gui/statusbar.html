@@ -1,0 +1,85 @@
+<html>
+<head>
+<script type="text/javascript" src="Navi.js"></script>
+<script>
+ function selector(choice) {
+	choice += "_tc";
+	var nSelectorData = new NaviData("tcSelectorData");
+	nSelectorData.add({selector: choice});
+	nSelectorData.send();
+	delete nSelectorData;
+ }
+ function start_highlight(value) {
+	var nHighLightData = new NaviData("sbHighLightData");
+	nHighLightData.add({value: value});
+	nHighLightData.send();
+	delete nHighLightData; 
+ }
+</script>
+<link rel="stylesheet" type="text/css" href="styles_collar.css">
+<link rel="stylesheet" type="text/css" href="statusbar.css">
+<style type="text/css">
+			body
+			{
+				overflow-y: hidden;
+				overflow-x: hidden;
+				margin: 2px;
+				margin-top: 18px; 
+				width:636px;
+				height: 44px;
+				background-color: #303030;
+				font-family: Verdana, Arial;
+				font-size:7pt;
+				color: #FFFFFF;
+			}
+			.small
+			{
+				font-family: Verdana, Arial;
+				font-size:6pt;
+				font-weight:bold;
+				color: #FFFFFF;
+			}
+</style>
+<body>
+<span class="start_button" 
+	onclick="selector('projectmanager');" 
+	id="start" 
+	onmouseup="this.className='start_button_h';" 
+	onmousedown="this.className='start_button_a';" 
+	onmouseout="this.className='start_button';" 
+	onmouseover="this.className='start_button_h';"
+></span>
+<div id="mode" class="ctrlText" style="color:#00CCFF; position:absolute; top:20px; left:78px;">Idle</div>
+<div id="FPSo" class="ctrlText" style="position:absolute; top:34px; left:78px;">FPS: <span id="FPS" class="ctrlText">00</span></div>
+<div id="polycounto" class="ctrlText" style="position:absolute; top:48px; left:78px;">Tris: <span id="polycount" class="ctrlText"><br></span></div>
+
+<div id="speed" class="ctrlText" style="position:absolute; top:20px; left:154px;">Speed: 320</div>
+<div id="gravity" class="ctrlText" style="position:absolute; top:34px; left:154px;">Gravity: Off</div>
+<div id="steprate" class="ctrlText" style="position:absolute; top:48px; left:154px;">StepRate: 1</div>
+
+<div id="Xo" class="ctrlText" style="position:absolute; top:20px; left:244px;">X: <span id="X" class="ctrlText">00000.00</span></div>
+<div id="Yo" class="ctrlText" style="position:absolute; top:34px; left:244px;">Y: <span id="Y" class="ctrlText">00000.00</span></div>
+<div id="Zo" class="ctrlText" style="position:absolute; top:48px; left:244px;">Z: <span id="Z" class="ctrlText">00000.00</span></div>
+
+<div id="rotation" class="ctrlText" style="position:absolute; top:20px; left:324px;">BrushRotation: <span id="BrushRotation" class="ctrlText">0.0</span></div>
+<div id="pressure" class="ctrlText" style="position:absolute; top:34px; left:324px;">BrushPressure: <span id="BrushPressure" class="ctrlText">50</span></div>
+<div id="toolsize" class="ctrlText" style="position:absolute; top:48px; left:324px;">BrushSize: <span id="BrushSize" class="ctrlText">8</span></div>
+
+<img onclick="selector('quickbrush');" style="position:absolute; top:24px; left:454px; border:1px #a0c000 solid;" id="selectedBrush" src="brush_01.png" width="32px" height="32px" border="0px">
+<img onclick="selector('texturestudio');" style="position:absolute; top:24px; left:514px; border:1px #a0c000 solid;" id="selectedTexture" src="splatting0.png" width="32px" height="32px" border="0px">
+<img onclick="selector('colorpicker');" style="position:absolute; top:32px; left:587px; border:1px #a0c000 solid; background-color:#ffffff;" id="selectedBgColor" src="images/dot.gif" width="24px" height="24px" border="0px">
+<img onclick="selector('colorpicker');" style="position:absolute; top:24px; left:574px; border:1px #a0c000 solid; background-color:#000000;" id="selectedColor" src="images/dot.gif" width="24px" height="24px" border="0px">
+<span onclick="javascript:document.location.href='statusbar.html?'+Math.random()"  
+ style="font-size:6pt; color: #404040; position:absolute; left:674px; top:54px;"
+ class="ctrlText" 
+ onmouseup="this.style.color='#404040';" 
+ onmousedown="this.style.color='#406000';" 
+ onmouseout="this.style.color='#404040';" 
+ onmouseover="this.style.color='#80A000';"
+>Reload</span>
+</div>
+</body>
+<script>
+
+</script>
+</html>

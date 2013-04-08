@@ -91,8 +91,6 @@ void PlayState::Enter(){
 		std::string line = astate->getAnimationName();
 		std::cout << line << "\n";
 	}*/
-	m_physics_engine->ShowDebugDraw(false);
-	m_scene_manager->setSkyDome(true, "Examples/CloudySky");
 	
 	m_cam_node = m_scene_manager->getRootSceneNode()->createChildSceneNode("camNode");
 	m_cam_node->attachObject(m_camera);
@@ -101,6 +99,9 @@ void PlayState::Enter(){
 	mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, m_cam_node, m_camera, "../../resources/maps/terrain/");
 	 // load a zone
 	mArtifexLoader->loadZone("demo");
+
+	m_physics_engine->ShowDebugDraw(false);
+	m_scene_manager->setSkyDome(true, "Examples/CloudySky");
 }
 
 void PlayState::Exit(){

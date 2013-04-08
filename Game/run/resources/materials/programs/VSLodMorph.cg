@@ -1,0 +1,32 @@
+    void terrain_vp(
+	    float4 position : POSITION,
+	    float2 uv1   	: TEXCOORD0,
+	    /*float2 uv2   	: TEXCOORD1,
+	    float2 uv3   	: TEXCOORD2,
+	    float2 uv4   	: TEXCOORD3,*/
+	    float delta     : BLENDWEIGHT,
+
+	    out float4 oPosition : POSITION,
+	    out float2 oUv1		 : TEXCOORD0,
+	    out float2 oUv2		 : TEXCOORD1,
+	    out float2 oUv3		 : TEXCOORD2,
+	    out float2 oUv4		 : TEXCOORD3,
+	    uniform float splatScaleX,
+	    uniform float splatScaleZ,
+	    uniform float4x4 worldViewProj,
+	    uniform float morphFactor
+	    )
+    {
+	    position.y = position.y + (delta.x * morphFactor);
+	    oPosition = mul(worldViewProj, position);
+	    oUv1 = uv1;
+	    oUv2 = uv1;
+	    oUv3 = uv1;
+	    oUv4 = uv1;
+	    oUv2.x *= splatScaleX;
+	    oUv2.y *= splatScaleZ;
+	    oUv3.x *= splatScaleX;
+	    oUv3.y *= splatScaleZ;
+	    oUv4.x *= splatScaleX;
+	    oUv4.y *= splatScaleZ;
+    }

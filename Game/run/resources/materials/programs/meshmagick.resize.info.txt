@@ -1,0 +1,14 @@
+meshmagick transform -resize=s/30/s name.04.mesh
+
+hang.bridge.01.mesh = 40
+highlanderhouse.01.mesh = 75
+plant.02.mesh = 15
+plant.03.mesh = 5
+tower.01.mesh = 200
+tree.05.mesh = 50
+tree.07.mesh = 70
+tree.09.mesh = 90
+rock.05.mesh = 30
+rock.07.mesh = 50
+
+10 units = 1 meter

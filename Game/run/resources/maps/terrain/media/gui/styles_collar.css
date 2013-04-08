@@ -1,0 +1,497 @@
+			.ctrlgroup {
+				border:1px #002010 solid; 
+				font-size:8pt;
+				line-height:10px;
+				padding:10px;
+			}
+			.windowcloser {
+				border: 1px solid #102000;
+				border-bottom: 1px solid #203000;
+				border-right: 1px solid #203000;
+				
+				display:block;
+				padding:0px;				
+				width: 12px;
+				height: 12px;
+				background-image: url(images/closer.gif);
+				background-repeat: no-repeat;
+				background-position:-1px -1px;
+			}		
+			.setbutton {
+				text-align: left;
+				letter-spacing: 0.05em;
+				padding: 0px;
+				padding-left:3px;
+				padding-top: -1px;
+				width:30px;
+				height:10px;
+				display:block;
+				background:url(images/button_black_150.jpg);
+				background-position: 0px -5px;
+				font-family: Arial;
+				font-size:7pt;
+				font-weight: bolder;
+				color: #CCCCCC;							
+				border:1px solid #406000;
+				border-right: 1px solid #303030;
+				border-bottom: 1px solid #303030;
+				padding-top:1px;
+				padding-bottom:1px;
+			}	
+			span { cursor: pointer; }
+			.border1 {
+				border-right:1px solid #204000; 
+				border-bottom:1px solid #204000; 
+				border-left:1px dotted #406000;
+				border-top:1px dotted #406000;
+			}
+			.border2 {
+				border-left:1px solid #305000; 
+				border-top:1px solid #305000; 
+				border-right:1px dotted #608000;
+				border-bottom:1px dotted #608000;
+			}
+			
+			.uiButtonSlim {
+				background:url(images/button_slim.jpg) no-repeat;
+				color: #ffffff;
+				font-family: arial;
+				font-size: 6pt;
+				padding: 5px;
+				padding-top: 4px;
+				padding-bottom: 2px;
+				margin: 1px;
+				border-right:1px solid #204000; 
+				border-bottom:1px solid #204000; 
+				border-left:1px solid #608000;
+				border-top:1px solid #608000;
+			}
+			.uiButtonSlimDn {
+				background:url(images/button_slim_dn.jpg) no-repeat;
+				color: #404040;
+				font-family: arial;
+				font-size: 6pt;
+				padding: 5px;
+				padding-top: 4px;
+				padding-bottom: 2px;
+				margin: 1px;
+				border-right:1px solid #102000; 
+				border-bottom:1px solid #102000; 
+				border-left:1px solid #304000;
+				border-top:1px solid #304000;
+			}			
+			
+			.helptable
+			{
+				font-family: Verdana, Arial;
+				font-size:6pt;
+				font-weight:bold;
+				color: #A0B020;
+			}
+			.uitext
+			{
+				font-family: Verdana, Arial;
+				font-size:7pt;
+			}
+			.uplink {
+				font-family: Verdana, Arial;
+				font-size:7pt;
+				font-weight: bold;
+				text-decoration: none;
+				color: #A0CC00;
+			}
+			.uplink:hover {
+				text-decoration: underline;
+			}
+			.colorfield {
+				padding:2px;
+				border:1px dotted #cccccc;
+			}
+			.uibar {
+				width: 150px;
+				height: 16px;
+				background-image:url(images/button_black_150.jpg);
+				background-repeat: no-repeat;
+				background-position: 0px -2px;
+			}
+			.uibarlink {
+				text-decoration:none;
+				font-family: Arial;
+				font-size:6pt;
+				color:#cccccc;
+			}
+			.uibarlink:hover {
+				color:#ffffff;
+			}
+			.uibarlink:active {
+				color:#808080;
+			}
+			.filenamebox
+			{
+				border:1px solid #404040;			
+				border-bottom: 1px solid #303030;
+				border-right: 1px solid #303030;
+				padding: 2px;
+				font-family: Arial;
+				font-size:7pt;
+				font-weight:bold;
+				color: #FFFFFF;
+				background-color:#102000;
+				width:175px;
+				height:17px;
+				text-align: left;
+			}	
+			.sliderbox
+			{
+				border:1px dotted #A0B020;			
+				padding:1px;
+				font-family: Arial;
+				font-size:7pt;
+				font-weight:bold;
+				color: #FFFFFF;
+				background-color:#102000;
+				width:25px;
+				height:15px;
+				text-align: right;
+			}	
+			.reload_button{
+				width:auto;
+				height:16px;
+				display:block;
+				background-image:url(images/button_black_150.jpg);
+				background-position: -75px -3px;
+				background-color: black;
+				font-family: Arial;
+				font-size:6pt;
+				color: #CCCCCC;							
+				border:1px solid #404040;			
+				border-right: 1px solid #303030;
+				border-bottom: 1px solid #303030;
+				padding-left:1px;
+				padding-right:2px;
+			}
+			.reload_button_h{
+				width:auto;
+				height:16px;
+				display:block;
+				background-image:url(images/button_black_150.jpg);
+				background-position: -75px -3px;
+				font-family: Arial;
+				font-size:6pt;
+				color: #CCCCCC;							
+				border:1px solid #6080A0;			
+				border-right: 1px solid #305070;
+				border-bottom: 1px solid #305070;
+				padding-left:1px;
+				padding-right:2px;
+			}
+			.reload_button_a{
+				width:auto;
+				height:16px;
+				display:block;
+				background-image:url(images/button_black_150.jpg);
+				background-position: -75px -3px;
+				font-family: Arial;
+				font-size:6pt;
+				color: #CCCCCC;							
+				border:1px solid #406080;			
+				border-left: 1px solid #204060;
+				border-top: 1px solid #204060;
+				padding-left:1px;
+				padding-right:2px;
+			}
+			.button2{
+				width:75px;
+				height:13px;
+				display:block;
+				background-image:url(images/button_black_150.jpg);
+				background-position: 0px -3px;
+				font-family: Arial;
+				font-size:6pt;
+				color: #CCCCCC;							
+				border:1px solid #404040;			
+				border-right: 1px solid #303030;
+				border-bottom: 1px solid #303030;
+				padding-top:3px;
+			}
+			.button2_h{
+				width:75px;
+				height:13px;
+				display:block;
+				background-image:url(images/button_black_150.jpg);
+				background-position: 0px -3px;
+				font-family: Arial;
+				font-size:6pt;				
+				padding-top:3px;
+				color: #A0C020;
+				border:1px solid #6080A0;			
+				border-right: 1px solid #305070;
+				border-bottom: 1px solid #305070;
+			}	
+			.button2_a{
+				width:75px;
+				height:13px;
+				display:block;
+				background-image:url(images/button_black_150.jpg);
+				background-position: 0px -3px;
+				font-family: Arial;
+				font-size:6pt;				
+				padding-top:3px;
+				color: #608000;
+				border:1px solid #406080;			
+				border-left: 1px solid #204060;
+				border-top: 1px solid #204060;
+			}	
+			.lightblue {
+				font-family: Arial;
+				font-size:7pt;
+				font-weight:bold;
+				color: #00CCFF;			
+			}
+			.mediumlime {
+				font-family: Arial;
+				font-size:7pt;
+				font-weight:bold;
+				color: #AACC20;			
+			}
+			.checkbox
+			{
+				border:1px solid #404040;			
+				border-right: 1px solid #303030;
+				border-bottom: 1px solid #303030;
+				padding:2px;
+				padding-left: 20px;
+				font-family: Arial;
+				font-size:7pt;
+				font-weight:bold;
+				color: #00CCFF;
+				background-color:#102000;
+				width:106px; 
+				height:10px;
+				margin:0px;	
+				//text-align: right;
+				cursor: pointer;
+				background-image:url(images/option_o.png);
+				background-position: 5px 0px;
+				background-repeat: no-repeat;		
+			}
+			.inputbox
+			{
+				border:1px solid #404040;			
+				border-right: 1px solid #303030;
+				border-bottom: 1px solid #303030;
+				padding:1px;
+				font-family: Arial;
+				font-size:7pt;
+				font-weight:bold;
+				color: #FFFFFF;
+				background-color:#102000;
+				width:130px;
+				height:16px;
+			}
+			.inputtd {
+				padding-top:3px; 
+				padding-bottom: 0px;
+				
+				padding-left:10px; 
+				padding-right:10px;
+			}
+			.numbox
+			{
+				border:1px solid #404040;			
+				border-right: 1px solid #303030;
+				border-bottom: 1px solid #303030;
+				padding:1px;
+				font-family: Arial;
+				font-size:7pt;
+				font-weight:bold;
+				color: #FFFFFF;
+				background-color:#102000;
+				width:60px;
+				height:11px;
+				text-align: right;
+			}
+			.ctrlbody
+			{
+				border:1px dotted #A0B020;
+				border-top:1px solid #204000;				
+				padding:0px;
+				font-family: Arial;
+				font-size:8pt;
+				font-weight:bold;
+				color: #FFFFFF;
+				//background-color:#102000;
+				background-color: black;
+			}	
+			.uiLink {
+				font-family: VERDANA;
+				font-size:7pt;
+				color: #A0B020;
+				font-weight:bold;
+				text-decoration:none;
+			}
+			.uiLink:hover {
+				text-decoration:none;
+				color: #A0C000;
+			}
+			.ctrlText {
+				font-family: VERDANA;
+				font-size:7pt;
+				color: #A0B020;
+				font-weight:bold;			
+			}
+			.ctrlTextWhite {
+				font-family: VERDANA;
+				font-size:7pt;
+				color: #CCCCCC;
+				font-weight:bold;			
+			}			
+			.requestbar {
+				width:76px;
+				height:12px;
+				display:block;
+				background:url(images/button_black_150.jpg);
+				font-family: Arial;
+				font-size:6pt;
+				color: #CCCCCC;				
+				padding-top:4px;
+				background-position:0px -2px; 
+				text-align:center
+			}			
+			.button {
+				width:75px;
+				height:13px;
+				display:block;
+				background:url(images/button_black_150.jpg);
+				font-family: Arial;
+				font-size:6pt;
+				color: #CCCCCC;							
+				border:1px dotted #406000;
+				padding-top:3px;
+			}
+			.button:hover {
+				color: #608000;
+			}
+			.ctrlHint {
+				font-family: VERDANA;
+				font-size:7pt;
+				color: #406000;			
+			}			
+			#bgColor {
+				background-color:#ffffff;
+			}
+			#fgColor {				
+				background-color:#000000;
+			}
+			.uiLinkBlock {
+				border-top:1px dotted #A0B020;
+				display:block;
+				background-image:url(images/button_bottom.jpg);
+				background-repeat: no-repeat;
+				width: 138px;
+				height: 10px;
+				padding:6px;
+				font-family:Arial;
+				font-size:6pt;
+				color: #A0B020;
+				font-weight:bold;
+				text-decoration:none;
+				text-align:center;
+			}
+			.uiLinkBlock:hover {
+				text-decoration:none;
+				color: #A0C000;
+			}
+			.uiLinkBlock:active {
+				text-decoration:none;
+				color: #406000;
+			}
+			.logo {
+				text-decoration:none;
+				font-family: Arial;
+				font-size:6pt;
+				color:#A0C000;
+			}
+			.uiSwitch {
+				cursor: pointer;				
+				border-bottom:1px dotted #406000;
+				display:block;
+				background-image:url(images/option_o.png);
+				background-repeat: no-repeat;
+				width: 120px;
+				height: auto;
+				padding:1px;
+				font-family:Arial;
+				font-size:7pt;
+				color: #cccccc;
+				font-weight:bold;
+				text-decoration:none;
+				text-align:right;
+				margin:0px;
+				margin-bottom:2px;
+			}		
+			.uiSwitch:hover {
+				color:#ffffff;				
+			}
+			
+			.uiSwitchBox {
+				font-family: Verdana, Arial;
+				width:110;
+				height:152px;
+				font-size:7pt;
+				//font-weight:bold;
+				color: #FFFFFF;
+				background-color: #000000;
+			}
+			.uiSwitchBoxItem{
+				cursor: pointer;				
+				display:block;
+				background-image:url(images/option_o.png);
+				background-repeat: no-repeat;
+				width: 120px;
+				height: auto;
+				padding:1px;
+				padding-left: 15px;
+				font-family:Arial;
+				font-size:7pt;
+				color: #cccccc;
+				font-weight:bold;
+				text-decoration:none;
+				text-align:left;
+				margin:0px;
+				margin-bottom:2px;
+			}	
+			.uiMsgBox {
+				text-align:center;
+				vertical-align: center;
+				height:49px;
+				width:348px;
+				position:absolute; top:18px; left:0px;	
+				font-family: Arial;
+				font-size:7pt;
+				line-height: 12.5px;				
+				color: #00B0D0;
+				background: black;
+				font-weight:bold;
+				padding: 4px;				
+				margin: 1px;
+				border:1px solid #404040;			
+				border-right: 1px solid #303030;
+				border-bottom: 1px solid #303030;
+			}
+			.filterbutton {
+				text-align: left;
+				letter-spacing: 1px;
+				padding: 0px;
+				padding-left:5px;
+				width:30px;
+				height:13px;
+				display:block;
+				background:url(images/button_black_150.jpg);
+				font-family: Arial;
+				font-size:6pt;
+				color: #CCCCCC;							
+				border:1px dotted #406000;
+				padding-top:3px;
+			}				
+			

@@ -1,626 +1,468 @@
-15:49:30: Creating resource group General
-15:49:30: Creating resource group Internal
-15:49:30: Creating resource group Autodetect
-15:49:30: SceneManagerFactory for type 'DefaultSceneManager' registered.
-15:49:30: Registering ResourceManager for type Material
-15:49:30: Registering ResourceManager for type Mesh
-15:49:30: Registering ResourceManager for type Skeleton
-15:49:30: MovableObjectFactory for type 'ParticleSystem' registered.
-15:49:30: OverlayElementFactory for type Panel registered.
-15:49:30: OverlayElementFactory for type BorderPanel registered.
-15:49:30: OverlayElementFactory for type TextArea registered.
-15:49:30: Registering ResourceManager for type Font
-15:49:30: ArchiveFactory for archive type FileSystem registered.
-15:49:30: ArchiveFactory for archive type Zip registered.
-15:49:30: ArchiveFactory for archive type EmbeddedZip registered.
-15:49:30: DDS codec registering
-15:49:30: FreeImage version: 3.15.3
-15:49:31: This program uses FreeImage, a free, open source image library supporting all common bitmap formats. See http://freeimage.sourceforge.net for details
-15:49:31: Supported formats: bmp,ico,jpg,jif,jpeg,jpe,jng,koa,iff,lbm,mng,pbm,pbm,pcd,pcx,pgm,pgm,png,ppm,ppm,ras,tga,targa,tif,tiff,wap,wbmp,wbm,psd,cut,xbm,xpm,gif,hdr,g3,sgi,exr,j2k,j2c,jp2,pfm,pct,pict,pic,3fr,arw,bay,bmq,cap,cine,cr2,crw,cs1,dc2,dcr,drf,dsc,dng,erf,fff,ia,iiq,k25,kc2,kdc,mdc,mef,mos,mrw,nef,nrw,orf,pef,ptx,pxn,qtk,raf,raw,rdc,rw2,rwl,rwz,sr2,srf,srw,sti
-15:49:31: Registering ResourceManager for type HighLevelGpuProgram
-15:49:31: Registering ResourceManager for type Compositor
-15:49:31: MovableObjectFactory for type 'Entity' registered.
-15:49:31: MovableObjectFactory for type 'Light' registered.
-15:49:31: MovableObjectFactory for type 'BillboardSet' registered.
-15:49:31: MovableObjectFactory for type 'ManualObject' registered.
-15:49:31: MovableObjectFactory for type 'BillboardChain' registered.
-15:49:31: MovableObjectFactory for type 'RibbonTrail' registered.
-15:49:31: Loading library .\RenderSystem_Direct3D9_d
-15:49:31: Installing plugin: D3D9 RenderSystem
-15:49:31: D3D9 : Direct3D9 Rendering Subsystem created.
-15:49:31: D3D9: Driver Detection Starts
-15:49:31: D3D9: Driver Detection Ends
-15:49:31: Plugin successfully installed
-15:49:31: Loading library .\RenderSystem_GL_d
-15:49:31: Installing plugin: GL RenderSystem
-15:49:31: OpenGL Rendering Subsystem created.
-15:49:31: Plugin successfully installed
-15:49:31: Loading library .\Plugin_ParticleFX_d
-15:49:31: Installing plugin: ParticleFX
-15:49:31: Particle Emitter Type 'Point' registered
-15:49:31: Particle Emitter Type 'Box' registered
-15:49:31: Particle Emitter Type 'Ellipsoid' registered
-15:49:31: Particle Emitter Type 'Cylinder' registered
-15:49:31: Particle Emitter Type 'Ring' registered
-15:49:31: Particle Emitter Type 'HollowEllipsoid' registered
-15:49:31: Particle Affector Type 'LinearForce' registered
-15:49:31: Particle Affector Type 'ColourFader' registered
-15:49:31: Particle Affector Type 'ColourFader2' registered
-15:49:31: Particle Affector Type 'ColourImage' registered
-15:49:32: Particle Affector Type 'ColourInterpolator' registered
-15:49:32: Particle Affector Type 'Scaler' registered
-15:49:32: Particle Affector Type 'Rotator' registered
-15:49:32: Particle Affector Type 'DirectionRandomiser' registered
-15:49:32: Particle Affector Type 'DeflectorPlane' registered
-15:49:32: Plugin successfully installed
-15:49:32: Loading library .\Plugin_PCZSceneManager_d
-15:49:32: Installing plugin: Portal Connected Zone Scene Manager
-15:49:32: PCZone Factory Type 'ZoneType_Default' registered
-15:49:32: Plugin successfully installed
-15:49:32: Loading library .\Plugin_OctreeZone_d
-15:49:32: Installing plugin: Octree Zone Factory
-15:49:32: Plugin successfully installed
-15:49:32: Loading library .\Plugin_OctreeSceneManager_d
-15:49:32: Installing plugin: Octree Scene Manager
-15:49:32: Plugin successfully installed
-15:49:32: *-*-* OGRE Initialising
-15:49:32: *-*-* Version 1.8.1 (Byatis)
-15:49:32: Added resource location '../../resources' of type 'FileSystem' to resource group 'General'
-15:49:32: Creating resource group Popular
-15:49:32: Added resource location '../../resources/fonts' of type 'FileSystem' to resource group 'Popular'
-15:49:32: Added resource location '../../resources/materials/programs' of type 'FileSystem' to resource group 'Popular'
-15:49:32: Added resource location '../../resources/materials/scripts' of type 'FileSystem' to resource group 'Popular'
-15:49:32: Added resource location '../../resources/materials/textures' of type 'FileSystem' to resource group 'Popular'
-15:49:32: Added resource location '../../resources/models' of type 'FileSystem' to resource group 'Popular'
-15:49:32: Added resource location '../../resources/terrain' of type 'FileSystem' to resource group 'Popular'
-15:49:32: Added resource location '../../resources/packs/Sinbad.zip' of type 'Zip' to resource group 'Popular'
-15:49:32: Added resource location '../../resources/packs/skybox.zip' of type 'Zip' to resource group 'Popular'
-15:49:32: D3D9 : RenderSystem Option: Full Screen = No
-15:49:32: D3D9 : RenderSystem Option: Video Mode = 800 x 600 @ 32-bit colour
-15:49:32: CPU Identifier & Features
-15:49:32: -------------------------
-15:49:32:  *   CPU ID: GenuineIntel: Intel(R) Core(TM) i7 CPU       Q 720  @ 1.60GHz
-15:49:32:  *      SSE: yes
-15:49:32:  *     SSE2: yes
-15:49:32:  *     SSE3: yes
-15:49:32:  *      MMX: yes
-15:49:32:  *   MMXEXT: yes
-15:49:32:  *    3DNOW: no
-15:49:32:  * 3DNOWEXT: no
-15:49:32:  *     CMOV: yes
-15:49:32:  *      TSC: yes
-15:49:32:  *      FPU: yes
-15:49:32:  *      PRO: yes
-15:49:32:  *       HT: no
-15:49:32: -------------------------
-15:49:32: D3D9 : Subsystem Initialising
-15:49:32: Registering ResourceManager for type Texture
-15:49:32: Registering ResourceManager for type GpuProgram
-15:49:32: D3D9RenderSystem::_createRenderWindow "Yomi's Bubble Adventure", 800x600 windowed  miscParams: FSAA=0 FSAAHint= colourDepth=32 gamma=false monitorIndex=0 useNVPerfHUD=false vsync=true vsyncInterval=1 
-15:49:32: D3D9 : Created D3D9 Rendering Window 'Yomi's Bubble Adventure' : 800x600, 32bpp
-15:49:32: D3D9: Vertex texture format supported - PF_FLOAT16_RGB
-15:49:32: D3D9: Vertex texture format supported - PF_FLOAT16_RGBA
-15:49:32: D3D9: Vertex texture format supported - PF_FLOAT32_RGB
-15:49:32: D3D9: Vertex texture format supported - PF_FLOAT32_RGBA
-15:49:32: D3D9: Vertex texture format supported - PF_FLOAT16_R
-15:49:32: D3D9: Vertex texture format supported - PF_FLOAT32_R
-15:49:32: D3D9: Vertex texture format supported - PF_FLOAT16_GR
-15:49:32: D3D9: Vertex texture format supported - PF_FLOAT32_GR
-15:49:32: RenderSystem capabilities
-15:49:32: -------------------------
-15:49:32: RenderSystem Name: Direct3D9 Rendering Subsystem
-15:49:32: GPU Vendor: nvidia
-15:49:32: Device Name: Monitor-1-NVIDIA GeForce GT 330M
-15:49:32: Driver Version: 9.18.13.697
-15:49:32:  * Fixed function pipeline: yes
-15:49:32:  * Hardware generation of mipmaps: yes
-15:49:32:  * Texture blending: yes
-15:49:32:  * Anisotropic texture filtering: yes
-15:49:32:  * Dot product texture operation: yes
-15:49:32:  * Cube mapping: yes
-15:49:32:  * Hardware stencil buffer: yes
-15:49:32:    - Stencil depth: 8
-15:49:32:    - Two sided stencil support: yes
-15:49:32:    - Wrap stencil values: yes
-15:49:32:  * Hardware vertex / index buffers: yes
-15:49:32:  * Vertex programs: yes
-15:49:32:  * Number of floating-point constants for vertex programs: 256
-15:49:32:  * Number of integer constants for vertex programs: 16
-15:49:32:  * Number of boolean constants for vertex programs: 16
-15:49:32:  * Fragment programs: yes
-15:49:32:  * Number of floating-point constants for fragment programs: 224
-15:49:32:  * Number of integer constants for fragment programs: 16
-15:49:32:  * Number of boolean constants for fragment programs: 16
-15:49:32:  * Geometry programs: no
-15:49:32:  * Number of floating-point constants for geometry programs: 0
-15:49:32:  * Number of integer constants for geometry programs: 8
-15:49:32:  * Number of boolean constants for geometry programs: 0
-15:49:32:  * Supported Shader Profiles: hlsl ps_1_1 ps_1_2 ps_1_3 ps_1_4 ps_2_0 ps_2_a ps_2_b ps_2_x ps_3_0 vs_1_1 vs_2_0 vs_2_a vs_2_x vs_3_0
-15:49:32:  * Texture Compression: yes
-15:49:32:    - DXT: yes
-15:49:32:    - VTC: no
-15:49:32:    - PVRTC: no
-15:49:32:  * Scissor Rectangle: yes
-15:49:32:  * Hardware Occlusion Query: yes
-15:49:32:  * User clip planes: yes
-15:49:32:  * VET_UBYTE4 vertex element type: yes
-15:49:32:  * Infinite far plane projection: yes
-15:49:32:  * Hardware render-to-texture: yes
-15:49:32:  * Floating point textures: yes
-15:49:32:  * Non-power-of-two textures: yes
-15:49:32:  * Volume textures: yes
-15:49:32:  * Multiple Render Targets: 4
-15:49:32:    - With different bit depths: yes
-15:49:32:  * Point Sprites: yes
-15:49:32:  * Extended point parameters: yes
-15:49:32:  * Max Point Size: 8192
-15:49:32:  * Vertex texture fetch: yes
-15:49:32:  * Number of world matrices: 0
-15:49:32:  * Number of texture units: 8
-15:49:32:  * Stencil buffer depth: 8
-15:49:32:  * Number of vertex blend matrices: 0
-15:49:32:    - Max vertex textures: 4
-15:49:32:    - Vertex textures shared: no
-15:49:32:  * Render to Vertex Buffer : no
-15:49:32:  * DirectX per stage constants: yes
-15:49:32: ***************************************
-15:49:32: *** D3D9 : Subsystem Initialised OK ***
-15:49:32: ***************************************
-15:49:32: DefaultWorkQueue('Root') initialising on thread 014957E8.
-15:49:32: DefaultWorkQueue('Root')::WorkerFunc - thread 0155EEF8 starting.
-15:49:32: DefaultWorkQueue('Root')::WorkerFunc - thread 0155EEB8 starting.
-15:49:32: DefaultWorkQueue('Root')::WorkerFunc - thread 015625C8 starting.
-15:49:32: DefaultWorkQueue('Root')::WorkerFunc - thread 01563028 starting.
-15:49:32: DefaultWorkQueue('Root')::WorkerFunc - thread 01565D68 starting.
-15:49:32: DefaultWorkQueue('Root')::WorkerFunc - thread 01562C18 starting.
-15:49:32: DefaultWorkQueue('Root')::WorkerFunc - thread 01567188 starting.
-15:49:32: DefaultWorkQueue('Root')::WorkerFunc - thread 01566828 starting.
-15:49:32: Particle Renderer Type 'billboard' registered
-15:49:32: SceneManagerFactory for type 'PCZSceneManager' registered.
-15:49:32: MovableObjectFactory for type 'PCZLight' registered.
-15:49:32: MovableObjectFactory for type 'Portal' registered.
-15:49:32: MovableObjectFactory for type 'AntiPortal' registered.
-15:49:33: PCZone Factory Type 'ZoneType_Octree' registered
-15:49:33: SceneManagerFactory for type 'OctreeSceneManager' registered.
-15:49:33: Parsing scripts for resource group Autodetect
-15:49:33: Finished parsing scripts for resource group Autodetect
-15:49:33: Creating resources for group Autodetect
-15:49:33: All done
-15:49:33: Parsing scripts for resource group General
-15:49:33: Finished parsing scripts for resource group General
-15:49:33: Creating resources for group General
-15:49:33: All done
-15:49:33: Parsing scripts for resource group Internal
-15:49:33: Finished parsing scripts for resource group Internal
-15:49:33: Creating resources for group Internal
-15:49:33: All done
-15:49:33: Parsing scripts for resource group Popular
-15:49:33: Parsing script Examples.material
-15:49:33: Parsing script Penguin.material
-15:49:33: Parsing script Sinbad.material
-15:49:33: Parsing script sample.fontdef
-15:49:33: Finished parsing scripts for resource group Popular
-15:49:33: Creating resources for group Popular
-15:49:33: All done
-15:49:33: Creating resource group BtOgre
-15:49:33: Texture: BeachStones.jpg: Loading 1 faces(PF_R8G8B8,512x512x1) Internal format is PF_X8R8G8B8,512x512x1.
-15:49:49: Texture: clouds.jpg: Loading 1 faces(PF_R8G8B8,256x256x1) Internal format is PF_X8R8G8B8,256x256x1.
-15:49:49: Creating resource group ETM
-15:49:49: Added resource location '../../resources/maps/terrain/demo' of type 'FileSystem' to resource group 'ETM'
-15:49:49: Initialising resource group ETM
-15:49:49: Parsing scripts for resource group ETM
-15:49:49: Parsing script ETShader.program
-15:49:50: Parsing script ETTerrain.material
-15:49:50: Finished parsing scripts for resource group ETM
-15:49:50: Creating resources for group ETM
-15:49:50: All done
-15:49:51: Texture: ETSplatting0: Loading 1 faces(PF_R8G8B8,1024x1024x1) Internal format is PF_X8R8G8B8,1024x1024x1.
-15:49:51: Texture: ETSplatting1: Loading 1 faces(PF_R8G8B8,1024x1024x1) Internal format is PF_X8R8G8B8,1024x1024x1.
-15:49:51: Texture: ETSplatting2: Loading 1 faces(PF_R8G8B8,1024x1024x1) Internal format is PF_X8R8G8B8,1024x1024x1.
-15:49:53: Texture: ArtifexTerra3D_ColourMap: Loading 1 faces(PF_R8G8B8,2048x2048x1) Internal format is PF_X8R8G8B8,2048x2048x1.
-15:49:53: Texture: Splatting0: Loading 1 faces(PF_R8G8B8,1024x1024x1) Internal format is PF_X8R8G8B8,1024x1024x1.
-15:49:54: Texture: Splatting1: Loading 1 faces(PF_R8G8B8,1024x1024x1) Internal format is PF_X8R8G8B8,1024x1024x1.
-15:49:54: Texture: Splatting2: Loading 1 faces(PF_R8G8B8,1024x1024x1) Internal format is PF_X8R8G8B8,1024x1024x1.
-15:49:55: Texture: Splatting3: Loading 1 faces(PF_R8G8B8,1024x1024x1) Internal format is PF_X8R8G8B8,1024x1024x1.
-15:49:55: Texture: Splatting4: Loading 1 faces(PF_R8G8B8,1024x1024x1) Internal format is PF_X8R8G8B8,1024x1024x1.
-15:49:56: Texture: Splatting5: Loading 1 faces(PF_R8G8B8,1024x1024x1) Internal format is PF_X8R8G8B8,1024x1024x1.
-15:49:56: Texture: Splatting6: Loading 1 faces(PF_A8R8G8B8,1024x1024x1) Internal format is PF_A8R8G8B8,1024x1024x1.
-15:49:57: Texture: Splatting7: Loading 1 faces(PF_R8G8B8,1024x1024x1) Internal format is PF_X8R8G8B8,1024x1024x1.
-15:49:57: Texture: Splatting8: Loading 1 faces(PF_A8R8G8B8,1024x1024x1) Internal format is PF_A8R8G8B8,1024x1024x1.
-15:49:57: OGRE EXCEPTION(2:InvalidParametersException): Sky box material '_MySky' not found. in SceneManager::setSkyBox at ..\..\..\..\OgreMain\src\OgreSceneManager.cpp (line 1742)
-15:49:57: Can't assign material OUTMaterials/Water.02 to SubEntity of water because this Material does not exist. Have you forgotten to define it in a .material script?
-15:49:57: OGRE EXCEPTION(2:InvalidParametersException): World geometry is not supported by the generic SceneManager. in SceneManager::setWorldGeometry at ..\..\..\..\OgreMain\src\OgreSceneManager.cpp (line 1578)
-15:49:57: Mesh: Loading tree.09.mesh.
-15:49:57: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.09.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:49:58: Mesh: Loading tree.07.mesh.
-15:49:58: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:49:58: Mesh: Loading tree.07.mesh.
-15:49:58: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:49:58: Mesh: Loading tower.01.mesh.
-15:49:58: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tower.01.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:49:58: Mesh: Loading tree.07.mesh.
-15:49:58: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:49:58: Mesh: Loading tree.07.mesh.
-15:49:58: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:49:58: Mesh: Loading tree.07.mesh.
-15:49:58: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:49:58: Mesh: Loading tree.07.mesh.
-15:49:58: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:49:58: Mesh: Loading tree.07.mesh.
-15:49:58: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:49:58: Mesh: Loading plant.03.mesh.
-15:49:58: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource plant.03.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:49:58: Mesh: Loading plant.03.mesh.
-15:49:58: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource plant.03.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:49:59: Mesh: Loading plant.03.mesh.
-15:49:59: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource plant.03.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:49:59: Mesh: Loading plant.03.mesh.
-15:49:59: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource plant.03.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:49:59: Mesh: Loading plant.03.mesh.
-15:49:59: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource plant.03.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:49:59: Mesh: Loading plant.03.mesh.
-15:49:59: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource plant.03.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:49:59: Mesh: Loading tree.07.mesh.
-15:49:59: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:49:59: Mesh: Loading tree.07.mesh.
-15:49:59: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:49:59: Mesh: Loading tree.07.mesh.
-15:49:59: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:49:59: Mesh: Loading tree.07.mesh.
-15:49:59: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:49:59: Mesh: Loading tree.07.mesh.
-15:49:59: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:49:59: Mesh: Loading tree.07.mesh.
-15:50:00: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:00: Mesh: Loading plant.02.mesh.
-15:50:00: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource plant.02.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:00: Mesh: Loading plant.02.mesh.
-15:50:00: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource plant.02.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:00: Mesh: Loading plant.02.mesh.
-15:50:00: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource plant.02.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:00: Mesh: Loading plant.02.mesh.
-15:50:00: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource plant.02.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:00: Mesh: Loading plant.02.mesh.
-15:50:00: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource plant.02.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:00: Mesh: Loading plant.02.mesh.
-15:50:00: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource plant.02.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:00: Mesh: Loading plant.02.mesh.
-15:50:00: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource plant.02.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:00: Mesh: Loading plant.02.mesh.
-15:50:00: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource plant.02.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:00: Mesh: Loading plant.02.mesh.
-15:50:00: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource plant.02.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:01: Mesh: Loading plant.02.mesh.
-15:50:01: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource plant.02.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:01: Mesh: Loading highlanderhouse.01.mesh.
-15:50:01: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource highlanderhouse.01.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:01: Mesh: Loading hang.bridge.01.mesh.
-15:50:01: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource hang.bridge.01.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:01: Mesh: Loading tree.09.mesh.
-15:50:01: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.09.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:01: Mesh: Loading tree.05.mesh.
-15:50:01: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.05.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:01: Mesh: Loading tree.09.mesh.
-15:50:01: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.09.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:01: Mesh: Loading tree.09.mesh.
-15:50:01: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.09.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:01: Mesh: Loading tree.09.mesh.
-15:50:01: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.09.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:02: Mesh: Loading tree.09.mesh.
-15:50:02: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.09.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:02: Mesh: Loading tree.07.mesh.
-15:50:02: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:02: Mesh: Loading tree.07.mesh.
-15:50:02: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:02: Mesh: Loading tree.07.mesh.
-15:50:02: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:02: Mesh: Loading tree.07.mesh.
-15:50:02: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:02: Mesh: Loading tree.07.mesh.
-15:50:02: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:02: Mesh: Loading tree.07.mesh.
-15:50:02: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:02: Mesh: Loading tree.07.mesh.
-15:50:02: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:02: Mesh: Loading tree.07.mesh.
-15:50:02: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:02: Mesh: Loading tree.07.mesh.
-15:50:02: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:03: Mesh: Loading tree.07.mesh.
-15:50:03: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:03: Mesh: Loading tree.07.mesh.
-15:50:03: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:03: Mesh: Loading tree.07.mesh.
-15:50:03: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:03: Mesh: Loading tree.07.mesh.
-15:50:03: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:03: Mesh: Loading tree.07.mesh.
-15:50:03: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:03: Mesh: Loading tree.07.mesh.
-15:50:03: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:03: Mesh: Loading tree.07.mesh.
-15:50:03: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:03: Mesh: Loading tree.07.mesh.
-15:50:03: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:03: Mesh: Loading tree.07.mesh.
-15:50:03: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:03: Mesh: Loading tree.07.mesh.
-15:50:03: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:03: Mesh: Loading tree.07.mesh.
-15:50:03: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:04: Mesh: Loading tree.07.mesh.
-15:50:04: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:04: Mesh: Loading tree.07.mesh.
-15:50:04: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:04: Mesh: Loading tree.07.mesh.
-15:50:04: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:04: Mesh: Loading tree.07.mesh.
-15:50:04: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:04: Mesh: Loading tree.07.mesh.
-15:50:04: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:04: Mesh: Loading tree.07.mesh.
-15:50:04: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:04: Mesh: Loading tree.07.mesh.
-15:50:04: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:04: Mesh: Loading tree.07.mesh.
-15:50:04: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:04: Mesh: Loading tree.07.mesh.
-15:50:04: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:04: Mesh: Loading tree.07.mesh.
-15:50:04: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:04: Mesh: Loading tree.07.mesh.
-15:50:04: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:04: Mesh: Loading tree.07.mesh.
-15:50:04: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:05: Mesh: Loading tree.07.mesh.
-15:50:05: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:05: Mesh: Loading tree.07.mesh.
-15:50:05: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:05: Mesh: Loading tree.07.mesh.
-15:50:05: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:05: Mesh: Loading tree.07.mesh.
-15:50:05: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:05: Mesh: Loading tree.07.mesh.
-15:50:05: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:05: Mesh: Loading tree.07.mesh.
-15:50:05: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:05: Mesh: Loading tree.07.mesh.
-15:50:05: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:05: Mesh: Loading tree.07.mesh.
-15:50:05: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:05: Mesh: Loading tree.07.mesh.
-15:50:05: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:05: Mesh: Loading tree.07.mesh.
-15:50:05: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:05: Mesh: Loading tree.07.mesh.
-15:50:05: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:05: Mesh: Loading tree.07.mesh.
-15:50:05: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:06: Mesh: Loading tree.07.mesh.
-15:50:06: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:06: Mesh: Loading tree.07.mesh.
-15:50:06: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:06: Mesh: Loading tree.07.mesh.
-15:50:06: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:06: Mesh: Loading tree.07.mesh.
-15:50:06: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:06: Mesh: Loading tree.07.mesh.
-15:50:06: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:06: Mesh: Loading tree.07.mesh.
-15:50:06: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:06: Mesh: Loading tree.07.mesh.
-15:50:06: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:06: Mesh: Loading tree.07.mesh.
-15:50:06: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:06: Mesh: Loading tree.07.mesh.
-15:50:06: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:07: Mesh: Loading tree.07.mesh.
-15:50:07: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:07: Mesh: Loading tree.07.mesh.
-15:50:07: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:07: Mesh: Loading tree.07.mesh.
-15:50:07: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:07: Mesh: Loading tree.07.mesh.
-15:50:07: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:07: Mesh: Loading tree.07.mesh.
-15:50:07: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:07: Mesh: Loading tree.07.mesh.
-15:50:07: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:07: Mesh: Loading tree.07.mesh.
-15:50:07: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:07: Mesh: Loading tree.07.mesh.
-15:50:07: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:08: Mesh: Loading tree.07.mesh.
-15:50:08: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:08: Mesh: Loading tree.07.mesh.
-15:50:08: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:08: Mesh: Loading tree.07.mesh.
-15:50:08: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:08: Mesh: Loading tree.07.mesh.
-15:50:08: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:08: Mesh: Loading tree.07.mesh.
-15:50:08: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:08: Mesh: Loading tree.07.mesh.
-15:50:08: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:08: Mesh: Loading tree.07.mesh.
-15:50:08: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:08: Mesh: Loading tree.07.mesh.
-15:50:08: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:09: Mesh: Loading tree.07.mesh.
-15:50:09: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:09: Mesh: Loading tree.07.mesh.
-15:50:09: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:09: Mesh: Loading tree.07.mesh.
-15:50:09: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:09: Mesh: Loading hang.bridge.01.mesh.
-15:50:09: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource hang.bridge.01.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:09: Mesh: Loading tree.07.mesh.
-15:50:09: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:09: Mesh: Loading tree.07.mesh.
-15:50:09: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:09: Mesh: Loading tree.07.mesh.
-15:50:09: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:09: Mesh: Loading tree.07.mesh.
-15:50:09: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:09: Mesh: Loading tree.07.mesh.
-15:50:09: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:10: Mesh: Loading tree.07.mesh.
-15:50:10: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:10: Mesh: Loading tree.07.mesh.
-15:50:10: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:10: Mesh: Loading tree.07.mesh.
-15:50:10: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:10: Mesh: Loading tower.01.mesh.
-15:50:10: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tower.01.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:10: Mesh: Loading rock.05.mesh.
-15:50:10: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource rock.05.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:10: Mesh: Loading rock.05.mesh.
-15:50:10: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource rock.05.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:10: Mesh: Loading rock.05.mesh.
-15:50:10: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource rock.05.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:10: Mesh: Loading rock.07.mesh.
-15:50:10: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource rock.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:11: Mesh: Loading rock.07.mesh.
-15:50:11: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource rock.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:11: Mesh: Loading rock.05.mesh.
-15:50:11: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource rock.05.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:11: Mesh: Loading rock.05.mesh.
-15:50:11: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource rock.05.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:11: Mesh: Loading rock.05.mesh.
-15:50:11: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource rock.05.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:11: Mesh: Loading rock.05.mesh.
-15:50:11: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource rock.05.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:11: Mesh: Loading tree.07.mesh.
-15:50:11: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:11: Mesh: Loading tree.07.mesh.
-15:50:11: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:11: Mesh: Loading tree.07.mesh.
-15:50:11: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource tree.07.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:12: Mesh: Loading plant.02.mesh.
-15:50:12: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource plant.02.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:12: Mesh: Loading plant.02.mesh.
-15:50:12: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource plant.02.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:12: Mesh: Loading plant.02.mesh.
-15:50:12: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource plant.02.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:12: Mesh: Loading plant.02.mesh.
-15:50:12: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource plant.02.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:12: Mesh: Loading plant.02.mesh.
-15:50:12: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource plant.02.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:12: Mesh: Loading plant.02.mesh.
-15:50:12: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource plant.02.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:12: Mesh: Loading plant.02.mesh.
-15:50:12: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource plant.02.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:12: Mesh: Loading plant.02.mesh.
-15:50:12: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource plant.02.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:13: Mesh: Loading plant.02.mesh.
-15:50:13: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource plant.02.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:13: Mesh: Loading plant.02.mesh.
-15:50:13: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource plant.02.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:13: Mesh: Loading plant.02.mesh.
-15:50:13: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource plant.02.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:13: Mesh: Loading plant.02.mesh.
-15:50:13: OGRE EXCEPTION(6:FileNotFoundException): Cannot locate resource plant.02.mesh in resource group Autodetect or any other group. in ResourceGroupManager::openResource at ..\..\..\..\OgreMain\src\OgreResourceGroupManager.cpp (line 756)
-15:50:14: Texture: BeachStones.jpg: Loading 1 faces(PF_R8G8B8,512x512x1) Internal format is PF_X8R8G8B8,512x512x1.
-15:50:14: Texture: clouds.jpg: Loading 1 faces(PF_R8G8B8,256x256x1) Internal format is PF_X8R8G8B8,256x256x1.
-15:50:14: Texture: spot_shadow_fade.png: Loading 1 faces(PF_R8G8B8,128x128x1) Internal format is PF_X8R8G8B8,128x128x1.
-15:50:14: D3D9 device: 0x[0458EDA0] destroy. Releasing D3D9 texture: BeachStones.jpg
-15:50:14: Released D3D9 texture: BeachStones.jpg
-15:50:14: D3D9 device: 0x[0458EDA0] destroy. Releasing D3D9 texture: clouds.jpg
-15:50:14: Released D3D9 texture: clouds.jpg
-15:50:14: D3D9 device: 0x[0458EDA0] destroy. Releasing D3D9 texture: ETSplatting0
-15:50:14: Released D3D9 texture: ETSplatting0
-15:50:14: D3D9 device: 0x[0458EDA0] destroy. Releasing D3D9 texture: ETSplatting1
-15:50:14: Released D3D9 texture: ETSplatting1
-15:50:14: D3D9 device: 0x[0458EDA0] destroy. Releasing D3D9 texture: ETSplatting2
-15:50:14: Released D3D9 texture: ETSplatting2
-15:50:14: D3D9 device: 0x[0458EDA0] destroy. Releasing D3D9 texture: ArtifexTerra3D_ColourMap
-15:50:14: Released D3D9 texture: ArtifexTerra3D_ColourMap
-15:50:14: D3D9 device: 0x[0458EDA0] destroy. Releasing D3D9 texture: Splatting0
-15:50:14: Released D3D9 texture: Splatting0
-15:50:14: D3D9 device: 0x[0458EDA0] destroy. Releasing D3D9 texture: Splatting1
-15:50:14: Released D3D9 texture: Splatting1
-15:50:14: D3D9 device: 0x[0458EDA0] destroy. Releasing D3D9 texture: Splatting2
-15:50:14: Released D3D9 texture: Splatting2
-15:50:14: D3D9 device: 0x[0458EDA0] destroy. Releasing D3D9 texture: Splatting3
-15:50:14: Released D3D9 texture: Splatting3
-15:50:14: D3D9 device: 0x[0458EDA0] destroy. Releasing D3D9 texture: Splatting4
-15:50:14: Released D3D9 texture: Splatting4
-15:50:14: D3D9 device: 0x[0458EDA0] destroy. Releasing D3D9 texture: Splatting5
-15:50:14: Released D3D9 texture: Splatting5
-15:50:14: D3D9 device: 0x[0458EDA0] destroy. Releasing D3D9 texture: Splatting6
-15:50:14: Released D3D9 texture: Splatting6
-15:50:14: D3D9 device: 0x[0458EDA0] destroy. Releasing D3D9 texture: Splatting7
-15:50:14: Released D3D9 texture: Splatting7
-15:50:14: D3D9 device: 0x[0458EDA0] destroy. Releasing D3D9 texture: Splatting8
-15:50:14: Released D3D9 texture: Splatting8
-15:50:14: D3D9 device: 0x[0458EDA0] destroy. Releasing D3D9 texture: spot_shadow_fade.png
-15:50:14: Released D3D9 texture: spot_shadow_fade.png
-15:50:25: Destroying resource group BtOgre
-15:50:25: Unloading resource group BtOgre
-15:50:25: Finished unloading resource group BtOgre
-15:50:25: DefaultWorkQueue('Root') shutting down on thread 014957E8.
-15:50:25: DefaultWorkQueue('Root')::WorkerFunc - thread 01562C18 stopped.
-15:50:25: DefaultWorkQueue('Root')::WorkerFunc - thread 01563028 stopped.
-15:50:25: DefaultWorkQueue('Root')::WorkerFunc - thread 01567188 stopped.
-15:50:25: DefaultWorkQueue('Root')::WorkerFunc - thread 0155EEB8 stopped.
-15:50:25: DefaultWorkQueue('Root')::WorkerFunc - thread 01566828 stopped.
-15:50:25: DefaultWorkQueue('Root')::WorkerFunc - thread 01565D68 stopped.
-15:50:25: DefaultWorkQueue('Root')::WorkerFunc - thread 0155EEF8 stopped.
-15:50:25: DefaultWorkQueue('Root')::WorkerFunc - thread 015625C8 stopped.
-15:50:25: PCZone Factory Type 'ZoneType_Octree' unregistered
-15:50:25: *-*-* OGRE Shutdown
-15:50:25: Unregistering ResourceManager for type Compositor
-15:50:25: Unregistering ResourceManager for type Font
-15:50:25: Unregistering ResourceManager for type Skeleton
-15:50:25: Unregistering ResourceManager for type Mesh
-15:50:25: Unregistering ResourceManager for type HighLevelGpuProgram
-15:50:25: Uninstalling plugin: Octree Scene Manager
-15:50:25: Plugin successfully uninstalled
-15:50:25: Unloading library .\Plugin_OctreeSceneManager_d
-15:50:25: Uninstalling plugin: Octree Zone Factory
-15:50:25: Plugin successfully uninstalled
-15:50:25: Unloading library .\Plugin_OctreeZone_d
-15:50:25: Uninstalling plugin: Portal Connected Zone Scene Manager
-15:50:25: Plugin successfully uninstalled
-15:50:25: Unloading library .\Plugin_PCZSceneManager_d
-15:50:25: Uninstalling plugin: ParticleFX
-15:50:25: Plugin successfully uninstalled
-15:50:25: Unloading library .\Plugin_ParticleFX_d
-15:50:25: Uninstalling plugin: GL RenderSystem
-15:50:25: *** Stopping Win32GL Subsystem ***
-15:50:25: Plugin successfully uninstalled
-15:50:25: Unloading library .\RenderSystem_GL_d
-15:50:25: Uninstalling plugin: D3D9 RenderSystem
-15:50:25: D3D9 device: 0x[01575160] destroy. Releasing D3D9 texture: ETSplatting0
-15:50:25: Released D3D9 texture: ETSplatting0
-15:50:25: D3D9 device: 0x[01575160] destroy. Releasing D3D9 texture: ETSplatting1
-15:50:25: Released D3D9 texture: ETSplatting1
-15:50:25: D3D9 device: 0x[01575160] destroy. Releasing D3D9 texture: ETSplatting2
-15:50:25: Released D3D9 texture: ETSplatting2
-15:50:25: D3D9 device: 0x[01575160] destroy. Releasing D3D9 texture: ArtifexTerra3D_ColourMap
-15:50:25: Released D3D9 texture: ArtifexTerra3D_ColourMap
-15:50:25: D3D9 device: 0x[01575160] destroy. Releasing D3D9 texture: Splatting0
-15:50:25: Released D3D9 texture: Splatting0
-15:50:25: D3D9 device: 0x[01575160] destroy. Releasing D3D9 texture: Splatting1
-15:50:25: Released D3D9 texture: Splatting1
-15:50:25: D3D9 device: 0x[01575160] destroy. Releasing D3D9 texture: Splatting2
-15:50:25: Released D3D9 texture: Splatting2
-15:50:25: D3D9 device: 0x[01575160] destroy. Releasing D3D9 texture: Splatting3
-15:50:25: Released D3D9 texture: Splatting3
-15:50:25: D3D9 device: 0x[01575160] destroy. Releasing D3D9 texture: Splatting4
-15:50:25: Released D3D9 texture: Splatting4
-15:50:25: D3D9 device: 0x[01575160] destroy. Releasing D3D9 texture: Splatting5
-15:50:25: Released D3D9 texture: Splatting5
-15:50:25: D3D9 device: 0x[01575160] destroy. Releasing D3D9 texture: Splatting6
-15:50:25: Released D3D9 texture: Splatting6
-15:50:25: D3D9 device: 0x[01575160] destroy. Releasing D3D9 texture: Splatting7
-15:50:25: Released D3D9 texture: Splatting7
-15:50:25: D3D9 device: 0x[01575160] destroy. Releasing D3D9 texture: Splatting8
-15:50:25: Released D3D9 texture: Splatting8
-15:50:25: D3D9 : Shutting down cleanly.
-15:50:25: Unregistering ResourceManager for type Texture
-15:50:25: Unregistering ResourceManager for type GpuProgram
-15:50:25: D3D9 : Direct3D9 Rendering Subsystem destroyed.
-15:50:25: Plugin successfully uninstalled
-15:50:25: Unloading library .\RenderSystem_Direct3D9_d
-15:50:25: Unregistering ResourceManager for type Material
+16:19:20: Creating resource group General
+16:19:20: Creating resource group Internal
+16:19:20: Creating resource group Autodetect
+16:19:20: SceneManagerFactory for type 'DefaultSceneManager' registered.
+16:19:20: Registering ResourceManager for type Material
+16:19:20: Registering ResourceManager for type Mesh
+16:19:20: Registering ResourceManager for type Skeleton
+16:19:20: MovableObjectFactory for type 'ParticleSystem' registered.
+16:19:20: OverlayElementFactory for type Panel registered.
+16:19:20: OverlayElementFactory for type BorderPanel registered.
+16:19:20: OverlayElementFactory for type TextArea registered.
+16:19:20: Registering ResourceManager for type Font
+16:19:20: ArchiveFactory for archive type FileSystem registered.
+16:19:20: ArchiveFactory for archive type Zip registered.
+16:19:20: ArchiveFactory for archive type EmbeddedZip registered.
+16:19:20: DDS codec registering
+16:19:20: FreeImage version: 3.15.3
+16:19:20: This program uses FreeImage, a free, open source image library supporting all common bitmap formats. See http://freeimage.sourceforge.net for details
+16:19:20: Supported formats: bmp,ico,jpg,jif,jpeg,jpe,jng,koa,iff,lbm,mng,pbm,pbm,pcd,pcx,pgm,pgm,png,ppm,ppm,ras,tga,targa,tif,tiff,wap,wbmp,wbm,psd,cut,xbm,xpm,gif,hdr,g3,sgi,exr,j2k,j2c,jp2,pfm,pct,pict,pic,3fr,arw,bay,bmq,cap,cine,cr2,crw,cs1,dc2,dcr,drf,dsc,dng,erf,fff,ia,iiq,k25,kc2,kdc,mdc,mef,mos,mrw,nef,nrw,orf,pef,ptx,pxn,qtk,raf,raw,rdc,rw2,rwl,rwz,sr2,srf,srw,sti
+16:19:20: Registering ResourceManager for type HighLevelGpuProgram
+16:19:20: Registering ResourceManager for type Compositor
+16:19:20: MovableObjectFactory for type 'Entity' registered.
+16:19:20: MovableObjectFactory for type 'Light' registered.
+16:19:20: MovableObjectFactory for type 'BillboardSet' registered.
+16:19:20: MovableObjectFactory for type 'ManualObject' registered.
+16:19:20: MovableObjectFactory for type 'BillboardChain' registered.
+16:19:20: MovableObjectFactory for type 'RibbonTrail' registered.
+16:19:20: Loading library .\RenderSystem_Direct3D9_d
+16:19:20: Installing plugin: D3D9 RenderSystem
+16:19:20: D3D9 : Direct3D9 Rendering Subsystem created.
+16:19:20: D3D9: Driver Detection Starts
+16:19:20: D3D9: Driver Detection Ends
+16:19:20: Plugin successfully installed
+16:19:20: Loading library .\RenderSystem_GL_d
+16:19:20: Installing plugin: GL RenderSystem
+16:19:21: OpenGL Rendering Subsystem created.
+16:19:21: Plugin successfully installed
+16:19:21: Loading library .\Plugin_ParticleFX_d
+16:19:21: Installing plugin: ParticleFX
+16:19:21: Particle Emitter Type 'Point' registered
+16:19:21: Particle Emitter Type 'Box' registered
+16:19:21: Particle Emitter Type 'Ellipsoid' registered
+16:19:21: Particle Emitter Type 'Cylinder' registered
+16:19:21: Particle Emitter Type 'Ring' registered
+16:19:21: Particle Emitter Type 'HollowEllipsoid' registered
+16:19:21: Particle Affector Type 'LinearForce' registered
+16:19:21: Particle Affector Type 'ColourFader' registered
+16:19:21: Particle Affector Type 'ColourFader2' registered
+16:19:21: Particle Affector Type 'ColourImage' registered
+16:19:21: Particle Affector Type 'ColourInterpolator' registered
+16:19:21: Particle Affector Type 'Scaler' registered
+16:19:21: Particle Affector Type 'Rotator' registered
+16:19:21: Particle Affector Type 'DirectionRandomiser' registered
+16:19:21: Particle Affector Type 'DeflectorPlane' registered
+16:19:21: Plugin successfully installed
+16:19:21: Loading library .\Plugin_PCZSceneManager_d
+16:19:21: Installing plugin: Portal Connected Zone Scene Manager
+16:19:21: PCZone Factory Type 'ZoneType_Default' registered
+16:19:21: Plugin successfully installed
+16:19:21: Loading library .\Plugin_OctreeZone_d
+16:19:21: Installing plugin: Octree Zone Factory
+16:19:21: Plugin successfully installed
+16:19:21: Loading library .\Plugin_OctreeSceneManager_d
+16:19:21: Installing plugin: Octree Scene Manager
+16:19:21: Plugin successfully installed
+16:19:21: *-*-* OGRE Initialising
+16:19:21: *-*-* Version 1.8.1 (Byatis)
+16:19:21: Added resource location '../../resources' of type 'FileSystem' to resource group 'General'
+16:19:21: Creating resource group Popular
+16:19:21: Added resource location '../../resources/fonts' of type 'FileSystem' to resource group 'Popular'
+16:19:21: Added resource location '../../resources/materials/programs' of type 'FileSystem' to resource group 'Popular'
+16:19:21: Added resource location '../../resources/materials/scripts' of type 'FileSystem' to resource group 'Popular'
+16:19:21: Added resource location '../../resources/materials/textures' of type 'FileSystem' to resource group 'Popular'
+16:19:21: Added resource location '../../resources/models' of type 'FileSystem' to resource group 'Popular'
+16:19:22: Added resource location '../../resources/terrain' of type 'FileSystem' to resource group 'Popular'
+16:19:22: Added resource location '../../resources/packs/Sinbad.zip' of type 'Zip' to resource group 'Popular'
+16:19:22: Added resource location '../../resources/packs/skybox.zip' of type 'Zip' to resource group 'Popular'
+16:19:22: D3D9 : RenderSystem Option: Full Screen = No
+16:19:22: D3D9 : RenderSystem Option: Video Mode = 800 x 600 @ 32-bit colour
+16:19:22: CPU Identifier & Features
+16:19:22: -------------------------
+16:19:22:  *   CPU ID: GenuineIntel: Intel(R) Core(TM) i7 CPU       Q 720  @ 1.60GHz
+16:19:22:  *      SSE: yes
+16:19:22:  *     SSE2: yes
+16:19:22:  *     SSE3: yes
+16:19:22:  *      MMX: yes
+16:19:22:  *   MMXEXT: yes
+16:19:22:  *    3DNOW: no
+16:19:22:  * 3DNOWEXT: no
+16:19:22:  *     CMOV: yes
+16:19:22:  *      TSC: yes
+16:19:22:  *      FPU: yes
+16:19:22:  *      PRO: yes
+16:19:22:  *       HT: no
+16:19:22: -------------------------
+16:19:22: D3D9 : Subsystem Initialising
+16:19:22: Registering ResourceManager for type Texture
+16:19:22: Registering ResourceManager for type GpuProgram
+16:19:22: D3D9RenderSystem::_createRenderWindow "Yomi's Bubble Adventure", 800x600 windowed  miscParams: FSAA=0 FSAAHint= colourDepth=32 gamma=false monitorIndex=0 useNVPerfHUD=false vsync=true vsyncInterval=1 
+16:19:22: D3D9 : Created D3D9 Rendering Window 'Yomi's Bubble Adventure' : 800x600, 32bpp
+16:19:22: D3D9: Vertex texture format supported - PF_FLOAT16_RGB
+16:19:22: D3D9: Vertex texture format supported - PF_FLOAT16_RGBA
+16:19:22: D3D9: Vertex texture format supported - PF_FLOAT32_RGB
+16:19:22: D3D9: Vertex texture format supported - PF_FLOAT32_RGBA
+16:19:22: D3D9: Vertex texture format supported - PF_FLOAT16_R
+16:19:22: D3D9: Vertex texture format supported - PF_FLOAT32_R
+16:19:22: D3D9: Vertex texture format supported - PF_FLOAT16_GR
+16:19:22: D3D9: Vertex texture format supported - PF_FLOAT32_GR
+16:19:22: RenderSystem capabilities
+16:19:22: -------------------------
+16:19:22: RenderSystem Name: Direct3D9 Rendering Subsystem
+16:19:22: GPU Vendor: nvidia
+16:19:22: Device Name: Monitor-1-NVIDIA GeForce GT 330M
+16:19:22: Driver Version: 9.18.13.697
+16:19:22:  * Fixed function pipeline: yes
+16:19:22:  * Hardware generation of mipmaps: yes
+16:19:22:  * Texture blending: yes
+16:19:22:  * Anisotropic texture filtering: yes
+16:19:22:  * Dot product texture operation: yes
+16:19:22:  * Cube mapping: yes
+16:19:22:  * Hardware stencil buffer: yes
+16:19:22:    - Stencil depth: 8
+16:19:22:    - Two sided stencil support: yes
+16:19:22:    - Wrap stencil values: yes
+16:19:22:  * Hardware vertex / index buffers: yes
+16:19:22:  * Vertex programs: yes
+16:19:22:  * Number of floating-point constants for vertex programs: 256
+16:19:22:  * Number of integer constants for vertex programs: 16
+16:19:22:  * Number of boolean constants for vertex programs: 16
+16:19:22:  * Fragment programs: yes
+16:19:22:  * Number of floating-point constants for fragment programs: 224
+16:19:22:  * Number of integer constants for fragment programs: 16
+16:19:22:  * Number of boolean constants for fragment programs: 16
+16:19:22:  * Geometry programs: no
+16:19:22:  * Number of floating-point constants for geometry programs: 0
+16:19:22:  * Number of integer constants for geometry programs: 8
+16:19:22:  * Number of boolean constants for geometry programs: 0
+16:19:22:  * Supported Shader Profiles: hlsl ps_1_1 ps_1_2 ps_1_3 ps_1_4 ps_2_0 ps_2_a ps_2_b ps_2_x ps_3_0 vs_1_1 vs_2_0 vs_2_a vs_2_x vs_3_0
+16:19:22:  * Texture Compression: yes
+16:19:22:    - DXT: yes
+16:19:22:    - VTC: no
+16:19:22:    - PVRTC: no
+16:19:22:  * Scissor Rectangle: yes
+16:19:22:  * Hardware Occlusion Query: yes
+16:19:22:  * User clip planes: yes
+16:19:22:  * VET_UBYTE4 vertex element type: yes
+16:19:22:  * Infinite far plane projection: yes
+16:19:22:  * Hardware render-to-texture: yes
+16:19:22:  * Floating point textures: yes
+16:19:22:  * Non-power-of-two textures: yes
+16:19:22:  * Volume textures: yes
+16:19:22:  * Multiple Render Targets: 4
+16:19:22:    - With different bit depths: yes
+16:19:22:  * Point Sprites: yes
+16:19:22:  * Extended point parameters: yes
+16:19:22:  * Max Point Size: 8192
+16:19:22:  * Vertex texture fetch: yes
+16:19:22:  * Number of world matrices: 0
+16:19:22:  * Number of texture units: 8
+16:19:22:  * Stencil buffer depth: 8
+16:19:22:  * Number of vertex blend matrices: 0
+16:19:22:    - Max vertex textures: 4
+16:19:22:    - Vertex textures shared: no
+16:19:22:  * Render to Vertex Buffer : no
+16:19:22:  * DirectX per stage constants: yes
+16:19:22: ***************************************
+16:19:22: *** D3D9 : Subsystem Initialised OK ***
+16:19:22: ***************************************
+16:19:22: DefaultWorkQueue('Root') initialising on thread 010157E8.
+16:19:22: DefaultWorkQueue('Root')::WorkerFunc - thread 04284AF8 starting.
+16:19:22: DefaultWorkQueue('Root')::WorkerFunc - thread 010DEAD0 starting.
+16:19:22: DefaultWorkQueue('Root')::WorkerFunc - thread 04284AB8 starting.
+16:19:22: DefaultWorkQueue('Root')::WorkerFunc - thread 010DEFA0 starting.
+16:19:22: DefaultWorkQueue('Root')::WorkerFunc - thread 010E2480 starting.
+16:19:22: DefaultWorkQueue('Root')::WorkerFunc - thread 010E21A0 starting.
+16:19:22: Particle Renderer Type 'billboard' registered
+16:19:22: DefaultWorkQueue('Root')::WorkerFunc - thread 010E2AB0 starting.
+16:19:22: DefaultWorkQueue('Root')::WorkerFunc - thread 010E28C0 starting.
+16:19:22: SceneManagerFactory for type 'PCZSceneManager' registered.
+16:19:22: MovableObjectFactory for type 'PCZLight' registered.
+16:19:22: MovableObjectFactory for type 'Portal' registered.
+16:19:22: MovableObjectFactory for type 'AntiPortal' registered.
+16:19:22: PCZone Factory Type 'ZoneType_Octree' registered
+16:19:22: SceneManagerFactory for type 'OctreeSceneManager' registered.
+16:19:22: Parsing scripts for resource group Autodetect
+16:19:22: Finished parsing scripts for resource group Autodetect
+16:19:22: Creating resources for group Autodetect
+16:19:22: All done
+16:19:22: Parsing scripts for resource group General
+16:19:22: Finished parsing scripts for resource group General
+16:19:22: Creating resources for group General
+16:19:22: All done
+16:19:22: Parsing scripts for resource group Internal
+16:19:22: Finished parsing scripts for resource group Internal
+16:19:22: Creating resources for group Internal
+16:19:22: All done
+16:19:22: Parsing scripts for resource group Popular
+16:19:22: Parsing script black2alpha.program
+16:19:22: Parsing script ETShader.program
+16:19:23: Parsing script artifex3d.pointer.02.material
+16:19:23: Parsing script decal.material
+16:19:23: Parsing script ETTerrain.material
+16:19:23: Parsing script Examples.material
+16:19:23: Parsing script grass.material
+16:19:23: Parsing script hang.bridge.01.material
+16:19:23: Parsing script highlander.house.01.material
+16:19:23: Parsing script mysky.material
+16:19:23: Parsing script OUaTWater.01.material
+16:19:23: Parsing script OUaTWater.02.material
+16:19:23: Parsing script Penguin.material
+16:19:23: Parsing script plant.02.material
+16:19:23: Parsing script plant.03.material
+16:19:23: Parsing script rock.05.material
+16:19:23: Parsing script rock.07.material
+16:19:23: Parsing script skybox.material
+16:19:23: Compiler error: reference to a non existing object in skybox.material(46)
+16:19:23: Compiler error: reference to a non existing object in skybox.material(51)
+16:19:23: Parsing script tower.01.material
+16:19:23: Parsing script tree.05.material
+16:19:23: Parsing script tree.07.material
+16:19:23: Parsing script tree.09.material
+16:19:23: Parsing script Sinbad.material
+16:19:24: Parsing script sample.fontdef
+16:19:24: Finished parsing scripts for resource group Popular
+16:19:24: Creating resources for group Popular
+16:19:24: All done
+16:19:24: Creating resource group BtOgre
+16:19:24: Texture: BeachStones.jpg: Loading 1 faces(PF_R8G8B8,512x512x1) Internal format is PF_X8R8G8B8,512x512x1.
+16:19:41: Texture: clouds.jpg: Loading 1 faces(PF_R8G8B8,256x256x1) Internal format is PF_X8R8G8B8,256x256x1.
+16:19:41: Creating resource group ETM
+16:19:41: Added resource location '../../resources/maps/terrain/demo' of type 'FileSystem' to resource group 'ETM'
+16:19:41: Initialising resource group ETM
+16:19:41: Parsing scripts for resource group ETM
+16:19:41: Parsing script ETShader.program
+16:19:41: Parsing script ETTerrain.material
+16:19:41: Finished parsing scripts for resource group ETM
+16:19:41: Creating resources for group ETM
+16:19:41: All done
+16:19:42: Texture: ETSplatting0: Loading 1 faces(PF_R8G8B8,1024x1024x1) Internal format is PF_X8R8G8B8,1024x1024x1.
+16:19:42: Texture: ETSplatting1: Loading 1 faces(PF_R8G8B8,1024x1024x1) Internal format is PF_X8R8G8B8,1024x1024x1.
+16:19:43: Texture: ETSplatting2: Loading 1 faces(PF_R8G8B8,1024x1024x1) Internal format is PF_X8R8G8B8,1024x1024x1.
+16:19:44: Texture: ArtifexTerra3D_ColourMap: Loading 1 faces(PF_R8G8B8,2048x2048x1) Internal format is PF_X8R8G8B8,2048x2048x1.
+16:19:45: Texture: Splatting0: Loading 1 faces(PF_R8G8B8,1024x1024x1) Internal format is PF_X8R8G8B8,1024x1024x1.
+16:19:45: Texture: Splatting1: Loading 1 faces(PF_R8G8B8,1024x1024x1) Internal format is PF_X8R8G8B8,1024x1024x1.
+16:19:46: Texture: Splatting2: Loading 1 faces(PF_R8G8B8,1024x1024x1) Internal format is PF_X8R8G8B8,1024x1024x1.
+16:19:46: Texture: Splatting3: Loading 1 faces(PF_R8G8B8,1024x1024x1) Internal format is PF_X8R8G8B8,1024x1024x1.
+16:19:47: Texture: Splatting4: Loading 1 faces(PF_R8G8B8,1024x1024x1) Internal format is PF_X8R8G8B8,1024x1024x1.
+16:19:47: Texture: Splatting5: Loading 1 faces(PF_R8G8B8,1024x1024x1) Internal format is PF_X8R8G8B8,1024x1024x1.
+16:19:48: Texture: Splatting6: Loading 1 faces(PF_A8R8G8B8,1024x1024x1) Internal format is PF_A8R8G8B8,1024x1024x1.
+16:19:48: Texture: Splatting7: Loading 1 faces(PF_R8G8B8,1024x1024x1) Internal format is PF_X8R8G8B8,1024x1024x1.
+16:19:49: Texture: Splatting8: Loading 1 faces(PF_A8R8G8B8,1024x1024x1) Internal format is PF_A8R8G8B8,1024x1024x1.
+16:19:49: Texture: MySky_fr.bmp: Loading 1 faces(PF_R8G8B8,512x512x1) Internal format is PF_X8R8G8B8,512x512x1.
+16:19:49: Texture: MySky_bk.bmp: Loading 1 faces(PF_R8G8B8,512x512x1) Internal format is PF_X8R8G8B8,512x512x1.
+16:19:49: Texture: MySky_lf.bmp: Loading 1 faces(PF_R8G8B8,512x512x1) Internal format is PF_X8R8G8B8,512x512x1.
+16:19:49: Texture: MySky_rt.bmp: Loading 1 faces(PF_R8G8B8,512x512x1) Internal format is PF_X8R8G8B8,512x512x1.
+16:19:49: Texture: MySky_up.bmp: Loading 1 faces(PF_R8G8B8,512x512x1) Internal format is PF_X8R8G8B8,512x512x1.
+16:19:49: Texture: MySky_dn.bmp: Loading 1 faces(PF_R8G8B8,512x512x1) Internal format is PF_X8R8G8B8,512x512x1.
+16:19:49: D3D9 : Loading 3D Texture, image name : 'NoiseVolume.dds' with 5 mip map levels
+16:19:50: Texture: cloudy_noon_water.jpg: Loading 6 faces(PF_R8G8B8,512x512x1) Internal format is PF_X8R8G8B8,512x512x1.
+16:19:50: OGRE EXCEPTION(2:InvalidParametersException): World geometry is not supported by the generic SceneManager. in SceneManager::setWorldGeometry at ..\..\..\..\OgreMain\src\OgreSceneManager.cpp (line 1578)
+16:19:50: Mesh: Loading tree.09.mesh.
+16:19:50: WARNING: tree.09.mesh is an older format ([MeshSerializer_v1.40]); you should upgrade it as soon as possible using the OgreMeshUpgrade tool.
+16:19:51: Texture: tree.09.png: Loading 1 faces(PF_A8R8G8B8,1024x1024x1) Internal format is PF_A8R8G8B8,1024x1024x1.
+16:19:51: Mesh: Loading tree.07.mesh.
+16:19:51: WARNING: tree.07.mesh is an older format ([MeshSerializer_v1.40]); you should upgrade it as soon as possible using the OgreMeshUpgrade tool.
+16:19:51: Texture: tree.07.png: Loading 1 faces(PF_A8R8G8B8,1024x1024x1) Internal format is PF_A8R8G8B8,1024x1024x1.
+16:19:51: Mesh: Loading tower.01.mesh.
+16:19:52: WARNING: tower.01.mesh is an older format ([MeshSerializer_v1.40]); you should upgrade it as soon as possible using the OgreMeshUpgrade tool.
+16:19:52: Texture: tower.01.jpg: Loading 1 faces(PF_R8G8B8,1024x1024x1) Internal format is PF_X8R8G8B8,1024x1024x1.
+16:19:52: Mesh: Loading plant.03.mesh.
+16:19:52: WARNING: plant.03.mesh is an older format ([MeshSerializer_v1.40]); you should upgrade it as soon as possible using the OgreMeshUpgrade tool.
+16:19:52: Texture: plant.03.02.png: Loading 1 faces(PF_A8R8G8B8,512x569x1) with 5 generated mipmaps from Image. Internal format is PF_A8R8G8B8,512x569x1.
+16:19:53: Texture: plant.03.png: Loading 1 faces(PF_A8R8G8B8,512x569x1) with 5 generated mipmaps from Image. Internal format is PF_A8R8G8B8,512x569x1.
+16:19:53: Mesh: Loading plant.02.mesh.
+16:19:53: WARNING: plant.02.mesh is an older format ([MeshSerializer_v1.40]); you should upgrade it as soon as possible using the OgreMeshUpgrade tool.
+16:19:53: Texture: plant.02.02.png: Loading 1 faces(PF_A8R8G8B8,460x898x1) with 5 generated mipmaps from Image. Internal format is PF_A8R8G8B8,460x898x1.
+16:19:54: Texture: plant.02.png: Loading 1 faces(PF_A8R8G8B8,432x982x1) with 5 generated mipmaps from Image. Internal format is PF_A8R8G8B8,432x982x1.
+16:19:54: Texture: plant.02.03.png: Loading 1 faces(PF_A8R8G8B8,393x891x1) with 5 generated mipmaps from Image. Internal format is PF_A8R8G8B8,393x891x1.
+16:19:54: Mesh: Loading highlanderhouse.01.mesh.
+16:19:54: WARNING: highlanderhouse.01.mesh is an older format ([MeshSerializer_v1.40]); you should upgrade it as soon as possible using the OgreMeshUpgrade tool.
+16:19:55: Texture: highlander.house.01.jpg: Loading 1 faces(PF_R8G8B8,1024x1024x1) Internal format is PF_X8R8G8B8,1024x1024x1.
+16:19:55: Mesh: Loading hang.bridge.01.mesh.
+16:19:55: WARNING: hang.bridge.01.mesh is an older format ([MeshSerializer_v1.40]); you should upgrade it as soon as possible using the OgreMeshUpgrade tool.
+16:19:55: Texture: hang.bridge.01.ropes.png: Loading 1 faces(PF_A8R8G8B8,256x256x1) Internal format is PF_A8R8G8B8,256x256x1.
+16:19:55: Texture: hang.bridge.01.boards.jpg: Loading 1 faces(PF_R8G8B8,256x256x1) Internal format is PF_X8R8G8B8,256x256x1.
+16:19:55: Texture: hang.bridge.01.pole.jpg: Loading 1 faces(PF_R8G8B8,512x512x1) Internal format is PF_X8R8G8B8,512x512x1.
+16:19:55: Texture: hang.bridge.01.pole.end.jpg: Loading 1 faces(PF_R8G8B8,128x128x1) Internal format is PF_X8R8G8B8,128x128x1.
+16:19:55: Mesh: Loading tree.05.mesh.
+16:19:55: WARNING: tree.05.mesh is an older format ([MeshSerializer_v1.40]); you should upgrade it as soon as possible using the OgreMeshUpgrade tool.
+16:19:56: Texture: tree.05.png: Loading 1 faces(PF_A8R8G8B8,512x512x1) Internal format is PF_A8R8G8B8,512x512x1.
+16:19:57: Mesh: Loading rock.05.mesh.
+16:19:57: WARNING: rock.05.mesh is an older format ([MeshSerializer_v1.40]); you should upgrade it as soon as possible using the OgreMeshUpgrade tool.
+16:19:57: Texture: rock.05.png: Loading 1 faces(PF_A8R8G8B8,1024x1024x1) Internal format is PF_A8R8G8B8,1024x1024x1.
+16:19:57: Mesh: Loading rock.07.mesh.
+16:19:57: WARNING: rock.07.mesh is an older format ([MeshSerializer_v1.40]); you should upgrade it as soon as possible using the OgreMeshUpgrade tool.
+16:20:29: Texture: BeachStones.jpg: Loading 1 faces(PF_R8G8B8,512x512x1) Internal format is PF_X8R8G8B8,512x512x1.
+16:20:29: Texture: clouds.jpg: Loading 1 faces(PF_R8G8B8,256x256x1) Internal format is PF_X8R8G8B8,256x256x1.
+16:20:29: Texture: MySky_fr.bmp: Loading 1 faces(PF_R8G8B8,512x512x1) Internal format is PF_X8R8G8B8,512x512x1.
+16:20:29: Texture: MySky_bk.bmp: Loading 1 faces(PF_R8G8B8,512x512x1) Internal format is PF_X8R8G8B8,512x512x1.
+16:20:29: Texture: MySky_lf.bmp: Loading 1 faces(PF_R8G8B8,512x512x1) Internal format is PF_X8R8G8B8,512x512x1.
+16:20:29: Texture: MySky_rt.bmp: Loading 1 faces(PF_R8G8B8,512x512x1) Internal format is PF_X8R8G8B8,512x512x1.
+16:20:29: Texture: MySky_up.bmp: Loading 1 faces(PF_R8G8B8,512x512x1) Internal format is PF_X8R8G8B8,512x512x1.
+16:20:29: Texture: MySky_dn.bmp: Loading 1 faces(PF_R8G8B8,512x512x1) Internal format is PF_X8R8G8B8,512x512x1.
+16:20:29: D3D9 : Loading 3D Texture, image name : 'NoiseVolume.dds' with 5 mip map levels
+16:20:30: Texture: cloudy_noon_water.jpg: Loading 6 faces(PF_R8G8B8,512x512x1) Internal format is PF_X8R8G8B8,512x512x1.
+16:20:31: Texture: tree.09.png: Loading 1 faces(PF_A8R8G8B8,1024x1024x1) Internal format is PF_A8R8G8B8,1024x1024x1.
+16:20:31: Texture: tree.07.png: Loading 1 faces(PF_A8R8G8B8,1024x1024x1) Internal format is PF_A8R8G8B8,1024x1024x1.
+16:20:32: Texture: tower.01.jpg: Loading 1 faces(PF_R8G8B8,1024x1024x1) Internal format is PF_X8R8G8B8,1024x1024x1.
+16:20:32: Texture: plant.03.02.png: Loading 1 faces(PF_A8R8G8B8,512x569x1) with 5 generated mipmaps from Image. Internal format is PF_A8R8G8B8,512x569x1.
+16:20:33: Texture: plant.03.png: Loading 1 faces(PF_A8R8G8B8,512x569x1) with 5 generated mipmaps from Image. Internal format is PF_A8R8G8B8,512x569x1.
+16:20:33: Texture: plant.02.02.png: Loading 1 faces(PF_A8R8G8B8,460x898x1) with 5 generated mipmaps from Image. Internal format is PF_A8R8G8B8,460x898x1.
+16:20:34: Texture: plant.02.png: Loading 1 faces(PF_A8R8G8B8,432x982x1) with 5 generated mipmaps from Image. Internal format is PF_A8R8G8B8,432x982x1.
+16:20:35: Texture: plant.02.03.png: Loading 1 faces(PF_A8R8G8B8,393x891x1) with 5 generated mipmaps from Image. Internal format is PF_A8R8G8B8,393x891x1.
+16:20:36: Texture: highlander.house.01.jpg: Loading 1 faces(PF_R8G8B8,1024x1024x1) Internal format is PF_X8R8G8B8,1024x1024x1.
+16:20:36: Texture: hang.bridge.01.ropes.png: Loading 1 faces(PF_A8R8G8B8,256x256x1) Internal format is PF_A8R8G8B8,256x256x1.
+16:20:36: Texture: hang.bridge.01.boards.jpg: Loading 1 faces(PF_R8G8B8,256x256x1) Internal format is PF_X8R8G8B8,256x256x1.
+16:20:36: Texture: hang.bridge.01.pole.jpg: Loading 1 faces(PF_R8G8B8,512x512x1) Internal format is PF_X8R8G8B8,512x512x1.
+16:20:36: Texture: hang.bridge.01.pole.end.jpg: Loading 1 faces(PF_R8G8B8,128x128x1) Internal format is PF_X8R8G8B8,128x128x1.
+16:20:36: Texture: tree.05.png: Loading 1 faces(PF_A8R8G8B8,512x512x1) Internal format is PF_A8R8G8B8,512x512x1.
+16:20:37: Texture: rock.05.png: Loading 1 faces(PF_A8R8G8B8,1024x1024x1) Internal format is PF_A8R8G8B8,1024x1024x1.
+16:20:46: Texture: spot_shadow_fade.png: Loading 1 faces(PF_R8G8B8,128x128x1) Internal format is PF_X8R8G8B8,128x128x1.
+16:20:47: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: BeachStones.jpg
+16:20:47: Released D3D9 texture: BeachStones.jpg
+16:20:47: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: clouds.jpg
+16:20:47: Released D3D9 texture: clouds.jpg
+16:20:47: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: ETSplatting0
+16:20:47: Released D3D9 texture: ETSplatting0
+16:20:47: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: ETSplatting1
+16:20:47: Released D3D9 texture: ETSplatting1
+16:20:47: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: ETSplatting2
+16:20:47: Released D3D9 texture: ETSplatting2
+16:20:47: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: ArtifexTerra3D_ColourMap
+16:20:47: Released D3D9 texture: ArtifexTerra3D_ColourMap
+16:20:47: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: Splatting0
+16:20:47: Released D3D9 texture: Splatting0
+16:20:47: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: Splatting1
+16:20:47: Released D3D9 texture: Splatting1
+16:20:47: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: Splatting2
+16:20:47: Released D3D9 texture: Splatting2
+16:20:47: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: Splatting3
+16:20:47: Released D3D9 texture: Splatting3
+16:20:47: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: Splatting4
+16:20:47: Released D3D9 texture: Splatting4
+16:20:47: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: Splatting5
+16:20:47: Released D3D9 texture: Splatting5
+16:20:47: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: Splatting6
+16:20:47: Released D3D9 texture: Splatting6
+16:20:47: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: Splatting7
+16:20:47: Released D3D9 texture: Splatting7
+16:20:47: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: Splatting8
+16:20:47: Released D3D9 texture: Splatting8
+16:20:48: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: MySky_fr.bmp
+16:20:48: Released D3D9 texture: MySky_fr.bmp
+16:20:48: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: MySky_bk.bmp
+16:20:48: Released D3D9 texture: MySky_bk.bmp
+16:20:48: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: MySky_lf.bmp
+16:20:48: Released D3D9 texture: MySky_lf.bmp
+16:20:48: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: MySky_rt.bmp
+16:20:48: Released D3D9 texture: MySky_rt.bmp
+16:20:48: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: MySky_up.bmp
+16:20:48: Released D3D9 texture: MySky_up.bmp
+16:20:48: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: MySky_dn.bmp
+16:20:48: Released D3D9 texture: MySky_dn.bmp
+16:20:48: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: NoiseVolume.dds
+16:20:48: Released D3D9 texture: NoiseVolume.dds
+16:20:48: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: cloudy_noon_water.jpg
+16:20:48: Released D3D9 texture: cloudy_noon_water.jpg
+16:20:48: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: tree.09.png
+16:20:48: Released D3D9 texture: tree.09.png
+16:20:48: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: tree.07.png
+16:20:48: Released D3D9 texture: tree.07.png
+16:20:48: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: tower.01.jpg
+16:20:48: Released D3D9 texture: tower.01.jpg
+16:20:48: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: plant.03.02.png
+16:20:48: Released D3D9 texture: plant.03.02.png
+16:20:48: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: plant.03.png
+16:20:48: Released D3D9 texture: plant.03.png
+16:20:48: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: plant.02.02.png
+16:20:48: Released D3D9 texture: plant.02.02.png
+16:20:48: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: plant.02.png
+16:20:48: Released D3D9 texture: plant.02.png
+16:20:48: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: plant.02.03.png
+16:20:48: Released D3D9 texture: plant.02.03.png
+16:20:48: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: highlander.house.01.jpg
+16:20:48: Released D3D9 texture: highlander.house.01.jpg
+16:20:48: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: hang.bridge.01.ropes.png
+16:20:48: Released D3D9 texture: hang.bridge.01.ropes.png
+16:20:48: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: hang.bridge.01.boards.jpg
+16:20:48: Released D3D9 texture: hang.bridge.01.boards.jpg
+16:20:48: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: hang.bridge.01.pole.jpg
+16:20:48: Released D3D9 texture: hang.bridge.01.pole.jpg
+16:20:48: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: hang.bridge.01.pole.end.jpg
+16:20:48: Released D3D9 texture: hang.bridge.01.pole.end.jpg
+16:20:48: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: tree.05.png
+16:20:48: Released D3D9 texture: tree.05.png
+16:20:48: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: rock.05.png
+16:20:48: Released D3D9 texture: rock.05.png
+16:20:48: D3D9 device: 0x[0428DDC0] destroy. Releasing D3D9 texture: spot_shadow_fade.png
+16:20:48: Released D3D9 texture: spot_shadow_fade.png
+16:23:16: Destroying resource group BtOgre
+16:23:16: Unloading resource group BtOgre
+16:23:16: Finished unloading resource group BtOgre
+16:23:16: DefaultWorkQueue('Root') shutting down on thread 010157E8.
+16:23:16: DefaultWorkQueue('Root')::WorkerFunc - thread 04284AB8 stopped.
+16:23:16: DefaultWorkQueue('Root')::WorkerFunc - thread 010E28C0 stopped.
+16:23:16: DefaultWorkQueue('Root')::WorkerFunc - thread 010DEAD0 stopped.
+16:23:16: DefaultWorkQueue('Root')::WorkerFunc - thread 010DEFA0 stopped.
+16:23:16: DefaultWorkQueue('Root')::WorkerFunc - thread 010E2AB0 stopped.
+16:23:16: DefaultWorkQueue('Root')::WorkerFunc - thread 010E2480 stopped.
+16:23:16: DefaultWorkQueue('Root')::WorkerFunc - thread 010E21A0 stopped.
+16:23:16: DefaultWorkQueue('Root')::WorkerFunc - thread 04284AF8 stopped.
+16:23:16: PCZone Factory Type 'ZoneType_Octree' unregistered
+16:23:16: *-*-* OGRE Shutdown
+16:23:16: Unregistering ResourceManager for type Compositor
+16:23:16: Unregistering ResourceManager for type Font
+16:23:16: Unregistering ResourceManager for type Skeleton
+16:23:16: Unregistering ResourceManager for type Mesh
+16:23:16: Unregistering ResourceManager for type HighLevelGpuProgram
+16:23:16: Uninstalling plugin: Octree Scene Manager
+16:23:16: Plugin successfully uninstalled
+16:23:16: Unloading library .\Plugin_OctreeSceneManager_d
+16:23:16: Uninstalling plugin: Octree Zone Factory
+16:23:16: Plugin successfully uninstalled
+16:23:16: Unloading library .\Plugin_OctreeZone_d
+16:23:16: Uninstalling plugin: Portal Connected Zone Scene Manager
+16:23:16: Plugin successfully uninstalled
+16:23:16: Unloading library .\Plugin_PCZSceneManager_d
+16:23:16: Uninstalling plugin: ParticleFX
+16:23:16: Plugin successfully uninstalled
+16:23:16: Unloading library .\Plugin_ParticleFX_d
+16:23:16: Uninstalling plugin: GL RenderSystem
+16:23:16: *** Stopping Win32GL Subsystem ***
+16:23:16: Plugin successfully uninstalled
+16:23:16: Unloading library .\RenderSystem_GL_d
+16:23:16: Uninstalling plugin: D3D9 RenderSystem
+16:23:16: D3D9 device: 0x[0ED34160] destroy. Releasing D3D9 texture: ETSplatting0
+16:23:16: Released D3D9 texture: ETSplatting0
+16:23:16: D3D9 device: 0x[0ED34160] destroy. Releasing D3D9 texture: ETSplatting1
+16:23:16: Released D3D9 texture: ETSplatting1
+16:23:16: D3D9 device: 0x[0ED34160] destroy. Releasing D3D9 texture: ETSplatting2
+16:23:16: Released D3D9 texture: ETSplatting2
+16:23:16: D3D9 device: 0x[0ED34160] destroy. Releasing D3D9 texture: ArtifexTerra3D_ColourMap
+16:23:16: Released D3D9 texture: ArtifexTerra3D_ColourMap
+16:23:16: D3D9 device: 0x[0ED34160] destroy. Releasing D3D9 texture: Splatting0
+16:23:16: Released D3D9 texture: Splatting0
+16:23:16: D3D9 device: 0x[0ED34160] destroy. Releasing D3D9 texture: Splatting1
+16:23:16: Released D3D9 texture: Splatting1
+16:23:16: D3D9 device: 0x[0ED34160] destroy. Releasing D3D9 texture: Splatting2
+16:23:16: Released D3D9 texture: Splatting2
+16:23:16: D3D9 device: 0x[0ED34160] destroy. Releasing D3D9 texture: Splatting3
+16:23:16: Released D3D9 texture: Splatting3
+16:23:16: D3D9 device: 0x[0ED34160] destroy. Releasing D3D9 texture: Splatting4
+16:23:16: Released D3D9 texture: Splatting4
+16:23:16: D3D9 device: 0x[0ED34160] destroy. Releasing D3D9 texture: Splatting5
+16:23:16: Released D3D9 texture: Splatting5
+16:23:16: D3D9 device: 0x[0ED34160] destroy. Releasing D3D9 texture: Splatting6
+16:23:16: Released D3D9 texture: Splatting6
+16:23:16: D3D9 device: 0x[0ED34160] destroy. Releasing D3D9 texture: Splatting7
+16:23:16: Released D3D9 texture: Splatting7
+16:23:16: D3D9 device: 0x[0ED34160] destroy. Releasing D3D9 texture: Splatting8
+16:23:16: Released D3D9 texture: Splatting8
+16:23:17: D3D9 : Shutting down cleanly.
+16:23:17: Unregistering ResourceManager for type Texture
+16:23:17: Unregistering ResourceManager for type GpuProgram
+16:23:17: D3D9 : Direct3D9 Rendering Subsystem destroyed.
+16:23:17: Plugin successfully uninstalled
+16:23:17: Unloading library .\RenderSystem_Direct3D9_d
+16:23:17: Unregistering ResourceManager for type Material

@@ -1,0 +1,32 @@
+material plant.03.mat/ALPHA/TEX/plant.03.02.png/TWOSIDE
+{
+	technique
+	{
+		pass
+		{
+			cull_hardware none
+			cull_software none
+			alpha_rejection greater 192
+			texture_unit
+			{
+				texture plant.03.02.png
+			}
+		}
+	}
+}
+material plant.03.mat/ALPHA/TEX/plant.03.png/TWOSIDE
+{
+	technique
+	{
+		pass
+		{
+			cull_hardware none
+			cull_software none
+			alpha_rejection greater 192
+			texture_unit
+			{
+				texture plant.03.png
+			}
+		}
+	}
+}

@@ -1,0 +1,738 @@
+<html>
+<head>
+<script type="text/javascript" src="Navi.js"></script>
+<script>
+function loaded() {
+	var nOnLoadData = new NaviData("onLoadData");
+	nOnLoadData.send();
+	delete nOnLoadData;
+ }
+ function hideWindow() {
+	var nHideData = new NaviData("opCloseData");
+	nHideData.send();
+	delete nHideData;
+ }
+ function inputFocus() {
+	var nFocusData = new NaviData("opFocusData");
+	nFocusData.add({focus: 'gained'});
+	nFocusData.send();
+	delete nFocusData;
+ }
+ function inputBlur() {
+	var nFocusData = new NaviData("opFocusData");
+	nFocusData.add({focus: 'lost'});
+	nFocusData.send();
+	delete nFocusData;
+ }
+ function setObjProperty(val) {
+ 	var nSetPropertyData = new NaviData("opSetData");	
+	id = val.substr(0,(val.length)-4);
+	nSetPropertyData.add({what: id});
+	value = $(id+"_value").value;
+	nSetPropertyData.add({value: value});
+	nSetPropertyData.send();
+	delete nSetPropertyData;
+ }
+ 
+ cusProps = Array();
+ 
+ function propExists(prop) {
+	for (a=0;a<cusProps.length;a++) {
+		if (cusProps[a].trim() == prop.trim()) return true;
+	}
+	return false;
+ }
+ function delProp(prop) {
+	for (a=0;a<cusProps.length;a++) {
+		if (cusProps[a].trim() == prop.trim())  {
+			//alert("found");
+			cusProps[a]="";	
+			break;
+		}
+	}
+ }
+ function addRow(element,id,property,value,closer) {
+	if($('meshname_value').value.trim()=="Nothing") {
+		$('id_info').innerHTML='Please select an object first.';
+		return;
+	}
+	if ($('addnew_name').value.trim()=="" && property.trim()=="") {
+			$('id_info').innerHTML='Please specify the name of the new property first.';
+			return;
+	} else {
+		if(property=="") property = $('addnew_name').value.trim();
+		$('addnew_name').value="";
+	}
+	if(propExists(property.toLowerCase())) {
+		$('id_info').innerHTML='That property already exists.';
+		return;
+	}
+	if ($('addnew_value').value.trim()!="") {
+		value = $('addnew_value').value.trim();
+		$('addnew_value').value="";
+	}
+	
+	id = property.toLowerCase();
+	
+	var objParent = $(element);
+	var objTR = document.createElement('tr');
+	objTR.setAttribute('id',id+'_tr');
+	// td1
+	var objTD1 = document.createElement('td');	
+	var objIP1 = document.createElement('input');
+	objIP1.setAttribute('id',id+'_name');
+	objIP1.setAttribute('class','propertyleft');
+	objIP1.setAttribute('type','text');
+	objIP1.setAttribute('value',property);	
+	objIP1.setAttribute('onMouseover',"$('id_info').innerHTML=this.value");
+	objIP1.setAttribute('onMouseout',"$('id_info').innerHTML=''");
+	objIP1.setAttribute('onFocus',"inputFocus()");
+	objIP1.setAttribute('onBlur',"inputBlur()");	
+	objTD1.appendChild(objIP1);
+	// td2
+	var objTD2 = document.createElement('td');	
+	var objIP2 = document.createElement('input');
+	objIP2.setAttribute('id',id+'_value');
+	objIP2.setAttribute('class','propertyright');
+	objIP2.setAttribute('type','text');
+	objIP2.setAttribute('value',value);	
+	objIP2.setAttribute('onMouseover',"$('id_info').innerHTML=this.value");
+	objIP2.setAttribute('onMouseout',"$('id_info').innerHTML=''");
+	objIP2.setAttribute('onFocus',"inputFocus()");
+	objIP2.setAttribute('onBlur',"inputBlur()");	
+	objTD2.appendChild(objIP2);
+	
+	var objTD3 = document.createElement('td');	
+	var objSP3 = document.createElement('span');
+	objSP3.setAttribute('class','propertybutton'); 
+	objSP3.setAttribute('onClick','setObjProperty(this.id);'); 
+	objSP3.setAttribute('id',id+'_set'); 
+	objSP3.setAttribute('onMouseup',"this.style.color='#a0c000';");
+	objSP3.setAttribute('onMousedown',"this.style.color='#406000';");
+	objSP3.setAttribute('onMouseout',"this.style.color='#CCCCCC';");
+	objSP3.setAttribute('onMouseover',"this.style.color='#A0C000';");
+	objSP3.innerHTML = "S E T";
+	objTD3.appendChild(objSP3);		
+	
+	objTR.appendChild(objTD1);
+	objTR.appendChild(objTD2);
+	
+	
+	if (closer) {
+		var objTD4 = document.createElement('td');
+		var objSP4 = document.createElement('span');		
+		objSP4.setAttribute('class','closer'); 
+		objSP4.setAttribute('onClick','removeObjProperty(this.id);'); 
+		objSP4.setAttribute('id',id+'_del'); 		
+		objSP4.setAttribute('onMouseout',"this.style.backgroundImage='url(images/closer.gif)';");
+		objSP4.setAttribute('onMouseover',"this.style.backgroundImage='url(images/closer_.gif)';");
+		objSP4.innerHTML = "";
+		objTD4.appendChild(objSP4);	
+		objTR.appendChild(objTD4);
+		objIP2.setAttribute('style','width:101px;');
+		
+	}	else {
+		var objTD4 = document.createElement('td');
+		objTR.appendChild(objTD4);	
+	}	
+	
+	objTR.appendChild(objTD3);
+	
+	objParent.appendChild(objTR);
+
+	cusProps.push(property.toLowerCase());
+	
+	var nAddPropertyData = new NaviData("opAddPropertyData");		
+	nAddPropertyData.add({what: id});
+	nAddPropertyData.add({value: value});
+	nAddPropertyData.send();
+	delete nAddPropertyData;
+ }
+ 
+ function clearCustomProperties() {
+	for (a=0;a<cusProps.length;a++) {
+		try {
+			if (cusProps[a]!="") {
+				removeObjProperty(cusProps[a]+"_del");	
+			}
+		}catch(e) {		
+		}	
+	}
+	delete cusProps;
+	cusProps = Array();
+ }
+ 
+ function removeObjProperty(objId) {
+	objId = objId.substr(0,objId.length-4);
+	delProp(objId);
+
+	$('propgrid2_body').removeChild($(objId+'_tr'));
+	
+	var nDelPropertyData = new NaviData("opDelPropertyData");		
+	nDelPropertyData.add({what: objId});	
+	nDelPropertyData.send();
+	delete nDelPropertyData;
+ }
+  
+function checkBoxClick(id) {
+	if ($(id).selected) {
+		$(id).style.backgroundImage="url(images/option_o.png)";
+		$(id).selected = false;
+	} else {	
+		$(id).style.backgroundImage="url(images/option_x.png)";
+		$(id).selected = true;
+	}
+	
+	var nSetPropertyData = new NaviData("opSetData");		
+	nSetPropertyData.add({what: id});
+	value = $(id).selected;
+	nSetPropertyData.add({value: value});
+	nSetPropertyData.send();
+	delete nSetPropertyData;
+}
+
+function setCheckBox(id,value) {
+	if (value=='false') {
+		$(id).style.backgroundImage="url(images/option_o.png)";
+		$(id).selected = false;
+	} else {	
+		$(id).style.backgroundImage="url(images/option_x.png)";
+		$(id).selected = true;
+	}
+}
+
+</script>
+<link rel="stylesheet" type="text/css" href="styles_collar.css">
+<link rel="stylesheet" type="text/css" href="objectproperties.css">
+</head>
+<body id="id_body">
+<form style="margin:0px;">
+<div id="contentpane" class="windowbody">
+	<div style="margin-bottom:7px;" class="ctrlHint">Hint: to select objects go into 'Meshmode' with Ctrl+M,
+	then select it by left-clicking the object.</div>			
+	<div class="ctrlText">Default-Properties:</div>
+	<table id="propgrid1" border="0px" cellspacing="0px" cellpadding="0px">
+	<tbody id="propgrid1_body">
+	<tr>
+		<td align="left">
+			<input 
+				id="meshname_name" 
+				class="propertyleft" 
+				value="Mesh-Name:" 
+				readonly 
+				onmouseover="$('id_info').innerHTML=this.value"
+				onmouseout="$('id_info').innerHTML=''"
+				onfocus="inputFocus()" onblur="inputBlur()"
+			/>
+		</td>
+		<td align="left">			
+			<input 
+				id="meshname_value" 
+				class="propertyright" 
+				value="Nothing" 
+				onmouseover="$('id_info').innerHTML=this.value"
+				onmouseout="$('id_info').innerHTML=''"
+				onfocus="inputFocus()" onblur="inputBlur()"
+			/>			
+		</td>
+		<td align="left">
+			<span class="propertybutton" 
+				onclick="setObjProperty(this.id);" 
+				id="meshname_set"				
+				onmouseup="this.style.color='#a0c000';" 
+				onmousedown="this.style.color='#406000';" 
+				onmouseout="this.style.color='#CCCCCC';" 
+				onmouseover="this.style.color='#A0C000';"
+			>S E T</span>			
+		</td>
+	</tr>	
+	<tr>
+		<td>
+			<input 
+				id="meshfile_name" 	class="propertyleft" 
+				type="text" value="Mesh-File:" readonly
+				onmouseover="$('id_info').innerHTML=this.value" 
+				onmouseout="$('id_info').innerHTML=''" 
+				onfocus="inputFocus()" onblur="inputBlur()"
+			/>
+		</td>
+		<td>
+			<input 
+				id="meshfile_value" class="propertyright" 
+				type="text" value="selected." 
+				onmouseover="$('id_info').innerHTML=this.value" 
+				onmouseout="$('id_info').innerHTML=''" 
+				onfocus="inputFocus()" onblur="inputBlur()"
+			/>
+		</td>
+		<td>
+			<span 
+				id="meshfile_set" class="propertybutton" 
+				onclick=""
+				onmouseup="this.style.color='#a0c000';" 
+				onmousedown="this.style.color='#406000';" 
+				onmouseout="this.style.color='#CCCCCC';" 
+				onmouseover="this.style.color='#A0C000';"
+			>   </span>
+		</td>
+	</tr>	
+	<tr>
+		<td colspan="3" style="padding-bottom:2px;"><div class="propertycloser"></div></td>
+	</tr>
+	<tr>
+		<td>
+			<input 
+				id="object_group_name" 	class="propertyleft" 
+				type="text" value="Object-Group:" readonly
+				onmouseover="$('id_info').innerHTML=this.value" 
+				onmouseout="$('id_info').innerHTML=''" 
+				onfocus="inputFocus()" onblur="inputBlur()"
+			/>
+		</td>
+		<td>
+			<input 
+				id="object_group_value" class="propertyright" 
+				type="text" value="" 
+				onmouseover="$('id_info').innerHTML=this.value" 
+				onmouseout="$('id_info').innerHTML=''" 
+				onfocus="inputFocus()" onblur="inputBlur()"
+			/>
+		</td>
+		<td>
+			<span 
+				id="object_group_set" class="propertybutton" 
+				onclick="setObjProperty(this.id);"
+				onmouseup="this.style.color='#a0c000';" 
+				onmousedown="this.style.color='#406000';" 
+				onmouseout="this.style.color='#CCCCCC';" 
+				onmouseover="this.style.color='#A0C000';"
+			>S E T</span>
+		</td>
+	</tr>	
+	<tr>
+		<td colspan="3" style="padding-bottom:2px;"><div class="propertycloser"></div></td>
+	</tr>
+	<tr>
+		<td>
+			<input 
+				id="position_x_name" 	class="propertyleft" 
+				type="text" value="Position-X:" readonly
+				onmouseover="$('id_info').innerHTML=this.value" 
+				onmouseout="$('id_info').innerHTML=''" 
+				onfocus="inputFocus()" onblur="inputBlur()"
+			/>
+		</td>
+		<td>
+			<input 
+				id="position_x_value" class="propertyright" 
+				type="text" value="0.0" 
+				onmouseover="$('id_info').innerHTML=this.value" 
+				onmouseout="$('id_info').innerHTML=''" 
+				onfocus="inputFocus()" onblur="inputBlur()"
+			/>
+		</td>
+		<td>
+			<span 
+				id="position_x_set" class="propertybutton" 
+				onclick="setObjProperty(this.id);"
+				onmouseup="this.style.color='#a0c000';" 
+				onmousedown="this.style.color='#406000';" 
+				onmouseout="this.style.color='#CCCCCC';" 
+				onmouseover="this.style.color='#A0C000';"
+			>S E T</span>
+		</td>
+	</tr>	
+	<tr>
+		<td>
+			<input 
+				id="position_y_name" 	class="propertyleft" 
+				type="text" value="Position-Y:" 
+				onmouseover="$('id_info').innerHTML=this.value" 
+				onmouseout="$('id_info').innerHTML=''" 
+				onfocus="inputFocus()" onblur="inputBlur()"
+			/>
+		</td>
+		<td>
+			<input 
+				id="position_y_value" class="propertyright" 
+				type="text" value="0.0" 
+				onmouseover="$('id_info').innerHTML=this.value" 
+				onmouseout="$('id_info').innerHTML=''" 
+				onfocus="inputFocus()" onblur="inputBlur()"
+			/>
+		</td>
+		<td>
+			<span 
+				id="position_y_set" class="propertybutton" 
+				onclick="setObjProperty(this.id);"
+				onmouseup="this.style.color='#a0c000';" 
+				onmousedown="this.style.color='#406000';" 
+				onmouseout="this.style.color='#CCCCCC';" 
+				onmouseover="this.style.color='#A0C000';"
+			>S E T</span>
+		</td>
+	</tr>	
+	<tr>
+		<td>
+			<input 
+				id="position_z_name" 	class="propertyleft" 
+				type="text" value="Position-Z:" 
+				onmouseover="$('id_info').innerHTML=this.value" 
+				onmouseout="$('id_info').innerHTML=''" 
+				onfocus="inputFocus()" onblur="inputBlur()"
+			/>
+		</td>
+		<td>
+			<input 
+				id="position_z_value" class="propertyright" 
+				type="text" value="0.0" 
+				onmouseover="$('id_info').innerHTML=this.value" 
+				onmouseout="$('id_info').innerHTML=''" 
+				onfocus="inputFocus()" onblur="inputBlur()"
+			/>
+		</td>
+		<td>
+			<span 
+				id="position_z_set" class="propertybutton" 
+				onclick="setObjProperty(this.id);"
+				onmouseup="this.style.color='#a0c000';" 
+				onmousedown="this.style.color='#406000';" 
+				onmouseout="this.style.color='#CCCCCC';" 
+				onmouseover="this.style.color='#A0C000';"
+			>S E T</span>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="3"  style="padding-bottom:2px;"><div class="propertycloser"></div></td>
+	</tr>	
+	<tr>
+		<td>
+			<input 
+				id="rotation_x_name" 	class="propertyleft" 
+				type="text" value="Rotation-X:" 
+				onmouseover="$('id_info').innerHTML=this.value" 
+				onmouseout="$('id_info').innerHTML=''" 
+				onfocus="inputFocus()" onblur="inputBlur()"
+			/>
+		</td>
+		<td>
+			<input 
+				id="rotation_x_value" class="propertyright" 
+				type="text" value="0.0" 
+				onmouseover="$('id_info').innerHTML=this.value" 
+				onmouseout="$('id_info').innerHTML=''" 
+				onfocus="inputFocus()" onblur="inputBlur()"
+			/>
+		</td>
+		<td>
+			<span 
+				id="rotation_x_set" class="propertybutton" 
+				onclick="setObjProperty(this.id);"
+				onmouseup="this.style.color='#a0c000';" 
+				onmousedown="this.style.color='#406000';" 
+				onmouseout="this.style.color='#CCCCCC';" 
+				onmouseover="this.style.color='#A0C000';"
+			>S E T</span>
+		</td>
+	</tr>	
+	<tr>
+		<td>
+			<input 
+				id="rotation_y_name" 	class="propertyleft" 
+				type="text" value="Rotation-Y:" 
+				onmouseover="$('id_info').innerHTML=this.value" 
+				onmouseout="$('id_info').innerHTML=''" 
+				onfocus="inputFocus()" onblur="inputBlur()"
+			/>
+		</td>
+		<td>
+			<input 
+				id="rotation_y_value" class="propertyright" 
+				type="text" value="0.0" 
+				onmouseover="$('id_info').innerHTML=this.value" 
+				onmouseout="$('id_info').innerHTML=''" 
+				onfocus="inputFocus()" onblur="inputBlur()"
+			/>
+		</td>
+		<td>
+			<span 
+				id="rotation_y_set" class="propertybutton" 
+				onclick="setObjProperty(this.id);"
+				onmouseup="this.style.color='#a0c000';" 
+				onmousedown="this.style.color='#406000';" 
+				onmouseout="this.style.color='#CCCCCC';" 
+				onmouseover="this.style.color='#A0C000';"
+			>S E T</span>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<input 
+				id="rotation_z_name" 	class="propertyleft" 
+				type="text" value="Rotation-Z:" 
+				onmouseover="$('id_info').innerHTML=this.value" 
+				onmouseout="$('id_info').innerHTML=''" 
+				onfocus="inputFocus()" onblur="inputBlur()"
+			/>
+		</td>
+		<td>
+			<input 
+				id="rotation_z_value" class="propertyright" 
+				type="text" value="0.0" 
+				onmouseover="$('id_info').innerHTML=this.value" 
+				onmouseout="$('id_info').innerHTML=''" 
+				onfocus="inputFocus()" onblur="inputBlur()"
+			/>
+		</td>
+		<td>
+			<span 
+				id="rotation_z_set" class="propertybutton" 
+				onclick="setObjProperty(this.id);"
+				onmouseup="this.style.color='#a0c000';" 
+				onmousedown="this.style.color='#406000';" 
+				onmouseout="this.style.color='#CCCCCC';" 
+				onmouseover="this.style.color='#A0C000';"
+			>S E T</span>
+		</td>
+	</tr>	
+	<tr>
+		<td colspan="3" style="padding-bottom:2px;"><div class="propertycloser"></div></td>
+	</tr>
+	<tr>
+		<td>
+			<input 
+				id="scale_x_name" 	class="propertyleft" 
+				type="text" value="Scale-X:" 
+				onmouseover="$('id_info').innerHTML=this.value" 
+				onmouseout="$('id_info').innerHTML=''" 
+				onfocus="inputFocus()" onblur="inputBlur()"
+			/>
+		</td>
+		<td>
+			<input 
+				id="scale_x_value" class="propertyright" 
+				type="text" value="0.0" 
+				onmouseover="$('id_info').innerHTML=this.value" 
+				onmouseout="$('id_info').innerHTML=''" 
+				onfocus="inputFocus()" onblur="inputBlur()"
+			/>
+		</td>
+		<td>
+			<span 
+				id="scale_x_set" class="propertybutton" 
+				onclick="setObjProperty(this.id);"
+				onmouseup="this.style.color='#a0c000';" 
+				onmousedown="this.style.color='#406000';" 
+				onmouseout="this.style.color='#CCCCCC';" 
+				onmouseover="this.style.color='#A0C000';"
+			>S E T</span>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<input 
+				id="scale_y_name" 	class="propertyleft" 
+				type="text" value="Scale-Y:" 
+				onmouseover="$('id_info').innerHTML=this.value" 
+				onmouseout="$('id_info').innerHTML=''" 
+				onfocus="inputFocus()" onblur="inputBlur()"
+			/>
+		</td>
+		<td>
+			<input 
+				id="scale_y_value" class="propertyright" 
+				type="text" value="0.0" 
+				onmouseover="$('id_info').innerHTML=this.value" 
+				onmouseout="$('id_info').innerHTML=''" 
+				onfocus="inputFocus()" onblur="inputBlur()"
+			/>
+		</td>
+		<td>
+			<span 
+				id="scale_y_set" class="propertybutton" 
+				onclick="setObjProperty(this.id);"
+				onmouseup="this.style.color='#a0c000';" 
+				onmousedown="this.style.color='#406000';" 
+				onmouseout="this.style.color='#CCCCCC';" 
+				onmouseover="this.style.color='#A0C000';"
+			>S E T</span>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<input 
+				id="scale_z_name" 	class="propertyleft" 
+				type="text" value="Scale-Z:" 
+				onmouseover="$('id_info').innerHTML=this.value" 
+				onmouseout="$('id_info').innerHTML=''" 
+				onfocus="inputFocus()" onblur="inputBlur()"
+			/>
+		</td>
+		<td>
+			<input 
+				id="scale_z_value" class="propertyright" 
+				type="text" value="0.0" 
+				onmouseover="$('id_info').innerHTML=this.value" 
+				onmouseout="$('id_info').innerHTML=''" 
+				onfocus="inputFocus()" onblur="inputBlur()"
+			/>
+		</td>
+		<td>
+			<span 
+				id="scale_z_set" class="propertybutton" 
+				onclick="setObjProperty(this.id);"
+				onmouseup="this.style.color='#a0c000';" 
+				onmousedown="this.style.color='#406000';" 
+				onmouseout="this.style.color='#CCCCCC';" 
+				onmouseover="this.style.color='#A0C000';"
+			>S E T</span>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="3" style="padding-bottom:2px;"><div class="propertycloser" /></td>
+	</tr>	
+	<tr>
+		<td>
+			<input 
+				id="query_mask_name" 	class="propertyleft" 
+				type="text" value="Query-Mask:" 
+				onmouseover="$('id_info').innerHTML=this.value" 
+				onmouseout="$('id_info').innerHTML=''" 
+				onfocus="inputFocus()" onblur="inputBlur()"
+			/>
+		</td>
+		<td>
+			<input 
+				id="query_mask_value" class="propertyright" 
+				type="text" value="0" 
+				onmouseover="$('id_info').innerHTML=this.value" 
+				onmouseout="$('id_info').innerHTML=''" 
+				onfocus="inputFocus()" onblur="inputBlur()"
+			/>
+		</td>
+		<td>
+			<span 
+				id="query_mask_set" class="propertybutton" 
+				onclick="setObjProperty(this.id);"
+				onmouseup="this.style.color='#a0c000';" 
+				onmousedown="this.style.color='#406000';" 
+				onmouseout="this.style.color='#CCCCCC';" 
+				onmouseover="this.style.color='#A0C000';"
+			>S E T</span>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="3" style="padding-bottom:8px;"><div class="propertycloser" /></td>
+	</tr>
+	<tr>
+		<td>
+			<div		
+				id="render_static"
+				class="checkboxleft" 	
+				onClick="checkBoxClick(this.id)"
+			>Render Static</div>
+		</td>
+		<td>
+			<div
+				id="drop_to_ground" 
+				class="checkboxright"
+				onClick="checkBoxClick(this.id)"
+			>Drop to Ground</div>
+		</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td colspan="2" style="padding-bottom:2px;"><div class="propertycloser" /></td>
+	</tr>			
+	</tbody>
+	</table>	
+	<br>
+	<div class="ctrlText">Custom-Properties:</div>
+	<table id="propgrid2" border="0px" cellspacing="0px" cellpadding="0px">
+	<tbody id="propgrid2_body">		
+	</tbody>
+	<tr>
+		<td colspan="4"><div class="propertycloser" /></td>		
+	</tr>
+	</table>
+	<br>
+	<div class="ctrlText">Add new:</div>
+	<table id="addwidget" border="0px" cellspacing="0px" cellpadding="0px">
+	<tbody>
+	<tr>
+		<td><input id="addnew_name"
+				class="propertyleft"  
+			type="text" value="" 
+			onfocus="inputFocus()" onblur="inputBlur()"
+		/></td>
+		<td><input id="addnew_value"
+				class="propertyright" 
+			type="text" value="" 
+			onfocus="inputFocus()" onblur="inputBlur()"
+		/></td>
+		<td><span class="propertybutton" 
+				onclick="addRow('propgrid2_body','','','',true);" 
+				id="add_row" 
+				value="meshname"
+				onmouseup="this.style.color='#a0c000';" 
+				onmousedown="this.style.color='#406000';" 
+				onmouseout="this.style.color='#CCCCCC';" 
+				onmouseover="this.style.color='#A0C000';"
+			>A D D
+		</span></td>
+	</tr>
+	<tr>
+		<td colspan="3"><div class="propertycloser" /></td>		
+	</tr>
+	</tbody>	
+	</table>
+	<br><br>
+</div>	
+<div style="position:fixed; top:0px; left:0px; width:304px; height:20px; background-color:#303030;" align="left">
+	<table class="uibar" width="150px" height="20px" border="0px" cellspacing="0px" cellpadding="0px">
+	<tr>
+		<td align="left" valign="center" style="padding-left:0px; width:12px; height:20px;">
+			<br>
+		</td>
+		<td align="left" valign="center" style="padding-left:5px;">
+			<font class="uibarlink"> O B J E C T - P R O P E R T I E S </font>
+		</td>
+	</tr>
+	</table>
+</div>
+<span 
+	onclick="hideWindow()" class="windowcloser" 
+	style="position:fixed; top:4px; left:286px;"
+	onMouseout="this.style.backgroundImage='url(images/closer.gif)';"
+	onMouseover="this.style.backgroundImage='url(images/closer_.gif)';"
+></span>
+<span onclick="javascript:document.location.href='objectproperties.html?'+Math.random()"  
+ class="ctrlText" style="color: #404040; position:fixed; top:5px; left:230px;"
+ onmouseup="this.style.color='#404040';" 
+ onmousedown="this.style.color='#406000';" 
+ onmouseout="this.style.color='#404040';" 
+ onmouseover="this.style.color='#80A000';"
+>[ Reload ]</span>		
+<div id="inner_border_top1"></div>
+<div id="inner_border_top2"></div>
+<div id="inner_border_top3"></div>
+<div id="inner_border_bottom1"></div>
+<div id="inner_border_bottom2"></div>
+<div id="inner_border_bottom3"></div>
+<div id="left_border"></div>
+<div id="bottom_bar">			
+	<div id="id_info" class="statusbar"></div>
+</div>
+</form>
+</body>
+<script type="text/javascript">
+
+	$('render_static').setAttribute('selected','false'); 
+	$('drop_to_ground').setAttribute('selected','false'); 
+
+	window.addEvent('domready', function(){
+		loaded();
+	});
+	
+</script>
+</html>
