@@ -225,10 +225,10 @@ bool InputSystem::mouseMoved(const OIS::MouseEvent& e){
 
 bool InputSystem::mousePressed(const OIS::MouseEvent& e, OIS::MouseButtonID id){
 	switch (id){
-	case (int)OIS::MouseButtonID::MB_Right:
+	case 1: //OIS::MouseButtonID::MB_Right: (1 == OIS::MouseButtonID::MB_Right, writing "OIS::MouseButtonID::MB_Right" instead of "1" causes build warning)
 		m_bubble_adventure->ButtonPressed(BTN_START);
 		break;
-	case OIS::MouseButtonID::MB_Left:
+	case 0: //OIS::MouseButtonID::MB_Left:
 		m_bubble_adventure->ButtonPressed(BTN_BACK);
 		break;
 	default:
@@ -239,10 +239,10 @@ bool InputSystem::mousePressed(const OIS::MouseEvent& e, OIS::MouseButtonID id){
 
 bool InputSystem::mouseReleased(const OIS::MouseEvent& e, OIS::MouseButtonID id){
 	switch (id){
-	case OIS::MouseButtonID::MB_Right:
+	case 1: //OIS::MouseButtonID::MB_Right:
 		m_bubble_adventure->ButtonReleased(BTN_START);
 		break;
-	case OIS::MouseButtonID::MB_Left:
+	case 0: //OIS::MouseButtonID::MB_Left:
 		m_bubble_adventure->ButtonReleased(BTN_BACK);
 		break;
 	default:

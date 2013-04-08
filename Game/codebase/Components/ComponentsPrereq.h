@@ -23,6 +23,8 @@ enum EComponentMsg{
 	MSG_ALL_POSITION_SET,
 	MSG_ALL_ORIENTATION_SET,
 	MSG_ALL_SCALE_SET,
+	MSG_RIGIDBODY_POSITION_SET,
+	MSG_RIGIDBODY_ORIENTATION_SET,
 	MSG_ANIMATION_PLAY,
 	MSG_ANIMATION_PAUSE,
 	MSG_SIZE
@@ -67,14 +69,19 @@ public:
 	virtual void Update(float deltatime) = 0;
 };
 
+struct RigidBodyDef{
+	int collider_type;
+	btScalar mass;
+};
+
 struct AnimationMsg{
 	int index;
 	Ogre::String id;
 };
 
 struct AddForceMsg{
-	float strength;
-	Ogre::Vector3 dir;
+	Ogre::Vector3 pwr;
+	Ogre::Vector3 dir;	
 };
 
 /*

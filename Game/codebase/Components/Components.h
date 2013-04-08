@@ -22,10 +22,10 @@ protected:
 	Ogre::Quaternion	m_orientation;
 };
 
-class RenderComponent : public Component, public IComponentObserver {
+class MeshRenderComponent : public Component, public IComponentObserver {
 public:
-	RenderComponent(void) : m_node(NULL), m_entity(NULL), m_scene_manager(NULL){ m_type = COMPONENT_RENDERER; }
-	virtual ~RenderComponent(void){}
+	MeshRenderComponent(void) : m_node(NULL), m_entity(NULL), m_scene_manager(NULL){ m_type = COMPONENT_RENDERER; }
+	virtual ~MeshRenderComponent(void){}
 	virtual void Notify(int type, void* message);
 	virtual void Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager);
 	Ogre::SceneNode* GetSceneNode() const { return m_node; }
@@ -39,7 +39,7 @@ protected:
 	Ogre::SceneManager* m_scene_manager;
 };
 
-class AnimationComponent : public RenderComponent, public IComponentUpdateable{
+class AnimationComponent : public MeshRenderComponent, public IComponentUpdateable{
 public:
 	AnimationComponent(void){ m_type = COMPONENT_ANIMATION; }
 	virtual ~AnimationComponent(void){}

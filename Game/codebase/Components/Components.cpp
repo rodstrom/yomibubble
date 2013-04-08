@@ -17,7 +17,12 @@ void TransformComponent::SetMessenger(ComponentMessenger* messenger){
 
 void TransformComponent::Shut(){
 	if (m_messenger){
-		m_messenger->Unregister(this);
+		m_messenger->Unregister(MSG_TRANSFORM_POSITION_GET, this);
+		m_messenger->Unregister(MSG_TRANSFORM_SCALE_GET, this);
+		m_messenger->Unregister(MSG_TRANSFORM_POSITION_SET, this);
+		m_messenger->Unregister(MSG_TRANSFORM_SCALE_SET, this);
+		m_messenger->Unregister(MSG_TRANSFORM_ORIENTATION_GET, this);
+		m_messenger->Unregister(MSG_TRANSFORM_ORIENTATION_SET, this);
 	}
 }
 
@@ -49,14 +54,14 @@ void TransformComponent::Notify(int type, void* msg){
 	}
 }
 
-void RenderComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager){
+void MeshRenderComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager){
 	m_scene_manager = scene_manager;
 	m_entity = m_scene_manager->createEntity(filename);
 	m_node = m_scene_manager->getRootSceneNode()->createChildSceneNode();
 	m_node->attachObject(m_entity);
 }
 
-void RenderComponent::Notify(int type, void* msg){
+void MeshRenderComponent::Notify(int type, void* msg){
 	switch (type){
 	case MSG_ALL_POSITION_SET:
 		m_node->setPosition(*static_cast<Ogre::Vector3*>(msg));
@@ -72,16 +77,18 @@ void RenderComponent::Notify(int type, void* msg){
 	}
 }
 
-void RenderComponent::SetMessenger(ComponentMessenger* messenger){
+void MeshRenderComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger = messenger;
 	m_messenger->Register(MSG_ALL_POSITION_SET, this);
 	m_messenger->Register(MSG_ALL_ORIENTATION_SET, this);
 	m_messenger->Register(MSG_ALL_SCALE_SET, this);
 }
 
-void RenderComponent::Shut(){
+void MeshRenderComponent::Shut(){
 	if (m_messenger){
-		m_messenger->Unregister(this);
+		m_messenger->Unregister(MSG_ALL_POSITION_SET, this);
+		m_messenger->Unregister(MSG_ALL_ORIENTATION_SET, this);
+		m_messenger->Unregister(MSG_ALL_SCALE_SET, this);
 	}
 	if (m_node != NULL){
 		m_scene_manager->destroySceneNode(m_node);
@@ -94,13 +101,13 @@ void RenderComponent::Shut(){
 }
 
 void AnimationComponent::SetMessenger(ComponentMessenger* messenger){
-	RenderComponent::SetMessenger(messenger);
+	MeshRenderComponent::SetMessenger(messenger);
 	m_messenger->Register(MSG_ANIMATION_PLAY, this);
 	m_messenger->Register(MSG_ANIMATION_PAUSE, this);
 }
 
 void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager){
-	RenderComponent::Init(filename, scene_manager);
+	MeshRenderComponent::Init(filename, scene_manager);
 }
 
 void AnimationComponent::AddAnimationStates(unsigned int value){
@@ -121,7 +128,7 @@ void AnimationComponent::Update(float deltatime){
 }
 
 void AnimationComponent::Notify(int type, void* msg){
-	RenderComponent::Notify(type, msg);
+	MeshRenderComponent::Notify(type, msg);
 	switch (type){
 	case MSG_ANIMATION_PLAY:
 		{
@@ -156,7 +163,9 @@ void AnimationComponent::Shut(){
 		}
 	}
 	m_animation_states.clear();
-	RenderComponent::Shut();
+	m_messenger->Unregister(MSG_ANIMATION_PLAY, this);
+	m_messenger->Unregister(MSG_ANIMATION_PAUSE, this);
+	MeshRenderComponent::Shut();
 }
 
 
@@ -165,7 +174,7 @@ void RigidbodyComponent::Notify(int type, void* msg){
 	case MSG_ADD_FORCE:
 		{
 			AddForceMsg& force = *static_cast<AddForceMsg*>(msg);
-			m_rigidbody->applyForce(btVector3(force.strength, force.strength, force.strength), btVector3(force.dir.x, force.dir.y, force.dir.z));
+			m_rigidbody->applyForce(btVector3(force.pwr.x, force.pwr.y, force.pwr.z), btVector3(force.dir.x, force.dir.y, force.dir.z));
 		}
 		break;
 	default:
@@ -209,10 +218,14 @@ void RigidbodyComponent::Shut(){
 	m_shape = NULL;
 	delete m_rigidbody_state;
 	m_rigidbody_state = NULL;
-	m_messenger->Unregister(this);
+	m_messenger->Unregister(MSG_ADD_FORCE, this);
+	m_messenger->Unregister(MSG_RIGIDBODY_POSITION_SET, this);
+	m_messenger->Unregister(MSG_RIGIDBODY_ORIENTATION_SET, this);
 }
 
 void RigidbodyComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger = messenger;
 	m_messenger->Register(MSG_ADD_FORCE, this);
+	m_messenger->Register(MSG_RIGIDBODY_POSITION_SET, this);
+	m_messenger->Register(MSG_RIGIDBODY_ORIENTATION_SET, this);
 }

@@ -9,7 +9,7 @@
 #include "..\Components\ComponentMessenger.h"
 #include "..\Components\PlayerController.h"*/
 
-PlayState::PlayState(void) : m_physics_engine(NULL){}
+PlayState::PlayState(void) : m_physics_engine(NULL), m_game_object_manager(NULL){}
 PlayState::~PlayState(void){}
 
 void PlayState::Enter(){
@@ -112,7 +112,7 @@ void PlayState::Exit(){
 	m_plane_body->getMotionState();
 	delete m_plane_body;
 	delete m_ground_motion_state;
-	m_plane_shape->getMeshInterface();
+	delete m_plane_shape->getMeshInterface();
 	delete m_plane_shape;
 
 	/*m_sinbad->Shut();
@@ -121,6 +121,9 @@ void PlayState::Exit(){
 	delete m_messenger;
 	m_messenger = NULL;*/
 
+	m_game_object_manager->Shut();
+	delete m_game_object_manager;
+	m_game_object_manager = NULL;
 	m_physics_engine->CloseDebugDraw();
 	m_physics_engine->Shut();
 	delete m_physics_engine;

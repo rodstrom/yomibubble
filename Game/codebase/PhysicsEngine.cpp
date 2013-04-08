@@ -30,6 +30,10 @@ void PhysicsEngine::Shut(){
 		delete m_seq_impulse_con_solver;
 		m_seq_impulse_con_solver = NULL;
 	}
+	if (m_collision_configuration){
+		delete m_collision_configuration;
+		m_collision_configuration = NULL;
+	}
 	if (m_collision_dispatcher){
 		delete m_collision_dispatcher;
 		m_collision_dispatcher = NULL;

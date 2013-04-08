@@ -6,26 +6,26 @@ void PlayerController::Update(float deltatime){
 	if (m_input_manager->IsButtonDown(BTN_LEFT)){
 		AddForceMsg msg;
 		msg.dir = Ogre::Vector3(0.0f,-10.0f,0.0f);
-		msg.strength = 50.0f;
+		msg.pwr = Ogre::Vector3(0.0f,-10.0f,0.0f);
 		m_messenger->Notify(MSG_ADD_FORCE, &msg);
 	}
 	else if (m_input_manager->IsButtonDown(BTN_RIGHT)){
 		AddForceMsg msg;
 		msg.dir = Ogre::Vector3(0.0f,10.0f,0.0f);
-		msg.strength = 50.0f;
+		msg.pwr = Ogre::Vector3(0.0f,10.0f,0.0f);
 		m_messenger->Notify(MSG_ADD_FORCE, &msg);
 	}
 
 	if (m_input_manager->IsButtonDown(BTN_UP)){
 		AddForceMsg msg;
 		msg.dir = Ogre::Vector3(0.0f,0.0f,10.0f);
-		msg.strength = 50.0f;
+		msg.pwr = Ogre::Vector3(0.0f,0.0f,100.0f);
 		m_messenger->Notify(MSG_ADD_FORCE, &msg);
 	}
 	else if (m_input_manager->IsButtonDown(BTN_DOWN)){
 		AddForceMsg msg;
 		msg.dir = Ogre::Vector3(0.0f,0.0f,-10.0f);
-		msg.strength = 50.0f;
+		msg.pwr = Ogre::Vector3(0.0f,0.0f,-10.0f);
 		m_messenger->Notify(MSG_ADD_FORCE, &msg);
 	}
 
