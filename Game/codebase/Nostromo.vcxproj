@@ -57,7 +57,8 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\libs\Ogre\include;..\libs\boost;..\libs\Bullet\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4786;4503;4251;4275;4290;4661;4996;4127;4100;4193;4244</DisableSpecificWarnings>
-      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <AdditionalOptions>/Zm200 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -91,6 +92,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Artifex\ArtifexLoader.cpp" />
+    <ClCompile Include="Artifex\ArtifexLoaderEnvironment.cpp" />
+    <ClCompile Include="Artifex\ArtifexLoaderObjects.cpp" />
+    <ClCompile Include="Artifex\ArtifexLoaderTerrain.cpp" />
+    <ClCompile Include="Artifex\CppSQLite3.cpp" />
+    <ClCompile Include="Artifex\DBManager.cpp" />
+    <ClCompile Include="Artifex\sqlite3.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeaderOutputFile>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
     <ClCompile Include="BubbleAdventure.cpp" />
     <ClCompile Include="BtOgre.cpp" />
     <ClCompile Include="Components\ComponentMessenger.cpp" />
@@ -112,6 +128,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Artifex\ArtifexLoader.h" />
+    <ClInclude Include="Artifex\CppSQLite3.h" />
+    <ClInclude Include="Artifex\CustomTypes.h" />
+    <ClInclude Include="Artifex\DBManager.h" />
+    <ClInclude Include="Artifex\sqlite3.h" />
+    <ClInclude Include="Artifex\sqlite3ext.h" />
+    <ClInclude Include="Artifex\StaticUtils.h" />
     <ClInclude Include="BubbleAdventure.h" />
     <ClInclude Include="BtOgreExtras.h" />
     <ClInclude Include="BtOgreGP.h" />

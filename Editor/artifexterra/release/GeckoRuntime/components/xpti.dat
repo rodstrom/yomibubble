@@ -2,16 +2,16 @@
 
 [Header,2]
 0,Version,2,0
-1,AppDir,C:\artifexterra\release\GeckoRuntime
+1,AppDir,D:\Projects\GitHub\yomibubble\Editor\artifexterra\release\GeckoRuntime
 
 [Directories,2]
-0,C:\artifexterra\release\GeckoRuntime\components
-1,C:\artifexterra\release\GeckoRuntime\plugins
+0,D:\Projects\GitHub\yomibubble\Editor\artifexterra\release\GeckoRuntime\components
+1,D:\Projects\GitHub\yomibubble\Editor\artifexterra\release\GeckoRuntime\plugins
 
 [Files,3]
-0,all.xpt,0,308278,1226553088000
-1,linked.xpt,0,306926,1200157098000
-2,flashplayer.xpt,1,856,1157491340000
+0,all.xpt,0,308278,1365411818023
+1,linked.xpt,0,306926,1365411818337
+2,flashplayer.xpt,1,856,1365411820379
 
 [ArchiveItems,0]
 

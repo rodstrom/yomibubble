@@ -4,6 +4,9 @@
 #include "State.h"
 #include "..\PhysicsEngine.h"
 
+#include "..\Artifex\ArtifexLoader.h"
+class ArtifexLoader;
+
 class ComponentMessenger;
 class GameObject;
 class PhysicsEngine;
@@ -37,6 +40,9 @@ private:
 	PhysicsEngine*				m_physics_engine;
 	GameObject*					m_sinbad;
 	ComponentMessenger*			m_messenger;
+
+	Ogre::SceneNode* m_cam_node;
+	ArtifexLoader* mArtifexLoader;
 };
 
 #endif // _PLAY_STATE_H_

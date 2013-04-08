@@ -31,6 +31,12 @@
     <Filter Include="Source Files\Components">
       <UniqueIdentifier>{116edac0-f4d7-49c4-a806-263d58bb1f4b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Artifex">
+      <UniqueIdentifier>{5f833404-f796-4d46-9016-19c200ab2937}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Artifex">
+      <UniqueIdentifier>{0d0f1c9b-c01c-462e-9e01-19d376a9f227}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -83,6 +89,27 @@
     </ClCompile>
     <ClCompile Include="BubbleAdventure.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Artifex\ArtifexLoader.cpp">
+      <Filter>Source Files\Artifex</Filter>
+    </ClCompile>
+    <ClCompile Include="Artifex\ArtifexLoaderEnvironment.cpp">
+      <Filter>Source Files\Artifex</Filter>
+    </ClCompile>
+    <ClCompile Include="Artifex\ArtifexLoaderObjects.cpp">
+      <Filter>Source Files\Artifex</Filter>
+    </ClCompile>
+    <ClCompile Include="Artifex\ArtifexLoaderTerrain.cpp">
+      <Filter>Source Files\Artifex</Filter>
+    </ClCompile>
+    <ClCompile Include="Artifex\CppSQLite3.cpp">
+      <Filter>Source Files\Artifex</Filter>
+    </ClCompile>
+    <ClCompile Include="Artifex\DBManager.cpp">
+      <Filter>Source Files\Artifex</Filter>
+    </ClCompile>
+    <ClCompile Include="Artifex\sqlite3.c">
+      <Filter>Source Files\Artifex</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -160,6 +187,27 @@
     </ClInclude>
     <ClInclude Include="BubbleAdventure.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Artifex\ArtifexLoader.h">
+      <Filter>Header Files\Artifex</Filter>
+    </ClInclude>
+    <ClInclude Include="Artifex\CppSQLite3.h">
+      <Filter>Header Files\Artifex</Filter>
+    </ClInclude>
+    <ClInclude Include="Artifex\CustomTypes.h">
+      <Filter>Header Files\Artifex</Filter>
+    </ClInclude>
+    <ClInclude Include="Artifex\DBManager.h">
+      <Filter>Header Files\Artifex</Filter>
+    </ClInclude>
+    <ClInclude Include="Artifex\sqlite3.h">
+      <Filter>Header Files\Artifex</Filter>
+    </ClInclude>
+    <ClInclude Include="Artifex\sqlite3ext.h">
+      <Filter>Header Files\Artifex</Filter>
+    </ClInclude>
+    <ClInclude Include="Artifex\StaticUtils.h">
+      <Filter>Header Files\Artifex</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

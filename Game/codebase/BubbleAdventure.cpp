@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "BubbleAdventure.h"
 #include "Managers\InputManager.h"
 #include "Managers\StateManager.h"

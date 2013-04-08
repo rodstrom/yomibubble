@@ -1,4 +1,4 @@
-#include "..\stdafx.h"
+#include "stdafx.h"
 #include "StateManager.h"
 #include "..\InputSystem.h"
 #include "InputManager.h"

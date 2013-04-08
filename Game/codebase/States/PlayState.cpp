@@ -1,4 +1,4 @@
-#include "..\stdafx.h"
+#include "stdafx.h"
 #include "PlayState.h"
 #include "..\Managers\InputManager.h"
 #include "..\InputSystem.h"
@@ -42,32 +42,32 @@ void PlayState::Enter(){
 	m_messenger = new ComponentMessenger;
 	m_sinbad = new GameObject;
 
-	Animation* renderer = new Animation;
-	renderer->SetType(COMPONENT_RENDERER);
-	renderer->SetOwner(m_sinbad);
-	renderer->SetMessenger(m_messenger);
-	renderer->Init("sinbad.mesh", m_scene_manager);
-	renderer->AddAnimationStates(2);
-	m_sinbad->AddComponent(renderer);
-	m_sinbad->AddUpdateable(renderer);
-	Rigidbody* body = new Rigidbody;
-	body->SetType(COMPONENT_RIGIDBODY);
-	body->SetOwner(m_sinbad);
-	body->SetMessenger(m_messenger);
-	body->Init(renderer->GetEntity(), renderer->GetSceneNode(), m_physics_engine);
-	m_sinbad->AddComponent(body);
-	PlayerController* controller = new PlayerController;
-	controller->SetType(COMPONENT_CONTROLLER);
-	controller->SetOwner(m_sinbad);
-	controller->SetMessenger(m_messenger);
-	controller->Init(m_input_manager);
-	m_sinbad->AddComponent(controller);
-	m_sinbad->AddUpdateable(controller);
-	Transform* transform = new Transform;
-	transform->SetType(COMPONENT_NONE);
-	transform->SetOwner(m_sinbad);
-	transform->SetMessenger(m_messenger);
-	m_sinbad->AddComponent(transform);
+	//Animation* renderer = new Animation;
+	//renderer->SetType(COMPONENT_RENDERER);
+	//renderer->SetOwner(m_sinbad);
+	//renderer->SetMessenger(m_messenger);
+	//renderer->Init("sinbad.mesh", m_scene_manager);
+	//renderer->AddAnimationStates(2);
+	//m_sinbad->AddComponent(renderer);
+	//m_sinbad->AddUpdateable(renderer);
+	//Rigidbody* body = new Rigidbody;
+	//body->SetType(COMPONENT_RIGIDBODY);
+	//body->SetOwner(m_sinbad);
+	//body->SetMessenger(m_messenger);
+	//body->Init(renderer->GetEntity(), renderer->GetSceneNode(), m_physics_engine);
+	//m_sinbad->AddComponent(body);
+	//PlayerController* controller = new PlayerController;
+	//controller->SetType(COMPONENT_CONTROLLER);
+	//controller->SetOwner(m_sinbad);
+	//controller->SetMessenger(m_messenger);
+	//controller->Init(m_input_manager);
+	//m_sinbad->AddComponent(controller);
+	//m_sinbad->AddUpdateable(controller);
+	//Transform* transform = new Transform;
+	//transform->SetType(COMPONENT_NONE);
+	//transform->SetOwner(m_sinbad);
+	//transform->SetMessenger(m_messenger);
+	//m_sinbad->AddComponent(transform);
 
 	/*Ogre::Vector3 pos = Ogre::Vector3(0,200,0);
 	Ogre::Quaternion rot = Ogre::Quaternion::IDENTITY;
@@ -93,6 +93,14 @@ void PlayState::Enter(){
 	}*/
 	m_physics_engine->ShowDebugDraw(false);
 	m_scene_manager->setSkyDome(true, "Examples/CloudySky");
+	
+	m_cam_node = m_scene_manager->getRootSceneNode()->createChildSceneNode("camNode");
+	m_cam_node->attachObject(m_camera);
+
+	//mArtifexLoader = new ArtifexLoader(mRoot, mSceneMgr, mCamNode, mCamera, "../../resources/");
+	mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, m_cam_node, m_camera, "../../resources/maps/terrain/");
+	 // load a zone
+	mArtifexLoader->loadZone("demo");
 }
 
 void PlayState::Exit(){

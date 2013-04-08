@@ -24,4 +24,6 @@
 #include <string>
 #include <fstream>
 
+//#include "OGRE\Terrain\OgreTerrain.h"
+
 #endif // _NOSTROMO_PRECOMPILED_H_

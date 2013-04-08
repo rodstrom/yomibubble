@@ -1,4 +1,4 @@
-#include "..\stdafx.h"
+#include "stdafx.h"
 #include "Components.h"
 #include "ComponentMessenger.h"
 #include "..\BtOgrePG.h"
