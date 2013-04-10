@@ -77,25 +77,19 @@ void InputSystem::Shut(){
 }
 
 void InputSystem::Capture(){
-	//memcpy(m_last_keys, m_keys, sizeof(bool) * 238);
-	//memcpy(m_last_mouse_buttons, m_mouse_buttons, sizeof(bool) * 8);
-
 	if (m_mouse){
 		m_mouse->capture();
-		OIS::MouseState mouse_state = m_mouse->getMouseState();
-		m_bubble_adventure->SetMousePosition(mouse_state.X.abs, mouse_state.Y.abs, mouse_state.X.rel, mouse_state.Y.rel);
+		m_bubble_adventure->SetMouseState(m_mouse->getMouseState());
 	}
 	if (m_keyboard){
 		m_keyboard->capture();
 	}
-
 	if (m_joysticks.size() > 0){
 		for (auto it = m_joysticks.begin(); it != m_joysticks.end(); it++){
 			(*it)->capture();
 		}
 	}
 }
-
 
 void InputSystem::SetWindowExtents(int width, int height){
 	const OIS::MouseState& mouseState = m_mouse->getMouseState();
@@ -237,10 +231,10 @@ bool InputSystem::mouseMoved(const OIS::MouseEvent& e){
 
 bool InputSystem::mousePressed(const OIS::MouseEvent& e, OIS::MouseButtonID id){
 	switch (id){
-	case (int)OIS::MouseButtonID::MB_Right:
+	case 1: //OIS::MouseButtonID::MB_Right: (1 == OIS::MouseButtonID::MB_Right, writing "OIS::MouseButtonID::MB_Right" instead of "1" causes build warning)
 		m_bubble_adventure->ButtonPressed(BTN_START);
 		break;
-	case OIS::MouseButtonID::MB_Left:
+	case 0: //OIS::MouseButtonID::MB_Left:
 		m_bubble_adventure->ButtonPressed(BTN_BACK);
 		break;
 	default:
@@ -251,10 +245,10 @@ bool InputSystem::mousePressed(const OIS::MouseEvent& e, OIS::MouseButtonID id){
 
 bool InputSystem::mouseReleased(const OIS::MouseEvent& e, OIS::MouseButtonID id){
 	switch (id){
-	case OIS::MouseButtonID::MB_Right:
+	case 1: //OIS::MouseButtonID::MB_Right:
 		m_bubble_adventure->ButtonReleased(BTN_START);
 		break;
-	case OIS::MouseButtonID::MB_Left:
+	case 0: //OIS::MouseButtonID::MB_Left:
 		m_bubble_adventure->ButtonReleased(BTN_BACK);
 		break;
 	default:

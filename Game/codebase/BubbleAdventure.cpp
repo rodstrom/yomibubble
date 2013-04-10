@@ -31,10 +31,10 @@ void BubbleAdventure::Shut(){
 	}
 }
 
-void BubbleAdventure::SetMousePosition(int x, int y, int rel_x, int rel_y){
+void BubbleAdventure::SetMouseState(const OIS::MouseState mouse_state){
 	if (!m_input_managers.empty()){
 		for (unsigned int i = 0; i < m_input_managers.size(); i++){
-			m_input_managers[i]->SetMousePosition(x, y, rel_x, rel_y);
+			m_input_managers[i]->SetMouseState(mouse_state);
 		}
 	}
 }
