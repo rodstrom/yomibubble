@@ -2,8 +2,7 @@
 #include "InputSystem.h"
 #include "BubbleAdventure.h"
 
-InputSystem::InputSystem(BubbleAdventure* bubble_adventure, Ogre::RenderWindow* render_window) : 
-m_bubble_adventure(bubble_adventure),
+InputSystem::InputSystem(Ogre::RenderWindow* render_window) : 
 m_render_window(render_window),
 m_mouse(nullptr),
 m_keyboard(nullptr),
@@ -20,7 +19,10 @@ void InputSystem::Init(){
 		m_render_window->getCustomAttribute("WINDOW", &windowHnd);
 		windowHndStr << windowHnd;
 		pl.insert(std::make_pair(std::string("WINDOW"), windowHndStr.str()));
+		pl.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_FOREGROUND")));
+		pl.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_NONEXCLUSIVE")));
 		m_ois_input_manager = OIS::InputManager::createInputSystem(pl);
+		
 		if (m_ois_input_manager->getNumberOfDevices(OIS::OISKeyboard) > 0){
 			m_keyboard = static_cast<OIS::Keyboard*>(m_ois_input_manager->createInputObject(OIS::OISKeyboard, true));
 			m_keyboard->setEventCallback(this);
@@ -29,6 +31,7 @@ void InputSystem::Init(){
 		if (m_ois_input_manager->getNumberOfDevices(OIS::OISMouse) > 0){
 			m_mouse = static_cast<OIS::Mouse*>(m_ois_input_manager->createInputObject(OIS::OISMouse, true));
 			m_mouse->setEventCallback(this);
+			m_tray_manager = new OgreBites::SdkTrayManager("InterfaceName", m_render_window, m_mouse, this);
 		}
 
 		if (m_ois_input_manager->getNumberOfDevices(OIS::OISJoyStick) > 0){
@@ -43,6 +46,10 @@ void InputSystem::Init(){
 		std::fill(m_mouse_buttons, m_mouse_buttons + 8, false);
 		std::fill(m_last_mouse_buttons, m_last_mouse_buttons + 8, false);
 	}
+}
+
+void InputSystem::SetGame(BubbleAdventure* p_bubble_adventure){
+	m_bubble_adventure = p_bubble_adventure;
 }
 
 void InputSystem::Shut(){
@@ -116,21 +123,26 @@ const bool InputSystem::IsKeyReleased(OIS::KeyCode key) const{
 	return false;
 }
 
-const bool InputSystem::IsMouseButtonDown(OIS::MouseButtonID id) const{
+const bool InputSystem::IsMouseButtonDown(OIS::MouseButtonID id, OIS::MouseEvent& evt) const{
 	return m_mouse_buttons[id];
+
+	
 }
 
-const bool InputSystem::IsMouseButtonPressed(OIS::MouseButtonID id) const{
+const bool InputSystem::IsMouseButtonPressed(OIS::MouseButtonID id, OIS::MouseEvent& evt) const{
 	if (!m_last_mouse_buttons[id] && m_mouse_buttons[id]){
 		return true;
 	}
+
+	if(m_tray_manager->injectMouseDown(evt, id)) return true;
 	return false;
 }
 
-const bool InputSystem::IsMouseButtonReleased(OIS::MouseButtonID id) const{
+const bool InputSystem::IsMouseButtonReleased(OIS::MouseButtonID id, OIS::MouseEvent& evt) const{
 	if (m_last_mouse_buttons[id] && !m_mouse_buttons[id]){
 		return true;
 	}
+
 	return false;
 }
 

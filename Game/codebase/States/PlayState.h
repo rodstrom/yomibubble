@@ -5,6 +5,7 @@
 #include "..\PhysicsEngine.h"
 
 class Gui;
+class GuiManager;
 class ComponentMessenger;
 class GameObject;
 class PhysicsEngine;
@@ -40,6 +41,9 @@ private:
 	ComponentMessenger*			m_messenger;
 
 	Gui*						m_gui;
+	GuiManager*					m_gui_manager;
+
+	Ogre::Entity*				m_sword;
 };
 
 #endif // _PLAY_STATE_H_

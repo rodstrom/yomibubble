@@ -27,7 +27,7 @@ public:
 		p_parent->ManageState(p_id, state);
 	}
 	void Destroy(void) { delete this; }
-	void Init(Ogre::RenderWindow* render_window, MessageSystem* message_system) { m_render_window = render_window; m_message_system = message_system; }
+	void Init(Ogre::RenderWindow* render_window, MessageSystem* message_system, OgreBites::SdkTrayManager* p_tray_manager) { m_render_window = render_window; m_message_system = message_system, m_tray_manager = p_tray_manager; }
 	InputManager* GetInputManager() const { return m_input_manager; }
 	virtual void Enter() = 0;
 	virtual void Exit() = 0;
@@ -50,6 +50,7 @@ protected:
 	Ogre::Viewport*		m_viewport;
 	InputManager*		m_input_manager;
 	MessageSystem*		m_message_system;
+	OgreBites::SdkTrayManager* m_tray_manager;
 };
 
 

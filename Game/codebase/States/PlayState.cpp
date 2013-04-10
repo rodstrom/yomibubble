@@ -7,7 +7,7 @@
 #include "..\Components\Components.h"
 #include "..\Components\ComponentMessenger.h"
 #include "..\Components\PlayerController.h"
-#include "..\Gui.h"
+#include "..\Managers\GuiManager.h"
 
 PlayState::PlayState(void) : m_physics_engine(NULL){}
 PlayState::~PlayState(void){}
@@ -17,8 +17,6 @@ void PlayState::Enter(){
 	m_physics_engine = new PhysicsEngine;
 	m_physics_engine->Init();
 	m_physics_engine->SetDebugDraw(m_scene_manager);
-	m_gui = new Gui;
-	m_gui->createGui(m_scene_manager);
 	m_camera = m_scene_manager->createCamera("Camera");
 	m_camera->setPosition(Ogre::Vector3(0,0,50));
 	m_camera->lookAt(Ogre::Vector3(0,0,0));
@@ -42,14 +40,17 @@ void PlayState::Enter(){
 	m_plane_body = new btRigidBody(0, m_ground_motion_state, m_plane_shape, btVector3(0,0,0));
 	m_physics_engine->AddRigidBody(m_plane_body);
 
+	m_sword = m_scene_manager->createEntity("Sword", "Sword.mesh");
+
 	m_messenger = new ComponentMessenger;
 	m_sinbad = new GameObject;
+		
 
 	Animation* renderer = new Animation;
 	renderer->SetType(COMPONENT_RENDERER);
 	renderer->SetOwner(m_sinbad);
 	renderer->SetMessenger(m_messenger);
-	renderer->Init("sinbad.mesh", m_scene_manager);
+	renderer->Init("test1.mesh", m_scene_manager);
 	renderer->AddAnimationStates(2);
 	m_sinbad->AddComponent(renderer);
 	m_sinbad->AddUpdateable(renderer);
@@ -153,9 +154,9 @@ bool PlayState::frameRenderingQueued(const Ogre::FrameEvent& evt){
 
 	//CEGUI::System::getSingleton().injectTimePulse(evt.timeSinceLastFrame);
 
-	if (m_input_manager->IsButtonPressed(BTN_BACK)){
+	/*if (m_input_manager->IsButtonPressed(BTN_BACK)){
 		return false;
-	}
+	}*/
 
 	m_physics_engine->Step(evt.timeSinceLastFrame, 10);
 	return true;

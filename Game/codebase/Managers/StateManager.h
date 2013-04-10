@@ -16,7 +16,7 @@ public:
 		State* _state;
 	};
 
-	StateManager(Ogre::RenderWindow* render_window, InputListener* input_listener, MessageSystem* message_system);
+	StateManager(Ogre::RenderWindow* render_window, InputListener* input_listener, MessageSystem* message_system, OgreBites::SdkTrayManager*);
 	~StateManager(void);
 
 	State* FindById(const Ogre::String& id);
@@ -36,6 +36,7 @@ protected:
 	Ogre::RenderWindow*			m_render_window;
 	InputListener*				m_input_listener;
 	MessageSystem*				m_message_system;
+	OgreBites::SdkTrayManager* m_tray_manager;
 };
 
 #endif // _STATE_MANAGER_H_

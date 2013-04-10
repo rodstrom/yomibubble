@@ -1,5 +1,7 @@
 #include "Gui.h"
 #include <vector>
+#include <OGRE\SdkTrays.h>	
+#include "InputSystem.h"
 
 Gui::Gui(void)
 {
@@ -10,32 +12,26 @@ Gui::~Gui(void)
 {
 }
 
-void Gui::createGui(Ogre::SceneManager* p_scene_manager)
-{
+void Gui::createGui(Ogre::SceneManager* p_scene_manager, OgreBites::SdkTrayManager* p_tray_manager){
+	m_tray_manager = p_tray_manager;
+	m_button = m_tray_manager->createButton(OgreBites::TL_TOPLEFT, "MyButton", "Click me!");
+
+	if(m_button->getName() == "MyButton"){
+		int p = 0;
+	}
+
 	// Load layout
    Ogre::ResourceGroupManager::getSingletonPtr();
-   Ogre::OverlayManager*   mg = Ogre::OverlayManager::getSingletonPtr();
-   Ogre::Overlay*         ov = mg->getByName("testOverlay");
+   Ogre::OverlayManager* mg = Ogre::OverlayManager::getSingletonPtr();
+   Ogre::Overlay* ov = mg->getByName("testOverlay");
    ov->show();
 
-	/*Ogre::OverlayManager& overlayManager = Ogre::OverlayManager::getSingleton();
-         // Create an overlay
-         Ogre::Overlay* overlay = overlayManager.create( "OverlayName" );
- 
-         // Create a panel
-         Ogre::OverlayContainer* panel = static_cast<Ogre::OverlayContainer*>( overlayManager.createOverlayElement( "Panel", "PanelName" ) );
-         panel->setPosition( 0.0, 0.0 );
-         panel->setDimensions( 0.1, 0.1 );
-         panel->setMaterialName( "BaseWhite" );
-         // Add the panel to the overlay
-         overlay->add2D( panel );
- 
-         // Show the overlay
-         overlay->show();*/
 
+}
 
-	/*Ogre::SceneNode* myNode = static_cast<Ogre::SceneNode*>(p_scene_manager->getRootSceneNode()->createChild());
-	Ogre::BillboardSet* mySet = p_scene_manager->createBillboardSet("mySet");
-	Ogre::Billboard* myBillboard = mySet->createBillboard(Ogre::Vector3(100, 0, 200));
-	myNode->attachObject(mySet);*/
+void Gui::ButtonHit(){
+	
+	
+	m_tray_manager->buttonHit(m_button);
+	
 }

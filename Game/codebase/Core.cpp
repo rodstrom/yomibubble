@@ -52,10 +52,13 @@ bool Core::Init(){
 
 	//Ogre::LogManager::getSingletonPtr()->logMessage("*** Initializing OIS ***");
 
-	m_bubble_adventure = new BubbleAdventure;
-	m_bubble_adventure->Init(m_render_window, m_message_system);
-	m_input_system = new InputSystem(m_bubble_adventure, m_render_window);
+	
+	m_input_system = new InputSystem(m_render_window);
 	m_input_system->Init();
+	//guimanager, skicka med till alla states.
+	m_bubble_adventure = new BubbleAdventure;
+	m_bubble_adventure->Init(m_render_window, m_message_system, m_input_system->GetTrayManager());
+	m_input_system->SetGame(m_bubble_adventure);
 	return true;
 }
 

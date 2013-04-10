@@ -32,7 +32,7 @@ void PlayerController::Update(float deltatime){
 	if (m_input_manager->IsButtonPressed(BTN_W)){
 		AnimationMsg msg;
 		msg.index = 0;
-		msg.id = "RunBase";
+		msg.id = "run";
 		m_messenger->Notify(MSG_ANIMATION_PLAY, &msg);
 	}
 	if (m_input_manager->IsButtonPressed(BTN_S)){
@@ -45,7 +45,7 @@ void PlayerController::Update(float deltatime){
 	if (m_input_manager->IsButtonPressed(BTN_A)){
 		AnimationMsg msg;
 		msg.index = 1;
-		msg.id = "RunTop";
+		msg.id = "walk";
 		m_messenger->Notify(MSG_ANIMATION_PLAY, &msg);
 	}
 	if (m_input_manager->IsButtonPressed(BTN_D)){

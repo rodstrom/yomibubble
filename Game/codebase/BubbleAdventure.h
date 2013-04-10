@@ -11,7 +11,7 @@ public:
 	BubbleAdventure(void);
 	~BubbleAdventure(void);
 
-	bool Init(Ogre::RenderWindow* render_window, MessageSystem* message_system);
+	bool Init(Ogre::RenderWindow* render_window, MessageSystem* message_system, OgreBites::SdkTrayManager* p_tray_manager);
 	void Shut();
 	void SetMousePosition(int x, int y, int rel_x, int rel_y);
 	void ButtonPressed(int btn);

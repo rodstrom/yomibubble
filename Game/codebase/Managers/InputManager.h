@@ -2,6 +2,7 @@
 #define _CONTROLS_H_
 
 #include "..\InputPrereq.h"
+#include "..\InputSystem.h"
 
 class InputManager;
 class InputListener{
@@ -27,12 +28,14 @@ public:
 	void SetPause(bool value) { m_pause = value; }
 
 	const MousePosition& GetMousePosition() const { return m_mouse_position; }
+	InputSystem* GetInputSystem() { return m_input_system; }
 
 private:
 	bool			m_pause;
 	bool			m_buttons[BTN_SIZE];
 	bool			m_last_buttons[BTN_SIZE];
 	MousePosition	m_mouse_position;
+	InputSystem*    m_input_system;
 };
 
 #endif // _CONTROLS_H_
