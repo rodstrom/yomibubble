@@ -107,7 +107,6 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	go->AddComponent(pccomp);
 	go->AddUpdateable(pccomp);
 
-
 	acomp->Init("sinbad.mesh", m_scene_manager);
 	contr->Init(m_physics_engine);
 	contr->SetTurnSpeed(500.0f);
