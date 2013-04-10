@@ -78,11 +78,14 @@
     <ClCompile Include="Components\ComponentMessenger.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Components\PlayerController.cpp">
-      <Filter>Source Files\Components</Filter>
-    </ClCompile>
     <ClCompile Include="BubbleAdventure.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Managers\GameObjectManager.cpp">
+      <Filter>Source Files\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\PlayerInputComponent.cpp">
+      <Filter>Source Files\Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -152,14 +155,20 @@
     <ClInclude Include="Components\ComponentMessenger.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
-    <ClInclude Include="Components\AnimationComponent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Components\PlayerController.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
     <ClInclude Include="BubbleAdventure.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\GameObjectFactory.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\GameObjectPrereq.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Managers\GameObjectManager.h">
+      <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\PlayerInputComponent.h">
+      <Filter>Header Files\Components</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

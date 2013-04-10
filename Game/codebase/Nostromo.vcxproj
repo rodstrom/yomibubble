@@ -43,6 +43,7 @@
     <IntDir>..\obj\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)_d</TargetName>
     <OutDir>..\run\bin\debug\</OutDir>
+    <EnableManagedIncrementalBuild>true</EnableManagedIncrementalBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -51,11 +52,11 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\libs\Ogre\include;..\libs\boost;..\libs\Bullet\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\libs\vld\include;..\libs\Ogre\include;..\libs\boost;..\libs\Bullet\include\Bullet\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4786;4503;4251;4275;4290;4661;4996;4127;4100;4193;4244</DisableSpecificWarnings>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
@@ -65,7 +66,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>OgreMain_d.lib;OIS_d.lib;BulletDynamics_vs2010_debug.lib;BulletCollision_vs2010_debug.lib;LinearMath_vs2010_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\libs\boost\lib;..\libs\Ogre\lib\debug;..\libs\Bullet\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\libs\vld\lib\Win32\;..\libs\boost\lib;..\libs\Ogre\lib\debug;..\libs\Bullet\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -96,10 +97,11 @@
     <ClCompile Include="Components\ComponentMessenger.cpp" />
     <ClCompile Include="Components\Components.cpp" />
     <ClCompile Include="Components\GameObject.cpp" />
-    <ClCompile Include="Components\PlayerController.cpp" />
+    <ClCompile Include="Components\PlayerInputComponent.cpp" />
     <ClCompile Include="Core.cpp" />
     <ClCompile Include="InputSystem.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Managers\GameObjectManager.cpp" />
     <ClCompile Include="Managers\InputManager.cpp" />
     <ClCompile Include="Managers\StateManager.cpp" />
     <ClCompile Include="MessageSystem.cpp" />
@@ -116,16 +118,18 @@
     <ClInclude Include="BtOgreExtras.h" />
     <ClInclude Include="BtOgreGP.h" />
     <ClInclude Include="BtOgrePG.h" />
-    <ClInclude Include="Components\AnimationComponent.h" />
     <ClInclude Include="Components\ComponentMessenger.h" />
     <ClInclude Include="Components\Components.h" />
     <ClInclude Include="Components\ComponentsPrereq.h" />
     <ClInclude Include="Components\GameObject.h" />
-    <ClInclude Include="Components\PlayerController.h" />
+    <ClInclude Include="Components\GameObjectFactory.h" />
+    <ClInclude Include="Components\GameObjectPrereq.h" />
+    <ClInclude Include="Components\PlayerInputComponent.h" />
     <ClInclude Include="Convert.h" />
     <ClInclude Include="Core.h" />
     <ClInclude Include="InputPrereq.h" />
     <ClInclude Include="InputSystem.h" />
+    <ClInclude Include="Managers\GameObjectManager.h" />
     <ClInclude Include="Managers\InputManager.h" />
     <ClInclude Include="Managers\StateManager.h" />
     <ClInclude Include="MessageSystem.h" />

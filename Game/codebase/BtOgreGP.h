@@ -17,7 +17,7 @@
 #ifndef _BtOgrePG_H_
 #define _BtOgrePG_H_
 
-#include "Bullet\btBulletDynamicsCommon.h"
+//#include "Bullet\btBulletDynamicsCommon.h"
 //#include "btBulletDynamicsCommon.h" Not needed because of stdafx
 #include "BtOgreExtras.h"
 //#include "Ogre.h"
