@@ -7,12 +7,15 @@ PhysicsEngine::PhysicsEngine(void) :
 	m_collision_dispatcher(NULL), 
 	m_dynamic_world(NULL), 
 	m_seq_impulse_con_solver(NULL),
-	m_debug_drawer(NULL){}
+	m_debug_drawer(NULL),
+	m_ghost_pair_callback(NULL){}
 
 PhysicsEngine::~PhysicsEngine(void){}
 
 bool PhysicsEngine::Init(){
 	m_broadphase = new btDbvtBroadphase;
+	m_ghost_pair_callback = new btGhostPairCallback;
+	m_broadphase->getOverlappingPairCache()->setInternalGhostPairCallback(m_ghost_pair_callback);
 	m_collision_configuration = new btDefaultCollisionConfiguration;
 	m_collision_dispatcher = new btCollisionDispatcher(m_collision_configuration);
 	m_seq_impulse_con_solver = new btSequentialImpulseConstraintSolver;
@@ -30,9 +33,17 @@ void PhysicsEngine::Shut(){
 		delete m_seq_impulse_con_solver;
 		m_seq_impulse_con_solver = NULL;
 	}
+	if (m_collision_configuration){
+		delete m_collision_configuration;
+		m_collision_configuration = NULL;
+	}
 	if (m_collision_dispatcher){
 		delete m_collision_dispatcher;
 		m_collision_dispatcher = NULL;
+	}
+	if (m_ghost_pair_callback){
+		delete m_ghost_pair_callback;
+		m_ghost_pair_callback = NULL;
 	}
 	if (m_broadphase){
 		delete m_broadphase;
