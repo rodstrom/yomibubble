@@ -3,24 +3,8 @@
 
 #include "ComponentsPrereq.h"
 #include "..\BtOgrePG.h"
-
-class TransformComponent : public Component, public IComponentObserver{
-public:
-	TransformComponent(void) : m_position(Ogre::Vector3::ZERO), m_orientation(Ogre::Quaternion::IDENTITY), m_scale(Ogre::Vector3::UNIT_SCALE){ m_type = COMPONENT_TRANSFORM; }
-	virtual ~TransformComponent(void){}
-	virtual void Notify(int type, void* message);
-
-	const Ogre::Vector3& GetPosition() const { return m_position; }
-	const Ogre::Quaternion& GetOrientation() const { return m_orientation; }
-	const Ogre::Vector3& GetScale()    const { return m_scale; }
-	virtual void SetMessenger(ComponentMessenger* messenger);
-	virtual void Shut();
-
-protected:
-	Ogre::Vector3		m_position;
-	Ogre::Vector3		m_scale;
-	Ogre::Quaternion	m_orientation;
-};
+#include "BulletDynamics\Character\btKinematicCharacterController.h"
+#include "BulletCollision\CollisionDispatch\btGhostObject.h"
 
 class MeshRenderComponent : public Component, public IComponentObserver {
 public:
@@ -43,7 +27,7 @@ class AnimationComponent : public MeshRenderComponent, public IComponentUpdateab
 public:
 	AnimationComponent(void){ m_type = COMPONENT_ANIMATION; }
 	virtual ~AnimationComponent(void){}
-	virtual void Update(float deltatime);
+	virtual void Update(float dt);
 	virtual void Notify(int type, void* message);
 	virtual void Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager);
 	virtual void AddAnimationStates(unsigned int value = 1);
@@ -72,16 +56,72 @@ protected:
 	PhysicsEngine*			m_physics_engine;
 };
 
-class ColliderComponent : public Component, public IComponentObserver{
+class CharacterController : public Component, public IComponentObserver, public IComponentUpdateable, public IComponentLateUpdate{
 public:
-	ColliderComponent(void){ m_type = COMPONENT_COLLIDER; }
-	virtual ~ColliderComponent(void){}
-	virtual void Notify(int type, void* message){}
-	virtual void Shut(){}
-	virtual void SetMessenger(ComponentMessenger* messenger){}
+	CharacterController(void) : m_controller(NULL), m_ghost_object(NULL), m_shape(NULL), m_velocity(0.0), m_turn_speed(0.0f), 
+		m_move_backwards(false), m_move_forward(false), m_move_left(false), m_move_right(false), m_has_follow_cam(false) 
+	{ m_type = COMPONENT_CHARACTER_CONTROLLER; }
+	virtual ~CharacterController(void){}
+	virtual void Notify(int type, void* msg);
+	virtual void Shut();
+	virtual void SetMessenger(ComponentMessenger* messenger);
+	virtual void Init(PhysicsEngine* physics_engine);
+	virtual void Update(float dt);
+	virtual void LateUpdate(float dt);
+	void SetVelocity(btScalar velocity) { m_velocity = velocity; }
+	void SetTurnSpeed(float turn_speed) { m_turn_speed = turn_speed; }
+	void HasFollowCam(bool value) { m_has_follow_cam = value; }
 
 protected:
+	btKinematicCharacterController*		m_controller;
+	btPairCachingGhostObject*			m_ghost_object;
+	PhysicsEngine*						m_physics_engine;
+	btConvexShape*						m_shape;
+	btScalar							m_velocity;
+	float								m_turn_speed;
+	bool								m_move_forward;
+	bool								m_move_backwards;
+	bool								m_move_left;
+	bool								m_move_right;
+	bool								m_has_follow_cam;
+};
 
+class CameraComponent : public Component, public IComponentObserver, public IComponentUpdateable{
+public:
+	CameraComponent(void) : m_scene_manager(NULL), m_camera(NULL), m_viewport(NULL), m_camera_id(Ogre::StringUtil::BLANK) {}
+	virtual ~CameraComponent(void){}
+	virtual void Notify(int type, void* msg);
+	virtual void Shut();
+	virtual void SetMessenger(ComponentMessenger* messenger);
+	virtual void Init(Ogre::SceneManager* scene_manager, Ogre::Viewport* viewport, bool activate = false, const Ogre::String& camera_id = Ogre::StringUtil::BLANK);
+	virtual void Update(float dt);
+
+	const Ogre::String& GetCameraId() const { return m_camera_id; }
+	Ogre::Camera* GetCamera() const { return m_camera; }
+	void ActivateCamera();
+protected:
+	Ogre::SceneManager* m_scene_manager;
+	Ogre::Camera*		m_camera;
+	Ogre::Viewport*		m_viewport;
+	Ogre::String		m_camera_id;
+};
+
+class FollowCameraComponent : public CameraComponent{
+public:
+	FollowCameraComponent(void) : m_camera_goal(NULL), m_camera_pivot(NULL), m_camera_node(NULL), m_pivot_pitch(0){}
+	virtual ~FollowCameraComponent(void){}
+	virtual void Notify(int type, void* msg);
+	virtual void Shut();
+	virtual void SetMessenger(ComponentMessenger* messenger);
+	virtual void Init(Ogre::SceneManager* scene_manager, Ogre::Viewport* viewport, bool activate = false, const Ogre::String& camera_id = Ogre::StringUtil::BLANK);
+	virtual void Update(float dt);
+
+protected:
+	void UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real delta_pitch, Ogre::Real delta_zoom);
+	Ogre::SceneNode*	m_camera_pivot;
+	Ogre::SceneNode*	m_camera_goal;
+	Ogre::SceneNode*	m_camera_node;
+	Ogre::Real			m_pivot_pitch;
 };
 
 #endif // _N_COMPONENTS_H_

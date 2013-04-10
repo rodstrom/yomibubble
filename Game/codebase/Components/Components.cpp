@@ -4,55 +4,8 @@
 #include "..\BtOgrePG.h"
 #include "..\BtOgreGP.h"
 #include "..\PhysicsEngine.h"
-
-void TransformComponent::SetMessenger(ComponentMessenger* messenger){
-	m_messenger = messenger;
-	m_messenger->Register(MSG_TRANSFORM_POSITION_GET, this);
-	m_messenger->Register(MSG_TRANSFORM_SCALE_GET, this);
-	m_messenger->Register(MSG_TRANSFORM_POSITION_SET, this);
-	m_messenger->Register(MSG_TRANSFORM_SCALE_SET, this);
-	m_messenger->Register(MSG_TRANSFORM_ORIENTATION_GET, this);
-	m_messenger->Register(MSG_TRANSFORM_ORIENTATION_SET, this);
-}
-
-void TransformComponent::Shut(){
-	if (m_messenger){
-		m_messenger->Unregister(MSG_TRANSFORM_POSITION_GET, this);
-		m_messenger->Unregister(MSG_TRANSFORM_SCALE_GET, this);
-		m_messenger->Unregister(MSG_TRANSFORM_POSITION_SET, this);
-		m_messenger->Unregister(MSG_TRANSFORM_SCALE_SET, this);
-		m_messenger->Unregister(MSG_TRANSFORM_ORIENTATION_GET, this);
-		m_messenger->Unregister(MSG_TRANSFORM_ORIENTATION_SET, this);
-	}
-}
-
-void TransformComponent::Notify(int type, void* msg){
-	switch (type){
-	case MSG_TRANSFORM_POSITION_GET:
-		*static_cast<Ogre::Vector3*>(msg) = m_position;
-		break;
-	case MSG_TRANSFORM_POSITION_SET:
-		m_position = *static_cast<Ogre::Vector3*>(msg);
-		m_messenger->Notify(MSG_ALL_POSITION_SET, msg);
-		break;
-	case MSG_TRANSFORM_SCALE_GET:
-		*static_cast<Ogre::Vector3*>(msg) = m_scale;
-		break;
-	case MSG_TRANSFORM_SCALE_SET:
-		m_scale = *static_cast<Ogre::Vector3*>(msg);
-		m_messenger->Notify(MSG_ALL_SCALE_SET, msg);
-		break;
-	case MSG_TRANSFORM_ORIENTATION_GET:
-		*static_cast<Ogre::Quaternion*>(msg) = m_orientation;
-		break;
-	case MSG_TRANSFORM_ORIENTATION_SET:
-		m_orientation = *static_cast<Ogre::Quaternion*>(msg);
-		m_messenger->Notify(MSG_ALL_ORIENTATION_SET, msg);
-		break;
-	default:
-		break;
-	}
-}
+#include "GameObject.h"
+#include "..\Managers\InputManager.h"
 
 void MeshRenderComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager){
 	m_scene_manager = scene_manager;
@@ -63,14 +16,8 @@ void MeshRenderComponent::Init(const Ogre::String& filename, Ogre::SceneManager*
 
 void MeshRenderComponent::Notify(int type, void* msg){
 	switch (type){
-	case MSG_ALL_POSITION_SET:
-		m_node->setPosition(*static_cast<Ogre::Vector3*>(msg));
-		break;
-	case MSG_ALL_SCALE_SET:
-		m_node->setScale(*static_cast<Ogre::Vector3*>(msg));
-		break;
-	case MSG_ALL_ORIENTATION_SET:
-		m_node->setOrientation(*static_cast<Ogre::Quaternion*>(msg));
+	case MSG_NODE_GET_NODE:
+			*static_cast<Ogre::SceneNode**>(msg) = m_node;
 		break;
 	default:
 		break;
@@ -79,16 +26,12 @@ void MeshRenderComponent::Notify(int type, void* msg){
 
 void MeshRenderComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger = messenger;
-	m_messenger->Register(MSG_ALL_POSITION_SET, this);
-	m_messenger->Register(MSG_ALL_ORIENTATION_SET, this);
-	m_messenger->Register(MSG_ALL_SCALE_SET, this);
+	m_messenger->Register(MSG_NODE_GET_NODE, this);
 }
 
 void MeshRenderComponent::Shut(){
 	if (m_messenger){
-		m_messenger->Unregister(MSG_ALL_POSITION_SET, this);
-		m_messenger->Unregister(MSG_ALL_ORIENTATION_SET, this);
-		m_messenger->Unregister(MSG_ALL_SCALE_SET, this);
+		m_messenger->Unregister(MSG_NODE_GET_NODE, this);
 	}
 	if (m_node != NULL){
 		m_scene_manager->destroySceneNode(m_node);
@@ -117,11 +60,11 @@ void AnimationComponent::AddAnimationStates(unsigned int value){
 	}
 }
 
-void AnimationComponent::Update(float deltatime){
+void AnimationComponent::Update(float dt){
 	for (unsigned int i = 0; i < m_animation_states.size(); i++){
 		if (m_animation_states[i] != NULL){
 			if (m_animation_states[i]->getEnabled()){
-				m_animation_states[i]->addTime(deltatime);
+				m_animation_states[i]->addTime(dt);
 			}
 		}
 	}
@@ -168,7 +111,6 @@ void AnimationComponent::Shut(){
 	MeshRenderComponent::Shut();
 }
 
-
 void RigidbodyComponent::Notify(int type, void* msg){
 	switch (type){
 	case MSG_ADD_FORCE:
@@ -210,7 +152,7 @@ void RigidbodyComponent::Init(Ogre::Entity* entity, Ogre::SceneNode* node, Physi
 }
 
 void RigidbodyComponent::Shut(){
-	m_physics_engine->RemoveRigidBody(m_rigidbody);
+	m_physics_engine->GetDynamicWorld()->removeRigidBody(m_rigidbody);
 	m_rigidbody->getMotionState();
 	delete m_rigidbody;
 	m_rigidbody = NULL;
@@ -218,14 +160,259 @@ void RigidbodyComponent::Shut(){
 	m_shape = NULL;
 	delete m_rigidbody_state;
 	m_rigidbody_state = NULL;
-	m_messenger->Unregister(MSG_ADD_FORCE, this);
-	m_messenger->Unregister(MSG_RIGIDBODY_POSITION_SET, this);
-	m_messenger->Unregister(MSG_RIGIDBODY_ORIENTATION_SET, this);
+	m_messenger->Unregister(MSG_RIGIDBODY_GET_BODY, this);
 }
 
 void RigidbodyComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger = messenger;
-	m_messenger->Register(MSG_ADD_FORCE, this);
-	m_messenger->Register(MSG_RIGIDBODY_POSITION_SET, this);
-	m_messenger->Register(MSG_RIGIDBODY_ORIENTATION_SET, this);
+	m_messenger->Register(MSG_RIGIDBODY_GET_BODY, this);
+}
+
+
+void CharacterController::Notify(int type, void* msg){
+	switch (type){
+	case MSG_CHARACTER_CONROLLER_VELOCITY_SET:
+		m_velocity = *static_cast<float*>(msg);
+		break;
+	case MSG_CHARACTER_CONROLLER_TURN_SPEED_SET:
+		m_turn_speed = *static_cast<float*>(msg);
+		break;
+	case MSG_CHARACTER_CONTROLLER_MOVE_FORWARD:
+		m_move_forward = *static_cast<bool*>(msg);
+		break;
+	case MSG_CHARACTER_CONTROLLER_MOVE_BACKWARDS:
+		m_move_backwards = *static_cast<bool*>(msg);
+		break;
+	case MSG_CHARACTER_CONTROLLER_MOVE_LEFT:
+		m_move_left = *static_cast<bool*>(msg);
+		break;
+	case MSG_CHARACTER_CONTROLLER_MOVE_RIGHT:
+		m_move_right = *static_cast<bool*>(msg);
+		break;
+	case MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM:
+		m_has_follow_cam = *static_cast<bool*>(msg);
+		break;
+	default:
+		break;
+	}
+}
+
+void CharacterController::Update(float dt){
+	btVector3 walk_direction = btVector3(0.0,0.0,0.0);
+	btScalar walk_speed = m_velocity * dt;
+	
+	if (m_move_left){
+		walk_direction += btVector3(-1.0, 0.0, 0.0);
+	}
+	if (m_move_right){
+		walk_direction += btVector3(1.0, 0.0, 0.0);
+	}
+	if (m_move_forward){
+		walk_direction += btVector3(0.0, 0.0, -1.0);
+	}
+	if (m_move_backwards){
+		walk_direction += btVector3(0.0, 0.0, 1.0);
+	}
+	if (m_move_backwards || m_move_forward || m_move_left || m_move_right){
+		Ogre::SceneNode* node = NULL;
+		Ogre::SceneNode* camera_node = NULL;
+		m_messenger->Notify(MSG_NODE_GET_NODE, &node);
+		m_messenger->Notify(MSG_CAMERA_GET_CAMERA_NODE, &camera_node);
+		if (node && camera_node){
+			Ogre::Vector3 dir = BtOgre::Convert::toOgre(walk_direction);
+			Ogre::Vector3 goal_dir = Ogre::Vector3::ZERO;
+			goal_dir += dir.z * camera_node->getOrientation().zAxis();
+			goal_dir += dir.x * camera_node->getOrientation().xAxis();
+			goal_dir.y = 0.0f;
+			goal_dir.normalise();
+			Ogre::Quaternion goal = node->getOrientation().zAxis().getRotationTo(goal_dir);
+			Ogre::Real yaw_to_goal = goal.getYaw().valueDegrees();
+			Ogre::Real yaw_at_speed = yaw_to_goal / Ogre::Math::Abs(yaw_to_goal) * dt * m_turn_speed;
+
+			if (yaw_to_goal < 0) yaw_to_goal = std::min<Ogre::Real>(0, std::max<Ogre::Real>(yaw_to_goal, yaw_at_speed));
+			else if (yaw_to_goal > 0) yaw_to_goal = std::max<Ogre::Real>(0, std::min<Ogre::Real>(yaw_to_goal, yaw_at_speed));
+			node->yaw(Ogre::Degree(yaw_to_goal));
+			m_controller->setWalkDirection(BtOgre::Convert::toBullet(goal_dir * (float)walk_speed));
+		}	
+	}
+	else{
+		m_controller->setWalkDirection(walk_direction * walk_speed);
+	}
+}
+
+void CharacterController::LateUpdate(float dt){
+	if (m_ghost_object){
+		btTransform transform = m_ghost_object->getWorldTransform();
+		btVector3 pos = transform.getOrigin();
+		Ogre::SceneNode* node = NULL;
+		m_messenger->Notify(MSG_NODE_GET_NODE, &node);
+		if (node){
+			node->setPosition(BtOgre::Convert::toOgre(pos));
+		}
+	}
+}
+
+void CharacterController::Shut(){
+	if (m_ghost_object){
+		m_physics_engine->GetDynamicWorld()->removeCollisionObject(m_ghost_object);
+		delete m_ghost_object;
+		m_ghost_object = NULL;
+	}
+	if (m_shape){
+		delete m_shape;
+		m_shape = NULL;
+	}
+	if (m_controller){
+		m_physics_engine->GetDynamicWorld()->removeAction(m_controller);
+		delete m_controller;
+		m_controller = NULL;
+	}
+	if (m_messenger){
+		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_MOVE_FORWARD, this);
+		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_MOVE_BACKWARDS, this);
+		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_MOVE_LEFT, this);
+		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_MOVE_RIGHT, this);
+		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM, this);
+	}
+}
+
+void CharacterController::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
+	m_messenger->Register(MSG_CHARACTER_CONTROLLER_MOVE_FORWARD, this);
+	m_messenger->Register(MSG_CHARACTER_CONTROLLER_MOVE_BACKWARDS, this);
+	m_messenger->Register(MSG_CHARACTER_CONTROLLER_MOVE_LEFT, this);
+	m_messenger->Register(MSG_CHARACTER_CONTROLLER_MOVE_RIGHT, this);
+	m_messenger->Register(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM, this);
+}
+
+void CharacterController::Init(PhysicsEngine* physics_engine){
+	m_physics_engine = physics_engine;
+	btTransform start_transform;
+	start_transform.setIdentity();
+	start_transform.setOrigin(btVector3(0.0, 10.0, 0.0));
+	m_ghost_object = new btPairCachingGhostObject;
+	m_ghost_object->setWorldTransform(start_transform);
+	btScalar char_height = 6.0;
+	btScalar char_width = 1.75;
+	m_shape = new btCapsuleShape(char_width, char_height);
+	m_ghost_object->setCollisionShape(m_shape);
+	m_ghost_object->setCollisionFlags(btCollisionObject::CF_CHARACTER_OBJECT);
+	btScalar step_height = btScalar(0.35);
+	m_controller = new btKinematicCharacterController(m_ghost_object, m_shape, step_height);
+	m_physics_engine->GetDynamicWorld()->addCollisionObject(m_ghost_object, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter|btBroadphaseProxy::DefaultFilter);
+	m_physics_engine->GetDynamicWorld()->addAction(m_controller);
+}
+
+void CameraComponent::Notify(int type, void* msg){
+	switch(type){
+	case MSG_CAMERA_GET_CAMERA:
+		*static_cast<Ogre::Camera**>(msg) = m_camera;
+		break;
+	case MSG_CAMERA_SET_ACTIVE:
+		m_viewport->setCamera(m_camera);
+		break;
+	}
+}
+
+void CameraComponent::Shut(){
+	if (m_messenger){
+		m_messenger->Unregister(MSG_CAMERA_GET_CAMERA, this);
+		m_messenger->Unregister(MSG_CAMERA_SET_ACTIVE, this);
+	}
+}
+
+void CameraComponent::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
+	m_messenger->Register(MSG_CAMERA_GET_CAMERA, this);
+	m_messenger->Register(MSG_CAMERA_SET_ACTIVE, this);
+}
+
+void CameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewport* viewport, bool activate, const Ogre::String& camera_id){
+	m_scene_manager = scene_manager;
+	m_viewport = viewport;
+	if (camera_id == Ogre::StringUtil::BLANK){
+		m_camera_id = m_owner->GetId() + "Camera";
+	}
+	else{
+		m_camera_id = camera_id;
+	}
+	m_camera = m_scene_manager->createCamera(m_camera_id);
+	if (activate){
+		m_viewport->setCamera(m_camera);
+	}
+	m_camera->setAspectRatio(Ogre::Real(m_viewport->getActualWidth()) / Ogre::Real(m_viewport->getActualHeight()));
+}
+
+void CameraComponent::Update(float dt){
+
+}
+
+void CameraComponent::ActivateCamera(){
+	m_viewport->setCamera(m_camera);
+}
+
+void FollowCameraComponent::Notify(int type, void* msg){
+	CameraComponent::Notify(type, msg);
+	switch (type){
+	case MSG_CAMERA_GET_CAMERA_NODE:
+		*static_cast<Ogre::SceneNode**>(msg) = m_camera_node;
+		break;
+	default:
+		break;
+	}
+}
+
+void FollowCameraComponent::Shut(){
+	CameraComponent::Shut();
+	m_messenger->Unregister(MSG_CAMERA_GET_CAMERA_NODE, this);
+}
+
+void FollowCameraComponent::SetMessenger(ComponentMessenger* messenger){
+	CameraComponent::SetMessenger(messenger);
+	m_messenger->Register(MSG_CAMERA_GET_CAMERA_NODE, this);
+}
+
+void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewport* viewport, bool activate, const Ogre::String& camera_id){
+	CameraComponent::Init(scene_manager, viewport, activate, camera_id);
+	m_camera_pivot = m_camera->getSceneManager()->getRootSceneNode()->createChildSceneNode();
+	m_camera_goal = m_camera_pivot->createChildSceneNode(Ogre::Vector3(0,0,20));
+	m_camera_node = m_camera->getSceneManager()->getRootSceneNode()->createChildSceneNode();
+	m_camera_node->setPosition(m_camera_pivot->getPosition() + m_camera_goal->getPosition());
+	m_camera_pivot->setFixedYawAxis(true);
+	m_camera_goal->setFixedYawAxis(true);
+	m_camera_node->setFixedYawAxis(true);
+	m_camera_node->attachObject(m_camera);
+}
+
+void FollowCameraComponent::Update(float dt){
+	InputManager* input = NULL;
+	m_messenger->Notify(MSG_INPUT_MANAGER_GET, &input);
+	if (input){
+		OIS::MouseState ms = input->GetMouseState();
+		UpdateCameraGoal(-0.05f * ms.X.rel, -0.05f * ms.Y.rel, -0.0005f * ms.Z.rel);
+	}
+	Ogre::SceneNode* node = NULL;
+	m_messenger->Notify(MSG_NODE_GET_NODE, &node);
+	if (node){
+		m_camera_pivot->setPosition(node->getPosition() + Ogre::Vector3::UNIT_Y * 2);
+		Ogre::Vector3 goal_offset = m_camera_goal->_getDerivedPosition() - m_camera_node->getPosition();
+		m_camera_node->translate(goal_offset * dt * 9.0f);
+		m_camera_node->lookAt(m_camera_pivot->_getDerivedPosition(), Ogre::Node::TS_WORLD);
+	}
+}
+
+void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real delta_pitch, Ogre::Real delta_zoom){
+	m_camera_pivot->yaw(Ogre::Degree(delta_yaw), Ogre::Node::TS_WORLD);
+	if (!(m_pivot_pitch + delta_pitch > 15 && delta_pitch > 0) && 
+		!(m_pivot_pitch + delta_pitch < -60 && delta_pitch < 0)){
+			m_camera_pivot->pitch(Ogre::Degree(delta_pitch), Ogre::Node::TS_LOCAL);
+			m_pivot_pitch += delta_pitch;
+	}
+	Ogre::Real dist = m_camera_goal->_getDerivedPosition().distance(m_camera_pivot->_getDerivedPosition());
+	Ogre::Real dist_change = delta_zoom * dist;
+
+	if (!(dist + dist_change < 8 && dist_change < 0) &&
+		!(dist + dist_change > 25 && dist_change > 0)){
+			m_camera_goal->translate(0,0, dist_change, Ogre::Node::TS_LOCAL);
+	}
 }

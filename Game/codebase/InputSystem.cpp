@@ -70,25 +70,19 @@ void InputSystem::Shut(){
 }
 
 void InputSystem::Capture(){
-	//memcpy(m_last_keys, m_keys, sizeof(bool) * 238);
-	//memcpy(m_last_mouse_buttons, m_mouse_buttons, sizeof(bool) * 8);
-
 	if (m_mouse){
 		m_mouse->capture();
-		OIS::MouseState mouse_state = m_mouse->getMouseState();
-		m_bubble_adventure->SetMousePosition(mouse_state.X.abs, mouse_state.Y.abs, mouse_state.X.rel, mouse_state.Y.rel);
+		m_bubble_adventure->SetMouseState(m_mouse->getMouseState());
 	}
 	if (m_keyboard){
 		m_keyboard->capture();
 	}
-
 	if (m_joysticks.size() > 0){
 		for (auto it = m_joysticks.begin(); it != m_joysticks.end(); it++){
 			(*it)->capture();
 		}
 	}
 }
-
 
 void InputSystem::SetWindowExtents(int width, int height){
 	const OIS::MouseState& mouseState = m_mouse->getMouseState();

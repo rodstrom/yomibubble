@@ -56,7 +56,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\libs\vld\include;..\libs\Ogre\include;..\libs\boost;..\libs\Bullet\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\libs\vld\include;..\libs\Ogre\include;..\libs\boost;..\libs\Bullet\include\Bullet\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4786;4503;4251;4275;4290;4661;4996;4127;4100;4193;4244</DisableSpecificWarnings>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
@@ -97,7 +97,7 @@
     <ClCompile Include="Components\ComponentMessenger.cpp" />
     <ClCompile Include="Components\Components.cpp" />
     <ClCompile Include="Components\GameObject.cpp" />
-    <ClCompile Include="Components\PlayerController.cpp" />
+    <ClCompile Include="Components\PlayerInputComponent.cpp" />
     <ClCompile Include="Core.cpp" />
     <ClCompile Include="InputSystem.cpp" />
     <ClCompile Include="main.cpp" />
@@ -124,7 +124,7 @@
     <ClInclude Include="Components\GameObject.h" />
     <ClInclude Include="Components\GameObjectFactory.h" />
     <ClInclude Include="Components\GameObjectPrereq.h" />
-    <ClInclude Include="Components\PlayerController.h" />
+    <ClInclude Include="Components\PlayerInputComponent.h" />
     <ClInclude Include="Convert.h" />
     <ClInclude Include="Core.h" />
     <ClInclude Include="InputPrereq.h" />

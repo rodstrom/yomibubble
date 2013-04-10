@@ -13,7 +13,7 @@ public:
 
 	bool Init(Ogre::RenderWindow* render_window, MessageSystem* message_system);
 	void Shut();
-	void SetMousePosition(int x, int y, int rel_x, int rel_y);
+	void SetMouseState(const OIS::MouseState mouse_state);
 	void ButtonPressed(int btn);
 	void ButtonReleased(int btn);
 

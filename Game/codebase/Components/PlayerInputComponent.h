@@ -4,11 +4,11 @@
 #include "ComponentsPrereq.h"
 
 class InputManager;
-class PlayerController : public Component, public IComponentUpdateable, public IComponentObserver{
+class PlayerInputComponent : public Component, public IComponentUpdateable, public IComponentObserver{
 public:
-	PlayerController(void){ m_type = COMPONENT_PLAYER_CONTROLLER; }
-	virtual ~PlayerController(void){}
-	virtual void Update(float deltatime);
+	PlayerInputComponent(void){ m_type = COMPONENT_PLAYER_INPUT; }
+	virtual ~PlayerInputComponent(void){}
+	virtual void Update(float dt);
 	virtual void Notify(int type, void* message);
 	virtual void Shut();
 	virtual void Init(InputManager* input_manager);

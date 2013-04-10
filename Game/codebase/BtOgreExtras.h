@@ -16,7 +16,7 @@
 #ifndef _BtOgreShapes_H_
 #define _BtOgreShapes_H_
 
-#include "Bullet\btBulletDynamicsCommon.h"
+//#include "Bullet\btBulletDynamicsCommon.h"
 /*
 #include "btBulletDynamicsCommon.h"
 #include "OgreSceneNode.h"

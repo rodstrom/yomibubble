@@ -23,16 +23,16 @@ public:
 
 	void ButtonPressed(int btn);
 	void ButtonReleased(int btn);
-	void SetMousePosition(int x, int y, int rel_x, int rel_y);
+	void SetMouseState(const OIS::MouseState mouse_state);
 	void SetPause(bool value) { m_pause = value; }
 
-	const MousePosition& GetMousePosition() const { return m_mouse_position; }
+	const OIS::MouseState& GetMouseState() const { return m_mouse_state; }
 
 private:
 	bool			m_pause;
 	bool			m_buttons[BTN_SIZE];
 	bool			m_last_buttons[BTN_SIZE];
-	MousePosition	m_mouse_position;
+	OIS::MouseState m_mouse_state;
 };
 
 #endif // _CONTROLS_H_
