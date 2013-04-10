@@ -17,7 +17,7 @@
 #ifndef _BtOgreGP_H_
 #define _BtOgreGP_H_
 
-#include "Bullet\btBulletDynamicsCommon.h"
+//#include "Bullet\btBulletDynamicsCommon.h"
 //#include "btBulletDynamicsCommon.h"
 //#include "OgreSceneNode.h"
 #include "BtOgreExtras.h"
@@ -68,12 +68,14 @@ class RigidBodyState : public btMotionState
 
             btQuaternion rot = transform.getRotation();
             btVector3 pos = transform.getOrigin();
-			Ogre::Vector3 vec3 = Ogre::Vector3(pos.x(), pos.y(), pos.z());
-			Ogre::Quaternion q = Ogre::Quaternion(rot.w(),rot.x(), rot.y(), rot.z());
-			m_messenger->Notify(MSG_TRANSFORM_POSITION_SET, &vec3);
-			m_messenger->Notify(MSG_TRANSFORM_ORIENTATION_SET, &q);
-            //mNode->setOrientation(rot.w(), rot.x(), rot.y(), rot.z());
-            //mNode->setPosition(pos.x(), pos.y(), pos.z());
+			Ogre::Vector3 vec3 = BtOgre::Convert::toOgre(pos);
+			Ogre::Quaternion q = BtOgre::Convert::toOgre(rot);
+			Ogre::SceneNode* node = NULL;
+			m_messenger->Notify(MSG_NODE_GET_NODE, &node);
+			if (node){
+				node->setPosition(vec3);
+				node->setOrientation(q);
+			}
         }
 
         void setNode(Ogre::SceneNode *node)

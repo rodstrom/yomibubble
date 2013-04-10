@@ -5,25 +5,40 @@ enum EComponentType{
 	COMPONENT_NONE = 0,
 	COMPONENT_RENDERER ,
 	COMPONENT_COLLIDER,
-	COMPONENT_CONTROLLER,
+	COMPONENT_PLAYER_INPUT,
 	COMPONENT_ANIMATION,
+	COMPONENT_TRANSFORM,
 	COMPONENT_RIGIDBODY,
-	COMPONENT_AI
+	COMPONENT_AI,
+	COMPONENT_CHARACTER_CONTROLLER
 };
 
 enum EComponentMsg{
 	MSG_ADD_FORCE = 0,
-	MSG_SET_ANIMATION,
-	MSG_LOSE_LIFE,
-	MSG_TRANSFORM_POSITION_SET,
-	MSG_TRANSFORM_SCALE_SET,
-	MSG_TRANSFORM_POSITION_GET,
-	MSG_TRANSFORM_ORIENTATION_GET,
-	MSG_TRANSFORM_ORIENTATION_SET,
-	MSG_TRANSFORM_SCALE_GET,
+	MSG_NODE_GET_NODE,
+	MSG_MESH_RENDERER_GET_ENTITY,
+	MSG_RIGIDBODY_GET_BODY,
 	MSG_ANIMATION_PLAY,
 	MSG_ANIMATION_PAUSE,
+	MSG_CHARACTER_CONROLLER_VELOCITY_SET,
+	MSG_CHARACTER_CONROLLER_TURN_SPEED_SET,
+	MSG_CHARACTER_CONTROLLER_MOVE_FORWARD,
+	MSG_CHARACTER_CONTROLLER_MOVE_BACKWARDS,
+	MSG_CHARACTER_CONTROLLER_MOVE_LEFT,
+	MSG_CHARACTER_CONTROLLER_MOVE_RIGHT,
+	MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM,
+	MSG_CAMERA_GET_CAMERA_NODE,
+	MSG_CAMERA_GET_CAMERA,
+	MSG_CAMERA_SET_ACTIVE,
+	MSG_INPUT_MANAGER_GET,
 	MSG_SIZE
+};
+
+enum EColliderType{
+	COLLIDER_BOX = 0,
+	COLLIDER_SPHERE,
+	COLLIDER_CAPSULE,
+	COLLIDER_CYLINDER
 };
 
 class GameObject;
@@ -55,7 +70,19 @@ class IComponentUpdateable{
 public:
 	IComponentUpdateable(void){}
 	virtual ~IComponentUpdateable(void){}
-	virtual void Update(float deltatime) = 0;
+	virtual void Update(float dt) = 0;
+};
+
+class IComponentLateUpdate{
+public:
+	IComponentLateUpdate(void){}
+	virtual ~IComponentLateUpdate(void){}
+	virtual void LateUpdate(float dt) = 0;
+};
+
+struct RigidBodyDef{
+	int collider_type;
+	btScalar mass;
 };
 
 struct AnimationMsg{
@@ -64,7 +91,7 @@ struct AnimationMsg{
 };
 
 struct AddForceMsg{
-	float strength;
+	Ogre::Vector3 pwr;
 	Ogre::Vector3 dir;
 };
 

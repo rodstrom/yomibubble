@@ -1,14 +1,10 @@
 #include "..\stdafx.h"
 #include "PlayState.h"
 #include "..\Managers\InputManager.h"
-#include "..\InputSystem.h"
 #include "..\PhysicsEngine.h"
-#include "..\Components\GameObject.h"
-#include "..\Components\Components.h"
-#include "..\Components\ComponentMessenger.h"
-#include "..\Components\PlayerController.h"
+#include "..\Managers\GameObjectManager.h"
 
-PlayState::PlayState(void) : m_physics_engine(NULL){}
+PlayState::PlayState(void) : m_physics_engine(NULL), m_game_object_manager(NULL){}
 PlayState::~PlayState(void){}
 
 void PlayState::Enter(){
@@ -16,13 +12,17 @@ void PlayState::Enter(){
 	m_physics_engine = new PhysicsEngine;
 	m_physics_engine->Init();
 	m_physics_engine->SetDebugDraw(m_scene_manager);
-	m_camera = m_scene_manager->createCamera("Camera");
+	m_camera = m_scene_manager->createCamera("MainCamera");
 	m_camera->setPosition(Ogre::Vector3(0,0,50));
 	m_camera->lookAt(Ogre::Vector3(0,0,0));
 	m_camera->setNearClipDistance(5);
-	Ogre::Viewport* viewport = m_render_window->addViewport(m_camera);
-	viewport->setBackgroundColour(Ogre::ColourValue(0.0,0.0,1.0));
-	m_camera->setAspectRatio(Ogre::Real(viewport->getActualWidth()) / Ogre::Real(viewport->getActualHeight()));
+	m_viewport = m_render_window->addViewport(m_camera);
+	m_viewport->setBackgroundColour(Ogre::ColourValue(0.0,0.0,1.0));
+	m_camera->setAspectRatio(Ogre::Real(m_viewport->getActualWidth()) / Ogre::Real(m_viewport->getActualHeight()));
+	m_game_object_manager = new GameObjectManager;
+	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport);
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(0,0,0), NULL);
+
 	Ogre::Light* light = m_scene_manager->createLight("light1");
 	light->setType(Ogre::Light::LT_DIRECTIONAL);
 	light->setDirection(Ogre::Vector3(1,-1,0));
@@ -39,83 +39,22 @@ void PlayState::Enter(){
 	m_plane_body = new btRigidBody(0, m_ground_motion_state, m_plane_shape, btVector3(0,0,0));
 	m_physics_engine->AddRigidBody(m_plane_body);
 
-	m_messenger = new ComponentMessenger;
-	m_sinbad = new GameObject;
-
-	Animation* renderer = new Animation;
-	renderer->SetType(COMPONENT_RENDERER);
-	renderer->SetOwner(m_sinbad);
-	renderer->SetMessenger(m_messenger);
-	renderer->Init("sinbad.mesh", m_scene_manager);
-	renderer->AddAnimationStates(2);
-	m_sinbad->AddComponent(renderer);
-	m_sinbad->AddUpdateable(renderer);
-	Rigidbody* body = new Rigidbody;
-	body->SetType(COMPONENT_RIGIDBODY);
-	body->SetOwner(m_sinbad);
-	body->SetMessenger(m_messenger);
-	body->Init(renderer->GetEntity(), renderer->GetSceneNode(), m_physics_engine);
-	m_sinbad->AddComponent(body);
-	PlayerController* controller = new PlayerController;
-	controller->SetType(COMPONENT_CONTROLLER);
-	controller->SetOwner(m_sinbad);
-	controller->SetMessenger(m_messenger);
-	controller->Init(m_input_manager);
-	m_sinbad->AddComponent(controller);
-	m_sinbad->AddUpdateable(controller);
-	Transform* transform = new Transform;
-	transform->SetType(COMPONENT_NONE);
-	transform->SetOwner(m_sinbad);
-	transform->SetMessenger(m_messenger);
-	m_sinbad->AddComponent(transform);
-
-	/*Ogre::Vector3 pos = Ogre::Vector3(0,200,0);
-	Ogre::Quaternion rot = Ogre::Quaternion::IDENTITY;
-
-	m_penguin = m_scene_manager->createEntity("penguin", "penguin.mesh");
-	m_penguin_node = m_scene_manager->getRootSceneNode()->createChildSceneNode("penguinNode", pos, rot);
-	m_penguin_node->attachObject(m_penguin);
-	BtOgre::StaticMeshToShapeConverter converter2(m_penguin);
-	m_penguin_shape = converter2.createSphere();
-	btScalar mass = 5;
-	btVector3 inertia;
-	m_penguin_shape->calculateLocalInertia(mass, inertia);
-	m_penguin_state = new BtOgre::RigidBodyState(m_penguin_node);
-	m_penguin_body = new btRigidBody(mass, m_penguin_state, m_penguin_shape, inertia);
-	m_physics_engine->AddRigidBody(m_penguin_body);
-	m_physics_engine->ShowDebugDraw(false);
-
-	Ogre::AnimationStateIterator it = m_penguin->getAllAnimationStates()->getAnimationStateIterator();
-	while(it.hasMoreElements()){
-		Ogre::AnimationState* astate = it.getNext();
-		std::string line = astate->getAnimationName();
-		std::cout << line << "\n";
-	}*/
 	m_physics_engine->ShowDebugDraw(false);
 	m_scene_manager->setSkyDome(true, "Examples/CloudySky");
 }
 
 void PlayState::Exit(){
 	m_physics_engine->RemoveRigidBody(m_plane_body);
-	//m_physics_engine->RemoveRigidBody(m_penguin_body);
-
-	/*m_penguin_body->getMotionState();
-	delete m_penguin_body;
-	delete m_penguin_shape;
-	delete m_penguin_state;*/
 
 	m_plane_body->getMotionState();
 	delete m_plane_body;
 	delete m_ground_motion_state;
-	m_plane_shape->getMeshInterface();
+	delete m_plane_shape->getMeshInterface();
 	delete m_plane_shape;
 
-	m_sinbad->Shut();
-	delete m_sinbad;
-	m_sinbad = NULL;
-	delete m_messenger;
-	m_messenger = NULL;
-
+	m_game_object_manager->Shut();
+	delete m_game_object_manager;
+	m_game_object_manager = NULL;
 	m_physics_engine->CloseDebugDraw();
 	m_physics_engine->Shut();
 	delete m_physics_engine;
@@ -124,13 +63,11 @@ void PlayState::Exit(){
 	m_scene_manager = NULL;
 }
 
-bool PlayState::frameStarted(const Ogre::FrameEvent& evt){
-	return true;
-}
+
 
 bool PlayState::frameRenderingQueued(const Ogre::FrameEvent& evt){
-	m_sinbad->Update(evt.timeSinceLastFrame);
-	float cameraMovementSpeed = 50.0f;
+	m_game_object_manager->Update(evt.timeSinceLastFrame);
+	/*float cameraMovementSpeed = 50.0f;
 	Ogre::Vector3 translateCamera(0,0,0);
 	if (m_input_manager->IsButtonDown(BTN_W))
 		translateCamera += Ogre::Vector3(0,0,-1);
@@ -144,14 +81,10 @@ bool PlayState::frameRenderingQueued(const Ogre::FrameEvent& evt){
 	float rotX = m_input_manager->GetMousePosition().rel_x * evt.timeSinceLastFrame * -1;
 	float rotY = m_input_manager->GetMousePosition().rel_y * evt.timeSinceLastFrame * -1;
 	m_camera->yaw(Ogre::Radian(rotX));
-	m_camera->pitch(Ogre::Radian(rotY));
+	m_camera->pitch(Ogre::Radian(rotY));*/
 
-	//CEGUI::System::getSingleton().injectTimePulse(evt.timeSinceLastFrame);
-
-	if (m_input_manager->IsButtonPressed(BTN_BACK)){
-		return false;
-	}
 
 	m_physics_engine->Step(evt.timeSinceLastFrame, 10);
+	m_game_object_manager->LateUpdate(evt.timeSinceLastFrame);
 	return true;
 }
