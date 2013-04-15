@@ -1,4 +1,4 @@
-#include "..\stdafx.h"
+#include "stdafx.h"
 #include "StateManager.h"
 #include "..\InputSystem.h"
 #include "InputManager.h"
@@ -7,6 +7,13 @@ StateManager::StateManager(Ogre::RenderWindow* render_window, InputListener* inp
 	: m_render_window(render_window), m_input_listener(input_listener), m_message_system(message_system){}
 
 StateManager::~StateManager(void){}
+
+bool StateManager::Update(float dt){
+	if (!m_state_stack.empty()){
+		return m_state_stack.back()->Update(dt);
+	}
+	return false;
+}
 
 void StateManager::ManageState(const Ogre::String& id, State* state){
 	state_info nsi(id, state);
@@ -63,12 +70,12 @@ void StateManager::PopState(){
 }
 
 void StateManager::Init(State* state){
-	Ogre::Root::getSingleton().addFrameListener(state);
+	//Ogre::Root::getSingleton().addFrameListener(state);
 	m_input_listener->AddInputManager(state->GetInputManager());
 }
 
 void StateManager::Cleanup(State* state){
-	Ogre::Root::getSingleton().removeFrameListener(state);
+	//Ogre::Root::getSingleton().removeFrameListener(state);
 	m_input_listener->RemoveInputManager(state->GetInputManager());
 }
 

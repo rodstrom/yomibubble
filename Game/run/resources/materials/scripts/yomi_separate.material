@@ -1,0 +1,35 @@
+material "Yomi_2Body"
+{
+	technique
+	{
+		pass
+		{
+			scene_blend alpha_blend
+			depth_write on
+
+			texture_unit
+			{
+				texture Yomi_2Yomi_Diffuse.TGA
+			}
+		}
+	}
+}
+material "Yomi_2Hair"
+{
+	technique
+	{
+		pass
+		{
+			cull_hardware none
+			cull_software none
+
+			scene_blend alpha_blend
+			depth_write off
+
+			texture_unit
+			{
+				texture Yomi_2Yomi_Diffuse.TGA
+			}
+		}
+	}
+}

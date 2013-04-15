@@ -9,9 +9,10 @@ public:
 	MenuState(void);
 	~MenuState(void);
 
-	bool frameStarted(const Ogre::FrameEvent& evt);
-	bool frameRenderingQueued(const Ogre::FrameEvent& evt);
+	//bool frameStarted(const Ogre::FrameEvent& evt);
+	//bool frameRenderingQueued(const Ogre::FrameEvent& evt);
 
+	bool Update(float dt);
 	void Enter();
 	void Exit();
 

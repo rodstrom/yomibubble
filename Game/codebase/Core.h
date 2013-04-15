@@ -3,7 +3,7 @@
 
 class MessageSystem;
 class InputSystem;
-class BubbleAdventure;
+class Game;
 class Core
 {
 public:
@@ -18,7 +18,7 @@ private:
 	Ogre::RenderWindow* m_render_window;
 	InputSystem*		m_input_system;
 	MessageSystem*		m_message_system;
-	BubbleAdventure*	m_bubble_adventure;
+	Game*				m_game;
 };
 
 #endif // _CORE_H_
