@@ -8,6 +8,7 @@ public:
 	virtual GameObject* CreatePlayer(const Ogre::Vector3& position, void* data)		= 0;
 	virtual GameObject* CreateBlueBubble(const Ogre::Vector3& position, void* data) = 0;
 	virtual GameObject* CreatePinkBubble(const Ogre::Vector3& position, void* data) = 0;
+	virtual GameObject* Create2DOverlay(const Ogre::Vector3& p_position, void* data) = 0;
 };
 
 #endif // _N_GAME_OBJECT_FACTORY_H_

@@ -33,22 +33,17 @@ class RigidBodyState : public btMotionState
         btTransform mTransform;
         btTransform mCenterOfMassOffset;
 		ComponentMessenger* m_messenger;
-        Ogre::SceneNode *mNode;
 
     public:
-        RigidBodyState(ComponentMessenger* messenger, Ogre::SceneNode *node, const btTransform &transform, const btTransform &offset = btTransform::getIdentity())
+        RigidBodyState(ComponentMessenger* messenger, const btTransform &transform, const btTransform &offset = btTransform::getIdentity())
             : mTransform(transform),
               mCenterOfMassOffset(offset),
-              mNode(node),
 			  m_messenger(messenger)
         {
         }
 
-        RigidBodyState(ComponentMessenger* messenger, Ogre::SceneNode *node)
-            : mTransform(((node != NULL) ? BtOgre::Convert::toBullet(node->getOrientation()) : btQuaternion(0,0,0,1)),
-                         ((node != NULL) ? BtOgre::Convert::toBullet(node->getPosition())    : btVector3(0,0,0))),
+        RigidBodyState(ComponentMessenger* messenger) :
               mCenterOfMassOffset(btTransform::getIdentity()),
-              mNode(node),
 			  m_messenger(messenger)
         {
         }
@@ -60,7 +55,7 @@ class RigidBodyState : public btMotionState
 
         virtual void setWorldTransform(const btTransform &in)
         {
-            if (mNode == NULL)
+            if (m_messenger == NULL)
                 return;
 
             mTransform = in;
@@ -69,18 +64,13 @@ class RigidBodyState : public btMotionState
             btQuaternion rot = transform.getRotation();
             btVector3 pos = transform.getOrigin();
 			Ogre::Vector3 vec3 = BtOgre::Convert::toOgre(pos);
-			Ogre::Quaternion q = BtOgre::Convert::toOgre(rot);
+			Ogre::Quaternion quat = BtOgre::Convert::toOgre(rot);
 			Ogre::SceneNode* node = NULL;
 			m_messenger->Notify(MSG_NODE_GET_NODE, &node);
 			if (node){
 				node->setPosition(vec3);
-				node->setOrientation(q);
+				node->setOrientation(quat);
 			}
-        }
-
-        void setNode(Ogre::SceneNode *node)
-        {
-            mNode = node;
         }
 };
 

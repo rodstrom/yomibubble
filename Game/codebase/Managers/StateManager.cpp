@@ -8,6 +8,13 @@ StateManager::StateManager(Ogre::RenderWindow* render_window, InputListener* inp
 
 StateManager::~StateManager(void){}
 
+bool StateManager::Update(float dt){
+	if (!m_state_stack.empty()){
+		return m_state_stack.back()->Update(dt);
+	}
+	return false;
+}
+
 void StateManager::ManageState(const Ogre::String& id, State* state){
 	state_info nsi(id, state);
 	nsi._state->Init(m_render_window, m_message_system);
@@ -63,12 +70,12 @@ void StateManager::PopState(){
 }
 
 void StateManager::Init(State* state){
-	Ogre::Root::getSingleton().addFrameListener(state);
+	//Ogre::Root::getSingleton().addFrameListener(state);
 	m_input_listener->AddInputManager(state->GetInputManager());
 }
 
 void StateManager::Cleanup(State* state){
-	Ogre::Root::getSingleton().removeFrameListener(state);
+	//Ogre::Root::getSingleton().removeFrameListener(state);
 	m_input_listener->RemoveInputManager(state->GetInputManager());
 }
 
