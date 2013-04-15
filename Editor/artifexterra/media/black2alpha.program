@@ -1,6 +1,0 @@
-fragment_program Black2Alpha cg
-{
-  source black2alpha.cg
-  entry_point black2alpha_ps
-  profiles ps_2_0 arbfp1  
-}
