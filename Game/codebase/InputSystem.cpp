@@ -2,11 +2,12 @@
 #include "InputSystem.h"
 #include "BubbleAdventure.h"
 
-InputSystem::InputSystem(Ogre::RenderWindow* render_window) : 
+InputSystem::InputSystem(BubbleAdventure* bubble_adventure, Ogre::RenderWindow* render_window) : 
 m_render_window(render_window),
 m_mouse(nullptr),
 m_keyboard(nullptr),
-m_ois_input_manager(nullptr){}
+m_ois_input_manager(nullptr),
+m_bubble_adventure(bubble_adventure){}
 
 InputSystem::~InputSystem(void){}
 
@@ -31,7 +32,6 @@ void InputSystem::Init(){
 		if (m_ois_input_manager->getNumberOfDevices(OIS::OISMouse) > 0){
 			m_mouse = static_cast<OIS::Mouse*>(m_ois_input_manager->createInputObject(OIS::OISMouse, true));
 			m_mouse->setEventCallback(this);
-			m_tray_manager = new OgreBites::SdkTrayManager("InterfaceName", m_render_window, m_mouse, this);
 		}
 
 		if (m_ois_input_manager->getNumberOfDevices(OIS::OISJoyStick) > 0){
@@ -45,11 +45,9 @@ void InputSystem::Init(){
 		std::fill(m_last_keys, m_last_keys + 238, false);
 		std::fill(m_mouse_buttons, m_mouse_buttons + 8, false);
 		std::fill(m_last_mouse_buttons, m_last_mouse_buttons + 8, false);
+		
 	}
-}
-
-void InputSystem::SetGame(BubbleAdventure* p_bubble_adventure){
-	m_bubble_adventure = p_bubble_adventure;
+	windowResized(m_render_window);
 }
 
 void InputSystem::Shut(){
@@ -127,8 +125,6 @@ const bool InputSystem::IsMouseButtonPressed(OIS::MouseButtonID id, OIS::MouseEv
 	if (!m_last_mouse_buttons[id] && m_mouse_buttons[id]){
 		return true;
 	}
-
-	if(m_tray_manager->injectMouseDown(evt, id)) return true;
 	return false;
 }
 
@@ -136,7 +132,6 @@ const bool InputSystem::IsMouseButtonReleased(OIS::MouseButtonID id, OIS::MouseE
 	if (m_last_mouse_buttons[id] && !m_mouse_buttons[id]){
 		return true;
 	}
-
 	return false;
 }
 

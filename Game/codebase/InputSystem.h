@@ -6,10 +6,10 @@
 
 
 class BubbleAdventure;
-class InputSystem : public OIS::KeyListener, public OIS::MouseListener, public OIS::JoyStickListener, public Ogre::WindowEventListener, public OgreBites::SdkTrayListener
+class InputSystem : public OIS::KeyListener, public OIS::MouseListener, public OIS::JoyStickListener, public Ogre::WindowEventListener
 {
 public:
-	InputSystem(Ogre::RenderWindow* render_window);
+	InputSystem(BubbleAdventure* bubble_adventure, Ogre::RenderWindow* render_window);
 	~InputSystem(void);
 	
 	void Capture();
@@ -34,9 +34,7 @@ public:
 	void SetWindowExtents(int p_width, int p_height);	// will set new window boundary for the mouse, call this after window has been resized.
 
 	const MousePosition& GetMousePosition() const { return m_mouse_position; }
-	OgreBites::SdkTrayManager* GetTrayManager() { return m_tray_manager; }
 	OIS::Mouse* GetMouse() { return m_mouse; }
-	void SetGame(BubbleAdventure* p_bubble_adventure);
 	
 
 private:
@@ -69,8 +67,6 @@ private:
 	OIS::Mouse*			m_mouse;
 	OIS::Keyboard*		m_keyboard;
 	OIS::InputManager*	m_ois_input_manager;
-	OgreBites::SdkTrayManager* m_tray_manager;
-	OgreBites::SdkTrayListener * m_tray_listener;
 	
 	std::vector<OIS::JoyStick*>				m_joysticks;
 

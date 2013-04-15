@@ -22,6 +22,7 @@ private:
 	GameObject* CreatePlayer(const Ogre::Vector3& position, void* data);
 	GameObject* CreateBlueBubble(const Ogre::Vector3& position, void* data);
 	GameObject* CreatePinkBubble(const Ogre::Vector3& position, void* data);
+	GameObject* Create2DOverlay(const Ogre::Vector3& position, void* data);
 	void AddGameObject(GameObject* gameobject);
 
 	typedef GameObject* (GameObjectManager::*CreateObjectFptr)(const Ogre::Vector3&, void* data);

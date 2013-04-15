@@ -27,6 +27,20 @@ material Examples/Clouds
 	}
 }
 
+material Examples/Start
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture start.jpg
+			}
+		}
+	}
+}
+
 material Examples/BeachStones
 {
 	technique
@@ -59,7 +73,7 @@ material Examples/SpaceSkyBox
 		}
 	}
 }
-material CloudySky
+material Examples/CloudySky
 {
 	technique
 	{

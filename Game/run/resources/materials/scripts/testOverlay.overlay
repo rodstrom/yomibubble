@@ -10,16 +10,16 @@ testOverlay
         top 0
         width 0.5
         height 0.1
-        material Examples/Clouds
+        material Examples/Start
 
         // Another panel nested in this one
-        //container Panel(MyOverlayElements/AnotherPanel)
-        //{
-          //   left 0
-           //  top 0
-           //  width 0.1
-           //  height 0.1
-           //  material MyMaterials/NestedPanel
-        //}
+        container Panel(MyOverlayElements/AnotherPanel)
+        {
+             left 0
+             top 0
+             width 0.1
+             height 0.1
+             material Examples/BeachStones
+        }
     }
 }

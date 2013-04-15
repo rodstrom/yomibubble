@@ -7,8 +7,8 @@
 BubbleAdventure::BubbleAdventure(void) : m_state_manager(NULL){}
 BubbleAdventure::~BubbleAdventure(void){}
 
-bool BubbleAdventure::Init(Ogre::RenderWindow* render_window, MessageSystem* message_system, OgreBites::SdkTrayManager* p_tray_manager){
-	m_state_manager = new StateManager(render_window, this, message_system, p_tray_manager);
+bool BubbleAdventure::Init(Ogre::RenderWindow* render_window, MessageSystem* message_system){
+	m_state_manager = new StateManager(render_window, this, message_system);
 	PlayState::Create<PlayState>(m_state_manager, "PlayState");
 	MenuState::Create<MenuState>(m_state_manager, "MenuState");
 	m_state_manager->ChangeState(m_state_manager->FindById("PlayState"));
