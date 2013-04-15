@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "InputSystem.h"
-#include "BubbleAdventure.h"
+#include "Game.h"
 
-InputSystem::InputSystem(BubbleAdventure* bubble_adventure, Ogre::RenderWindow* render_window) : 
-m_bubble_adventure(bubble_adventure),
+InputSystem::InputSystem(Game* game, Ogre::RenderWindow* render_window) : 
+m_game(game),
 m_render_window(render_window),
 m_mouse(nullptr),
 m_keyboard(nullptr),
@@ -72,7 +72,7 @@ void InputSystem::Shut(){
 void InputSystem::Capture(){
 	if (m_mouse){
 		m_mouse->capture();
-		m_bubble_adventure->SetMouseState(m_mouse->getMouseState());
+		m_game->SetMouseState(m_mouse->getMouseState());
 	}
 	if (m_keyboard){
 		m_keyboard->capture();
@@ -139,34 +139,34 @@ const OIS::JoyStick* InputSystem::GetJoystick(unsigned int index) const {
 bool InputSystem::keyPressed(const OIS::KeyEvent& e){
 	switch (e.key){
 	case OIS::KC_UP:
-		m_bubble_adventure->ButtonPressed(BTN_UP);
+		m_game->ButtonPressed(BTN_UP);
 		break;
 	case OIS::KC_DOWN:
-		m_bubble_adventure->ButtonPressed(BTN_DOWN);
+		m_game->ButtonPressed(BTN_DOWN);
 		break;
 	case OIS::KC_RIGHT:
-		m_bubble_adventure->ButtonPressed(BTN_RIGHT);
+		m_game->ButtonPressed(BTN_RIGHT);
 		break;
 	case OIS::KC_LEFT:
-		m_bubble_adventure->ButtonPressed(BTN_LEFT);
+		m_game->ButtonPressed(BTN_LEFT);
 		break;
 	case OIS::KC_W:
-		m_bubble_adventure->ButtonPressed(BTN_W);
+		m_game->ButtonPressed(BTN_W);
 		break;
 	case OIS::KC_S:
-		m_bubble_adventure->ButtonPressed(BTN_S);
+		m_game->ButtonPressed(BTN_S);
 		break;
 	case OIS::KC_A:
-		m_bubble_adventure->ButtonPressed(BTN_A);
+		m_game->ButtonPressed(BTN_A);
 		break;
 	case OIS::KC_D:
-		m_bubble_adventure->ButtonPressed(BTN_D);
+		m_game->ButtonPressed(BTN_D);
 		break;
 	case OIS::KC_SPACE:
-		m_bubble_adventure->ButtonPressed(BTN_START);
+		m_game->ButtonPressed(BTN_START);
 		break;
 	case OIS::KC_ESCAPE:
-		m_bubble_adventure->ButtonPressed(BTN_BACK);
+		m_game->ButtonPressed(BTN_BACK);
 		break;
 	default:
 		break;
@@ -177,34 +177,34 @@ bool InputSystem::keyPressed(const OIS::KeyEvent& e){
 bool InputSystem::keyReleased(const OIS::KeyEvent& e){
 	switch (e.key){
 	case OIS::KC_UP:
-		m_bubble_adventure->ButtonReleased(BTN_UP);
+		m_game->ButtonReleased(BTN_UP);
 		break;
 	case OIS::KC_DOWN:
-		m_bubble_adventure->ButtonReleased(BTN_DOWN);
+		m_game->ButtonReleased(BTN_DOWN);
 		break;
 	case OIS::KC_RIGHT:
-		m_bubble_adventure->ButtonReleased(BTN_RIGHT);
+		m_game->ButtonReleased(BTN_RIGHT);
 		break;
 	case OIS::KC_LEFT:
-		m_bubble_adventure->ButtonReleased(BTN_LEFT);
+		m_game->ButtonReleased(BTN_LEFT);
 		break;
 	case OIS::KC_W:
-		m_bubble_adventure->ButtonReleased(BTN_W);
+		m_game->ButtonReleased(BTN_W);
 		break;
 	case OIS::KC_S:
-		m_bubble_adventure->ButtonReleased(BTN_S);
+		m_game->ButtonReleased(BTN_S);
 		break;
 	case OIS::KC_A:
-		m_bubble_adventure->ButtonReleased(BTN_A);
+		m_game->ButtonReleased(BTN_A);
 		break;
 	case OIS::KC_D:
-		m_bubble_adventure->ButtonReleased(BTN_D);
+		m_game->ButtonReleased(BTN_D);
 		break;
 	case OIS::KC_SPACE:
-		m_bubble_adventure->ButtonReleased(BTN_START);
+		m_game->ButtonReleased(BTN_START);
 		break;
 	case OIS::KC_ESCAPE:
-		m_bubble_adventure->ButtonReleased(BTN_BACK);
+		m_game->ButtonReleased(BTN_BACK);
 		break;
 	default:
 		break;
@@ -220,10 +220,10 @@ bool InputSystem::mouseMoved(const OIS::MouseEvent& e){
 bool InputSystem::mousePressed(const OIS::MouseEvent& e, OIS::MouseButtonID id){
 	switch (id){
 	case 1: //OIS::MouseButtonID::MB_Right: (1 == OIS::MouseButtonID::MB_Right, writing "OIS::MouseButtonID::MB_Right" instead of "1" causes build warning)
-		m_bubble_adventure->ButtonPressed(BTN_START);
+		m_game->ButtonPressed(BTN_RIGHT_MOUSE);
 		break;
 	case 0: //OIS::MouseButtonID::MB_Left:
-		m_bubble_adventure->ButtonPressed(BTN_BACK);
+		m_game->ButtonPressed(BTN_LEFT_MOUSE);
 		break;
 	default:
 		break;
@@ -234,10 +234,10 @@ bool InputSystem::mousePressed(const OIS::MouseEvent& e, OIS::MouseButtonID id){
 bool InputSystem::mouseReleased(const OIS::MouseEvent& e, OIS::MouseButtonID id){
 	switch (id){
 	case 1: //OIS::MouseButtonID::MB_Right:
-		m_bubble_adventure->ButtonReleased(BTN_START);
+		m_game->ButtonReleased(BTN_RIGHT_MOUSE);
 		break;
 	case 0: //OIS::MouseButtonID::MB_Left:
-		m_bubble_adventure->ButtonReleased(BTN_BACK);
+		m_game->ButtonReleased(BTN_LEFT_MOUSE);
 		break;
 	default:
 		break;

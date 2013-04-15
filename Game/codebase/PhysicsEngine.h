@@ -4,7 +4,7 @@
 #include "BtOgrePG.h"
 #include "BtOgreGP.h"
 #include "BulletCollision/CollisionDispatch/btGhostObject.h"
-#include "OGRE\OgreVector3.h"
+
 class PhysicsEngine
 {
 public:
@@ -14,12 +14,10 @@ public:
 	bool Init();
 	void Shut();
 
-	void Step(float dt, int time);
+	void Step(float dt);
 	void SetDebugDraw(Ogre::SceneManager* scene_manager);
 	void ShowDebugDraw(bool value);
 	void CloseDebugDraw();
-	void AddRigidBody(btRigidBody* rigidbody);
-	void RemoveRigidBody(btRigidBody* rigidbody);
 
 	btBroadphaseInterface* GetBroadphaseInterface() const { return m_broadphase; }
 	btDiscreteDynamicsWorld* GetDynamicWorld() const { return m_dynamic_world; }

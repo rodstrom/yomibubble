@@ -1,5 +1,7 @@
+#include "stdafx.h"
 #include "PhysicsEngine.h"
-
+#include "Components\GameObject.h"
+#include "Components\GameObjectPrereq.h"
 
 PhysicsEngine::PhysicsEngine(void) : 
 	m_broadphase(NULL), 
@@ -66,24 +68,47 @@ void PhysicsEngine::CloseDebugDraw(){
 	}
 }
 
-void PhysicsEngine::AddRigidBody(btRigidBody* rigidbody){
-	m_dynamic_world->addRigidBody(rigidbody);
-}
-
-void PhysicsEngine::RemoveRigidBody(btRigidBody* rigidbody){
-	m_dynamic_world->removeRigidBody(rigidbody);
-}
-
 void PhysicsEngine::ShowDebugDraw(bool value){
 	if (m_debug_drawer){
 		m_debug_drawer->setDebugMode(value);
+		m_dynamic_world->debugDrawWorld();
 	}
 }
 
-void PhysicsEngine::Step(float timestep, int substeps){
-	m_dynamic_world->stepSimulation(timestep, substeps);
+void PhysicsEngine::Step(float dt){
+	float fixed_time_step = 1.0f/60.0f;
+	float physics_time = dt / 1000.0f;
+	int max_steps = physics_time / (fixed_time_step) + 1;
+	//int max_steps = 2;
+	/*while (dt > (float)max_steps * fixed_time_step){
+		max_steps++;
+	}*/
+
+	m_dynamic_world->stepSimulation(dt, max_steps, fixed_time_step);
 	if (m_debug_drawer){
-		m_dynamic_world->debugDrawWorld();
 		m_debug_drawer->step();
+	}
+	int num_manifolds = m_dynamic_world->getDispatcher()->getNumManifolds();
+	for (int i = 0; i < num_manifolds; i++){
+		btPersistentManifold* contact_manifold = m_dynamic_world->getDispatcher()->getManifoldByIndexInternal(i);
+		const btCollisionObject* obj_a = static_cast<const btCollisionObject*>(contact_manifold->getBody0());
+		const btCollisionObject* obj_b = static_cast<const btCollisionObject*>(contact_manifold->getBody1());
+		int num_contacts = contact_manifold->getNumContacts();
+		for (int j = 0; j < num_contacts; j++){
+			btManifoldPoint& pt = contact_manifold->getContactPoint(j);
+			if (pt.getDistance() < 0.0f){
+				GameObject* go_a = static_cast<GameObject*>(obj_a->getUserPointer());
+				GameObject* go_b = static_cast<GameObject*>(obj_b->getUserPointer());
+				if (go_a->GetId() == GAME_OBJECT_PLAYER && go_b->GetId() == GAME_OBJECT_TOTT){
+					std::cout << "COLLISION\n";
+				}
+				else if (go_b->GetId() == GAME_OBJECT_PLAYER && go_a->GetId() == GAME_OBJECT_TOTT){
+					std::cout << "COLLISION\n";
+				}
+				const btVector3& pt_a = pt.getPositionWorldOnA();
+				const btVector3& pt_b = pt.getPositionWorldOnB();
+				const btVector3& normal_on_b = pt.m_normalWorldOnB;
+			}
+		}
 	}
 }

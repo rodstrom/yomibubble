@@ -1,16 +1,17 @@
-#include "..\stdafx.h"
+#include "stdafx.h"
 #include "GameObject.h"
-#include "Components.h"
+#include "ComponentMessenger.h"
+//#include "Components.h"
 
-int GameObject::m_object_counter = -1;
+int GameObject::m_object_counter = 0;
 
 GameObject::GameObject(void){
 	m_messenger = new ComponentMessenger;
 	m_object_counter++;
-	m_id = "GameObject" + NumberToString(m_object_counter);
+	m_id = m_object_counter;
 }
 
-GameObject::GameObject(const Ogre::String& id) : m_id(id){
+GameObject::GameObject(int id) : m_id(id){
 	m_messenger = new ComponentMessenger;
 	m_object_counter++;
 }
