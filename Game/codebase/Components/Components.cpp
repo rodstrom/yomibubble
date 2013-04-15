@@ -1,5 +1,4 @@
-#include "..\stdafx.h"
-#include "Components.h"
+#include "stdafx.h"
 #include "ComponentMessenger.h"
 #include "..\BtOgrePG.h"
 #include "..\BtOgreGP.h"
@@ -111,6 +110,35 @@ void AnimationComponent::Shut(){
 	MeshRenderComponent::Shut();
 }
 
+void ChildSceneNodeComponent::Notify(int type, void* msg){
+	switch (type)
+	{
+	case MSG_CHILD_NODE_GET_NODE:
+		*static_cast<Ogre::SceneNode**>(msg) = m_node;
+		break;
+	default:
+		break;
+	}
+}
+
+void ChildSceneNodeComponent::Init(const Ogre::Vector3& position, const Ogre::String& id, Ogre::SceneNode* parent){
+	m_id = id;
+	m_node = parent->createChildSceneNode();
+	m_node->setPosition(position);
+}
+
+void ChildSceneNodeComponent::Shut(){
+	if (m_messenger){
+		m_messenger->Unregister(MSG_CHILD_NODE_GET_NODE, this);
+	}
+}
+
+void ChildSceneNodeComponent::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
+	m_messenger->Register(MSG_CHILD_NODE_GET_NODE, this);
+}
+
+
 void RigidbodyComponent::Notify(int type, void* msg){
 	switch (type){
 	case MSG_ADD_FORCE:
@@ -124,7 +152,7 @@ void RigidbodyComponent::Notify(int type, void* msg){
 	}
 }
 
-void RigidbodyComponent::Init(Ogre::Entity* entity, Ogre::SceneNode* node, PhysicsEngine* physics_engine, btScalar p_mass, int collider_type){
+void RigidbodyComponent::Init(const Ogre::Vector3& position, Ogre::Entity* entity, PhysicsEngine* physics_engine, float p_mass, int collider_type, int body_type){
 	m_physics_engine = physics_engine;
 	BtOgre::StaticMeshToShapeConverter converter(entity);
 	switch (collider_type){
@@ -140,26 +168,44 @@ void RigidbodyComponent::Init(Ogre::Entity* entity, Ogre::SceneNode* node, Physi
 	case COLLIDER_SPHERE:
 		m_shape = converter.createSphere();
 		break;
+	case COLLIDER_TRIANGLE_MESH_SHAPE:
+		m_shape = converter.createTrimesh();
+		break;
 	default:
 		break;
 	}
-	btScalar mass = p_mass;
-	btVector3 inertia;
-	m_shape->calculateLocalInertia(mass, inertia);
-	m_rigidbody_state = new BtOgre::RigidBodyState(m_messenger, node);
-	m_rigidbody = new btRigidBody(mass, m_rigidbody_state, m_shape, inertia);
-	m_physics_engine->AddRigidBody(m_rigidbody);
+	if (body_type == DYNAMIC_BODY){
+		btScalar mass = (btScalar)p_mass;
+		btVector3 inertia;
+		m_shape->calculateLocalInertia(mass, inertia);
+		m_motion_state = new BtOgre::RigidBodyState(m_messenger);
+		m_rigidbody = new btRigidBody(mass, m_motion_state, m_shape, inertia);
+	}
+	else if (body_type == STATIC_BODY){
+		m_motion_state = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)));
+		m_rigidbody = new btRigidBody(0, m_motion_state, m_shape, btVector3(0,0,0));
+	}
+	m_collision_object = new btCollisionObject;
+	m_collision_object->setCollisionShape(m_shape);
+	m_collision_object->setUserPointer(m_owner);
+	m_rigidbody->setUserPointer(m_owner);
+	m_rigidbody->getWorldTransform().setOrigin(BtOgre::Convert::toBullet(position));
+	m_physics_engine->GetDynamicWorld()->addRigidBody(m_rigidbody);
+	m_physics_engine->GetDynamicWorld()->addCollisionObject(m_collision_object);
 }
 
 void RigidbodyComponent::Shut(){
 	m_physics_engine->GetDynamicWorld()->removeRigidBody(m_rigidbody);
+	m_physics_engine->GetDynamicWorld()->removeCollisionObject(m_collision_object);
 	m_rigidbody->getMotionState();
 	delete m_rigidbody;
 	m_rigidbody = NULL;
 	delete m_shape;
 	m_shape = NULL;
-	delete m_rigidbody_state;
-	m_rigidbody_state = NULL;
+	delete m_motion_state;
+	m_motion_state = NULL;
+	delete m_collision_object;
+	m_collision_object = NULL;
 	m_messenger->Unregister(MSG_RIGIDBODY_GET_BODY, this);
 }
 
@@ -167,7 +213,6 @@ void RigidbodyComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger = messenger;
 	m_messenger->Register(MSG_RIGIDBODY_GET_BODY, this);
 }
-
 
 void CharacterController::Notify(int type, void* msg){
 	switch (type){
@@ -213,27 +258,46 @@ void CharacterController::Update(float dt){
 	if (m_move_backwards){
 		walk_direction += btVector3(0.0, 0.0, 1.0);
 	}
-	if (m_move_backwards || m_move_forward || m_move_left || m_move_right){
+	if (m_move_backwards || m_move_forward || m_move_left || m_move_right){   //if the character is moving in any direction
+		if (m_has_follow_cam){
 		Ogre::SceneNode* node = NULL;
 		Ogre::SceneNode* camera_node = NULL;
 		m_messenger->Notify(MSG_NODE_GET_NODE, &node);
 		m_messenger->Notify(MSG_CAMERA_GET_CAMERA_NODE, &camera_node);
-		if (node && camera_node){
-			Ogre::Vector3 dir = BtOgre::Convert::toOgre(walk_direction);
-			Ogre::Vector3 goal_dir = Ogre::Vector3::ZERO;
-			goal_dir += dir.z * camera_node->getOrientation().zAxis();
-			goal_dir += dir.x * camera_node->getOrientation().xAxis();
-			goal_dir.y = 0.0f;
-			goal_dir.normalise();
-			Ogre::Quaternion goal = node->getOrientation().zAxis().getRotationTo(goal_dir);
-			Ogre::Real yaw_to_goal = goal.getYaw().valueDegrees();
-			Ogre::Real yaw_at_speed = yaw_to_goal / Ogre::Math::Abs(yaw_to_goal) * dt * m_turn_speed;
+			if (node && camera_node){
+				Ogre::Vector3 dir = BtOgre::Convert::toOgre(walk_direction);
+				Ogre::Vector3 goal_dir = Ogre::Vector3::ZERO;
+				goal_dir += dir.z * camera_node->getOrientation().zAxis();
+				goal_dir += dir.x * camera_node->getOrientation().xAxis();
+				goal_dir.y = 0.0f;
+				goal_dir.normalise();
+				Ogre::Quaternion goal = node->getOrientation().zAxis().getRotationTo(goal_dir);
+				Ogre::Real yaw_to_goal = goal.getYaw().valueDegrees();
+				Ogre::Real yaw_at_speed = yaw_to_goal / Ogre::Math::Abs(yaw_to_goal) * dt * m_turn_speed;
 
-			if (yaw_to_goal < 0) yaw_to_goal = std::min<Ogre::Real>(0, std::max<Ogre::Real>(yaw_to_goal, yaw_at_speed));
-			else if (yaw_to_goal > 0) yaw_to_goal = std::max<Ogre::Real>(0, std::min<Ogre::Real>(yaw_to_goal, yaw_at_speed));
-			node->yaw(Ogre::Degree(yaw_to_goal));
-			m_controller->setWalkDirection(BtOgre::Convert::toBullet(goal_dir * (float)walk_speed));
-		}	
+				if (yaw_to_goal < 0) yaw_to_goal = std::min<Ogre::Real>(0, std::max<Ogre::Real>(yaw_to_goal, yaw_at_speed));
+				else if (yaw_to_goal > 0) yaw_to_goal = std::max<Ogre::Real>(0, std::min<Ogre::Real>(yaw_to_goal, yaw_at_speed));
+				node->yaw(Ogre::Degree(yaw_to_goal));
+				m_controller->setWalkDirection(BtOgre::Convert::toBullet(goal_dir * (float)walk_speed));
+			}
+		}
+		else{
+			Ogre::SceneNode* node = NULL;
+			m_messenger->Notify(MSG_NODE_GET_NODE, &node);
+				if (node){
+					Ogre::Vector3 dir = BtOgre::Convert::toOgre(walk_direction);
+					dir.y = 0.0f;
+					dir.normalise();
+					Ogre::Quaternion goal = node->getOrientation().zAxis().getRotationTo(dir);
+					Ogre::Real yaw_to_goal = goal.getYaw().valueDegrees();
+					Ogre::Real yaw_at_speed = yaw_to_goal / Ogre::Math::Abs(yaw_to_goal) * dt * m_turn_speed;
+
+					if (yaw_to_goal < 0) yaw_to_goal = std::min<Ogre::Real>(0, std::max<Ogre::Real>(yaw_to_goal, yaw_at_speed));
+					else if (yaw_to_goal > 0) yaw_to_goal = std::max<Ogre::Real>(0, std::min<Ogre::Real>(yaw_to_goal, yaw_at_speed));
+					node->yaw(Ogre::Degree(yaw_to_goal));
+					m_controller->setWalkDirection(BtOgre::Convert::toBullet(dir * (float)walk_speed));
+				}
+		}
 	}
 	else{
 		m_controller->setWalkDirection(walk_direction * walk_speed);
@@ -285,21 +349,20 @@ void CharacterController::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM, this);
 }
 
-void CharacterController::Init(PhysicsEngine* physics_engine){
+void CharacterController::Init(const Ogre::Vector3& position, Ogre::Entity* entity, float width, float height, float step_height, PhysicsEngine* physics_engine){
 	m_physics_engine = physics_engine;
+	BtOgre::StaticMeshToShapeConverter converter(entity);
 	btTransform start_transform;
 	start_transform.setIdentity();
-	start_transform.setOrigin(btVector3(0.0, 10.0, 0.0));
+	start_transform.setOrigin(BtOgre::Convert::toBullet(position));
 	m_ghost_object = new btPairCachingGhostObject;
 	m_ghost_object->setWorldTransform(start_transform);
-	btScalar char_height = 6.0;
-	btScalar char_width = 1.75;
-	m_shape = new btCapsuleShape(char_width, char_height);
+	m_shape = converter.createCapsule();
 	m_ghost_object->setCollisionShape(m_shape);
 	m_ghost_object->setCollisionFlags(btCollisionObject::CF_CHARACTER_OBJECT);
-	btScalar step_height = btScalar(0.35);
-	m_controller = new btKinematicCharacterController(m_ghost_object, m_shape, step_height);
-	m_physics_engine->GetDynamicWorld()->addCollisionObject(m_ghost_object, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter|btBroadphaseProxy::DefaultFilter);
+	m_controller = new btKinematicCharacterController(m_ghost_object, m_shape, (btScalar)step_height);
+	m_ghost_object->setUserPointer(m_owner);
+	m_physics_engine->GetDynamicWorld()->addCollisionObject(m_ghost_object, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter|btBroadphaseProxy::DefaultFilter|btBroadphaseProxy::CharacterFilter);
 	m_physics_engine->GetDynamicWorld()->addAction(m_controller);
 }
 
@@ -375,7 +438,7 @@ void FollowCameraComponent::SetMessenger(ComponentMessenger* messenger){
 void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewport* viewport, bool activate, const Ogre::String& camera_id){
 	CameraComponent::Init(scene_manager, viewport, activate, camera_id);
 	m_camera_pivot = m_camera->getSceneManager()->getRootSceneNode()->createChildSceneNode();
-	m_camera_goal = m_camera_pivot->createChildSceneNode(Ogre::Vector3(0,0,20));
+	m_camera_goal = m_camera_pivot->createChildSceneNode(Ogre::Vector3(0,0,2));
 	m_camera_node = m_camera->getSceneManager()->getRootSceneNode()->createChildSceneNode();
 	m_camera_node->setPosition(m_camera_pivot->getPosition() + m_camera_goal->getPosition());
 	m_camera_pivot->setFixedYawAxis(true);
@@ -394,7 +457,7 @@ void FollowCameraComponent::Update(float dt){
 	Ogre::SceneNode* node = NULL;
 	m_messenger->Notify(MSG_NODE_GET_NODE, &node);
 	if (node){
-		m_camera_pivot->setPosition(node->getPosition() + Ogre::Vector3::UNIT_Y * 2);
+		m_camera_pivot->setPosition(node->getPosition() + Ogre::Vector3::UNIT_Y * 1);
 		Ogre::Vector3 goal_offset = m_camera_goal->_getDerivedPosition() - m_camera_node->getPosition();
 		m_camera_node->translate(goal_offset * dt * 9.0f);
 		m_camera_node->lookAt(m_camera_pivot->_getDerivedPosition(), Ogre::Node::TS_WORLD);

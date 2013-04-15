@@ -23,6 +23,22 @@ protected:
 	Ogre::SceneManager* m_scene_manager;
 };
 
+class ChildSceneNodeComponent : public Component, public IComponentObserver{
+public:
+	ChildSceneNodeComponent(void){}
+	virtual ~ChildSceneNodeComponent(void){}
+	virtual void Notify(int type, void* msg);
+	virtual void Init(const Ogre::Vector3& position, const Ogre::String& id, Ogre::SceneNode* parent);
+	virtual void Shut();
+	virtual void SetMessenger(ComponentMessenger* messenger);
+	Ogre::SceneNode* GetNode() const { return m_node; }
+	const Ogre::String& GetId() const { return m_id; }
+
+protected:
+	Ogre::SceneNode* m_node;
+	Ogre::String m_id;
+};
+
 class AnimationComponent : public MeshRenderComponent, public IComponentUpdateable{
 public:
 	AnimationComponent(void){ m_type = COMPONENT_ANIMATION; }
@@ -41,18 +57,19 @@ protected:
 class PhysicsEngine;
 class RigidbodyComponent : public Component, public IComponentObserver{
 public:
-	RigidbodyComponent(void) : m_rigidbody(NULL), m_rigidbody_state(NULL), m_shape(NULL){ m_type = COMPONENT_RIGIDBODY; }
+	RigidbodyComponent(void) : m_rigidbody(NULL), m_shape(NULL), m_motion_state(NULL), m_collision_object(NULL){ m_type = COMPONENT_RIGIDBODY; }
 	virtual ~RigidbodyComponent(void){}
 	virtual void Notify(int type, void* message);
-	virtual void Init(Ogre::Entity* entity, Ogre::SceneNode* node, PhysicsEngine* physics_engine, btScalar p_mass, int collider_type);
+	virtual void Init(const Ogre::Vector3& position, Ogre::Entity* entity, PhysicsEngine* physics_engine, float mass, int collider_type, int body_type = DYNAMIC_BODY);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
 	btRigidBody* GetRigidbody() { return m_rigidbody; }
 
 protected:
 	btRigidBody*			m_rigidbody;
-	BtOgre::RigidBodyState* m_rigidbody_state;
 	btCollisionShape*		m_shape;
+	btCollisionObject*		m_collision_object;
+	btMotionState*			m_motion_state;
 	PhysicsEngine*			m_physics_engine;
 };
 
@@ -65,7 +82,7 @@ public:
 	virtual void Notify(int type, void* msg);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
-	virtual void Init(PhysicsEngine* physics_engine);
+	virtual void Init(const Ogre::Vector3& position, Ogre::Entity* entity, float width, float height, float step_height, PhysicsEngine* physics_engine);
 	virtual void Update(float dt);
 	virtual void LateUpdate(float dt);
 	void SetVelocity(btScalar velocity) { m_velocity = velocity; }
@@ -88,7 +105,7 @@ protected:
 
 class CameraComponent : public Component, public IComponentObserver, public IComponentUpdateable{
 public:
-	CameraComponent(void) : m_scene_manager(NULL), m_camera(NULL), m_viewport(NULL), m_camera_id(Ogre::StringUtil::BLANK) {}
+	CameraComponent(void) : m_scene_manager(NULL), m_camera(NULL), m_viewport(NULL), m_camera_id(Ogre::StringUtil::BLANK) { m_type = COMPONENT_CAMERA; }
 	virtual ~CameraComponent(void){}
 	virtual void Notify(int type, void* msg);
 	virtual void Shut();
@@ -108,7 +125,7 @@ protected:
 
 class FollowCameraComponent : public CameraComponent{
 public:
-	FollowCameraComponent(void) : m_camera_goal(NULL), m_camera_pivot(NULL), m_camera_node(NULL), m_pivot_pitch(0){}
+	FollowCameraComponent(void) : m_camera_goal(NULL), m_camera_pivot(NULL), m_camera_node(NULL), m_pivot_pitch(0) { m_type = COMPONENT_FOLLOW_CAMERA; }
 	virtual ~FollowCameraComponent(void){}
 	virtual void Notify(int type, void* msg);
 	virtual void Shut();

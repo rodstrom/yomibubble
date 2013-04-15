@@ -2,16 +2,17 @@
 #define _N_GAME_OBJECT_MANAGER_H_
 
 #include "..\Components\GameObjectPrereq.h"
-#include "..\Components\GameObjectFactory.h"
 
+class GameObject;
 class InputManager;
 class PhysicsEngine;
-class GameObjectManager : public IGameObjectFactory
+class SoundManager;
+class GameObjectManager
 {
 public:
 	GameObjectManager(void);
 	~GameObjectManager(void);
-	void Init(PhysicsEngine* physics_engine, Ogre::SceneManager* scene_manager, InputManager* input_manager, Ogre::Viewport* viewport);
+	void Init(PhysicsEngine* physics_engine, Ogre::SceneManager* scene_manager, InputManager* input_manager, Ogre::Viewport* viewport, SoundManager* sound_manager);
 	void Update(float dt);
 	void LateUpdate(float dt);		// Update performed after physics simulation.	
 	void RemoveGameObject(GameObject* gameobject);
@@ -19,11 +20,13 @@ public:
 	void Shut();
 
 private:
+	void AddGameObject(GameObject* gameobject);
 	GameObject* CreatePlayer(const Ogre::Vector3& position, void* data);
 	GameObject* CreateBlueBubble(const Ogre::Vector3& position, void* data);
 	GameObject* CreatePinkBubble(const Ogre::Vector3& position, void* data);
 	GameObject* Create2DOverlay(const Ogre::Vector3& position, void* data);
-	void AddGameObject(GameObject* gameobject);
+	GameObject* CreateTott(const Ogre::Vector3& position, void* data);
+	GameObject* CreatePlane(const Ogre::Vector3& position, void* data);
 
 	typedef GameObject* (GameObjectManager::*CreateObjectFptr)(const Ogre::Vector3&, void* data);
 	
@@ -35,6 +38,7 @@ private:
 	Ogre::SceneManager*		m_scene_manager;
 	InputManager*			m_input_manager;
 	Ogre::Viewport*			m_viewport;
+	SoundManager*			m_sound_manager;
 };
 
 #endif // _N_GAME_OBJECT_MANAGER_H_

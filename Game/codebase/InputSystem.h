@@ -5,11 +5,11 @@
 #include <OGRE\SdkTrays.h>
 
 
-class BubbleAdventure;
+class Game;
 class InputSystem : public OIS::KeyListener, public OIS::MouseListener, public OIS::JoyStickListener, public Ogre::WindowEventListener
 {
 public:
-	InputSystem(BubbleAdventure* bubble_adventure, Ogre::RenderWindow* render_window);
+	InputSystem(Game* bubble_adventure, Ogre::RenderWindow* render_window);
 	~InputSystem(void);
 	
 	void Capture();
@@ -38,7 +38,7 @@ public:
 	
 
 private:
-	BubbleAdventure* m_bubble_adventure;
+	Game* m_game;
 
 	virtual void windowResized(Ogre::RenderWindow* render_window);
 	virtual void windowClosed(Ogre::RenderWindow* render_window);
