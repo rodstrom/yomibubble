@@ -13,8 +13,9 @@ public:
 	PlayState(void);
 	~PlayState(void);
 
-	bool frameRenderingQueued(const Ogre::FrameEvent& evt);
+	//bool frameRenderingQueued(const Ogre::FrameEvent& evt);
 
+	bool Update(float dt);
 	void Enter();
 	void Exit();
 

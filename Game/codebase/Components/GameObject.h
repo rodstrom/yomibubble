@@ -8,13 +8,13 @@ class GameObject
 {
 public:
 	GameObject(void);
-	GameObject(const Ogre::String& id);
+	GameObject(int id);
 	~GameObject(void);
 
 	void Update(float dt);
 	void LateUpdate(float dt);		// Late Update is used to sync Kinematic character controllers to the renderer
 	Component* GetComponent(int type);
-	void GetComponents(int type, std::vector<Component*>& list);	// get a list of all components, should there be more than one of the same type
+	void GetComponents(int type, std::vector<Component*>& list);	// get a list of all components of selected type, should there be more than one of the same type
 	void AddComponent(Component* component);
 	void AddUpdateable(IComponentUpdateable* updateable);
 	void AddLateUpdate(IComponentLateUpdate* late_update);
@@ -23,7 +23,8 @@ public:
 	bool DoLateUpdate();
 	GameObjectManager* GetGameObjectManager() const { return m_game_object_manager; }
 	ComponentMessenger* GetComponentMessenger() const { return m_messenger; }
-	const Ogre::String& GetId() { return m_id; }
+	int GetId() { return m_id; }
+	void SetGameObjectManager(GameObjectManager* game_object_manager) { m_game_object_manager = game_object_manager; }
 
 private:
 	std::vector<Component*> m_components;
@@ -31,7 +32,7 @@ private:
 	std::vector<IComponentLateUpdate*> m_late_updates;
 	ComponentMessenger* m_messenger;
 	GameObjectManager* m_game_object_manager;
-	Ogre::String m_id;
+	int m_id;
 	static int m_object_counter;
 };
 

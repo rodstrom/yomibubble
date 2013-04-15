@@ -8,7 +8,7 @@ class InputListener{
 public:
 	virtual void AddInputManager(InputManager* input_manager)		= 0;
 	virtual void RemoveInputManager(InputManager* input_manager)	= 0;
-	virtual void Update()											= 0;
+	virtual void UpdateInput()										= 0;
 };
 
 class InputManager{

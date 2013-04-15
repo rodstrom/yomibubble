@@ -2,11 +2,11 @@
 #define _N_GAME_OBJECT_MANAGER_H_
 
 #include "..\Components\GameObjectPrereq.h"
-#include "..\Components\GameObjectFactory.h"
 
+class GameObject;
 class InputManager;
 class PhysicsEngine;
-class GameObjectManager : public IGameObjectFactory
+class GameObjectManager
 {
 public:
 	GameObjectManager(void);
@@ -19,10 +19,12 @@ public:
 	void Shut();
 
 private:
+	void AddGameObject(GameObject* gameobject);
 	GameObject* CreatePlayer(const Ogre::Vector3& position, void* data);
 	GameObject* CreateBlueBubble(const Ogre::Vector3& position, void* data);
 	GameObject* CreatePinkBubble(const Ogre::Vector3& position, void* data);
-	void AddGameObject(GameObject* gameobject);
+	GameObject* CreateTott(const Ogre::Vector3& position, void* data);
+	GameObject* CreatePlane(const Ogre::Vector3& position, void* data);
 
 	typedef GameObject* (GameObjectManager::*CreateObjectFptr)(const Ogre::Vector3&, void* data);
 	

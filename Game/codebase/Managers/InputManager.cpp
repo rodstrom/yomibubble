@@ -1,4 +1,4 @@
-#include "..\stdafx.h"
+#include "stdafx.h"
 #include "InputManager.h"
 
 InputManager::InputManager(void) : m_pause(false) {

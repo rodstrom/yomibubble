@@ -17,7 +17,8 @@ public:
 	virtual void PopState() = 0;
 };
 
-class State : public Ogre::FrameListener
+//class State : public Ogre::FrameListener
+class State
 {
 public:
 	template <typename T>
@@ -29,6 +30,7 @@ public:
 	void Destroy(void) { delete this; }
 	void Init(Ogre::RenderWindow* render_window, MessageSystem* message_system) { m_render_window = render_window; m_message_system = message_system; }
 	InputManager* GetInputManager() const { return m_input_manager; }
+	virtual bool Update(float dt) = 0;
 	virtual void Enter() = 0;
 	virtual void Exit() = 0;
 	virtual bool Pause() { return false; }
