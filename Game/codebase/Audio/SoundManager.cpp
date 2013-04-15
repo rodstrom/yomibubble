@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "SoundManager.h"
 
 SoundManager::SoundManager(Ogre::SceneManager* scene_manager, Ogre::Camera* camera){

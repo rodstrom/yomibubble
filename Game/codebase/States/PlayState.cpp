@@ -1,4 +1,4 @@
-#include "..\stdafx.h"
+#include "stdafx.h"
 #include "PlayState.h"
 #include "..\Managers\InputManager.h"
 #include "..\PhysicsEngine.h"

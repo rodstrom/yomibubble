@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "AudioComponents.h"
 #include "..\Audio\SoundManager.h"
 #include "ComponentMessenger.h"

@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "PlayerInputComponent.h"
 #include "..\Managers\InputManager.h"
 #include "ComponentMessenger.h"

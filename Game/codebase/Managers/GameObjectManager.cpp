@@ -1,4 +1,4 @@
-#include "..\stdafx.h"
+#include "stdafx.h"
 #include "GameObjectManager.h"
 #include "..\Components\GameObject.h"
 #include "..\PhysicsEngine.h"
