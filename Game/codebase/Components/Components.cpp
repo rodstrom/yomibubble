@@ -479,3 +479,75 @@ void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real de
 			m_camera_goal->translate(0,0, dist_change, Ogre::Node::TS_LOCAL);
 	}
 }
+
+void Overlay2DComponent::Init(const Ogre::String& p_overlay_name){
+	Ogre::OverlayManager* overlay_manager = Ogre::OverlayManager::getSingletonPtr();
+	m_id = p_overlay_name;
+
+	m_overlay = overlay_manager->getByName(m_id);	
+	m_overlay->show();
+}
+
+void Overlay2DComponent::Shut()
+{
+	if (m_messenger){
+		m_messenger->Unregister(MSG_GET_2D_OVERLAY_CONTAINER, this);
+	}
+	Ogre::OverlayManager& overlay_mrg = Ogre::OverlayManager::getSingleton();
+	overlay_mrg.destroy(m_overlay);
+}
+
+void Overlay2DComponent::Notify(int type, void* msg){
+	switch(type){
+	case MSG_GET_2D_OVERLAY_CONTAINER:
+		*static_cast<Ogre::OverlayContainer**>(msg) = m_overlay->getChild("MyOverlayElements/TestPanel");
+		break;
+	}
+}
+
+void Overlay2DComponent::SetMessenger(ComponentMessenger* messenger) {
+	m_messenger = messenger;
+	m_messenger->Register(MSG_GET_2D_OVERLAY_CONTAINER, this);
+}
+
+void OverlayCollisionCallback::Init(InputManager* p_input_manager, Ogre::Viewport* p_view_port){
+	m_input_manager = p_input_manager;
+	m_view_port = p_view_port;
+
+}
+
+void OverlayCollisionCallback::Update(float dt){
+	Ogre::OverlayContainer* overlay_container = NULL;
+
+	m_messenger->Notify(MSG_GET_2D_OVERLAY_CONTAINER, &overlay_container);
+	if(overlay_container){
+		float mouseX = m_input_manager->GetMouseState().X.abs / (float)m_view_port->getActualWidth();
+		float mouseY = m_input_manager->GetMouseState().Y.abs / (float)m_view_port->getActualHeight(); 
+		std::cout << mouseX << "   " << mouseY << std::endl;  
+		float x = overlay_container->getLeft();
+		float y = overlay_container->getTop();
+		float w = overlay_container->getWidth();
+		float h = overlay_container->getHeight();
+
+		if(mouseX <= x) return;
+		if(mouseX >= x + w) return;
+		if(mouseY <= y) return;
+		if(mouseY >= y + h) return;
+
+		std::cout << "collision" << std::endl;
+		
+	}
+
+}
+
+
+void OverlayCollisionCallback::Shut(){
+}
+
+void OverlayCollisionCallback::Notify(int type, void* msg){
+}
+
+void OverlayCollisionCallback::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
+}
+

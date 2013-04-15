@@ -28,6 +28,10 @@ void PlayState::Enter(){
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(0,10,0), &player_def);
 	CharControllerDef tott_def(COLLIDER_CAPSULE, 0.35f, 500.0f, 5.0f);
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(1,10,1), &tott_def);
+	
+	Ogre::String overlay = "testOverlay";
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_OVERLAY, Ogre::Vector3(0,0,0), &overlay);
+	
 
 
 	Ogre::Light* light = m_scene_manager->createLight("light1");

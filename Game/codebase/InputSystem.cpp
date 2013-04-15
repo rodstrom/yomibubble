@@ -20,7 +20,10 @@ void InputSystem::Init(){
 		m_render_window->getCustomAttribute("WINDOW", &windowHnd);
 		windowHndStr << windowHnd;
 		pl.insert(std::make_pair(std::string("WINDOW"), windowHndStr.str()));
+		pl.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_FOREGROUND")));
+		pl.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_NONEXCLUSIVE")));
 		m_ois_input_manager = OIS::InputManager::createInputSystem(pl);
+		
 		if (m_ois_input_manager->getNumberOfDevices(OIS::OISKeyboard) > 0){
 			m_keyboard = static_cast<OIS::Keyboard*>(m_ois_input_manager->createInputObject(OIS::OISKeyboard, true));
 			m_keyboard->setEventCallback(this);
@@ -42,7 +45,9 @@ void InputSystem::Init(){
 		std::fill(m_last_keys, m_last_keys + 238, false);
 		std::fill(m_mouse_buttons, m_mouse_buttons + 8, false);
 		std::fill(m_last_mouse_buttons, m_last_mouse_buttons + 8, false);
+		
 	}
+	windowResized(m_render_window);
 }
 
 void InputSystem::Shut(){
@@ -110,18 +115,20 @@ const bool InputSystem::IsKeyReleased(OIS::KeyCode key) const{
 	return false;
 }
 
-const bool InputSystem::IsMouseButtonDown(OIS::MouseButtonID id) const{
+const bool InputSystem::IsMouseButtonDown(OIS::MouseButtonID id, OIS::MouseEvent& evt) const{
 	return m_mouse_buttons[id];
+
+	
 }
 
-const bool InputSystem::IsMouseButtonPressed(OIS::MouseButtonID id) const{
+const bool InputSystem::IsMouseButtonPressed(OIS::MouseButtonID id, OIS::MouseEvent& evt) const{
 	if (!m_last_mouse_buttons[id] && m_mouse_buttons[id]){
 		return true;
 	}
 	return false;
 }
 
-const bool InputSystem::IsMouseButtonReleased(OIS::MouseButtonID id) const{
+const bool InputSystem::IsMouseButtonReleased(OIS::MouseButtonID id, OIS::MouseEvent& evt) const{
 	if (m_last_mouse_buttons[id] && !m_mouse_buttons[id]){
 		return true;
 	}

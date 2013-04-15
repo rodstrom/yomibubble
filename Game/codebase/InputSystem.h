@@ -2,6 +2,8 @@
 #define _INPUT_MANAGER_H_
 
 #include "InputPrereq.h"
+#include <OGRE\SdkTrays.h>
+
 
 class Game;
 class InputSystem : public OIS::KeyListener, public OIS::MouseListener, public OIS::JoyStickListener, public Ogre::WindowEventListener
@@ -9,27 +11,31 @@ class InputSystem : public OIS::KeyListener, public OIS::MouseListener, public O
 public:
 	InputSystem(Game* bubble_adventure, Ogre::RenderWindow* render_window);
 	~InputSystem(void);
-
+	
 	void Capture();
 	void Init();
 	void Shut();
+	void Test();
 
 	const bool IsKeyDown(OIS::KeyCode) const;		// check if a keyboard key is down
 	const bool IsKeyPressed(OIS::KeyCode) const;	// check if a keybaord key is pressed
 	const bool IsKeyReleased(OIS::KeyCode) const;	// check if a keyboard key is released
 
-	const bool IsMouseButtonDown(OIS::MouseButtonID) const;
-	const bool IsMouseButtonPressed(OIS::MouseButtonID) const;
-	const bool IsMouseButtonReleased(OIS::MouseButtonID) const;
+	const bool IsMouseButtonDown(OIS::MouseButtonID, OIS::MouseEvent& evt) const;
+	const bool IsMouseButtonPressed(OIS::MouseButtonID, OIS::MouseEvent& evt) const;
+	const bool IsMouseButtonReleased(OIS::MouseButtonID, OIS::MouseEvent& evt) const;
 
 	const OIS::Keyboard*	GetKeyboard() const		{ return m_keyboard; }
 	const OIS::Mouse*		GetMouse() const		{ return m_mouse; }
 	
-	const OIS::JoyStick*	GetJoystick(unsigned int) const;	
+	const OIS::JoyStick*	GetJoystick(unsigned int) const;
+
 
 	void SetWindowExtents(int p_width, int p_height);	// will set new window boundary for the mouse, call this after window has been resized.
 
 	const MousePosition& GetMousePosition() const { return m_mouse_position; }
+	OIS::Mouse* GetMouse() { return m_mouse; }
+	
 
 private:
 	Game* m_game;

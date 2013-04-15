@@ -141,4 +141,36 @@ protected:
 	Ogre::Real			m_pivot_pitch;
 };
 
+class Overlay2DComponent : public Component, public IComponentObserver {
+public:
+	Overlay2DComponent(void){}
+	virtual ~Overlay2DComponent(void){}
+	virtual void Notify(int type, void* message);
+	virtual void Shut();
+	virtual void SetMessenger(ComponentMessenger* messenger);
+	void Init(const Ogre::String& p_overlay_name);
+	//2dcollision box, ta in en point, som kan vara muspos. inputmanager*, ärva from updatable
+
+protected:
+	Ogre::Overlay*					m_overlay;
+	Ogre::String					m_id;
+};
+
+class InputManager;
+class OverlayCollisionCallback : public Component, public IComponentObserver, public IComponentUpdateable{
+public:
+	OverlayCollisionCallback(void){}
+	virtual ~OverlayCollisionCallback(void){}
+	virtual void Notify(int type, void* message);
+	virtual void Update(float dt);
+	virtual void Shut();
+	virtual void SetMessenger(ComponentMessenger* messenger);
+	void Init(InputManager* p_input_manager, Ogre::Viewport* p_view_port);
+
+protected:
+	InputManager*		m_input_manager;
+	Ogre::Viewport*		m_view_port;
+};
+
+
 #endif // _N_COMPONENTS_H_

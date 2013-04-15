@@ -25,6 +25,7 @@ void GameObjectManager::Init(PhysicsEngine* physics_engine, Ogre::SceneManager* 
 	m_create_fptr[GAME_OBJECT_PINK_BUBBLE] =	&GameObjectManager::CreatePinkBubble;
 	m_create_fptr[GAME_OBJECT_TOTT] =			&GameObjectManager::CreateTott;
 	m_create_fptr[GAME_OBJECT_PLANE] =			&GameObjectManager::CreatePlane;
+	m_create_fptr[GAME_OBJECT_OVERLAY]	   =	&GameObjectManager::Create2DOverlay;
 }
 
 void GameObjectManager::Update(float dt){
@@ -209,3 +210,17 @@ GameObject* GameObjectManager::CreatePlane(const Ogre::Vector3& position, void* 
 	rc->GetRigidbody()->setFriction(0.5f);
 	return go;
 }
+GameObject* GameObjectManager::Create2DOverlay(const Ogre::Vector3& position, void* data) {
+	GameObject* go = new GameObject;
+	Overlay2DComponent* overlayComp = new Overlay2DComponent;
+	go->AddComponent(overlayComp);
+	OverlayCollisionCallback* overlayCallBack = new OverlayCollisionCallback;
+	go->AddComponent(overlayCallBack);
+	go->AddUpdateable(overlayCallBack);
+
+	overlayComp->Init(*static_cast<Ogre::String*>(data));
+	overlayCallBack->Init(m_input_manager, m_viewport);
+
+	return go;
+}
+//mouseposition, storleken på overlayen

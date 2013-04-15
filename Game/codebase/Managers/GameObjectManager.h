@@ -24,6 +24,7 @@ private:
 	GameObject* CreatePlayer(const Ogre::Vector3& position, void* data);
 	GameObject* CreateBlueBubble(const Ogre::Vector3& position, void* data);
 	GameObject* CreatePinkBubble(const Ogre::Vector3& position, void* data);
+	GameObject* Create2DOverlay(const Ogre::Vector3& position, void* data);
 	GameObject* CreateTott(const Ogre::Vector3& position, void* data);
 	GameObject* CreatePlane(const Ogre::Vector3& position, void* data);
 
