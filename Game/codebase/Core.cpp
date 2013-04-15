@@ -51,18 +51,11 @@ bool Core::Init(){
 	Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
 	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
-	//Ogre::LogManager::getSingletonPtr()->logMessage("*** Initializing OIS ***");
 	m_game = new Game;
 	m_game->Init(m_render_window, m_message_system);
 	m_input_system = new InputSystem(m_game, m_render_window);
 	m_input_system->Init();
 
-//	m_single_scene_mgr = m_root->createSceneManager ( Ogre::ST_GENERIC, "Default SceneManager" );
-	/*
-	m_sound_manager = new SoundManager(m_single_scene_mgr);
-	m_sound_manager->LoadAudio();
-	m_sound_manager->Play2DSound("Sound1");
-	*/
 	return true;
 }
 

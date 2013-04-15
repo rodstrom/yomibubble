@@ -26,6 +26,17 @@ void PlayerInputComponent::Update(float dt){
 		move_back = true;
 	}
 
+	if (!move_left
+		&& !move_right
+		&& !move_forward
+		&& !move_back)
+	{
+		m_messenger->Notify(MSG_SFX2D_STOP, &m_walk_sound);
+	}
+	else{
+		m_messenger->Notify(MSG_SFX2D_PLAY, &m_walk_sound);
+	}
+
 	if (!m_is_creating_bubble){
 		Ogre::SceneNode* node = NULL;
 		if (m_input_manager->IsButtonPressed(BTN_LEFT_MOUSE)){
@@ -132,6 +143,17 @@ void PlayerInputComponent::Shut(){
 
 void PlayerInputComponent::Init(InputManager* input_manager){
 	m_input_manager = input_manager;
+
+	m_walk_sound = "Yomi_Walk";
+	m_def_music = "Main_Theme";
+
+	//m_messenger->Notify(MSG_MUSIC2D_PLAY, &m_def_music);
+
+	//testing section
+	sound_data.m_name = "Dun_Dun";
+	sound_data.m_position.x = 200;
+	sound_data.m_position.y = 50;
+	sound_data.m_position.z = 1000;
 	
 }
 
@@ -139,4 +161,3 @@ void PlayerInputComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger = messenger;
 	m_messenger->Register(MSG_INPUT_MANAGER_GET, this);
 }
-

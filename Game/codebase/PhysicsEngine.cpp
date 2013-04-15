@@ -79,10 +79,6 @@ void PhysicsEngine::Step(float dt){
 	float fixed_time_step = 1.0f/60.0f;
 	float physics_time = dt / 1000.0f;
 	int max_steps = physics_time / (fixed_time_step) + 1;
-	//int max_steps = 2;
-	/*while (dt > (float)max_steps * fixed_time_step){
-		max_steps++;
-	}*/
 
 	m_dynamic_world->stepSimulation(dt, max_steps, fixed_time_step);
 	if (m_debug_drawer){
