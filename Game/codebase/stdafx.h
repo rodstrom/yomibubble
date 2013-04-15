@@ -8,6 +8,8 @@
 #endif
 
 #include "OGRE\Ogre.h"
+#include "OGRE\Terrain\OgreTerrain.h"
+#include "OGRE\Terrain\OgreTerrainGroup.h"
 #include "OIS\OIS.h"
 #include "Bullet\btBulletDynamicsCommon.h"
 #include "Bullet\btBulletCollisionCommon.h"

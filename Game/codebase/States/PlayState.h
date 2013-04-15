@@ -4,7 +4,9 @@
 #include "State.h"
 #include "..\PhysicsEngine.h"
 
-#include "..\Artifex\ArtifexLoader.h"
+//#include "..\Artifex\ArtifexLoader.h"
+#include "..\Artifex\Loader\ArtifexLoader.h"
+
 class ArtifexLoader;
 
 class ComponentMessenger;

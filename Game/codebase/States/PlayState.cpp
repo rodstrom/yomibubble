@@ -7,12 +7,14 @@
 #include "..\Components\Components.h"
 #include "..\Components\ComponentMessenger.h"
 #include "..\Components\PlayerController.h"
+//#include "..\SimpleTerrainMaterialGenerator.h"
 
 PlayState::PlayState(void) : m_physics_engine(NULL){}
 PlayState::~PlayState(void){}
 
 void PlayState::Enter(){
 	m_scene_manager = Ogre::Root::getSingleton().createSceneManager(Ogre::ST_GENERIC);
+	//m_scene_manager = Ogre::Root::getSingleton().createSceneManager("TerrainSceneManager");
 	m_physics_engine = new PhysicsEngine;
 	m_physics_engine->Init();
 	m_physics_engine->SetDebugDraw(m_scene_manager);
@@ -99,9 +101,21 @@ void PlayState::Enter(){
 	mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, m_cam_node, m_camera, "../../resources/maps/terrain/");
 	 // load a zone
 	mArtifexLoader->loadZone("demo");
+	//mArtifexLoader->loadZone("demo",true,false,false,true,true,true,true,true,true);
+	//mArtifexLoader->loadTerrain();
+
+ //	  mTerrainGlobals = OGRE_NEW Ogre::TerrainGlobalOptions();
+ //
+ //   mTerrainGroup = OGRE_NEW Ogre::TerrainGroup(m_scene_manager, Ogre::Terrain::ALIGN_X_Z, 1025, 5000.0f);
+ //   mTerrainGroup->setFilenameConvention(Ogre::String("BasicTutorial3Terrain"), Ogre::String("dat"));
+ //   mTerrainGroup->setOrigin(Ogre::Vector3::ZERO);    
+ //   
+ //   TerrainMaterialGeneratorPtr mMTerrMatGen;
+ //   mMTerrMatGen.bind( OGRE_NEW  SimpleTerrainMaterialGenerator() );            
+ //   mTerrainGlobals->setDefaultMaterialGenerator( mMTerrMatGen );
 
 	m_physics_engine->ShowDebugDraw(false);
-	m_scene_manager->setSkyDome(true, "Examples/CloudySky");
+	//m_scene_manager->setSkyDome(true, "Examples/CloudySky");
 }
 
 void PlayState::Exit(){
@@ -154,7 +168,7 @@ bool PlayState::frameRenderingQueued(const Ogre::FrameEvent& evt){
 	float rotY = m_input_manager->GetMousePosition().rel_y * evt.timeSinceLastFrame * -1;
 	m_camera->yaw(Ogre::Radian(rotX));
 	m_camera->pitch(Ogre::Radian(rotY));
-
+	
 	//CEGUI::System::getSingleton().injectTimePulse(evt.timeSinceLastFrame);
 
 	if (m_input_manager->IsButtonPressed(BTN_BACK)){
