@@ -3,7 +3,7 @@
 #include "BubbleAdventure.h"
 #include "InputSystem.h"
 #include "MessageSystem.h"
-#include "SoundManager.h"
+#include "Audio\SoundManager.h"
 
 Core::Core(void) : m_root(NULL), m_bubble_adventure(NULL), m_message_system(NULL), m_input_system(NULL) {}
 Core::~Core(void){}
@@ -59,10 +59,11 @@ bool Core::Init(){
 	m_input_system->Init();
 
 	m_single_scene_mgr = m_root->createSceneManager ( Ogre::ST_GENERIC, "Default SceneManager" );
+	/*
 	m_sound_manager = new SoundManager(m_single_scene_mgr);
 	m_sound_manager->LoadAudio();
 	m_sound_manager->Play2DSound("Sound1");
-
+	*/
 	return true;
 }
 
