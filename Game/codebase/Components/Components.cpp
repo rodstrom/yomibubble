@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "Components.h"
 #include "ComponentMessenger.h"
 #include "..\BtOgrePG.h"
 #include "..\BtOgreGP.h"

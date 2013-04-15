@@ -4,6 +4,7 @@
 #include "..\Managers\InputManager.h"
 
 class MessageSystem;
+class SoundManager;
 class State;
 class StateListener
 {
@@ -52,6 +53,7 @@ protected:
 	Ogre::Viewport*		m_viewport;
 	InputManager*		m_input_manager;
 	MessageSystem*		m_message_system;
+	SoundManager*		m_sound_manager;
 };
 
 

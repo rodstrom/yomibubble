@@ -6,12 +6,13 @@
 class GameObject;
 class InputManager;
 class PhysicsEngine;
+class SoundManager;
 class GameObjectManager
 {
 public:
 	GameObjectManager(void);
 	~GameObjectManager(void);
-	void Init(PhysicsEngine* physics_engine, Ogre::SceneManager* scene_manager, InputManager* input_manager, Ogre::Viewport* viewport);
+	void Init(PhysicsEngine* physics_engine, Ogre::SceneManager* scene_manager, InputManager* input_manager, Ogre::Viewport* viewport, SoundManager* sound_manager);
 	void Update(float dt);
 	void LateUpdate(float dt);		// Update performed after physics simulation.	
 	void RemoveGameObject(GameObject* gameobject);
@@ -36,6 +37,7 @@ private:
 	Ogre::SceneManager*		m_scene_manager;
 	InputManager*			m_input_manager;
 	Ogre::Viewport*			m_viewport;
+	SoundManager*			m_sound_manager;
 };
 
 #endif // _N_GAME_OBJECT_MANAGER_H_

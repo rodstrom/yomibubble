@@ -2,6 +2,7 @@
 #include "PlayState.h"
 #include "..\Managers\InputManager.h"
 #include "..\PhysicsEngine.h"
+#include "..\Audio\SoundManager.h"
 #include "..\Managers\GameObjectManager.h"
 
 PlayState::PlayState(void) : m_physics_engine(NULL), m_game_object_manager(NULL){}
@@ -20,7 +21,9 @@ void PlayState::Enter(){
 	m_viewport->setBackgroundColour(Ogre::ColourValue(0.0,0.0,1.0));
 	m_camera->setAspectRatio(Ogre::Real(m_viewport->getActualWidth()) / Ogre::Real(m_viewport->getActualHeight()));
 	m_game_object_manager = new GameObjectManager;
-	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport);
+	m_sound_manager = new SoundManager(m_scene_manager, m_camera);
+	m_sound_manager->LoadAudio();
+	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager);
 	CharControllerDef player_def(COLLIDER_CAPSULE, 0.35f, 1000.0f, 5.0f);
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(0,10,0), &player_def);
 	CharControllerDef tott_def(COLLIDER_CAPSULE, 0.35f, 500.0f, 5.0f);
@@ -62,6 +65,7 @@ void PlayState::Exit(){
 }
 
 bool PlayState::Update(float dt){
+	m_sound_manager->Update(m_camera, dt);
 	m_game_object_manager->Update(dt);
 	m_physics_engine->Step(dt);
 	m_game_object_manager->LateUpdate(dt);
@@ -74,6 +78,7 @@ bool PlayState::Update(float dt){
 	else{
 		m_physics_engine->ShowDebugDraw(false);
 	}
+	m_game_object_manager->LateUpdate(dt);
 	return true;
 }
 

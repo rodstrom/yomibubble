@@ -2,6 +2,7 @@
 #define _N_PLAYER_CONTROLLER_H_
 
 #include "ComponentsPrereq.h"
+#include "..\Audio\SoundManager.h"
 
 class InputManager;
 class PlayerInputComponent : public Component, public IComponentUpdateable, public IComponentObserver{
@@ -26,6 +27,9 @@ protected:
 	bool m_is_creating_bubble;
 	float m_max_scale;
 	float m_current_scale;
+	Ogre::String m_walk_sound;
+	Ogre::String m_def_music;
+	SoundData3D sound_data;
 };
 
 #endif // _N_PLAYER_CONTROLLER_H_
