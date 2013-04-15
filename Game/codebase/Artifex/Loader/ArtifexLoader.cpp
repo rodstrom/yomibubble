@@ -41,9 +41,8 @@ ArtifexLoader::ArtifexLoader(Root *root, SceneManager *scenemgr, SceneNode *camn
 	mETBlendMapFileName[0] = "ETcoverage.0.png";
 	mETBlendMapFileName[1] = "ETcoverage.1.png";
 	mETBlendMapFileName[2] = "ETcoverage.2.png";
-	
 	mLoadTerrainBinary = false;
-	
+
 #ifdef PG_GRASSLOADER
 	mArtifexLoaderPGGrass = new ArtifexLoaderPGGrass(this);
 #endif	

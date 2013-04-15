@@ -13,26 +13,27 @@ PlayState::PlayState(void) : m_physics_engine(NULL){}
 PlayState::~PlayState(void){}
 
 void PlayState::Enter(){
-	m_scene_manager = Ogre::Root::getSingleton().createSceneManager(Ogre::ST_GENERIC);
+	m_scene_manager = Ogre::Root::getSingleton().createSceneManager("OctreeSceneManager");
 	//m_scene_manager = Ogre::Root::getSingleton().createSceneManager("TerrainSceneManager");
 	m_physics_engine = new PhysicsEngine;
 	m_physics_engine->Init();
-	m_physics_engine->SetDebugDraw(m_scene_manager);
+	//m_physics_engine->SetDebugDraw(m_scene_manager);
 	m_camera = m_scene_manager->createCamera("Camera");
-	m_camera->setPosition(Ogre::Vector3(0,0,50));
+	m_camera->setPosition(Ogre::Vector3(500,50,500));
 	m_camera->lookAt(Ogre::Vector3(0,0,0));
-	m_camera->setNearClipDistance(5);
+	m_camera->setNearClipDistance(0.2f);
+	//m_camera->setFarClipDistance(1000);
 	Ogre::Viewport* viewport = m_render_window->addViewport(m_camera);
 	viewport->setBackgroundColour(Ogre::ColourValue(0.0,0.0,1.0));
 	m_camera->setAspectRatio(Ogre::Real(viewport->getActualWidth()) / Ogre::Real(viewport->getActualHeight()));
-	Ogre::Light* light = m_scene_manager->createLight("light1");
+	/*Ogre::Light* light = m_scene_manager->createLight("light1");
 	light->setType(Ogre::Light::LT_DIRECTIONAL);
-	light->setDirection(Ogre::Vector3(1,-1,0));
-	m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
-	Ogre::Plane plane(Ogre::Vector3::UNIT_Y, -10);
-	Ogre::MeshManager::getSingleton().createPlane("plane", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane, 1500, 1500, 200, 200, true, 1, 5, 5, Ogre::Vector3::UNIT_Z);
+	light->setDirection(Ogre::Vector3(1,-1,0));*/
+	//m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
+	//Ogre::Plane plane(Ogre::Vector3::UNIT_Y, -10);
+	//Ogre::MeshManager::getSingleton().createPlane("plane", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane, 1500, 1500, 200, 200, true, 1, 5, 5, Ogre::Vector3::UNIT_Z);
 
-	m_plane = m_scene_manager->createEntity("LightPlaneEntity", "plane");
+	/*m_plane = m_scene_manager->createEntity("LightPlaneEntity", "plane");
 	m_scene_manager->getRootSceneNode()->createChildSceneNode()->attachObject(m_plane);
 	m_plane->setMaterialName("Examples/BeachStones");
 	BtOgre::StaticMeshToShapeConverter converter1(m_plane);
@@ -42,7 +43,7 @@ void PlayState::Enter(){
 	m_physics_engine->AddRigidBody(m_plane_body);
 
 	m_messenger = new ComponentMessenger;
-	m_sinbad = new GameObject;
+	m_sinbad = new GameObject;*/
 
 	//Animation* renderer = new Animation;
 	//renderer->SetType(COMPONENT_RENDERER);
@@ -98,9 +99,9 @@ void PlayState::Enter(){
 	m_cam_node->attachObject(m_camera);
 
 	//mArtifexLoader = new ArtifexLoader(mRoot, mSceneMgr, mCamNode, mCamera, "../../resources/");
-	mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, m_cam_node, m_camera, "../../resources/maps/terrain/");
+	mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, m_cam_node, m_camera, "../../resources/maps/");
 	 // load a zone
-	mArtifexLoader->loadZone("demo");
+	mArtifexLoader->loadZone("demozone");
 	//mArtifexLoader->loadZone("demo",true,false,false,true,true,true,true,true,true);
 	//mArtifexLoader->loadTerrain();
 
@@ -114,12 +115,11 @@ void PlayState::Enter(){
  //   mMTerrMatGen.bind( OGRE_NEW  SimpleTerrainMaterialGenerator() );            
  //   mTerrainGlobals->setDefaultMaterialGenerator( mMTerrMatGen );
 
-	m_physics_engine->ShowDebugDraw(false);
+	//m_physics_engine->ShowDebugDraw(false);
 	//m_scene_manager->setSkyDome(true, "Examples/CloudySky");
 }
 
 void PlayState::Exit(){
-	m_physics_engine->RemoveRigidBody(m_plane_body);
 	//m_physics_engine->RemoveRigidBody(m_penguin_body);
 
 	/*m_penguin_body->getMotionState();
@@ -127,17 +127,6 @@ void PlayState::Exit(){
 	delete m_penguin_shape;
 	delete m_penguin_state;*/
 
-	m_plane_body->getMotionState();
-	delete m_plane_body;
-	delete m_ground_motion_state;
-	m_plane_shape->getMeshInterface();
-	delete m_plane_shape;
-
-	m_sinbad->Shut();
-	delete m_sinbad;
-	m_sinbad = NULL;
-	delete m_messenger;
-	m_messenger = NULL;
 
 	m_physics_engine->CloseDebugDraw();
 	m_physics_engine->Shut();
@@ -152,7 +141,7 @@ bool PlayState::frameStarted(const Ogre::FrameEvent& evt){
 }
 
 bool PlayState::frameRenderingQueued(const Ogre::FrameEvent& evt){
-	m_sinbad->Update(evt.timeSinceLastFrame);
+
 	float cameraMovementSpeed = 50.0f;
 	Ogre::Vector3 translateCamera(0,0,0);
 	if (m_input_manager->IsButtonDown(BTN_W))
@@ -175,6 +164,6 @@ bool PlayState::frameRenderingQueued(const Ogre::FrameEvent& evt){
 		return false;
 	}
 
-	m_physics_engine->Step(evt.timeSinceLastFrame, 10);
+	//m_physics_engine->Step(evt.timeSinceLastFrame, 10);
 	return true;
 }

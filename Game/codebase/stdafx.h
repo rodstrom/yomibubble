@@ -11,8 +11,8 @@
 #include "OGRE\Terrain\OgreTerrain.h"
 #include "OGRE\Terrain\OgreTerrainGroup.h"
 #include "OIS\OIS.h"
-#include "Bullet\btBulletDynamicsCommon.h"
-#include "Bullet\btBulletCollisionCommon.h"
+#include "btBulletDynamicsCommon.h"
+#include "btBulletCollisionCommon.h"
 
 #include "nSystem.h"
 #include "Convert.h"

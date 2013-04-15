@@ -94,7 +94,7 @@ public:
 	ET::TerrainManager* mTerrainMgr;
     ET::TerrainInfo* mTerrainInfo;
     ET::SplattingManager* mSplatMgr;
-
+	
 	void loadTerrain();
 	void loadBinaryTerrain();
 	void loadImgTerrain();

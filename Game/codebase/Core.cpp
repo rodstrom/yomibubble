@@ -63,7 +63,8 @@ void Core::Run(){
 	while (1){
 		m_bubble_adventure->Update();
 		m_input_system->Capture();
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 
+		Ogre::WindowEventUtilities::messagePump();
+/*#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 
 		{
 			MSG msg;
 			while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)){
@@ -76,7 +77,7 @@ void Core::Run(){
 				}
 			}
 		}
-#endif
+#endif*/
 		if (!m_root->renderOneFrame()){
 			return;
 		}

@@ -160,7 +160,7 @@ void ArtifexLoader::loadImgTerrain() {
 	ET::TerrainInfo info;
 	ET::loadHeightmapFromImage(info, image);
 	info.setExtents(AxisAlignedBox(0, 0, 0, mTerrX, mTerrY, mTerrZ));
-	mTerrainMgr->createTerrain(info, mTerrainTileSize, mTerrainMaxLoD, mTerrainVertexNormals, mTerrainVertexTangents);	
+	mTerrainMgr->createTerrain(info, mTerrainTileSize, mTerrainMaxLoD, mTerrainVertexNormals, mTerrainVertexTangents);
 };
 void ArtifexLoader::loadBinaryTerrain() {
 	size_t width=0, height=0;
