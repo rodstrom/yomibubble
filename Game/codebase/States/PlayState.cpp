@@ -50,7 +50,11 @@ void PlayState::Enter(){
 	//m_cam_node->attachObject(m_camera);
 	//Ogre::SceneNode* node = m_scene_manager->getSceneNode("camNode");
 	mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_camera, "../../resources/terrain/");
-	mArtifexLoader->loadZone("demozone", true, true, true, true, true, false);
+#ifdef _DEBUG
+	mArtifexLoader->loadZone("demozone", false, false, false, true, false, false, true, true, true, true);
+#else
+	mArtifexLoader->loadZone("demozone", true, true, true, true, true, false, true, true, true, true);
+#endif
 	PlaneDef plane_def("plane", "Examples/BeachStones");
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(1000,1000,1000), &plane_def);
 
