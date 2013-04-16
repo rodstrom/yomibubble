@@ -189,6 +189,7 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 	go->AddLateUpdate(contr);
 
 	acomp->Init("Yomi_2Yomi.mesh", m_scene_manager);
+	m_sound_manager->m_scene_nodes.insert(std::pair<int, Ogre::SceneNode*>(go->GetId(), acomp->GetSceneNode()));
 	contr->Init(position, acomp->GetEntity(), def.step_height, def.collider_type, m_physics_engine);
 	contr->SetTurnSpeed(def.turn_speed);
 	contr->SetVelocity(def.velocity);

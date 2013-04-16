@@ -55,6 +55,8 @@ public:
 
 	bool testbajs;
 
+	std::map<int, Ogre::SceneNode*> m_scene_nodes;
+
 private:
     Ogre::SceneNode* m_ear_node;
 	Ogre::SceneManager* m_scene_manager;

@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "SoundManager.h"
 
+#include <iostream>
+
 SoundManager::SoundManager(Ogre::SceneManager* scene_manager, Ogre::Camera* camera){
 
     m_sound_manager = OgreOggSound::OgreOggSoundManager::getSingletonPtr();
@@ -28,9 +30,9 @@ SoundManager::~SoundManager(){
 
 void SoundManager::LoadAudio(){
 	m_sound_manager->createSound("Yomi_Walk", "SFX/Yomi/Yomi_Walk.wav", false, false, true);
-	m_sound_manager->createSound("Dun_Dun", "SFX/Tott/Bristlestick_Zoom.wav", false, false, true);
+	m_sound_manager->createSound("Dun_Dun", "SFX/Tott/Bristlestick_Zoom_mono.wav", false, false, true);
 
-	m_sound_manager->createSound("Main_Theme", "Music/Menu_theme.wav", false, true, true);
+	m_sound_manager->createSound("Main_Theme", "Music/Day_area_theme.wav", false, true, true);
 }
 
 /// does what it says on the tin. can be given null sounds
@@ -50,29 +52,39 @@ void SoundManager::Play2DMusic(Ogre::String name){
 };
 
 void SoundManager::Stop2DMusic(Ogre::String name){
-
+	m_sound_manager->getSound(name)->play();
 };
 
 void SoundManager::Play3DSound(Ogre::String name, Ogre::Vector3 position){
 
 	//testa med en bool att bara setta en gång
 
+	Ogre::SceneNode* node = m_scene_nodes.find(1)->second;
+	m_sound_manager->getListener();
+
+	std::cout << m_scene_nodes.find(1)->second->getPosition() << std::endl;
+
 	if (!testbajs)
 	{
-	Ogre::SceneNode* node = m_scene_manager->getSceneNode("testnode");
-	node->setPosition(position);
+		node->attachObject(m_sound_manager->getSound(name));
+		testbajs = true;
+	}
+	
+   m_sound_manager->setDistanceModel(AL_LINEAR_DISTANCE);
+
+	//node->setPosition(position);
 //	node->
-	m_sound_manager->getSound(name)->setPosition(position);
-	node->attachObject(m_sound_manager->getSound(name));
+	//m_sound_manager->getSound(name)->setPosition(position);
+	//node->attachObject(m_sound_manager->getSound(name));
 	m_sound_manager->getSound(name)->setReferenceDistance(10.0f);
 	m_sound_manager->getSound(name)->setRolloffFactor(2.0f);
-	m_sound_manager->getSound(name)->setMaxDistance(1000.0f);
+	//m_sound_manager->getSound(name)->setMaxDistance(1000.0f);
 	//m_sound_manager->getSound(name)->setListener(m_sound_manager->getListener());
 	//m_sound_manager->getSound(name)->setMinDistance(1.0f);
 	//m_sound_manager->getSound(name)->setListener(m_ear_node);
 	m_sound_manager->getSound(name)->play();
-	testbajs = true;
-	}
+	
+	//}
 	//m_sound_manager->getListener();
 
 	/*
@@ -90,6 +102,7 @@ void SoundManager::Play3DSound(Ogre::String name, Ogre::Vector3 position){
 
 void SoundManager::Stop3DSound(Ogre::String name){
 	m_sound_manager->getSound(name)->stop();
+	//testbajs = false;
 };
 
 void SoundManager::Update(Ogre::Camera* camera, float dt){
@@ -98,6 +111,22 @@ void SoundManager::Update(Ogre::Camera* camera, float dt){
 	//Update earNode
     m_ear_node->setPosition(camera->getPosition());
     m_ear_node->setOrientation(camera->getOrientation());
+
+	processSoundDeletesPending();
+
+	/*
+		    Ogre::Vector3 earsPosition = GameCore::mPlayerPool->getLocalPlayer()->getCar()->mBodyNode->getPosition();
+    Ogre::Quaternion earsOrientation = GameCore::mPlayerPool->getLocalPlayer()->getCar()->mBodyNode->getOrientation();
+
+    // if framerate is low, timeSinceLastFrame is larger.                   if framerate is high, timeSinceLastFrame is lower.
+    // if framerate is low, unscaled Velocity will be higher than expected. if framerate is high, unscaled velocity will be lower than expected.
+
+    mSoundManager->getListener()->setPosition(earsPosition);
+    //mSoundManager->getListener()->setOrientation(earsOrientation);
+
+    mSoundManager->getListener()->setVelocity(GameCore::mPlayerPool->getLocalPlayer()->getCar()->getLinearVelocity());	
+	*/
+
 }
 
 /// it is quite possible mInitOK is false, so this may return null.
