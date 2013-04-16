@@ -42,6 +42,7 @@ private:
 	btHeightfieldTerrainShape*				m_terrain_shape;
 	btRigidBody*							m_terrain_body;
 	btDefaultMotionState*					m_terrain_motion_state;
+	btCollisionObject*						m_terrain_coll_obj;
 };
 
 #endif // _N_PHYSICS_ENGINE_H_

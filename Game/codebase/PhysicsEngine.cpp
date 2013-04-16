@@ -115,16 +115,18 @@ void PhysicsEngine::CreateTerrainCollision(const ET::TerrainInfo& terrain_info){
 	if (!m_has_terrain_coll){
 		size_t height_stick_width = terrain_info.getWidth();
 		size_t height_stick_length = terrain_info.getWidth();
-		const void* heightfield_data = &terrain_info.getHeightmapData();
+		std::vector<float> terrain_data = terrain_info.getHeightmapData();
 		float max_height = terrain_info.getHeight();
 
 
-
-		m_terrain_shape = new btHeightfieldTerrainShape(height_stick_width, height_stick_length, heightfield_data, 1, 0.0f, max_height, 1, PHY_FLOAT, true);
+		m_terrain_shape = new btHeightfieldTerrainShape(height_stick_width, height_stick_length, &terrain_data, 1, 0.0f, max_height, 1, PHY_FLOAT, true);
 		m_terrain_shape->setUseDiamondSubdivision(true);
 		m_terrain_motion_state = new btDefaultMotionState;
 		m_terrain_body = new btRigidBody(0, m_terrain_motion_state, m_terrain_shape);
 		m_dynamic_world->addRigidBody(m_terrain_body);
+		m_terrain_coll_obj = new btCollisionObject;
+		m_terrain_coll_obj->setCollisionShape(m_terrain_shape);
+		m_dynamic_world->addCollisionObject(m_terrain_coll_obj);
 		m_has_terrain_coll = true;
 	}
 
