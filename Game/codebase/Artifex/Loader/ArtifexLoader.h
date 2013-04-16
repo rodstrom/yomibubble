@@ -53,9 +53,9 @@ THE SOFTWARE.
 // includes needed to work with Ogre::Terrain
 #ifdef OT_TERRAIN
 //#include "OgreTerrain.h"
-#include "OgreTerrainFix.h"
+#include "..\OgreTerrainFix.h"
 //#include "OgreTerrainGroup.h"
-#include "TerrainMaterialGeneratorC.h"
+#include "..\TerrainMaterialGeneratorC.h"
 #endif
 
 // enable grass loading

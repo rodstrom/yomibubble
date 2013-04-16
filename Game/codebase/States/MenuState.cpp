@@ -12,10 +12,14 @@ void MenuState::Exit(){
 
 }
 
-bool MenuState::frameStarted(const Ogre::FrameEvent& evt){
+bool MenuState::Update(float dt){
+	return true;
+}
+
+/*bool MenuState::frameStarted(const Ogre::FrameEvent& evt){
 	return true;
 }
 
 bool MenuState::frameRenderingQueued(const Ogre::FrameEvent& evt){
 	return true;
-}
+}*/

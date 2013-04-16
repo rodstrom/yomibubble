@@ -19,6 +19,7 @@ public:
 	StateManager(Ogre::RenderWindow* render_window, InputListener* input_listener, MessageSystem* message_system);
 	~StateManager(void);
 
+	bool Update(float dt);
 	State* FindById(const Ogre::String& id);
 	void ManageState(const Ogre::String& id, State* state);
 	void Start(State* state);

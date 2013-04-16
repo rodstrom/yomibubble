@@ -39,9 +39,6 @@ void InputManager::Update(){
 	memcpy(m_last_buttons, m_buttons, sizeof(bool) * BTN_SIZE);
 }
 
-void InputManager::SetMousePosition(int x, int y, int rel_x, int rel_y){
-	m_mouse_position.x = x;
-	m_mouse_position.y = y;
-	m_mouse_position.rel_x = rel_x;
-	m_mouse_position.rel_y = rel_y;
+void InputManager::SetMouseState(const OIS::MouseState mouse_state){
+	m_mouse_state = mouse_state;
 }

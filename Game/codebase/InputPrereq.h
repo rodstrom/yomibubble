@@ -8,6 +8,8 @@ enum EButtonType {
 	BTN_RIGHT,
 	BTN_START,
 	BTN_BACK,
+	BTN_RIGHT_MOUSE,
+	BTN_LEFT_MOUSE,
 	BTN_W,
 	BTN_A,
 	BTN_S,

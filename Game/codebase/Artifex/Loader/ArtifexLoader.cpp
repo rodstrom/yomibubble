@@ -141,9 +141,9 @@ bool ArtifexLoader::loadZone(string zonename, bool use_cfg_settings, bool fog, b
 		spawnLoader("movable");
 	}
 
-	mCamNode->setPosition(mCamX,mCamY,mCamZ);
-	mCamera->pitch( Degree(-5) );
-	mCamera->yaw( Degree(75) );
+	//mCamNode->setPosition(mCamX,mCamY,mCamZ);
+	//mCamera->pitch( Degree(-5) );
+	//mCamera->yaw( Degree(75) );
 
 	mZoneLoaded = true;
 	cout << "Done loading " << mZoneName.c_str() << ".\n";

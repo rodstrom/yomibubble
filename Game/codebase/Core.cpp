@@ -1,10 +1,11 @@
 #include "stdafx.h"
 #include "Core.h"
-#include "BubbleAdventure.h"
+#include "Game.h"
 #include "InputSystem.h"
 #include "MessageSystem.h"
+#include "Audio\SoundManager.h"
 
-Core::Core(void) : m_root(NULL), m_bubble_adventure(NULL), m_message_system(NULL), m_input_system(NULL) {}
+Core::Core(void) : m_root(NULL), m_game(NULL), m_message_system(NULL), m_input_system(NULL) {}
 Core::~Core(void){}
 
 bool Core::Init(){
@@ -50,21 +51,34 @@ bool Core::Init(){
 	Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
 	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
-	//Ogre::LogManager::getSingletonPtr()->logMessage("*** Initializing OIS ***");
-
-	m_bubble_adventure = new BubbleAdventure;
-	m_bubble_adventure->Init(m_render_window, m_message_system);
-	m_input_system = new InputSystem(m_bubble_adventure, m_render_window);
+	m_game = new Game;
+	m_game->Init(m_render_window, m_message_system);
+	m_input_system = new InputSystem(m_game, m_render_window);
 	m_input_system->Init();
+
 	return true;
 }
 
 void Core::Run(){
+Ogre::Timer timer;
+double dt = 0.0;
+double last_time = 0.0;
+double fps_cap = 60.0;
 	while (1){
-		m_bubble_adventure->Update();
-		m_input_system->Capture();
-		Ogre::WindowEventUtilities::messagePump();
-/*#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 
+		bool render = true;
+		double curr_sec = (double)timer.getMilliseconds() * 0.001;
+		dt = curr_sec - last_time;
+		double limit = 1.0 / fps_cap;
+		if (dt < limit){
+			render = false;
+		}
+		else {
+			last_time = curr_sec;
+			if (dt > 1.0){
+				dt = 0.0;
+			}
+		}
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 
 		{
 			MSG msg;
 			while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)){
@@ -77,9 +91,14 @@ void Core::Run(){
 				}
 			}
 		}
-#endif*/
-		if (!m_root->renderOneFrame()){
-			return;
+#endif
+		if (render){
+			m_game->UpdateInput();
+			m_input_system->Capture();
+			if (!m_game->Update(dt)){
+				return;
+			}
+			m_root->renderOneFrame();
 		}
 	}
 }
@@ -89,10 +108,10 @@ void Core::Shut(){
 		delete m_message_system;
 		m_message_system = NULL;
 	}
-	if (m_bubble_adventure){
-		m_bubble_adventure->Shut();
-		delete m_bubble_adventure;
-		m_bubble_adventure = NULL;
+	if (m_game){
+		m_game->Shut();
+		delete m_game;
+		m_game = NULL;
 	}
 	if (m_input_system){
 		m_input_system->Shut();

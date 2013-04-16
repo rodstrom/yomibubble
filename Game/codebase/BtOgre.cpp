@@ -357,7 +357,6 @@ namespace BtOgre {
 		btBvhTriangleMeshShape *shape = new btBvhTriangleMeshShape(trimesh, useQuantizedAABB);
 
 	        shape->setLocalScaling(Convert::toBullet(mScale));
-
 		return shape;
 	}
 	//------------------------------------------------------------------------------------------------

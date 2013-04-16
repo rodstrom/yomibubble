@@ -3,6 +3,10 @@
 
 #include "BtOgrePG.h"
 #include "BtOgreGP.h"
+#include "BulletCollision\CollisionDispatch\btGhostObject.h"
+#include "BulletCollision\CollisionShapes\btHeightfieldTerrainShape.h"
+#include "ETTerrainManager.h"
+#include "ETTerrainInfo.h"
 
 class PhysicsEngine
 {
@@ -13,12 +17,16 @@ public:
 	bool Init();
 	void Shut();
 
-	void Step(float deltatime, int time);
+	void Step(float dt);
 	void SetDebugDraw(Ogre::SceneManager* scene_manager);
 	void ShowDebugDraw(bool value);
 	void CloseDebugDraw();
-	void AddRigidBody(btRigidBody* rigidbody);
-	void RemoveRigidBody(btRigidBody* rigidbody);
+
+	void CreateTerrainCollision(const ET::TerrainInfo& terrain_info);
+	void DestroyTerrainCollision();
+
+	btBroadphaseInterface* GetBroadphaseInterface() const { return m_broadphase; }
+	btDiscreteDynamicsWorld* GetDynamicWorld() const { return m_dynamic_world; }
 
 private:
 	btBroadphaseInterface*					m_broadphase;
@@ -27,6 +35,13 @@ private:
 	btSequentialImpulseConstraintSolver*	m_seq_impulse_con_solver;
 	btDiscreteDynamicsWorld*				m_dynamic_world;
 	BtOgre::DebugDrawer*					m_debug_drawer;
+	btGhostPairCallback*					m_ghost_pair_callback;
+
+	//Terrain Collision
+	bool									m_has_terrain_coll;
+	btHeightfieldTerrainShape*				m_terrain_shape;
+	btRigidBody*							m_terrain_body;
+	btDefaultMotionState*					m_terrain_motion_state;
 };
 
 #endif // _N_PHYSICS_ENGINE_H_
