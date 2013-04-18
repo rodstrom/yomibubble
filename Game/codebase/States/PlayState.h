@@ -3,6 +3,7 @@
 
 #include "State.h"
 #include "..\PhysicsEngine.h"
+#include "..\Artifex\Loader\ArtifexLoader.h"
 
 
 class GameObjectManager;
@@ -35,6 +36,9 @@ private:
 	btDefaultMotionState*		m_ground_motion_state;
 	PhysicsEngine*				m_physics_engine;
 	GameObjectManager*			m_game_object_manager;
+
+	Ogre::SceneNode* m_cam_node;
+	ArtifexLoader* mArtifexLoader;
 };
 
 #endif // _PLAY_STATE_H_

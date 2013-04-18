@@ -3,6 +3,7 @@
 #include "Components\GameObject.h"
 #include "Components\GameObjectPrereq.h"
 
+
 PhysicsEngine::PhysicsEngine(void) : 
 	m_broadphase(NULL), 
 	m_collision_configuration(NULL), 
@@ -10,7 +11,8 @@ PhysicsEngine::PhysicsEngine(void) :
 	m_dynamic_world(NULL), 
 	m_seq_impulse_con_solver(NULL),
 	m_debug_drawer(NULL),
-	m_ghost_pair_callback(NULL){}
+	m_ghost_pair_callback(NULL),
+	m_has_terrain_coll(false){}
 
 PhysicsEngine::~PhysicsEngine(void){}
 
@@ -79,10 +81,6 @@ void PhysicsEngine::Step(float dt){
 	float fixed_time_step = 1.0f/60.0f;
 	float physics_time = dt / 1000.0f;
 	int max_steps = physics_time / (fixed_time_step) + 1;
-	//int max_steps = 2;
-	/*while (dt > (float)max_steps * fixed_time_step){
-		max_steps++;
-	}*/
 
 	m_dynamic_world->stepSimulation(dt, max_steps, fixed_time_step);
 	if (m_debug_drawer){
@@ -111,4 +109,27 @@ void PhysicsEngine::Step(float dt){
 			}
 		}
 	}
+}
+
+void PhysicsEngine::CreateTerrainCollision(const ET::TerrainInfo& terrain_info){
+	if (!m_has_terrain_coll){
+		size_t height_stick_width = terrain_info.getWidth();
+		size_t height_stick_length = terrain_info.getWidth();
+		const void* heightfield_data = &terrain_info.getHeightmapData();
+		float max_height = terrain_info.getHeight();
+
+
+
+		m_terrain_shape = new btHeightfieldTerrainShape(height_stick_width, height_stick_length, heightfield_data, 1, 0.0f, max_height, 1, PHY_FLOAT, true);
+		m_terrain_shape->setUseDiamondSubdivision(true);
+		m_terrain_motion_state = new btDefaultMotionState;
+		m_terrain_body = new btRigidBody(0, m_terrain_motion_state, m_terrain_shape);
+		m_dynamic_world->addRigidBody(m_terrain_body);
+		m_has_terrain_coll = true;
+	}
+
+}
+
+void PhysicsEngine::DestroyTerrainCollision(){
+
 }

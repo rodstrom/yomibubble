@@ -8,6 +8,8 @@
 #endif
 
 #include "OGRE\Ogre.h"
+#include "OGRE\Terrain\OgreTerrain.h"
+#include "OGRE\Terrain\OgreTerrainGroup.h"
 #include "OIS\OIS.h"
 #include "btBulletDynamicsCommon.h"
 #include "btBulletCollisionCommon.h"
@@ -23,5 +25,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+
+//#include "OGRE\Terrain\OgreTerrain.h"
 
 #endif // _NOSTROMO_PRECOMPILED_H_

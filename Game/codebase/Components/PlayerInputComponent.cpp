@@ -7,7 +7,7 @@
 #include "..\Managers\GameObjectManager.h"
 
 void PlayerInputComponent::Update(float dt){
-	//m_messenger->Notify(MSG_SFX2D_PLAY, &m_def_music);
+	m_messenger->Notify(MSG_SFX2D_PLAY, &m_def_music);
 	
 	bool move_left = false;
 	bool move_right = false;
@@ -23,11 +23,11 @@ void PlayerInputComponent::Update(float dt){
 
 	if (m_input_manager->IsButtonDown(BTN_UP)){
 		move_forward = true;
-		m_messenger->Notify(MSG_SFX3D_STOP, &sound_data);
+		//m_messenger->Notify(MSG_SFX3D_STOP, &m_3D_music_data);
 	}
 	else if (m_input_manager->IsButtonDown(BTN_DOWN)){
 		move_back = true;
-		m_messenger->Notify(MSG_SFX3D_PLAY, &sound_data);
+		m_messenger->Notify(MSG_MUSIC3D_PLAY, &m_3D_music_data);
 	}
 
 	if (!move_left
@@ -146,20 +146,12 @@ void PlayerInputComponent::Shut(){
 	m_messenger->Unregister(MSG_INPUT_MANAGER_GET, this);
 }
 
-void PlayerInputComponent::Init(InputManager* input_manager){
+void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound_manager){
 	m_input_manager = input_manager;
 
-	m_walk_sound = "Yomi_Walk";
-	m_def_music = "Main_Theme";
-
-	//m_messenger->Notify(MSG_SFX2D_PLAY, &m_def_music);
-
-	//testing section
-	sound_data.m_name = "Dun_Dun";
-	sound_data.m_position.x = 200;
-	sound_data.m_position.y = 50;
-	sound_data.m_position.z = 1000;
-	
+	m_walk_sound = sound_manager->Create2DData("Yomi_Walk", false, false, false, false, 1.0f, 1.0f);
+	m_def_music= sound_manager->Create2DData("Menu_Theme", false, false, false, false, 1.0f, 1.0f);
+	m_3D_music_data = sound_manager->Create3DData("Main_Theme", "", false, false, false, 1.0f, 1.0f);
 }
 
 void PlayerInputComponent::SetMessenger(ComponentMessenger* messenger){

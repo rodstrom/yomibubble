@@ -31,7 +31,8 @@ void CameraComponent::SetMessenger(ComponentMessenger* messenger){
 void CameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewport* viewport, bool activate, const Ogre::String& camera_id){
 	m_scene_manager = scene_manager;
 	m_viewport = viewport;
-	if (camera_id == Ogre::StringUtil::BLANK){
+	m_camera = m_scene_manager->getCamera("MainCamera");
+	/*if (camera_id == Ogre::StringUtil::BLANK){
 		m_camera_id = m_owner->GetId() + "Camera";
 	}
 	else{
@@ -41,7 +42,7 @@ void CameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewport* vi
 	if (activate){
 		m_viewport->setCamera(m_camera);
 	}
-	m_camera->setAspectRatio(Ogre::Real(m_viewport->getActualWidth()) / Ogre::Real(m_viewport->getActualHeight()));
+	m_camera->setAspectRatio(Ogre::Real(m_viewport->getActualWidth()) / Ogre::Real(m_viewport->getActualHeight()));*/
 }
 
 void CameraComponent::Update(float dt){
