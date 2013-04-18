@@ -24,6 +24,9 @@ void RigidbodyComponent::Notify(int type, void* msg){
 	case MSG_RIGIDBODY_GRAVITY_SET:
 		m_rigidbody->setGravity(BtOgre::Convert::toBullet(*static_cast<Ogre::Vector3*>(msg)));
 		break;
+	case MSG_RIGIDBODY_GET_BODY:
+		*static_cast<btRigidBody**>(msg) = m_rigidbody;
+		break;
 	default:
 		break;
 	}
@@ -105,23 +108,28 @@ void CharacterController::Notify(int type, void* msg){
 	case MSG_CHARACTER_CONROLLER_TURN_SPEED_SET:
 		m_turn_speed = *static_cast<float*>(msg);
 		break;
-	case MSG_CHARACTER_CONTROLLER_MOVE_FORWARD:
-		m_move_forward = *static_cast<bool*>(msg);
-		break;
-	case MSG_CHARACTER_CONTROLLER_MOVE_BACKWARDS:
-		m_move_backwards = *static_cast<bool*>(msg);
-		break;
-	case MSG_CHARACTER_CONTROLLER_MOVE_LEFT:
-		m_move_left = *static_cast<bool*>(msg);
-		break;
-	case MSG_CHARACTER_CONTROLLER_MOVE_RIGHT:
-		m_move_right = *static_cast<bool*>(msg);
-		break;
-	case MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM:
+	case MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_SET:
 		m_has_follow_cam = *static_cast<bool*>(msg);
 		break;
+	case MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_GET:
+		*static_cast<bool*>(msg) = m_has_follow_cam;
+		break;
 	case MSG_CHARACTER_CONROLLER_JUMP:
-		m_controller->jump();
+		{
+			if (m_controller->canJump()){
+				m_controller->jump();
+				m_is_jumping = true;
+			}
+		}
+		break;
+	case MSG_CHARACTER_CONTROLLER_GRAVITY_SET:
+		m_controller->setGravity(*static_cast<float*>(msg));
+		break;
+	case MSG_CHARACTER_CONTROLLER_WARP:
+		m_controller->warp(BtOgre::Convert::toBullet(*static_cast<Ogre::Vector3*>(msg)));
+		break;
+	case MSG_CHARACTER_CONTROLLER_SET_DIRECTION:
+		m_direction = BtOgre::Convert::toBullet(*static_cast<Ogre::Vector3*>(msg));
 		break;
 	default:
 		break;
@@ -129,10 +137,13 @@ void CharacterController::Notify(int type, void* msg){
 }
 
 void CharacterController::Update(float dt){
-	btVector3 walk_direction = btVector3(0.0,0.0,0.0);
+	m_last_y_pos = m_current_y_pos;
+	m_current_y_pos = m_controller->getGhostObject()->getWorldTransform().getOrigin().y();
+
+	//btVector3 walk_direction = btVector3(0.0,0.0,0.0);
 	btScalar walk_speed = m_velocity * dt;
-	
-	if (m_move_left){
+
+	/*if (m_move_left){
 		walk_direction += btVector3(-1.0, 0.0, 0.0);
 	}
 	if (m_move_right){
@@ -143,50 +154,57 @@ void CharacterController::Update(float dt){
 	}
 	if (m_move_backwards){
 		walk_direction += btVector3(0.0, 0.0, 1.0);
-	}
-	if (m_move_backwards || m_move_forward || m_move_left || m_move_right){   //if the character is moving in any direction
+	}*/
+	if (m_direction != btVector3(0.0f, 0.0f, 0.0f)){   //if the character is moving in any direction
 		if (m_has_follow_cam){
 		Ogre::SceneNode* node = NULL;
 		Ogre::SceneNode* camera_node = NULL;
 		m_messenger->Notify(MSG_NODE_GET_NODE, &node);
 		m_messenger->Notify(MSG_CAMERA_GET_CAMERA_NODE, &camera_node);
 			if (node && camera_node){
-				Ogre::Vector3 dir = BtOgre::Convert::toOgre(walk_direction);
+				Ogre::Vector3 dir = BtOgre::Convert::toOgre(m_direction);
 				Ogre::Vector3 goal_dir = Ogre::Vector3::ZERO;
 				goal_dir += dir.z * camera_node->getOrientation().zAxis();
 				goal_dir += dir.x * camera_node->getOrientation().xAxis();
 				goal_dir.y = 0.0f;
 				goal_dir.normalise();
-				Ogre::Quaternion goal = node->getOrientation().zAxis().getRotationTo(goal_dir);
-				Ogre::Real yaw_to_goal = goal.getYaw().valueDegrees();
-				Ogre::Real yaw_at_speed = yaw_to_goal / Ogre::Math::Abs(yaw_to_goal) * dt * m_turn_speed;
-
-				if (yaw_to_goal < 0) yaw_to_goal = std::min<Ogre::Real>(0, std::max<Ogre::Real>(yaw_to_goal, yaw_at_speed));
-				else if (yaw_to_goal > 0) yaw_to_goal = std::max<Ogre::Real>(0, std::min<Ogre::Real>(yaw_to_goal, yaw_at_speed));
-				node->yaw(Ogre::Degree(yaw_to_goal));
-				m_controller->setWalkDirection(BtOgre::Convert::toBullet(goal_dir * (float)walk_speed));
-			}
-		}
-		else{
-			Ogre::SceneNode* node = NULL;
-			m_messenger->Notify(MSG_NODE_GET_NODE, &node);
-				if (node){
-					Ogre::Vector3 dir = BtOgre::Convert::toOgre(walk_direction);
-					dir.y = 0.0f;
-					dir.normalise();
-					Ogre::Quaternion goal = node->getOrientation().zAxis().getRotationTo(dir);
+				if (!m_is_jumping){
+					Ogre::Quaternion goal = node->getOrientation().zAxis().getRotationTo(goal_dir);
 					Ogre::Real yaw_to_goal = goal.getYaw().valueDegrees();
 					Ogre::Real yaw_at_speed = yaw_to_goal / Ogre::Math::Abs(yaw_to_goal) * dt * m_turn_speed;
 
 					if (yaw_to_goal < 0) yaw_to_goal = std::min<Ogre::Real>(0, std::max<Ogre::Real>(yaw_to_goal, yaw_at_speed));
 					else if (yaw_to_goal > 0) yaw_to_goal = std::max<Ogre::Real>(0, std::min<Ogre::Real>(yaw_to_goal, yaw_at_speed));
 					node->yaw(Ogre::Degree(yaw_to_goal));
-					m_controller->setWalkDirection(BtOgre::Convert::toBullet(dir * (float)walk_speed));
 				}
+				m_controller->setWalkDirection(BtOgre::Convert::toBullet(goal_dir * (float)walk_speed));
+			}
+		}
+		else{
+			Ogre::SceneNode* node = NULL;
+			m_messenger->Notify(MSG_NODE_GET_NODE, &node);
+			if (node){
+				Ogre::Vector3 dir = BtOgre::Convert::toOgre(m_direction);
+				dir.y = 0.0f;
+				dir.normalise();
+				Ogre::Quaternion goal = node->getOrientation().zAxis().getRotationTo(dir);
+				Ogre::Real yaw_to_goal = goal.getYaw().valueDegrees();
+				Ogre::Real yaw_at_speed = yaw_to_goal / Ogre::Math::Abs(yaw_to_goal) * dt * m_turn_speed;
+
+				if (yaw_to_goal < 0) yaw_to_goal = std::min<Ogre::Real>(0, std::max<Ogre::Real>(yaw_to_goal, yaw_at_speed));
+				else if (yaw_to_goal > 0) yaw_to_goal = std::max<Ogre::Real>(0, std::min<Ogre::Real>(yaw_to_goal, yaw_at_speed));
+				node->yaw(Ogre::Degree(yaw_to_goal));
+				m_controller->setWalkDirection(BtOgre::Convert::toBullet(dir * (float)walk_speed));
+			}
 		}
 	}
 	else{
-		m_controller->setWalkDirection(walk_direction * walk_speed);
+		m_controller->setWalkDirection(m_direction * walk_speed);
+	}
+	if (m_is_jumping){
+		if (m_controller->onGround()){
+			m_is_jumping = false;
+		}
 	}
 }
 
@@ -200,6 +218,17 @@ void CharacterController::LateUpdate(float dt){
 			node->setPosition(BtOgre::Convert::toOgre(pos));
 		}
 	}
+}
+
+bool CharacterController::IsFalling(){
+	if (m_controller->onGround()){
+		return false;
+	}
+
+	if (m_last_y_pos > m_current_y_pos){
+		return true;
+	}
+	return false;
 }
 
 void CharacterController::Shut(){
@@ -218,23 +247,29 @@ void CharacterController::Shut(){
 		m_controller = NULL;
 	}
 	if (m_messenger){
-		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_MOVE_FORWARD, this);
-		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_MOVE_BACKWARDS, this);
-		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_MOVE_LEFT, this);
-		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_MOVE_RIGHT, this);
-		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM, this);
+		//m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_MOVE_FORWARD, this);
+		//m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_MOVE_BACKWARDS, this);
+		//m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_MOVE_LEFT, this);
+		//m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_MOVE_RIGHT, this);
+		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, this);
+		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_SET, this);
+		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_GET, this);
 		m_messenger->Unregister(MSG_CHARACTER_CONROLLER_JUMP, this);
+		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_WARP, this);
 	}
 }
 
 void CharacterController::SetMessenger(ComponentMessenger* messenger){
 	m_messenger = messenger;
-	m_messenger->Register(MSG_CHARACTER_CONTROLLER_MOVE_FORWARD, this);
-	m_messenger->Register(MSG_CHARACTER_CONTROLLER_MOVE_BACKWARDS, this);
-	m_messenger->Register(MSG_CHARACTER_CONTROLLER_MOVE_LEFT, this);
-	m_messenger->Register(MSG_CHARACTER_CONTROLLER_MOVE_RIGHT, this);
-	m_messenger->Register(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM, this);
+	//m_messenger->Register(MSG_CHARACTER_CONTROLLER_MOVE_FORWARD, this);
+	//m_messenger->Register(MSG_CHARACTER_CONTROLLER_MOVE_BACKWARDS, this);
+	//m_messenger->Register(MSG_CHARACTER_CONTROLLER_MOVE_LEFT, this);
+	//m_messenger->Register(MSG_CHARACTER_CONTROLLER_MOVE_RIGHT, this);
+	m_messenger->Register(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, this);
+	m_messenger->Register(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_SET, this);
+	m_messenger->Register(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_GET, this);
 	m_messenger->Register(MSG_CHARACTER_CONROLLER_JUMP, this);
+	m_messenger->Register(MSG_CHARACTER_CONTROLLER_WARP, this);
 }
 
 void CharacterController::Init(const Ogre::Vector3& position, Ogre::Entity* entity, float step_height, int collider_type, PhysicsEngine* physics_engine){
@@ -267,4 +302,22 @@ void CharacterController::Init(const Ogre::Vector3& position, Ogre::Entity* enti
 	m_ghost_object->setUserPointer(m_owner);
 	m_physics_engine->GetDynamicWorld()->addCollisionObject(m_ghost_object, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::StaticFilter|btBroadphaseProxy::DefaultFilter|btBroadphaseProxy::CharacterFilter);
 	m_physics_engine->GetDynamicWorld()->addAction(m_controller);
+}
+
+void Point2PointConstraintComponent::Notify(int type, void* msg){
+
+}
+
+void Point2PointConstraintComponent::Shut(){
+
+}
+
+void Point2PointConstraintComponent::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
+}
+
+void Point2PointConstraintComponent::Init(PhysicsEngine* physics_engine, btRigidBody* body_a, btRigidBody* body_b, const btVector3& pivot_a, const btVector3& pivot_b){
+	m_physics_engine = physics_engine;
+	m_constraint = new btPoint2PointConstraint(*body_a, *body_b, pivot_a, pivot_b);
+	m_physics_engine->GetDynamicWorld()->addConstraint(m_constraint);
 }

@@ -12,13 +12,14 @@ enum EGameObject{
 };
 
 struct CharControllerDef{
-	CharControllerDef(void) : collider_type(0), step_height(0.0f), turn_speed(0.0f), velocity(0.0f) {}
-	CharControllerDef(int p_collider_type, float p_step_height, float p_turn_speed , float p_velocity) : 
-		collider_type(p_collider_type), step_height(p_step_height), turn_speed(p_turn_speed), velocity(p_velocity){}
+	CharControllerDef(void) : collider_type(0), step_height(0.0f), turn_speed(0.0f), velocity(0.0f), max_jump_height(0.0f) {}
+	CharControllerDef(int p_collider_type, float p_step_height, float p_turn_speed , float p_velocity, float p_max_jump_height) : 
+		collider_type(p_collider_type), step_height(p_step_height), turn_speed(p_turn_speed), velocity(p_velocity), max_jump_height(p_max_jump_height){}
 	int collider_type;
 	float step_height;
 	float turn_speed;
 	float velocity;
+	float max_jump_height;
 };
 
 struct RigidbodyDef{

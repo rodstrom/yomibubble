@@ -4,7 +4,7 @@
 #include "State.h"
 #include "..\PhysicsEngine.h"
 #include "..\Artifex\Loader\ArtifexLoader.h"
-
+#include "..\Functor.h"
 
 class GameObjectManager;
 class PhysicsEngine;
@@ -19,6 +19,8 @@ public:
 	bool Update(float dt);
 	void Enter();
 	void Exit();
+
+	void test(void* data);
 
 private:
 	/*Ogre::Entity*				m_penguin;
@@ -39,6 +41,8 @@ private:
 
 	Ogre::SceneNode* m_cam_node;
 	ArtifexLoader* mArtifexLoader;
+
+	Functor<PlayState> m_func;
 };
 
 #endif // _PLAY_STATE_H_
