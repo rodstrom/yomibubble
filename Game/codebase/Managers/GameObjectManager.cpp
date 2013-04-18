@@ -124,11 +124,14 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	go->AddComponent(sound3D);
 	Music2DComponent* music2D = new Music2DComponent;
 	go->AddComponent(music2D);
-
+	
 	acomp->Init("Yomi_2Yomi.mesh", m_scene_manager);
+	//acomp->Init("yomi.mesh", m_scene_manager);
 	contr->Init(position, acomp->GetEntity(), def.step_height, def.collider_type, m_physics_engine);
 	contr->SetTurnSpeed(def.turn_speed);
 	contr->SetVelocity(def.velocity);
+	//contr->SetJumpPwr(1.0f);
+	//contr->SetJumpPwr(10.0f);
 	contr->HasFollowCam(true);
 	pccomp->Init(m_input_manager);
 	sound2D->Init(m_sound_manager);
@@ -223,4 +226,3 @@ GameObject* GameObjectManager::Create2DOverlay(const Ogre::Vector3& position, vo
 
 	return go;
 }
-//mouseposition, storleken på overlayen

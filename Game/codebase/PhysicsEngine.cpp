@@ -2,7 +2,7 @@
 #include "PhysicsEngine.h"
 #include "Components\GameObject.h"
 #include "Components\GameObjectPrereq.h"
-
+#include "Managers\CollisionManager.h"
 
 PhysicsEngine::PhysicsEngine(void) : 
 	m_broadphase(NULL), 
@@ -12,7 +12,8 @@ PhysicsEngine::PhysicsEngine(void) :
 	m_seq_impulse_con_solver(NULL),
 	m_debug_drawer(NULL),
 	m_ghost_pair_callback(NULL),
-	m_has_terrain_coll(false){}
+	m_has_terrain_coll(false),
+	m_collision_manager(NULL){}
 
 PhysicsEngine::~PhysicsEngine(void){}
 
@@ -25,6 +26,8 @@ bool PhysicsEngine::Init(){
 	m_seq_impulse_con_solver = new btSequentialImpulseConstraintSolver;
 	m_dynamic_world = new btDiscreteDynamicsWorld(m_collision_dispatcher, m_broadphase, m_seq_impulse_con_solver, m_collision_configuration);
 	m_dynamic_world->setGravity(btVector3(0.0f, -10.0f, 0.0f));
+	m_collision_manager = new CollisionManager(this);
+	m_collision_manager->Init();
 	return true;
 }
 
@@ -52,6 +55,11 @@ void PhysicsEngine::Shut(){
 	if (m_broadphase){
 		delete m_broadphase;
 		m_broadphase = NULL;
+	}
+	if (m_collision_manager){
+		m_collision_manager->Shut();
+		delete m_collision_manager;
+		m_collision_manager = NULL;
 	}
 }
 
@@ -95,17 +103,10 @@ void PhysicsEngine::Step(float dt){
 		for (int j = 0; j < num_contacts; j++){
 			btManifoldPoint& pt = contact_manifold->getContactPoint(j);
 			if (pt.getDistance() < 0.0f){
-				GameObject* go_a = static_cast<GameObject*>(obj_a->getUserPointer());
-				GameObject* go_b = static_cast<GameObject*>(obj_b->getUserPointer());
-				if (go_a->GetId() == GAME_OBJECT_PLAYER && go_b->GetId() == GAME_OBJECT_TOTT){
-					std::cout << "COLLISION\n";
-				}
-				else if (go_b->GetId() == GAME_OBJECT_PLAYER && go_a->GetId() == GAME_OBJECT_TOTT){
-					std::cout << "COLLISION\n";
-				}
 				const btVector3& pt_a = pt.getPositionWorldOnA();
 				const btVector3& pt_b = pt.getPositionWorldOnB();
 				const btVector3& normal_on_b = pt.m_normalWorldOnB;
+				m_collision_manager->ProcessCollision(obj_a, obj_b);
 			}
 		}
 	}

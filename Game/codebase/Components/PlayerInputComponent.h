@@ -8,19 +8,26 @@ class InputManager;
 class PlayerInputComponent : public Component, public IComponentUpdateable, public IComponentObserver{
 public:
 	PlayerInputComponent(void) : m_input_manager(NULL), m_current_bubble(NULL), m_is_creating_bubble(false), m_bubble_type(0),
-		m_max_scale(2.0f), m_current_scale(0.0f){ m_type = COMPONENT_PLAYER_INPUT; }
+		m_max_scale(2.0f), m_current_scale(0.0f), m_player_state(0){ m_type = COMPONENT_PLAYER_INPUT; }
 	virtual ~PlayerInputComponent(void){}
 	virtual void Update(float dt);
 	virtual void Notify(int type, void* message);
 	virtual void Shut();
 	virtual void Init(InputManager* input_manager);
 	virtual void SetMessenger(ComponentMessenger* messenger);
+	int GetPlayerState() { return m_player_state; }
 
 protected:
+	void Normal(float dt);
+	void OnBubble(float dt);
+	void InsideBubble(float dt);
+
 	enum EBubbleType{
 		BUBBLE_TYPE_BLUE = 0,
 		BUBBLE_TYPE_PINK
 	};
+	typedef void (PlayerInputComponent::*ControllerFptr)(float);
+
 	InputManager* m_input_manager;
 	GameObject* m_current_bubble;
 	int m_bubble_type;
@@ -30,6 +37,8 @@ protected:
 	Ogre::String m_walk_sound;
 	Ogre::String m_def_music;
 	SoundData3D sound_data;
+	int m_player_state;
+	ControllerFptr m_states[PLAYER_STATE_SIZE];
 };
 
 #endif // _N_PLAYER_CONTROLLER_H_
