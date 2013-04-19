@@ -50,7 +50,7 @@ void PlayState::Enter(){
 
 	//m_cam_node->attachObject(m_camera);
 	//Ogre::SceneNode* node = m_scene_manager->getSceneNode("camNode");
-	mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_camera, "../../resources/terrain/", m_game_object_manager);
+	mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_camera, m_game_object_manager, m_sound_manager, "../../resources/terrain/");
 #ifdef _DEBUG
 	mArtifexLoader->loadZone("demozone", false, false, false, true, false, false, true, true, true, true);
 #else
@@ -61,7 +61,7 @@ void PlayState::Enter(){
 
 	CharControllerDef player_def(COLLIDER_CAPSULE, 0.35f, 1000.0f, 5.0f, 10.0f);
 	//m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(x,y+1.0f,z), &player_def);
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(1230.0f,700.0f,2260.0f), &player_def);
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(1226.0f,800,2300.0f), &player_def);
 	CharControllerDef tott_def(COLLIDER_CAPSULE, 0.35f, 500.0f, 5.0f, 10.0f);
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y+1.0f,z+3.0f), &tott_def);
 	//m_physics_engine->CreateTerrainCollision(*mArtifexLoader->mTerrainInfo);

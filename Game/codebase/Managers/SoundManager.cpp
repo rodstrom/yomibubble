@@ -28,7 +28,7 @@ SoundManager::~SoundManager(){
 void SoundManager::LoadAudio(){
 	m_sound_manager->createSound("Yomi_Walk", "SFX/Yomi/Yomi_Walk.wav", false, false, true);
 	
-	m_sound_manager->createSound("Dun_Dun", "SFX/Tott/Bristlestick_Zoom_mono.wav", false, false, true);
+	//m_sound_manager->createSound("Dun_Dun", "SFX/Tott/Bristlestick_Zoom_mono.wav", false, false, true);
 
 	m_sound_manager->createSound("Main_Theme", "Music/Day_area_theme_mono.wav", false, true, true);
 	m_sound_manager->createSound("Menu_Theme", "Music/Menu_theme.wav", false, true, true);

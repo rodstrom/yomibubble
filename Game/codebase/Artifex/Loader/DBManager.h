@@ -22,10 +22,11 @@ class ArtifexLoader;
 #include "CppSQLite3.h"
 
 #include "..\..\Managers\GameObjectManager.h"
+#include "..\..\Managers\SoundManager.h"
 
 class DBManager {
 public:
-	DBManager(ArtifexLoader *artifexloader, GameObjectManager *game_object_manager);
+	DBManager(ArtifexLoader *artifexloader, GameObjectManager *game_object_manager, SoundManager *sound_manager);
 	~DBManager();
 
 	ArtifexLoader *mArtifexLoader;
@@ -49,6 +50,7 @@ public:
 	bool saving;
 
 	GameObjectManager *m_game_object_manager;
+	SoundManager *m_sound_manager;
 
 };
 #endif

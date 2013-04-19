@@ -3,13 +3,17 @@
 #include "DBManager.h"
 #include "..\..\Managers\GameObjectManager.h"
 #include "..\..\PhysicsEngine.h"
+#include "..\..\Components\GameObject.h"
+#include "..\..\Components\VisualComponents.h"
+#include "..\..\Managers\SoundManager.h"
 
-DBManager::DBManager(ArtifexLoader *artifexloader, GameObjectManager *game_object_manager) {
+DBManager::DBManager(ArtifexLoader *artifexloader, GameObjectManager *game_object_manager, SoundManager *sound_manager) {
 
 	mArtifexLoader = artifexloader;	
 	mDB = new CppSQLite3DB();
 	saving = false;
 	m_game_object_manager = game_object_manager;
+	m_sound_manager = sound_manager;
 
 };
 
@@ -44,10 +48,78 @@ int DBManager::Load() {
 		t.setRow(counter);
 
 		{
-			if((string)t.getStringField("object_type") != "Tott") {
-				//***************************					
-				entName = t.getStringField("entity");
-				meshFile = t.getStringField("meshfile");
+			//***************************					
+			entName = t.getStringField("entity");
+			meshFile = t.getStringField("meshfile");
+			//***************************
+
+			int dtg = t.getIntField("drop_to_ground");
+			float x = strToF(t.fieldValue("x"));
+			float y = strToF(t.fieldValue("y")); 
+			float z = strToF(t.fieldValue("z"));
+			float sy = strToF(t.fieldValue("scale_y"));
+
+
+			Spawn2 spawn;
+
+			spawn.name = entName;
+			spawn.meshfile = meshFile;
+			spawn.x = x;
+			spawn.y = y;
+			spawn.z = z;
+			spawn.ry = strToF(t.fieldValue("rot_y")); //r;
+			spawn.rx = strToF(t.fieldValue("rot_x")); //rx;
+			spawn.rz = strToF(t.fieldValue("rot_z")); //rz;			
+			spawn.sx = strToF(t.fieldValue("scale_x")); //
+			spawn.sy = sy;
+			spawn.sz = strToF(t.fieldValue("scale_z"));
+			spawn.drop_to_ground = dtg;
+			spawn.render_static = t.getIntField("static");
+			spawn.spawntype = t.getStringField("object_type");
+			spawn.mask = t.getIntField("mask");
+			
+			bool success = getObjectProperties(spawn);
+			
+			if (spawn.spawntype.length() < 1) spawn.spawntype = "default";
+			
+			mArtifexLoader->mObjectFile.push_back(spawn);
+			
+			bool interactive = false;
+			string nodeName = "";
+			if (spawn.attributes.size() > 0) {
+				//make sure to check if interactive first and get nodeName etc.
+				attributemap::iterator i = spawn.attributes.begin();	
+				for ( ; i != spawn.attributes.end(); i++ )
+				{
+					if (i->first == "interactive") {
+						if (i->second == "true") interactive = true;
+						
+						CharControllerDef tott_def(COLLIDER_CAPSULE, 0.35f, 500.0f, 5.0f, 10.0f);
+						GameObject* temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x, y, z), &tott_def);
+						AnimationComponent* tempAnim = dynamic_cast<AnimationComponent*>(temp->GetComponent(EComponentType::COMPONENT_ANIMATION));
+						nodeName = tempAnim->GetSceneNode()->getName();
+					}
+				}
+
+				//at this point we are certain about the spawns interactive-state
+				if (spawn.attributes.size() > 1 && interactive) {
+					attributemap::iterator j = spawn.attributes.begin();	
+					for ( ; j != spawn.attributes.end(); j++ )
+					{
+						if (j->first == "sound") {
+							SoundData3D m_3D_music_data;
+							m_3D_music_data = m_sound_manager->Create3DData(j->second, nodeName, false, false, false, 1.0f, 1.0f);
+						} 
+						else if (j->first == "waypoints") {
+
+						}
+					}
+				}
+			}
+
+			if(!interactive) {
+				//****************************		
+				
 				//***************************
 				Entity *newModel = NULL;
 				lCreateEntity:
@@ -66,43 +138,13 @@ int DBManager::Load() {
 				};					
 				newModel->setQueryFlags(t.getIntField("mask"));
 				//****************************
-				int dtg = t.getIntField("drop_to_ground");
-				float x = strToF(t.fieldValue("x"));
-				float y = strToF(t.fieldValue("y")); 
-				float z = strToF(t.fieldValue("z"));
-				float sy = strToF(t.fieldValue("scale_y"));
-
+				
 				// auto drop models on terrain
 				if (y==0 || dtg==1) {		
 					float tmpY = mArtifexLoader->getMeshYAdjust(meshFile)* sy;
 					y = mArtifexLoader->getHeightAt(x,z)+tmpY;
 				}
 
-				Spawn2 spawn;
-
-				spawn.name = entName;
-				spawn.meshfile = meshFile;
-				spawn.x = x;
-				spawn.y = y;
-				spawn.z = z;
-				spawn.ry = strToF(t.fieldValue("rot_y")); //r;
-				spawn.rx = strToF(t.fieldValue("rot_x")); //rx;
-				spawn.rz = strToF(t.fieldValue("rot_z")); //rz;			
-				spawn.sx = strToF(t.fieldValue("scale_x")); //
-				spawn.sy = sy;
-				spawn.sz = strToF(t.fieldValue("scale_z"));
-				spawn.drop_to_ground = dtg;
-				spawn.render_static = t.getIntField("static");
-				spawn.spawntype = t.getStringField("object_type");
-				spawn.mask = t.getIntField("mask");
-			
-				bool success = getObjectProperties(spawn);
-			
-				if (spawn.spawntype.length() < 1) spawn.spawntype = "default";
-			
-				mArtifexLoader->mObjectFile.push_back(spawn);
-
-				//****************************					
 				{
 					SceneNode *mNode = NULL;
 					try {
@@ -114,11 +156,7 @@ int DBManager::Load() {
 						cout << "\n|= ArtifexTerra3D =| Zoneloader v1.0 RC1 OT beta SQLite: spawnloader error - problems creating " << spawn.name.c_str() << ":" << e.what() << "\n";
 					};
 				}
-				//***************************			
-			}
-			else {
-				CharControllerDef tott_def(COLLIDER_CAPSULE, 0.35f, 500.0f, 5.0f, 10.0f);
-				m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(strToF(t.fieldValue("x")),strToF(t.fieldValue("y")),strToF(t.fieldValue("z"))), &tott_def);
+				//***************************	
 			}
 		}		
 	} 			
