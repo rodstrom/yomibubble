@@ -8,6 +8,7 @@
 
 void PlayerInputComponent::Update(float dt){
 	(this->*m_states[m_player_state])(dt);
+	m_messenger->Notify(MSG_SFX2D_PLAY, &m_def_music);
 }
 
 void PlayerInputComponent::Notify(int type, void* msg){
@@ -31,20 +32,14 @@ void PlayerInputComponent::Shut(){
 	m_messenger->Unregister(MSG_PLAYER_INPUT_SET_STATE, this);
 }
 
-void PlayerInputComponent::Init(InputManager* input_manager){
+void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound_manager){
 	m_input_manager = input_manager;
 	m_messenger->Register(MSG_PLAYER_INPUT_SET_BUBBLE, this);
 	m_messenger->Register(MSG_PLAYER_INPUT_SET_STATE, this);
-	m_walk_sound = "Yomi_Walk";
-	m_def_music = "Main_Theme";
 
-	//m_messenger->Notify(MSG_MUSIC2D_PLAY, &m_def_music);
-
-	//testing section
-	sound_data.m_name = "Dun_Dun";
-	sound_data.m_position.x = 200;
-	sound_data.m_position.y = 50;
-	sound_data.m_position.z = 1000;
+	m_walk_sound = sound_manager->Create2DData("Yomi_Walk", false, false, false, false, 1.0f, 1.0f);
+	m_def_music= sound_manager->Create2DData("Menu_Theme", false, false, false, false, 1.0f, 1.0f);
+	m_3D_music_data = sound_manager->Create3DData("Main_Theme", "", false, false, false, 1.0f, 1.0f);
 	m_states[PLAYER_STATE_NORMAL] = &PlayerInputComponent::Normal;
 	m_states[PLAYER_STATE_ON_BUBBLE] = &PlayerInputComponent::OnBubble;
 	m_states[PLAYER_STATE_INSIDE_BUBBLE] = &PlayerInputComponent::InsideBubble;
@@ -67,16 +62,19 @@ void PlayerInputComponent::Normal(float dt){
 
 	if (m_input_manager->IsButtonDown(BTN_UP)){
 		dir += Ogre::Vector3(0.0f, 0.0f, -1.0f);
+		//m_messenger->Notify(MSG_SFX3D_STOP, &m_3D_music_data);
 	}
 	else if (m_input_manager->IsButtonDown(BTN_DOWN)){
 		dir += Ogre::Vector3(0.0f, 0.0f, 1.0f);
+		m_messenger->Notify(MSG_MUSIC3D_PLAY, &m_3D_music_data);
 	}
 
 	if (dir != Ogre::Vector3::ZERO){
-		m_messenger->Notify(MSG_SFX2D_STOP, &m_walk_sound);
-	}
-	else{
 		m_messenger->Notify(MSG_SFX2D_PLAY, &m_walk_sound);
+	}
+	else
+	{
+		m_messenger->Notify(MSG_SFX2D_STOP, &m_walk_sound);
 	}
 
 	if (!m_is_creating_bubble){

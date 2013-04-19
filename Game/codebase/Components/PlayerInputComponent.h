@@ -2,7 +2,7 @@
 #define _N_PLAYER_CONTROLLER_H_
 
 #include "ComponentsPrereq.h"
-#include "..\Audio\SoundManager.h"
+#include "..\Managers\SoundManager.h"
 
 class InputManager;
 class PlayerInputComponent : public Component, public IComponentUpdateable, public IComponentObserver{
@@ -13,7 +13,7 @@ public:
 	virtual void Update(float dt);
 	virtual void Notify(int type, void* message);
 	virtual void Shut();
-	virtual void Init(InputManager* input_manager);
+	virtual void Init(InputManager* input_manager, SoundManager* sound_manager);
 	virtual void SetMessenger(ComponentMessenger* messenger);
 	int GetPlayerState() { return m_player_state; }
 
@@ -34,9 +34,9 @@ protected:
 	bool m_is_creating_bubble;
 	float m_max_scale;
 	float m_current_scale;
-	Ogre::String m_walk_sound;
-	Ogre::String m_def_music;
-	SoundData3D sound_data;
+	SoundData2D m_walk_sound;
+	SoundData2D m_def_music;
+	SoundData3D m_3D_music_data;
 	int m_player_state;
 	ControllerFptr m_states[PLAYER_STATE_SIZE];
 };

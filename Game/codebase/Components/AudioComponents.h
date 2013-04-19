@@ -32,6 +32,7 @@ public:
 
 private:
 	SoundManager* m_sound_manager;
+	//Ogre::SceneNode* m_node;
 };
 
 

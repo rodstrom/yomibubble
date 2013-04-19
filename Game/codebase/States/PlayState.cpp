@@ -2,7 +2,7 @@
 #include "PlayState.h"
 #include "..\Managers\InputManager.h"
 #include "..\PhysicsEngine.h"
-#include "..\Audio\SoundManager.h"
+#include "..\Managers\SoundManager.h"
 #include "..\Managers\GameObjectManager.h"
 
 PlayState::PlayState(void) : m_physics_engine(NULL), m_game_object_manager(NULL){}
@@ -88,7 +88,7 @@ void PlayState::Exit(){
 }
 
 bool PlayState::Update(float dt){
-	m_sound_manager->Update(m_camera, dt);
+	m_sound_manager->Update(m_camera, m_scene_manager, dt);
 	m_game_object_manager->Update(dt);
 	m_physics_engine->Step(dt);
 	m_game_object_manager->LateUpdate(dt);

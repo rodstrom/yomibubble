@@ -5,10 +5,11 @@
 #include "..\Components\VisualComponents.h"
 #include "..\Components\PhysicsComponents.h"
 #include "..\Components\CameraComponents.h"
+#include "..\Components\AIComponents.h"
 #include "InputManager.h"
 #include "..\Components\AudioComponents.h"
 #include "..\Components\PlayerInputComponent.h"
-#include "..\Audio\SoundManager.h"
+#include "..\Managers\SoundManager.h"
 
 GameObjectManager::GameObjectManager(void) : 
 	m_physics_engine(NULL), m_scene_manager(NULL), m_input_manager(NULL), m_viewport(NULL){}
@@ -124,7 +125,9 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	go->AddComponent(sound3D);
 	Music2DComponent* music2D = new Music2DComponent;
 	go->AddComponent(music2D);
-	
+	Music3DComponent* music3D = new Music3DComponent;
+	go->AddComponent(music3D);
+
 	acomp->Init("Yomi_2Yomi.mesh", m_scene_manager);
 	//acomp->Init("yomi.mesh", m_scene_manager);
 	contr->Init(position, acomp->GetEntity(), def.step_height, def.collider_type, m_physics_engine);
@@ -135,14 +138,17 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	//contr->SetJumpPwr(1.0f);
 	//contr->SetJumpPwr(10.0f);
 	contr->HasFollowCam(true);
-	pccomp->Init(m_input_manager);
+	pccomp->Init(m_input_manager, m_sound_manager);
 	sound2D->Init(m_sound_manager);
 	sound3D->Init(m_sound_manager);
 	music2D->Init(m_sound_manager);
+	music3D->Init(m_sound_manager);
 	fcc->Init(m_scene_manager, m_viewport, true);
 	fcc->GetCamera()->setNearClipDistance(0.1f);
 	//fcc->GetCamera()->setFarClipDistance(1000);
 	csnc->Init(Ogre::Vector3(0.0f, 0.0f, 1.0f), "CreateBubble", acomp->GetSceneNode());
+	m_sound_manager->GetYomiNode(acomp->GetSceneNode()->getName());
+
 	return go;
 }
 
@@ -192,8 +198,15 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 	go->AddComponent(contr);
 	go->AddUpdateable(contr);
 	go->AddLateUpdate(contr);
-
+	WayPointComponent* way_point = new WayPointComponent;
+	go->AddComponent(way_point);
+	go->AddUpdateable(way_point);
 	acomp->Init("Yomi_2Yomi.mesh", m_scene_manager);
+
+	m_sound_manager->GetTottNode(acomp->GetSceneNode()->getName());
+
+	way_point->Init(acomp->GetSceneNode(), 0.001);
+	
 	contr->Init(position, acomp->GetEntity(), def.step_height, def.collider_type, m_physics_engine);
 	contr->SetTurnSpeed(def.turn_speed);
 	contr->SetVelocity(def.velocity);

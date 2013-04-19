@@ -3,7 +3,7 @@
 #include "Game.h"
 #include "InputSystem.h"
 #include "MessageSystem.h"
-#include "Audio\SoundManager.h"
+#include "Managers\SoundManager.h"
 
 Core::Core(void) : m_root(NULL), m_game(NULL), m_message_system(NULL), m_input_system(NULL) {}
 Core::~Core(void){}
