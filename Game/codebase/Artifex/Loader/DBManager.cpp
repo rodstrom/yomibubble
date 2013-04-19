@@ -86,7 +86,6 @@ int DBManager::Load() {
 			mArtifexLoader->mObjectFile.push_back(spawn);
 			
 			bool interactive = false;
-			string nodeName = "";
 			if (spawn.attributes.size() > 0) {
 				GameObject* temp;
 				//make sure to check if interactive first and get nodeName etc.
@@ -102,25 +101,25 @@ int DBManager::Load() {
 							CharControllerDef tott_def(COLLIDER_CAPSULE, 0.35f, 500.0f, 5.0f, 10.0f);
 							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x, y, z), &tott_def);
 						}
-						AnimationComponent* tempAnim = dynamic_cast<AnimationComponent*>(temp->GetComponent(EComponentType::COMPONENT_ANIMATION));
-						nodeName = tempAnim->GetSceneNode()->getName();
 						interactive = true;
 					}
 				}
 
-				//at this point we are certain about the spawns interactive-state
-				if (spawn.attributes.size() > 1 && interactive) {
-					attributemap::iterator j = spawn.attributes.begin();	
-					for ( ; j != spawn.attributes.end(); j++ )
-					{
-						if (j->first == "sound") {
-							SoundData3D m_3D_music_data;
-							m_3D_music_data = m_sound_manager->Create3DData(j->second, nodeName, false, false, false, 1.0f, 1.0f);
-						} 
-						else if (j->first == "waypoints") {
-							WayPointComponent* tempWP = dynamic_cast<WayPointComponent*>(temp->GetComponent(EComponentType::COMPONENT_AI));
-							tempWP->AddWayPoint(getWaypoint(j->second));
-						}
+				attributemap::iterator j = spawn.attributes.begin();	
+				for ( ; j != spawn.attributes.end(); j++ )
+				{
+					if (j->first == "sound") {
+						SoundData3D m_3D_music_data;
+						AnimationComponent* tempAnim = dynamic_cast<AnimationComponent*>(temp->GetComponent(EComponentType::COMPONENT_ANIMATION));
+						m_3D_music_data = m_sound_manager->Create3DData(j->second, tempAnim->GetSceneNode()->getName(), false, false, false, 1.0f, 1.0f);
+					} 
+					else if (j->first == "waypoints") {
+						WayPointComponent* tempWP = dynamic_cast<WayPointComponent*>(temp->GetComponent(EComponentType::COMPONENT_AI));
+						std::vector<std::string> waypoints = split(j->second, ',');
+						for(int k = 0; k < waypoints.size(); k++) tempWP->AddWayPoint(getWaypoint(waypoints.at(k)));
+					}
+					else if (j->first == "waypoint") {		//dont render the waypoints
+						interactive = true;
 					}
 				}
 			}
@@ -171,6 +170,21 @@ int DBManager::Load() {
 	t.finalize();	
 	return 0;	
 };
+
+std::vector<std::string> &DBManager::split(const std::string &s, char delim, std::vector<std::string> &elems) {
+    std::stringstream ss(s);
+    std::string item;
+    while (std::getline(ss, item, delim)) {
+        elems.push_back(item);
+    }
+    return elems;
+}
+
+std::vector<std::string> DBManager::split(const std::string &s, char delim) {
+    std::vector<std::string> elems;
+    split(s, delim, elems);
+    return elems;
+}
 
 Vector3 DBManager::getWaypoint(string waypoint_id) {
 	string query = "SELECT object_name FROM attributes WHERE attribute='waypoint' AND value='"+waypoint_id+"'";

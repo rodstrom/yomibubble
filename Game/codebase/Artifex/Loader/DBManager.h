@@ -24,6 +24,9 @@ class ArtifexLoader;
 #include "..\..\Managers\GameObjectManager.h"
 #include "..\..\Managers\SoundManager.h"
 
+#include <string>
+#include <vector>
+
 class DBManager {
 public:
 	DBManager(ArtifexLoader *artifexloader, GameObjectManager *game_object_manager, SoundManager *sound_manager);
@@ -44,6 +47,9 @@ public:
 	bool EmptyTrash();
 	int DBManager::getObjectProperties(Spawn2 &spawn);
 	Vector3 DBManager::getWaypoint(string waypoint_id);
+
+	std::vector<std::string> &DBManager::split(const std::string &s, char delim, std::vector<std::string> &elems);
+	std::vector<std::string> DBManager::split(const std::string &s, char delim);
 
 	int Save();
 	int Load();
