@@ -6,6 +6,7 @@
 #include "..\..\Components\GameObject.h"
 #include "..\..\Components\VisualComponents.h"
 #include "..\..\Managers\SoundManager.h"
+#include "..\..\Components\AIComponents.h"
 
 DBManager::DBManager(ArtifexLoader *artifexloader, GameObjectManager *game_object_manager, SoundManager *sound_manager) {
 
@@ -87,17 +88,23 @@ int DBManager::Load() {
 			bool interactive = false;
 			string nodeName = "";
 			if (spawn.attributes.size() > 0) {
+				GameObject* temp;
 				//make sure to check if interactive first and get nodeName etc.
 				attributemap::iterator i = spawn.attributes.begin();	
 				for ( ; i != spawn.attributes.end(); i++ )
 				{
 					if (i->first == "interactive") {
-						if (i->second == "true") interactive = true;
-						
-						CharControllerDef tott_def(COLLIDER_CAPSULE, 0.35f, 500.0f, 5.0f, 10.0f);
-						GameObject* temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x, y, z), &tott_def);
+						if (i->second == "player") {
+							CharControllerDef player_def(COLLIDER_CAPSULE, 0.35f, 1000.0f, 5.0f, 10.0f);
+							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(x, y, z), &player_def);
+						}
+						else if (i->second == "tott") {
+							CharControllerDef tott_def(COLLIDER_CAPSULE, 0.35f, 500.0f, 5.0f, 10.0f);
+							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x, y, z), &tott_def);
+						}
 						AnimationComponent* tempAnim = dynamic_cast<AnimationComponent*>(temp->GetComponent(EComponentType::COMPONENT_ANIMATION));
 						nodeName = tempAnim->GetSceneNode()->getName();
+						interactive = true;
 					}
 				}
 
@@ -111,7 +118,8 @@ int DBManager::Load() {
 							m_3D_music_data = m_sound_manager->Create3DData(j->second, nodeName, false, false, false, 1.0f, 1.0f);
 						} 
 						else if (j->first == "waypoints") {
-
+							WayPointComponent* tempWP = dynamic_cast<WayPointComponent*>(temp->GetComponent(EComponentType::COMPONENT_AI));
+							tempWP->AddWayPoint(getWaypoint(j->second));
 						}
 					}
 				}
@@ -162,6 +170,40 @@ int DBManager::Load() {
 	} 			
 	t.finalize();	
 	return 0;	
+};
+
+Vector3 DBManager::getWaypoint(string waypoint_id) {
+	string query = "SELECT object_name FROM attributes WHERE attribute='waypoint' AND value='"+waypoint_id+"'";
+	CppSQLite3Table t;
+	try {
+		t = mDB->getTable(query.c_str());	
+	} catch (CppSQLite3Exception& e) {
+		cerr << e.errorCode() << ":" << e.errorMessage() << endl;
+		//return Vector3();
+	};
+	if (t.numRows()<1) {
+		t.finalize();
+		//return Vector3();
+	}
+	t.setRow(0);
+	string waypointObject = t.getStringField("object_name");
+	t.finalize();
+
+	query  = "SELECT x, y, z FROM objects WHERE entity='"+waypointObject+"'";
+	try {
+		t = mDB->getTable(query.c_str());	
+	} catch (CppSQLite3Exception& e) {
+		cerr << e.errorCode() << ":" << e.errorMessage() << endl;
+		//return Vector3();
+	};
+	if (t.numRows()<1) {
+		t.finalize();
+		//return Vector3();
+	}
+	t.setRow(0);
+	Vector3 result = Vector3(t.getFloatField("x"), t.getFloatField("y"), t.getFloatField("z"));
+	t.finalize();
+	return result;	
 };
 
 int DBManager::getObjectProperties(Spawn2 &spawn) {

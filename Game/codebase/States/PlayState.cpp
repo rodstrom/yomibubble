@@ -52,18 +52,18 @@ void PlayState::Enter(){
 	//Ogre::SceneNode* node = m_scene_manager->getSceneNode("camNode");
 	mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_camera, m_game_object_manager, m_sound_manager, "../../resources/terrain/");
 #ifdef _DEBUG
-	mArtifexLoader->loadZone("demozone", false, false, false, true, false, false, true, true, true, true);
+	mArtifexLoader->loadZone("demozone", false, false, false, false, false, false, true, true, true, true);
 #else
-	mArtifexLoader->loadZone("demozone", true, true, true, true, true, false, true, true, true, true);
+	mArtifexLoader->loadZone("demozone", true, true, true, false, true, false, true, true, true, true);
 #endif
-	PlaneDef plane_def("plane", "Examples/BeachStones");
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(x,y - 2.0f,z), &plane_def);
+	//PlaneDef plane_def("plane", "Examples/BeachStones");
+	//m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(x,y - 2.0f,z), &plane_def);
 
-	CharControllerDef player_def(COLLIDER_CAPSULE, 0.35f, 1000.0f, 5.0f, 10.0f);
-	//m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(x,y+1.0f,z), &player_def);
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(1226.0f,800,2300.0f), &player_def);
-	CharControllerDef tott_def(COLLIDER_CAPSULE, 0.35f, 500.0f, 5.0f, 10.0f);
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y+1.0f,z+3.0f), &tott_def);
+	//CharControllerDef player_def(COLLIDER_CAPSULE, 0.35f, 1000.0f, 5.0f, 10.0f);
+	////m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(x,y+1.0f,z), &player_def);
+	//m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(1226.0f,800,2300.0f), &player_def);
+	//CharControllerDef tott_def(COLLIDER_CAPSULE, 0.35f, 500.0f, 5.0f, 10.0f);
+	//m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y+1.0f,z+3.0f), &tott_def);
 	//m_physics_engine->CreateTerrainCollision(*mArtifexLoader->mTerrainInfo);
 	m_scene_manager->setSkyDome(true, "Examples/CloudySky");
 }

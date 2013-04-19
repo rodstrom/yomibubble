@@ -14,8 +14,8 @@ void WayPoint::Init(Ogre::SceneNode* node, float walk_speed){
 	m_walk_speed = walk_speed;
 	m_direction = Ogre::Vector3::ZERO;
 
-	/*AddWayPoint(Ogre::Vector3(25.0f, -10.0f, 0.0f));
-	AddWayPoint(Ogre::Vector3(1.0f, -10.0f, 21.0f));*/
+	AddWayPoint(Ogre::Vector3(25.0f, -10.0f, 0.0f));
+	AddWayPoint(Ogre::Vector3(1.0f, -10.0f, 21.0f));
 };
 
 bool WayPoint::NextLocation(){

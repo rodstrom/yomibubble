@@ -43,6 +43,7 @@ public:
 	bool WriteAttributes(Spawn2& spawn);
 	bool EmptyTrash();
 	int DBManager::getObjectProperties(Spawn2 &spawn);
+	Vector3 DBManager::getWaypoint(string waypoint_id);
 
 	int Save();
 	int Load();
