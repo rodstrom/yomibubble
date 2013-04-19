@@ -21,9 +21,11 @@ class ArtifexLoader;
 
 #include "CppSQLite3.h"
 
+#include "..\..\Managers\GameObjectManager.h"
+
 class DBManager {
 public:
-	DBManager(ArtifexLoader *artifexloader);
+	DBManager(ArtifexLoader *artifexloader, GameObjectManager *game_object_manager);
 	~DBManager();
 
 	ArtifexLoader *mArtifexLoader;
@@ -45,6 +47,8 @@ public:
 	int Load();
 
 	bool saving;
+
+	GameObjectManager *m_game_object_manager;
 
 };
 #endif

@@ -72,13 +72,15 @@ class DBManager;
 
 #define ETM_GROUP "ETM" // the resourcegroup for the zone
 
+#include "..\..\Managers\GameObjectManager.h"
+
 using namespace std;
 using namespace Ogre;
 using namespace Artifex;
 
 class ArtifexLoader {
 public:
-	ArtifexLoader(Root *root, SceneManager *scenemgr, SceneNode *camnode, Camera *camera, string zonepath="");
+	ArtifexLoader(Root *root, SceneManager *scenemgr, SceneNode *camnode, Camera *camera, string zonepath="", GameObjectManager *game_object_manager = NULL);
 	~ArtifexLoader();
 
 	Root *mRoot;

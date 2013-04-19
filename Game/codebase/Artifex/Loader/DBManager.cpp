@@ -1,13 +1,16 @@
 
 #include "stdafx.h"
 #include "DBManager.h"
+#include "..\..\Managers\GameObjectManager.h"
+#include "..\..\PhysicsEngine.h"
 
-DBManager::DBManager(ArtifexLoader *artifexloader) {
+DBManager::DBManager(ArtifexLoader *artifexloader, GameObjectManager *game_object_manager) {
 
 	mArtifexLoader = artifexloader;	
 	mDB = new CppSQLite3DB();
 	saving = false;
-	
+	m_game_object_manager = game_object_manager;
+
 };
 
 DBManager::~DBManager() {
@@ -41,76 +44,82 @@ int DBManager::Load() {
 		t.setRow(counter);
 
 		{
-			//***************************					
-			entName = t.getStringField("entity");
-			meshFile = t.getStringField("meshfile");
-			//***************************
-			Entity *newModel = NULL;
-			lCreateEntity:
-			try {
-				newModel = mArtifexLoader->mSceneMgr->createEntity((string) entName, (string) meshFile);
-			} catch(Exception &e) {
-				if (e.getNumber() != 4) {
-					cout << "\n|= ArtifexTerra3D =| Zoneloader v1.0 RC1 OT beta: Error " << e.getNumber() << " creating Entity " << entName.c_str() << ": " << e.getFullDescription().c_str() << "\n";
-				} else if (e.getNumber() == 4) {
-					cout << "\n|= ArtifexTerra3D =| Zoneloader v1.0 RC1 OT beta: Entity with the name " << entName.c_str() << " already exists, creating a random name:";
-					entName = "Entity"+StringConverter::toString((int)Math::RangeRandom(100000,999999));
-					cout << entName.c_str() << ".\n";
-					goto lCreateEntity;
-				}
-				continue;
-			};					
-			newModel->setQueryFlags(t.getIntField("mask"));
-			//****************************
-			int dtg = t.getIntField("drop_to_ground");
-			float x = strToF(t.fieldValue("x"));
-			float y = strToF(t.fieldValue("y")); 
-			float z = strToF(t.fieldValue("z"));
-			float sy = strToF(t.fieldValue("scale_y"));
-
-			// auto drop models on terrain
-			if (y==0 || dtg==1) {		
-				float tmpY = mArtifexLoader->getMeshYAdjust(meshFile)* sy;
-				y = mArtifexLoader->getHeightAt(x,z)+tmpY;
-			}
-
-			Spawn2 spawn;
-
-			spawn.name = entName;
-			spawn.meshfile = meshFile;
-			spawn.x = x;
-			spawn.y = y;
-			spawn.z = z;
-			spawn.ry = strToF(t.fieldValue("rot_y")); //r;
-			spawn.rx = strToF(t.fieldValue("rot_x")); //rx;
-			spawn.rz = strToF(t.fieldValue("rot_z")); //rz;			
-			spawn.sx = strToF(t.fieldValue("scale_x")); //
-			spawn.sy = sy;
-			spawn.sz = strToF(t.fieldValue("scale_z"));
-			spawn.drop_to_ground = dtg;
-			spawn.render_static = t.getIntField("static");
-			spawn.spawntype = t.getStringField("object_type");
-			spawn.mask = t.getIntField("mask");
-			
-			bool success = getObjectProperties(spawn);
-			
-			if (spawn.spawntype.length() < 1) spawn.spawntype = "default";
-			
-			mArtifexLoader->mObjectFile.push_back(spawn);
-
-			//****************************					
-			{
-				SceneNode *mNode = NULL;
+			if((string)t.getStringField("object_type") != "Tott") {
+				//***************************					
+				entName = t.getStringField("entity");
+				meshFile = t.getStringField("meshfile");
+				//***************************
+				Entity *newModel = NULL;
+				lCreateEntity:
 				try {
-					mNode = mArtifexLoader->mSceneMgr->getRootSceneNode()->createChildSceneNode(entName+"Node",Ogre::Vector3(spawn.x,spawn.y,spawn.z),Quaternion ((Degree(spawn.ry)), Vector3::UNIT_Y));
-					mNode->attachObject(newModel);
-					mNode->setScale(spawn.sx,spawn.sy,spawn.sz);						
-					mNode->setOrientation(Quaternion ((Degree(spawn.rx)), Vector3::UNIT_X)*Quaternion ((Degree(spawn.ry)), Vector3::UNIT_Y)*Quaternion ((Degree(spawn.rz)), Vector3::UNIT_Z));
-				} catch (Exception &e) {
-					cout << "\n|= ArtifexTerra3D =| Zoneloader v1.0 RC1 OT beta SQLite: spawnloader error - problems creating " << spawn.name.c_str() << ":" << e.what() << "\n";
-				};
+					newModel = mArtifexLoader->mSceneMgr->createEntity((string) entName, (string) meshFile);
+				} catch(Exception &e) {
+					if (e.getNumber() != 4) {
+						cout << "\n|= ArtifexTerra3D =| Zoneloader v1.0 RC1 OT beta: Error " << e.getNumber() << " creating Entity " << entName.c_str() << ": " << e.getFullDescription().c_str() << "\n";
+					} else if (e.getNumber() == 4) {
+						cout << "\n|= ArtifexTerra3D =| Zoneloader v1.0 RC1 OT beta: Entity with the name " << entName.c_str() << " already exists, creating a random name:";
+						entName = "Entity"+StringConverter::toString((int)Math::RangeRandom(100000,999999));
+						cout << entName.c_str() << ".\n";
+						goto lCreateEntity;
+					}
+					continue;
+				};					
+				newModel->setQueryFlags(t.getIntField("mask"));
+				//****************************
+				int dtg = t.getIntField("drop_to_ground");
+				float x = strToF(t.fieldValue("x"));
+				float y = strToF(t.fieldValue("y")); 
+				float z = strToF(t.fieldValue("z"));
+				float sy = strToF(t.fieldValue("scale_y"));
+
+				// auto drop models on terrain
+				if (y==0 || dtg==1) {		
+					float tmpY = mArtifexLoader->getMeshYAdjust(meshFile)* sy;
+					y = mArtifexLoader->getHeightAt(x,z)+tmpY;
+				}
+
+				Spawn2 spawn;
+
+				spawn.name = entName;
+				spawn.meshfile = meshFile;
+				spawn.x = x;
+				spawn.y = y;
+				spawn.z = z;
+				spawn.ry = strToF(t.fieldValue("rot_y")); //r;
+				spawn.rx = strToF(t.fieldValue("rot_x")); //rx;
+				spawn.rz = strToF(t.fieldValue("rot_z")); //rz;			
+				spawn.sx = strToF(t.fieldValue("scale_x")); //
+				spawn.sy = sy;
+				spawn.sz = strToF(t.fieldValue("scale_z"));
+				spawn.drop_to_ground = dtg;
+				spawn.render_static = t.getIntField("static");
+				spawn.spawntype = t.getStringField("object_type");
+				spawn.mask = t.getIntField("mask");
+			
+				bool success = getObjectProperties(spawn);
+			
+				if (spawn.spawntype.length() < 1) spawn.spawntype = "default";
+			
+				mArtifexLoader->mObjectFile.push_back(spawn);
+
+				//****************************					
+				{
+					SceneNode *mNode = NULL;
+					try {
+						mNode = mArtifexLoader->mSceneMgr->getRootSceneNode()->createChildSceneNode(entName+"Node",Ogre::Vector3(spawn.x,spawn.y,spawn.z),Quaternion ((Degree(spawn.ry)), Vector3::UNIT_Y));
+						mNode->attachObject(newModel);
+						mNode->setScale(spawn.sx,spawn.sy,spawn.sz);						
+						mNode->setOrientation(Quaternion ((Degree(spawn.rx)), Vector3::UNIT_X)*Quaternion ((Degree(spawn.ry)), Vector3::UNIT_Y)*Quaternion ((Degree(spawn.rz)), Vector3::UNIT_Z));
+					} catch (Exception &e) {
+						cout << "\n|= ArtifexTerra3D =| Zoneloader v1.0 RC1 OT beta SQLite: spawnloader error - problems creating " << spawn.name.c_str() << ":" << e.what() << "\n";
+					};
+				}
+				//***************************			
 			}
-			//***************************			
+			else {
+				CharControllerDef tott_def(COLLIDER_CAPSULE, 0.35f, 500.0f, 5.0f, 10.0f);
+				m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(strToF(t.fieldValue("x")),strToF(t.fieldValue("y")),strToF(t.fieldValue("z"))), &tott_def);
+			}
 		}		
 	} 			
 	t.finalize();	

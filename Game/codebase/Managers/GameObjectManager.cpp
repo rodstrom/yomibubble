@@ -130,6 +130,8 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	contr->Init(position, acomp->GetEntity(), def.step_height, def.collider_type, m_physics_engine);
 	contr->SetTurnSpeed(def.turn_speed);
 	contr->SetVelocity(def.velocity);
+	//GravityDebug!
+	contr->GetController()->setGravity(0.0f);
 	//contr->SetJumpPwr(1.0f);
 	//contr->SetJumpPwr(10.0f);
 	contr->HasFollowCam(true);
@@ -195,6 +197,8 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 	contr->Init(position, acomp->GetEntity(), def.step_height, def.collider_type, m_physics_engine);
 	contr->SetTurnSpeed(def.turn_speed);
 	contr->SetVelocity(def.velocity);
+	//GravityDebug!
+	contr->GetController()->setGravity(0.0f);
 	return go;
 }
 
