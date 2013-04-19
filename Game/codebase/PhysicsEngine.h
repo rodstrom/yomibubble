@@ -8,6 +8,7 @@
 #include "ETTerrainManager.h"
 #include "ETTerrainInfo.h"
 
+class CollisionManager;
 class PhysicsEngine
 {
 public:
@@ -36,12 +37,14 @@ private:
 	btDiscreteDynamicsWorld*				m_dynamic_world;
 	BtOgre::DebugDrawer*					m_debug_drawer;
 	btGhostPairCallback*					m_ghost_pair_callback;
+	CollisionManager*						m_collision_manager;
 
 	//Terrain Collision
 	bool									m_has_terrain_coll;
 	btHeightfieldTerrainShape*				m_terrain_shape;
 	btRigidBody*							m_terrain_body;
 	btDefaultMotionState*					m_terrain_motion_state;
+	btCollisionObject*						m_terrain_coll_obj;
 };
 
 #endif // _N_PHYSICS_ENGINE_H_

@@ -5,6 +5,7 @@
 #include "..\Components\VisualComponents.h"
 #include "..\Components\PhysicsComponents.h"
 #include "..\Components\CameraComponents.h"
+#include "..\Components\AIComponents.h"
 #include "InputManager.h"
 #include "..\Components\AudioComponents.h"
 #include "..\Components\PlayerInputComponent.h"
@@ -128,9 +129,12 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	go->AddComponent(music3D);
 
 	acomp->Init("Yomi_2Yomi.mesh", m_scene_manager);
+	//acomp->Init("yomi.mesh", m_scene_manager);
 	contr->Init(position, acomp->GetEntity(), def.step_height, def.collider_type, m_physics_engine);
 	contr->SetTurnSpeed(def.turn_speed);
 	contr->SetVelocity(def.velocity);
+	//contr->SetJumpPwr(1.0f);
+	//contr->SetJumpPwr(10.0f);
 	contr->HasFollowCam(true);
 	pccomp->Init(m_input_manager, m_sound_manager);
 	sound2D->Init(m_sound_manager);
@@ -192,12 +196,15 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 	go->AddComponent(contr);
 	go->AddUpdateable(contr);
 	go->AddLateUpdate(contr);
-
+	WayPointComponent* way_point = new WayPointComponent;
+	go->AddComponent(way_point);
+	go->AddUpdateable(way_point);
 	acomp->Init("Yomi_2Yomi.mesh", m_scene_manager);
 
-	//m_sound_manager->m_scene_nodes.insert(std::pair<int, Ogre::SceneNode*>(go->GetId(), acomp->GetSceneNode()));
 	m_sound_manager->GetTottNode(acomp->GetSceneNode()->getName());
 
+	way_point->Init(acomp->GetSceneNode(), 0.001);
+	
 	contr->Init(position, acomp->GetEntity(), def.step_height, def.collider_type, m_physics_engine);
 	contr->SetTurnSpeed(def.turn_speed);
 	contr->SetVelocity(def.velocity);
@@ -232,4 +239,3 @@ GameObject* GameObjectManager::Create2DOverlay(const Ogre::Vector3& position, vo
 
 	return go;
 }
-//mouseposition, storleken på overlayen

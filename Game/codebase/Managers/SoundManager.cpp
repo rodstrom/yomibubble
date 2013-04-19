@@ -91,6 +91,8 @@ void SoundManager::Play3DMusic(Ogre::String name, Ogre::String node_name, bool a
 	{ node->attachObject(m_sound_manager->getSound(name)); }
 	m_sound_manager->getSound(name)->play();
 
+	std::cout << "tott pos: " << node->getPosition() << std::endl;
+
 	node = NULL;
 };
 	
