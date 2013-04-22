@@ -2,6 +2,7 @@
 #define _N_GAME_OBJECT_MANAGER_H_
 
 #include "..\Components\GameObjectPrereq.h"
+#include <string>
 
 class GameObject;
 class InputManager;
@@ -18,6 +19,7 @@ public:
 	void RemoveGameObject(GameObject* gameobject);
 	GameObject* CreateGameObject(int type, const Ogre::Vector3& position, void* data);
 	void Shut();
+	//GameObject* GetGameObject(std::string id);
 
 private:
 	void AddGameObject(GameObject* gameobject);

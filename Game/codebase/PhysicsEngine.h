@@ -5,8 +5,6 @@
 #include "BtOgreGP.h"
 #include "BulletCollision\CollisionDispatch\btGhostObject.h"
 #include "BulletCollision\CollisionShapes\btHeightfieldTerrainShape.h"
-#include "ETTerrainManager.h"
-#include "ETTerrainInfo.h"
 
 class CollisionManager;
 class PhysicsEngine
@@ -23,7 +21,7 @@ public:
 	void ShowDebugDraw(bool value);
 	void CloseDebugDraw();
 
-	void CreateTerrainCollision(const ET::TerrainInfo& terrain_info);
+	//void CreateTerrainCollision(const ET::TerrainInfo& terrain_info);
 	void DestroyTerrainCollision();
 
 	btBroadphaseInterface* GetBroadphaseInterface() const { return m_broadphase; }

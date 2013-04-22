@@ -29,3 +29,7 @@ void WayPointComponent::Update(float dt){
 void WayPointComponent::AddWayPoint(Ogre::Vector3 way_point){
 	m_way_point->AddWayPoint(way_point);
 };
+
+void WayPointComponent::AddWayPoint(Ogre::SceneNode* scene_node){
+	m_way_point->AddWayPoint(scene_node);
+};

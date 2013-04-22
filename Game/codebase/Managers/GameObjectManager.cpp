@@ -128,7 +128,10 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	Music3DComponent* music3D = new Music3DComponent;
 	go->AddComponent(music3D);
 
-	acomp->Init("Yomi_2Yomi.mesh", m_scene_manager);
+	acomp->Init("sphere.mesh", m_scene_manager);
+	Ogre::Vector3 scale(0.003);
+	acomp->GetSceneNode()->setScale(scale);
+	acomp->GetEntity()->setMaterialName("SolidColor/Red");
 	//acomp->Init("yomi.mesh", m_scene_manager);
 	contr->Init(position, acomp->GetEntity(), def.step_height, def.collider_type, m_physics_engine);
 	contr->SetTurnSpeed(def.turn_speed);
@@ -160,8 +163,9 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 	go->AddComponent(rc);
 
 	mrc->Init("sphere.mesh", m_scene_manager);
-	Ogre::Vector3 scale(0.002,0.002,0.002);
+	Ogre::Vector3 scale(0.002);
 	mrc->GetSceneNode()->setScale(scale);
+	mrc->GetEntity()->setMaterialName("SolidColor/Blue");
 	//mrc->GetEntity()->setMaterialName();
 	rc->Init(position,  mrc->GetEntity(), m_physics_engine, 1.0f, COLLIDER_SPHERE, DYNAMIC_BODY);
 	rc->GetRigidbody()->setGravity(btVector3(0.0f, 0.0f, 0.0f));
@@ -178,8 +182,9 @@ GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, v
 	go->AddComponent(rc);
 
 	mrc->Init("sphere.mesh", m_scene_manager);
-	Ogre::Vector3 scale(0.002,0.002,0.002);
+	Ogre::Vector3 scale(0.002);
 	mrc->GetSceneNode()->setScale(scale);
+	mrc->GetEntity()->setMaterialName("SolidColor/Pink");
 	//mrc->GetEntity()->setMaterialName();
 	rc->Init(position,  mrc->GetEntity(), m_physics_engine, 1.0f, COLLIDER_SPHERE, DYNAMIC_BODY);
 	rc->GetRigidbody()->setGravity(btVector3(0.0f, 0.0f, 0.0f));
@@ -201,7 +206,10 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 	WayPointComponent* way_point = new WayPointComponent;
 	go->AddComponent(way_point);
 	go->AddUpdateable(way_point);
-	acomp->Init("Yomi_2Yomi.mesh", m_scene_manager);
+	acomp->Init("sphere.mesh", m_scene_manager);
+	Ogre::Vector3 scale(0.003);
+	acomp->GetSceneNode()->setScale(scale);
+	acomp->GetEntity()->setMaterialName("SolidColor/Green");
 
 	m_sound_manager->GetTottNode(acomp->GetSceneNode()->getName());
 

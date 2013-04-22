@@ -7,6 +7,7 @@
 #include "..\..\Components\VisualComponents.h"
 #include "..\..\Managers\SoundManager.h"
 #include "..\..\Components\AIComponents.h"
+#include <map>
 
 DBManager::DBManager(ArtifexLoader *artifexloader, GameObjectManager *game_object_manager, SoundManager *sound_manager) {
 
@@ -44,6 +45,8 @@ int DBManager::Load() {
 	};	
 	//***********************************************	
 	
+	std::map<std::string, Ogre::SceneNode*> followables;
+
 	for (int counter=0; counter<t.numRows(); counter ++)
 	{		
 		t.setRow(counter);
@@ -88,9 +91,10 @@ int DBManager::Load() {
 			bool interactive = false;
 			if (spawn.attributes.size() > 0) {
 				GameObject* temp;
+
 				//make sure to check if interactive first and get nodeName etc.
-				attributemap::iterator i = spawn.attributes.begin();	
-				for ( ; i != spawn.attributes.end(); i++ )
+				//attributemap::iterator i = spawn.attributes.begin();	
+				for ( attributemap::iterator i = spawn.attributes.begin(); i != spawn.attributes.end(); i++ )
 				{
 					if (i->first == "interactive") {
 						if (i->second == "player") {
@@ -105,21 +109,31 @@ int DBManager::Load() {
 					}
 				}
 
-				attributemap::iterator j = spawn.attributes.begin();	
-				for ( ; j != spawn.attributes.end(); j++ )
+				for ( attributemap::iterator i = spawn.attributes.begin(); i != spawn.attributes.end(); i++ )
 				{
-					if (j->first == "sound") {
+					if (i->first == "sound") {
 						SoundData3D m_3D_music_data;
-						AnimationComponent* tempAnim = dynamic_cast<AnimationComponent*>(temp->GetComponent(EComponentType::COMPONENT_ANIMATION));
-						m_3D_music_data = m_sound_manager->Create3DData(j->second, tempAnim->GetSceneNode()->getName(), false, false, false, 1.0f, 1.0f);
+						AnimationComponent* tempAnim = static_cast<AnimationComponent*>(temp->GetComponent(EComponentType::COMPONENT_ANIMATION));
+						m_3D_music_data = m_sound_manager->Create3DData(i->second, tempAnim->GetSceneNode()->getName(), false, false, false, 1.0f, 1.0f);
 					} 
-					else if (j->first == "waypoints") {
-						WayPointComponent* tempWP = dynamic_cast<WayPointComponent*>(temp->GetComponent(EComponentType::COMPONENT_AI));
-						std::vector<std::string> waypoints = split(j->second, ',');
-						for(int k = 0; k < waypoints.size(); k++) tempWP->AddWayPoint(getWaypoint(waypoints.at(k)));
+					else if (i->first == "waypoints") {
+						WayPointComponent* tempWP = static_cast<WayPointComponent*>(temp->GetComponent(EComponentType::COMPONENT_AI));
+						std::vector<std::string> waypoints = split(i->second, ',');
+						for(int j = 0; j < waypoints.size(); j++) tempWP->AddWayPoint(getWaypoint(waypoints.at(j)));
 					}
-					else if (j->first == "waypoint") {		//dont render the waypoints
+					else if (i->first == "waypoint") {		//dont render the waypoints
 						interactive = true;
+					}
+					else if (i->first == "followable") { 
+						followables[i->second] = static_cast<AnimationComponent*>(temp->GetComponent(EComponentType::COMPONENT_ANIMATION))->GetSceneNode();
+					}
+				}
+
+				for ( attributemap::iterator i = spawn.attributes.begin(); i != spawn.attributes.end(); i++ )
+				{
+					if (i->first == "follow") { 
+						Ogre::SceneNode* debugging = followables[i->second];
+						static_cast<WayPointComponent*>(temp->GetComponent(EComponentType::COMPONENT_AI))->AddWayPoint(followables[i->second]);
 					}
 				}
 			}
