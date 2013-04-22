@@ -111,7 +111,7 @@ void PhysicsEngine::Step(float dt){
 		}
 	}
 }
-
+/*
 void PhysicsEngine::CreateTerrainCollision(const ET::TerrainInfo& terrain_info){
 	if (!m_has_terrain_coll){
 		size_t height_stick_width = terrain_info.getWidth();
@@ -132,6 +132,7 @@ void PhysicsEngine::CreateTerrainCollision(const ET::TerrainInfo& terrain_info){
 	}
 
 }
+*/
 
 void PhysicsEngine::DestroyTerrainCollision(){
 

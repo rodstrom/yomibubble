@@ -39,7 +39,9 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 
 	m_walk_sound = sound_manager->Create2DData("Yomi_Walk", false, false, false, false, 1.0f, 1.0f);
 	m_def_music= sound_manager->Create2DData("Menu_Theme", false, false, false, false, 1.0f, 1.0f);
+	m_test_sfx = sound_manager->Create2DData("Dun_Dun", true, false, false, false, 1.0f, 1.0f);
 	m_3D_music_data = sound_manager->Create3DData("Main_Theme", "", false, false, false, 1.0f, 1.0f);
+	
 	m_states[PLAYER_STATE_NORMAL] = &PlayerInputComponent::Normal;
 	m_states[PLAYER_STATE_ON_BUBBLE] = &PlayerInputComponent::OnBubble;
 	m_states[PLAYER_STATE_INSIDE_BUBBLE] = &PlayerInputComponent::InsideBubble;
@@ -62,6 +64,7 @@ void PlayerInputComponent::Normal(float dt){
 
 	if (m_input_manager->IsButtonDown(BTN_UP)){
 		dir += Ogre::Vector3(0.0f, 0.0f, -1.0f);
+		m_messenger->Notify(MSG_SFX2D_PLAY, &m_test_sfx);
 		//m_messenger->Notify(MSG_SFX3D_STOP, &m_3D_music_data);
 	}
 	else if (m_input_manager->IsButtonDown(BTN_DOWN)){

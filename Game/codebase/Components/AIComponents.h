@@ -15,6 +15,8 @@ public:
 	virtual void SetMessenger(ComponentMessenger* messenger);
 	virtual void Update(float dt);
 
+	void AddWayPoint(Ogre::Vector3 way_point);
+
 private:
 	WayPoint* m_way_point;
 };

@@ -201,7 +201,7 @@ namespace OIS
 	public:
 		virtual ~KeyListener() {}
 		virtual bool keyPressed(const KeyEvent &arg) = 0;
-		virtual bool keyReleased(const KeyEvent &arg) = 0;	
+		virtual bool keyReleased(const KeyEvent &arg) = 0;		
 	};
 
 	/**

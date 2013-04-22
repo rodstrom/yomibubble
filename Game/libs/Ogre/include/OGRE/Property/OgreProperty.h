@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -299,9 +299,6 @@ namespace Ogre
 
 		/** Reports whether this property set contains a named property. */
 		bool hasProperty(const String& name) const;
-
-        /** Removes the named property from the property set. */
-        void removeProperty(const String& name);
 
 		typedef map<String, PropertyBase*>::type PropertyMap;
 		typedef Ogre::MapIterator<PropertyMap> PropertyIterator;

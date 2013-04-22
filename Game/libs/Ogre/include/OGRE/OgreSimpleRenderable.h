@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -51,29 +51,25 @@ namespace Ogre {
     protected:
         RenderOperation mRenderOp;
 
-        Matrix4 mWorldTransform;
+        Matrix4 m_matWorldTransform;
         AxisAlignedBox mBox;
 
-        String mMatName;
-        MaterialPtr mMaterial;
+        String m_strMatName;
+        MaterialPtr m_pMaterial;
 
         /// The scene manager for the current frame.
-        SceneManager *mParentSceneManager;
+        SceneManager *m_pParentSceneManager;
 
         /// The camera for the current frame.
-        Camera *mCamera;
+        Camera *m_pCamera;
 
         /// Static member used to automatically generate names for SimpleRendaerable objects.
-        static uint msGenNameCount;
+        static uint ms_uGenNameCount;
 
     public:
-        /// Constructor
         SimpleRenderable();
 
-        /// Named constructor
-        SimpleRenderable(const String& name);
-
-        virtual void setMaterial( const String& matName );
+        void setMaterial( const String& matName );
         virtual const MaterialPtr& getMaterial(void) const;
 
         virtual void setRenderOperation( const RenderOperation& rend );

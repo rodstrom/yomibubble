@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -80,8 +80,7 @@ namespace Ogre {
         Pass* pass;
         TextureUnitState* textureUnit;
         GpuProgramPtr program; // used when referencing a program, not when defining it
-        bool isVertexProgramShadowCaster; // when referencing, are we in context of shadow caster
-        bool isFragmentProgramShadowCaster; // when referencing, are we in context of shadow caster
+        bool isProgramShadowCaster; // when referencing, are we in context of shadow caster
         bool isVertexProgramShadowReceiver; // when referencing, are we in context of shadow caster
 		bool isFragmentProgramShadowReceiver; // when referencing, are we in context of shadow caster
         GpuProgramParametersSharedPtr programParams;
@@ -206,7 +205,7 @@ namespace Ogre {
         MaterialScriptContext mScriptContext;
 
         /** internal method for parsing a material
-        @return true if it expects the next line to be a {
+        @returns true if it expects the next line to be a {
         */
         bool parseScriptLine(String& line);
         /** internal method for finding & invoking an attribute parser. */
@@ -244,7 +243,6 @@ namespace Ogre {
         void writePass(const Pass* pPass);
         void writeVertexProgramRef(const Pass* pPass);
         void writeShadowCasterVertexProgramRef(const Pass* pPass);
-        void writeShadowCasterFragmentProgramRef(const Pass* pPass);
         void writeShadowReceiverVertexProgramRef(const Pass* pPass);
         void writeShadowReceiverFragmentProgramRef(const Pass* pPass);
         void writeFragmentProgramRef(const Pass* pPass);
@@ -418,14 +416,6 @@ namespace Ogre {
             String& buffer = (useMainBuffer ? mBuffer : mGpuProgramBuffer);
 			buffer += (" " + val);
 		}
-
-		String quoteWord(const String& val)
-		{
-			if (val.find_first_of(" \t") != String::npos)
-				return ("\"" + val + "\"");
-			else return val;
-		}
-
 
 		void writeComment(unsigned short level, const String& comment, const bool useMainBuffer = true)
 		{

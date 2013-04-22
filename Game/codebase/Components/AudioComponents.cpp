@@ -18,6 +18,9 @@ void Sound2DComponent::Notify(int type, void* message){
 
 		if (sound_data.m_change_volume)
 		{ m_sound_manager->ChangeVolume(sound_data.m_name, sound_data.m_volume); sound_data.m_change_volume = false; }
+
+		if (sound_data.m_fade_in)
+		{ m_sound_manager->FadeIn(sound_data.m_name, 1.0f); sound_data.m_fade_in = false; }
 	}
 	else if (type == MSG_SFX2D_STOP)
 	{ 

@@ -25,3 +25,7 @@ void WayPointComponent::Update(float dt){
 	m_way_point->Update(dt);
 	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &m_way_point->m_direction);
 };
+
+void WayPointComponent::AddWayPoint(Ogre::Vector3 way_point){
+	m_way_point->AddWayPoint(way_point);
+};

@@ -14,8 +14,6 @@ SoundManager::SoundManager(Ogre::SceneManager* scene_manager, Ogre::Camera* came
 	m_ear_node->attachObject(m_sound_manager->getListener());
 	m_scene_manager = scene_manager;
 	m_sound_manager->setDistanceModel(AL_LINEAR_DISTANCE_CLAMPED);
-
-	testbajs = false; //temp, remove this later
 }
 
 SoundManager::~SoundManager(){
@@ -29,6 +27,8 @@ void SoundManager::LoadAudio(){
 	m_sound_manager->createSound("Yomi_Walk", "SFX/Yomi/Yomi_Walk.wav", false, false, true);
 	
 	m_sound_manager->createSound("Dun_Dun", "SFX/Tott/Bristlestick_Zoom_mono.wav", false, false, true);
+	m_sound_manager->getSound("Dun_Dun")->setMinVolume(0.0f);
+	m_sound_manager->getSound("Dun_Dun")->setMaxVolume(1.0f);
 
 	m_sound_manager->createSound("Main_Theme", "Music/Day_area_theme_mono.wav", false, true, true);
 	m_sound_manager->createSound("Menu_Theme", "Music/Menu_theme.wav", false, true, true);
@@ -91,7 +91,7 @@ void SoundManager::Play3DMusic(Ogre::String name, Ogre::String node_name, bool a
 	{ node->attachObject(m_sound_manager->getSound(name)); }
 	m_sound_manager->getSound(name)->play();
 
-	std::cout << "tott pos: " << node->getPosition() << std::endl;
+	//std::cout << "tott pos: " << node->getPosition() << std::endl;
 
 	node = NULL;
 };
@@ -99,12 +99,21 @@ void SoundManager::Play3DMusic(Ogre::String name, Ogre::String node_name, bool a
 void SoundManager::Stop3DMusic(Ogre::String name){
 	m_sound_manager->getSound(name)->stop();
 };
-
-void SoundManager::FadeOut(Ogre::String name){ //Does this even work? Try further.
-	m_sound_manager->getSound(name)->startFade(true, 0.5f);
+/*
+	Fade data types: startFade(bool dir, float fadeTime, actionOnCompletion)
+	@param dir 
+		Direction to fade. (true=in | false=out)
+	@param fadeTime 
+		Time over which to fade (>0)
+	@param actionOnCompletion 
+		Optional action to perform when fading has finished (default: NONE)
+*/
+void SoundManager::FadeOut(Ogre::String name, float duration){ //Direction to fade. (true=in | false=out)
+	m_sound_manager->getSound(name)->startFade(false, duration);
 };
 	
-void SoundManager::FadeIn(Ogre::String name){
+void SoundManager::FadeIn(Ogre::String name, float duration){
+	m_sound_manager->getSound(name)->startFade(true, duration, OgreOggSound::FC_NONE);
 };
 	
 void SoundManager::ChangeVolume(Ogre::String name, float new_volume){ //This ranges from 0.0 to 1.0. Other values will normalize.
@@ -156,6 +165,9 @@ SoundData2D SoundManager::Create2DData(Ogre::String name, bool fade_in, bool fad
 	data.m_change_volume = change_volume;
 	data.m_pitch = pitch;
 	data.m_volume = volume;
+
+	data.m_fade_time = 0.5f;
+	data.m_fade_amount = 0.01;
 
 	return data;
 };

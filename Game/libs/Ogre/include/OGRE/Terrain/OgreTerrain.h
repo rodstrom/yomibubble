@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -636,7 +636,7 @@ namespace Ogre
 		@param inSpace The space that inPos is expressed as
 		@param inPos The incoming position
 		@param outSpace The space which outPos should be expressed as
-		@return The output position 
+		@returns The output position 
 		*/
 		Vector3 convertPosition(Space inSpace, const Vector3& inPos, Space outSpace) const;
 		/** Convert a direction from one space to another with respect to this terrain.
@@ -650,7 +650,7 @@ namespace Ogre
 		@param inSpace The space that inDir is expressed as
 		@param inDir The incoming direction
 		@param outSpace The space which outDir should be expressed as
-		@return The output direction 
+		@returns The output direction 
 		*/
 		Vector3 convertDirection(Space inSpace, const Vector3& inDir, Space outSpace) const;
 
@@ -696,7 +696,7 @@ namespace Ogre
 		@remarks
 			This is safe to do in a background thread as it creates no GPU resources.
 			It reads data from a native terrain data chunk. 
-		@return true if the preparation was successful
+		@returns true if the preparation was successful
 		*/
 		bool prepare(StreamSerialiser& stream);
 
@@ -839,10 +839,6 @@ namespace Ogre
 		@note This point is relative to Terrain::getPosition
 		*/
 		void getPoint(long x, long y, float height, Vector3* outpos);
-		/** Get a transform which converts Vector4(xindex, yindex, height, 1) into 
-			an object-space position including scalings and alignment.
-		*/
-		void getPointTransform(Matrix4* outXform) const;
 		/** Translate a vector from world space to local terrain space based on the alignment options.
 		@param inVec The vector in basis space, where x/y represents the 
 		terrain plane and z represents the up vector
@@ -954,21 +950,12 @@ namespace Ogre
 		Alignment getAlignment() const;
 		/// Get the size of the terrain in vertices along one side
 		uint16 getSize() const;
-		/** Set the size of terrain in vertices along one side. 
-		@note The existing height data will be bilinear filtered to fill the new size
-		@param newSize the new size of the terrain
-		*/
-        void setSize(uint16 newSize);
 		/// Get the maximum size in vertices along one side of a batch 
 		uint16 getMaxBatchSize() const;
 		/// Get the minimum size in vertices along one side of a batch 
 		uint16 getMinBatchSize() const;
 		/// Get the size of the terrain in world units
 		Real getWorldSize() const;
-		/** Set the world size of terrain. 
-		@param newWorldSize the new world size of the terrain
-		*/
-        void setWorldSize(Real newWorldSize);
 
 		/** Get the number of layers in this terrain. */
 		uint8 getLayerCount() const { return static_cast<uint8>(mLayers.size()); }
@@ -1222,7 +1209,7 @@ namespace Ogre
 			in its recorded position, and the place it will end up in the LOD
 			in which it is removed. 
 		@param rect Rectangle describing the area in which heights have altered 
-		@return A Rectangle describing the area which was updated (may be wider
+		@returns A Rectangle describing the area which was updated (may be wider
 			than the input rectangle)
 		*/
 		Rect calculateHeightDeltas(const Rect& rect);
@@ -1239,7 +1226,7 @@ namespace Ogre
 		/** Calculate (or recalculate) the normals on the terrain
 		@param rect Rectangle describing the area of heights that were changed
 		@param outFinalRect Output rectangle describing the area updated
-		@return Pointer to a PixelBox full of normals (caller responsible for deletion)
+		@returns Pointer to a PixelBox full of normals (caller responsible for deletion)
 		*/
 		PixelBox* calculateNormals(const Rect& rect, Rect& outFinalRect);
 
@@ -1257,7 +1244,7 @@ namespace Ogre
 		@param extraTargetRect Rectangle describing a target area of the terrain that
 			needs to be calculated additionally (e.g. from a neighbour)
 		@param outFinalRect Output rectangle describing the area updated in the lightmap
-		@return Pointer to a PixelBox full of lighting data (caller responsible for deletion)
+		@returns Pointer to a PixelBox full of lighting data (caller responsible for deletion)
 		*/
 		PixelBox* calculateLightmap(const Rect& rect, const Rect& extraTargetRect, Rect& outFinalRect);
 
@@ -1354,7 +1341,7 @@ namespace Ogre
 			may only upload it in the main render thread.
 		@param layerIndex The layer index, which should be 1 or higher (since 
 			the bottom layer has no blending).
-		@return Pointer to the TerrainLayerBlendMap requested. The caller must
+		@returns Pointer to the TerrainLayerBlendMap requested. The caller must
 			not delete this instance, use freeTemporaryResources if you want
 			to save the memory after completing your editing.
 		*/
@@ -1363,7 +1350,7 @@ namespace Ogre
 		/** Get the index of the blend texture that a given layer uses.
 		@param layerIndex The layer index, must be >= 1 and less than the number
 			of layers
-		@return The index of the shared blend texture
+		@returns The index of the shared blend texture
 		*/
 		uint8 getBlendTextureIndex(uint8 layerIndex) const;
 
@@ -1436,7 +1423,7 @@ namespace Ogre
 		/** Get the texture index and colour channel of the blend information for 
 			a given layer. 
 		@param layerIndex The index of the layer (1 or higher, layer 0 has no blend data)
-		@return A pair in which the first value is the texture index, and the 
+		@returns A pair in which the first value is the texture index, and the 
 			second value is the colour channel (RGBA)
 		*/
 		std::pair<uint8,uint8> getLayerBlendTextureIndex(uint8 layerIndex);
@@ -1503,9 +1490,6 @@ namespace Ogre
 		*/
 		void _setCompositeMapRequired(bool compositeMap);
 
-		/// Whether we're using vertex compression or not
-		bool _getUseVertexCompression() const; 
-		
 		/// WorkQueue::RequestHandler override
 		bool canHandleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ);
 		/// WorkQueue::RequestHandler override
@@ -1589,7 +1573,7 @@ namespace Ogre
 		/** Utility method to pick a neighbour based on a ray. 
 		@param ray The ray in world space
 		@param distanceLimit Limit beyond which we want to ignore neighbours (0 for infinite)
-		@return The first neighbour along this ray, or null
+		@returns The first neighbour along this ray, or null
 		*/
 		Terrain* raySelectNeighbour(const Ray& ray, Real distanceLimit = 0);
 
@@ -1848,7 +1832,6 @@ namespace Ogre
 		ColourValue mCompositeMapDiffuse;
 		Real mCompositeMapDistance;
 		String mResourceGroup;
-		bool mUseVertexCompressionWhenAvailable;
 
 	public:
 		TerrainGlobalOptions();
@@ -2014,20 +1997,6 @@ namespace Ogre
 		/** Get the default resource group to use to load / save terrains.
 		*/
 		const String& getDefaultResourceGroup() { return mResourceGroup; }
-		
-		/** Get whether to allow vertex compression to be used when the material
-			generator states that it supports it.
-		*/
-		bool getUseVertexCompressionWhenAvailable() const { return mUseVertexCompressionWhenAvailable; }
-
-		/** Set whether to allow vertex compression to be used when the material
-		 generator states that it supports it.
-		 @note You should only call this before creating any terrain instances. 
-		 The default is true, so if a material generator supports compressed vertices, 
-		 and so does the hardware (this basically means shader support), they will be used).
-		 However you can disable this in an emergency if required.
-		 */
-		void setUseVertexCompressionWhenAvailable(bool enable) { mUseVertexCompressionWhenAvailable = enable; }
 
 		/** Override standard Singleton retrieval.
 		@remarks

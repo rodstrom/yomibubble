@@ -39,14 +39,14 @@ THE SOFTWARE.
 
 // uncomment this if you want to use Ogre's::Terrain component (Ogre 1.7 and higher)
 //#define OT_TERRAIN
-#define ETM_TERRAIN
+#define OT_TERRAIN
 
 // includes needed to work with the Enhanced Terrain Manager
 #ifdef ETM_TERRAIN
-#include "ETTerrainManager.h"
-#include "ETTerrainInfo.h"
-#include "ETBrush.h"
-#include "ETSplattingManager.h"
+//#include "ETTerrainManager.h"
+//#include "ETTerrainInfo.h"
+//#include "ETBrush.h"
+//#include "ETSplattingManager.h"
 #endif
 //
 
@@ -91,15 +91,16 @@ public:
 
 #ifdef ETM_TERRAIN
 	// ETM
-	ET::TerrainManager* mTerrainMgr;
-    ET::TerrainInfo* mTerrainInfo;
-    ET::SplattingManager* mSplatMgr;
-	
+//	ET::TerrainManager* mTerrainMgr;
+//    ET::TerrainInfo* mTerrainInfo;
+//    ET::SplattingManager* mSplatMgr;
+	/*
 	void loadTerrain();
 	void loadBinaryTerrain();
 	void loadImgTerrain();
 	void initETM();
 	void updateLightmap();
+	*/
 	
 #elif defined(TSM_TERRAIN)
 	// TSM

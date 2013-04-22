@@ -128,7 +128,9 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	Music3DComponent* music3D = new Music3DComponent;
 	go->AddComponent(music3D);
 
-	acomp->Init("Yomi_2Yomi.mesh", m_scene_manager);
+	acomp->Init("sphere.mesh", m_scene_manager);
+	Ogre::Vector3 scale(0.002);
+	acomp->GetSceneNode()->setScale(scale);
 	//acomp->Init("yomi.mesh", m_scene_manager);
 	contr->Init(position, acomp->GetEntity(), def.step_height, def.collider_type, m_physics_engine);
 	contr->SetTurnSpeed(def.turn_speed);
@@ -199,11 +201,15 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 	WayPointComponent* way_point = new WayPointComponent;
 	go->AddComponent(way_point);
 	go->AddUpdateable(way_point);
-	acomp->Init("Yomi_2Yomi.mesh", m_scene_manager);
+	acomp->Init("sphere.mesh", m_scene_manager);
+
+	Ogre::Vector3 scale(0.002);
+	acomp->GetSceneNode()->setScale(scale);
 
 	m_sound_manager->GetTottNode(acomp->GetSceneNode()->getName());
 
 	way_point->Init(acomp->GetSceneNode(), 0.001);
+	way_point->AddWayPoint(Ogre::Vector3(15.0f, -10.0f, 21.0f));
 	
 	contr->Init(position, acomp->GetEntity(), def.step_height, def.collider_type, m_physics_engine);
 	contr->SetTurnSpeed(def.turn_speed);

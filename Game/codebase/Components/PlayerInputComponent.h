@@ -35,6 +35,7 @@ protected:
 	float m_max_scale;
 	float m_current_scale;
 	SoundData2D m_walk_sound;
+	SoundData2D m_test_sfx;
 	SoundData2D m_def_music;
 	SoundData3D m_3D_music_data;
 	int m_player_state;
