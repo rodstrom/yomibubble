@@ -44,12 +44,36 @@ void WayPoint::AddWayPoint(Ogre::SceneNode* scene_node){
 	m_walk_list.push_front(m_follow_node->getPosition());
 }
 
+float WayPoint::getSpeed(){
+	if(m_follow_node != NULL) {
+		if(withinDistance(1.0f)) return 0.0f;
+		else if(withinDistance(3.0f)) return m_walk_speed * 0.3f;
+		else if(withinDistance(8.0f)) return m_walk_speed * 0.8f;
+		else if(withinDistance(30.0f)) return m_walk_speed * 1.5f;
+		else return m_walk_speed * 2.0f;
+	}
+	return m_walk_speed;
+}
+
+bool WayPoint::withinDistance(float meters){
+	if (m_node->getPosition().x >= m_destination.x - meters
+		&& m_node->getPosition().x <= m_destination.x + meters)
+	{
+		if (m_node->getPosition().y >= m_destination.y - meters
+		&& m_node->getPosition().y <= m_destination.y + meters)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 void WayPoint::Update(float dt){
 	//null at first for some reason...
 	if(m_follow_node != NULL) {
 		m_destination = m_follow_node->getPosition();
 		m_direction = m_destination - m_node->getPosition();
-		m_destination = m_walk_list.front();
+//		m_destination = m_walk_list.front();
 	}
 
 	if (m_direction == Ogre::Vector3::ZERO) 
@@ -62,14 +86,11 @@ void WayPoint::Update(float dt){
 			//std::cout << "Deque empty: " << m_walk_list.empty() << std::endl;
 		}
 
-	int tolerance = 2;
-
-	if (m_node->getPosition().x >= m_destination.x - tolerance
-		&& m_node->getPosition().x <= m_destination.x + tolerance)
-	{
-		if (m_node->getPosition().y >= m_destination.y - tolerance
-		&& m_node->getPosition().y <= m_destination.y + tolerance)
-		{
+	if (withinDistance(1.0f)){
+		if(m_follow_node != NULL) {
+			//do nothing for now
+		}
+		else {
 			m_direction = Ogre::Vector3::ZERO;
 		}
 	}

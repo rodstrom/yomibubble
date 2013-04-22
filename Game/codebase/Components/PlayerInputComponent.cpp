@@ -136,11 +136,11 @@ void PlayerInputComponent::Normal(float dt){
 
 	if (m_input_manager->IsButtonPressed(BTN_START)){
 		bool is_jumping = true;
-		m_messenger->Notify(MSG_CHARACTER_CONROLLER_JUMP, &is_jumping);
+		m_messenger->Notify(MSG_CHARACTER_CONTROLLER_JUMP, &is_jumping);
 	}
 	else if (m_input_manager->IsButtonReleased(BTN_START)){
 		bool is_jumping = false;
-		m_messenger->Notify(MSG_CHARACTER_CONROLLER_JUMP, &is_jumping);
+		m_messenger->Notify(MSG_CHARACTER_CONTROLLER_JUMP, &is_jumping);
 	}
 	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &dir);
 }

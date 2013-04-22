@@ -213,7 +213,7 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 
 	m_sound_manager->GetTottNode(acomp->GetSceneNode()->getName());
 
-	way_point->Init(acomp->GetSceneNode(), 0.001);
+	way_point->Init(acomp->GetSceneNode(), 5.0f);
 	
 	contr->Init(position, acomp->GetEntity(), def.step_height, def.collider_type, m_physics_engine);
 	contr->SetTurnSpeed(def.turn_speed);

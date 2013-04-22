@@ -113,8 +113,9 @@ int DBManager::Load() {
 				{
 					if (i->first == "sound") {
 						SoundData3D m_3D_music_data;
-						AnimationComponent* tempAnim = static_cast<AnimationComponent*>(temp->GetComponent(EComponentType::COMPONENT_ANIMATION));
-						m_3D_music_data = m_sound_manager->Create3DData(i->second, tempAnim->GetSceneNode()->getName(), false, false, false, 1.0f, 1.0f);
+						m_3D_music_data = m_sound_manager->Create3DData(i->second, 
+							static_cast<MeshRenderComponent*>(temp->GetComponent(EComponentType::COMPONENT_RENDERER))->GetSceneNode()->getName(), 
+							false, false, false, 1.0f, 1.0f);
 					} 
 					else if (i->first == "waypoints") {
 						WayPointComponent* tempWP = static_cast<WayPointComponent*>(temp->GetComponent(EComponentType::COMPONENT_AI));
@@ -125,7 +126,7 @@ int DBManager::Load() {
 						interactive = true;
 					}
 					else if (i->first == "followable") { 
-						followables[i->second] = static_cast<AnimationComponent*>(temp->GetComponent(EComponentType::COMPONENT_ANIMATION))->GetSceneNode();
+						followables[i->second] = static_cast<MeshRenderComponent*>(temp->GetComponent(EComponentType::COMPONENT_RENDERER))->GetSceneNode();
 					}
 				}
 

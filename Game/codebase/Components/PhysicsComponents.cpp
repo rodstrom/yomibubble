@@ -102,10 +102,10 @@ void RigidbodyComponent::SetMessenger(ComponentMessenger* messenger){
 
 void CharacterController::Notify(int type, void* msg){
 	switch (type){
-	case MSG_CHARACTER_CONROLLER_VELOCITY_SET:
+	case MSG_CHARACTER_CONTROLLER_VELOCITY_SET:
 		m_velocity = *static_cast<float*>(msg);
 		break;
-	case MSG_CHARACTER_CONROLLER_TURN_SPEED_SET:
+	case MSG_CHARACTER_CONTROLLER_TURN_SPEED_SET:
 		m_turn_speed = *static_cast<float*>(msg);
 		break;
 	case MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_SET:
@@ -114,7 +114,7 @@ void CharacterController::Notify(int type, void* msg){
 	case MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_GET:
 		*static_cast<bool*>(msg) = m_has_follow_cam;
 		break;
-	case MSG_CHARACTER_CONROLLER_JUMP:
+	case MSG_CHARACTER_CONTROLLER_JUMP:
 		{
 			if (m_controller->canJump()){
 				m_controller->jump();
@@ -254,22 +254,20 @@ void CharacterController::Shut(){
 		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, this);
 		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_SET, this);
 		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_GET, this);
-		m_messenger->Unregister(MSG_CHARACTER_CONROLLER_JUMP, this);
+		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_JUMP, this);
 		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_WARP, this);
+		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_VELOCITY_SET, this);
 	}
 }
 
 void CharacterController::SetMessenger(ComponentMessenger* messenger){
 	m_messenger = messenger;
-	//m_messenger->Register(MSG_CHARACTER_CONTROLLER_MOVE_FORWARD, this);
-	//m_messenger->Register(MSG_CHARACTER_CONTROLLER_MOVE_BACKWARDS, this);
-	//m_messenger->Register(MSG_CHARACTER_CONTROLLER_MOVE_LEFT, this);
-	//m_messenger->Register(MSG_CHARACTER_CONTROLLER_MOVE_RIGHT, this);
 	m_messenger->Register(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, this);
 	m_messenger->Register(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_SET, this);
 	m_messenger->Register(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_GET, this);
-	m_messenger->Register(MSG_CHARACTER_CONROLLER_JUMP, this);
+	m_messenger->Register(MSG_CHARACTER_CONTROLLER_JUMP, this);
 	m_messenger->Register(MSG_CHARACTER_CONTROLLER_WARP, this);
+	m_messenger->Register(MSG_CHARACTER_CONTROLLER_VELOCITY_SET, this);
 }
 
 void CharacterController::Init(const Ogre::Vector3& position, Ogre::Entity* entity, float step_height, int collider_type, PhysicsEngine* physics_engine){

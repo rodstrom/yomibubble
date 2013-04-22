@@ -25,6 +25,10 @@ public:
     Ogre::Real m_walk_speed;                 // The speed at which the object is moving 
 
 	Ogre::SceneNode* m_follow_node;
+
+	float getSpeed();
+
+	bool withinDistance(float meters);
 };
 
 #endif //WAYPOINT_H
