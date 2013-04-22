@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,14 +33,11 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 #include "OgreGLHardwareBufferManager.h"
 #include "OgreGLGpuProgramManager.h"
+#include "OgreGLSLProgramFactory.h"
 #include "OgreVector4.h"
 
-
 namespace Ogre {
-    
-	class GLSLProgramFactory;
-
-	/**
+    /**
       Implementation of GL as a rendering system.
      */
     class _OgreGLExport GLRenderSystem : public RenderSystem
@@ -140,18 +137,9 @@ namespace Ogre {
 
 		ushort mActiveTextureUnit;
 
-        // local data members of _render that were moved here to improve performance
-        // (save allocations)
-        vector<GLuint>::type mRenderAttribsBound;
-        vector<GLuint>::type mRenderInstanceAttribsBound;
-
-
 	protected:
 		void setClipPlanesImpl(const PlaneList& clipPlanes);
 		bool activateGLTextureUnit(size_t unit);
-        void bindVertexElementToGpu( const VertexElement &elem, HardwareVertexBufferSharedPtr vertexBuffer,
-                const size_t vertexStart, 
-                vector<GLuint>::type &attribsBound, vector<GLuint>::type &instanceAttribsBound );
     public:
         // Default constructor / destructor
         GLRenderSystem();
@@ -218,12 +206,6 @@ namespace Ogre {
 		bool _createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions, 
 			RenderWindowList& createdWindows);
 
-		/// @copydoc RenderSystem::_createDepthBufferFor
-		DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget );
-
-		/// Mimics D3D9RenderSystem::_getDepthStencilFormatFor, if no FBO RTT manager, outputs GL_NONE
-		void _getDepthStencilFormatFor( GLenum internalColourFormat, GLenum *depthFormat,
-										GLenum *stencilFormat );
 		
 		/// @copydoc RenderSystem::createMultiRenderTarget
 		virtual MultiRenderTarget * createMultiRenderTarget(const String & name); 
@@ -452,7 +434,6 @@ namespace Ogre {
           RenderSystem
          */
         void _render(const RenderOperation& op);
-
         /** See
           RenderSystem
          */
@@ -515,16 +496,7 @@ namespace Ogre {
 
 		/// @copydoc RenderSystem::getDisplayMonitorCount
 		unsigned int getDisplayMonitorCount() const;
-        
-		/// @copydoc RenderSystem::beginProfileEvent
-        virtual void beginProfileEvent( const String &eventName );
-
-		/// @copydoc RenderSystem::endProfileEvent
-        virtual void endProfileEvent( void );
-
-		/// @copydoc RenderSystem::markProfileEvent
-        virtual void markProfileEvent( const String &eventName );
-};
+    };
 }
 #endif
 

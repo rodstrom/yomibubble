@@ -33,28 +33,33 @@ class RigidBodyState : public btMotionState
         btTransform mTransform;
         btTransform mCenterOfMassOffset;
 		ComponentMessenger* m_messenger;
+		bool m_update_orientation;
+		bool m_update_position;
+
+
 
     public:
         RigidBodyState(ComponentMessenger* messenger, const btTransform &transform, const btTransform &offset = btTransform::getIdentity())
             : mTransform(transform),
               mCenterOfMassOffset(offset),
-			  m_messenger(messenger)
-        {
-        }
+			  m_messenger(messenger),
+			  m_update_orientation(true),
+			  m_update_position(true){}
 
         RigidBodyState(ComponentMessenger* messenger) :
               mCenterOfMassOffset(btTransform::getIdentity()),
-			  m_messenger(messenger)
-        {
-        }
+			  m_messenger(messenger),
+			  m_update_orientation(true),
+			  m_update_position(true){}
 
-        virtual void getWorldTransform(btTransform &ret) const
-        {
+        virtual void getWorldTransform(btTransform &ret) const{
             ret = mTransform;
         }
 
-        virtual void setWorldTransform(const btTransform &in)
-        {
+		void UpdatePosition(bool value) { m_update_position = value; }
+		void UpdateOrientation(bool value) { m_update_orientation = value; }
+
+        virtual void setWorldTransform(const btTransform &in){
             if (m_messenger == NULL)
                 return;
 
@@ -68,8 +73,8 @@ class RigidBodyState : public btMotionState
 			Ogre::SceneNode* node = NULL;
 			m_messenger->Notify(MSG_NODE_GET_NODE, &node);
 			if (node){
-				node->setPosition(vec3);
-				node->setOrientation(quat);
+				if (m_update_position) node->setPosition(vec3);
+				if (m_update_orientation) node->setOrientation(quat);
 			}
         }
 };

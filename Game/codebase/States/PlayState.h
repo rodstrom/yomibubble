@@ -3,7 +3,8 @@
 
 #include "State.h"
 #include "..\PhysicsEngine.h"
-
+#include "..\Artifex\Loader\ArtifexLoader.h"
+#include "..\Functor.h"
 
 class GameObjectManager;
 class PhysicsEngine;
@@ -41,6 +42,11 @@ private:
 	Ogre::SceneNode*			m_node;
 	SkyX::SkyX*					m_sky_x;
 	SkyX::BasicController*		m_basic_controller;
+
+	Ogre::SceneNode* m_cam_node;
+	ArtifexLoader* mArtifexLoader;
+
+	Functor<PlayState> m_func;
 };
 
 #endif // _PLAY_STATE_H_

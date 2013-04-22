@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,11 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __SearchOps_H_
-#define __SearchOps_H_
 
 // Emulate _findfirst, _findnext on non-Windows platforms
-
 
 
 #include <string.h>
@@ -44,7 +41,9 @@ THE SOFTWARE.
 
 #include <dirent.h>
 #include <unistd.h>
+#if OGRE_PLATFORM != OGRE_PLATFORM_SYMBIAN
 #include <fnmatch.h>
+#endif
 
 /* Our simplified data entry structure */
 struct _finddata_t
@@ -54,6 +53,7 @@ struct _finddata_t
     unsigned long size;
 };
 
+#if OGRE_PLATFORM != OGRE_PLATFORM_SYMBIAN
 #define _A_NORMAL 0x00  /* Normalfile-Noread/writerestrictions */
 #define _A_RDONLY 0x01  /* Read only file */
 #define _A_HIDDEN 0x02  /* Hidden file */
@@ -62,8 +62,8 @@ struct _finddata_t
 #endif
 #define _A_SUBDIR 0x10  /* Subdirectory */
 
-intptr_t _findfirst(const char *pattern, struct _finddata_t *data);
-int _findnext(intptr_t id, struct _finddata_t *data);
-int _findclose(intptr_t id);
+long _findfirst(const char *pattern, struct _finddata_t *data);
+int _findnext(long id, struct _finddata_t *data);
+int _findclose(long id);
 
 #endif

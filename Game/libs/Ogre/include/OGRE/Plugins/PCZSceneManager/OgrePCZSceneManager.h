@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -131,26 +131,23 @@ namespace Ogre
         /** Creates a specialized PCZCamera */
         virtual Camera * createCamera( const String &name );
 
-        /** Deletes a scene node by name & corresponding PCZSceneNode */
+        /** Deletes a scene node & corresponding PCZSceneNode */
         virtual void destroySceneNode( const String &name );
 
-        /** Deletes a scene node & corresponding PCZSceneNode */
-        virtual void destroySceneNode(SceneNode* sn);
-
-		/** Overridden to clean up zones
+		/** overridden to clean up zones
 		*/
 		virtual void clearScene(void);
 
 		/** Overridden from SceneManager */
 		void setWorldGeometryRenderQueue(uint8 qid);
 
-		/// Overridden from basic scene manager
+		// Overridden from basic scene manager
 		void _renderScene(Camera *cam, Viewport *vp, bool includeOverlays);
 
-		/** Enable/disable sky rendering */
+		/* enable/disable sky rendering */
 		void enableSky(bool);
 
-		/** Set the zone which contains the sky node */
+		/* Set the zone which contains the sky node */
 		void setSkyZone(PCZone * zone);
 
         /** Update Scene Graph (does several things now) */
@@ -232,26 +229,26 @@ namespace Ogre
 		 */
 		void addPCZSceneNode(PCZSceneNode * sn, PCZone * zone);
 
-		/** Create a zone with the given name  */
+		/* Create a zone with the given name  */
 		PCZone * createZone(const String& zoneType, const String& instanceName);
 
-		/** Destroy an existing zone within the scene */
+		/* destroy an existing zone within the scene */
 		void destroyZone(PCZone* zone, bool destroySceneNodes);
 
         /** Make sure the home zone for the PCZSceneNode is up-to-date
         */
         void _updateHomeZone( PCZSceneNode *, bool );
 
-		/// Find the smallest zone which contains the point
+		// Find the smallest zone which contains the point
 		PCZone * findZoneForPoint(Vector3 & point);
 
-		/// Create any zone-specific data necessary for all zones for the given node
+		// create any zone-specific data necessary for all zones for the given node
 		void createZoneSpecificNodeData(PCZSceneNode *);
 
-		/// Create any zone-specific data necessary for all nodes for the given zone
+		// create any zone-specific data necessary for all nodes for the given zone
 		void createZoneSpecificNodeData(PCZone *);
 
-		/// Set the home zone for a scene node
+		// set the home zone for a scene node
 		void setNodeHomeZone(SceneNode *, PCZone *);
 
         /** Recurses the scene, adding any nodes intersecting with the box into the given list.
@@ -287,13 +284,13 @@ namespace Ogre
 						  PCZone * startZone,
 						  PCZSceneNode *start=0 );
 
-		/** Get the default zone */
+		/* Get the default zone */
 		PCZone * getDefaultZone(void)
 		{
 			return mDefaultZone;
 		}
 		
-		/** Get a zone by name */
+		/* Get a zone by name */
 		PCZone * getZoneByName(const String & zoneName);
 		
         /** Sets the portal visibility flag */
@@ -325,27 +322,27 @@ namespace Ogre
         RaySceneQuery* createRayQuery(const Ray& ray, unsigned long mask = 0xFFFFFFFF);
         IntersectionSceneQuery* createIntersectionQuery(unsigned long mask = 0xFFFFFFFF);
 		
-		/// ZoneMap iterator for read-only access to the zonemap 
+		// ZoneMap iterator for read-only access to the zonemap 
 		typedef MapIterator<ZoneMap> ZoneIterator;
 		ZoneIterator getZoneIterator(void) {return ZoneIterator(mZones.begin(), mZones.end());}
 
-		/// Clear portal update flag from all zones 
+		// clear portal update flag from all zones 
 		void _clearAllZonesPortalUpdateFlag(void);
 
-		/// @see SceneManager::prepareShadowTextures.
+		/// See SceneManager::prepareShadowTextures.
 		virtual void prepareShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList = 0);
 
 	protected:
-		/// Type of default zone to be used
+		// type of default zone to be used
 		String mDefaultZoneTypeName;
 
-		/// Name of data file for default zone
+		// name of data file for default zone
 		String mDefaultZoneFileName;
 
-		/// List of visible nodes since last _findVisibleObjects()
+		/// list of visible nodes since last _findVisibleObjects()
 		NodeList mVisible;
 
-		/// Camera of last _findVisibleObjects()
+		/// camera of last _findVisibleObjects()
 		Camera* mLastActiveCamera;
 
         /// The root PCZone;
@@ -363,10 +360,10 @@ namespace Ogre
         /// Portals visibility flag
         bool mShowPortals;
 
-        /// Frame counter used in visibility determination
+        /// frame counter used in visibility determination
         unsigned long mFrameCount;
 
-		/// ZoneFactoryManager instance
+		// ZoneFactoryManager instance
 		PCZoneFactoryManager * mZoneFactoryManager;
 
 		/// The zone of the active camera (for shadow texture casting use);

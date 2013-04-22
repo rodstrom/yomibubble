@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -187,8 +187,7 @@ namespace Ogre
 	class _OgreExport ScriptCompiler : public ScriptCompilerAlloc
 	{
 	public: // Externally accessible types
-		//typedef map<String,uint32>::type IdMap;
-		typedef HashMap<String,uint32> IdMap;
+		typedef map<String,uint32>::type IdMap;
 
 		// The container for errors
 		struct Error : public ScriptCompilerAlloc
@@ -338,7 +337,7 @@ namespace Ogre
 	};
 
 	/** This is a listener for the compiler. The compiler can be customized with
-		this listener. It lets you listen in on events occurring during compilation,
+		this listener. It lets you listen in on events occuring during compilation,
 		hook them, and change the behavior.
 	*/
 	class _OgreExport ScriptCompilerListener
@@ -583,7 +582,6 @@ namespace Ogre
 		ID_GEOMETRY_PROGRAM_REF,
 		ID_FRAGMENT_PROGRAM_REF,
 		ID_SHADOW_CASTER_VERTEX_PROGRAM_REF,
-		ID_SHADOW_CASTER_FRAGMENT_PROGRAM_REF,
 		ID_SHADOW_RECEIVER_VERTEX_PROGRAM_REF,
 		ID_SHADOW_RECEIVER_FRAGMENT_PROGRAM_REF,
 		ID_SHADOW_CASTER_MATERIAL,
@@ -687,7 +685,6 @@ namespace Ogre
 			ID_POINT,
 			ID_SPOT,
 			ID_DIRECTIONAL,
-		ID_LIGHT_MASK,
 		ID_POINT_SIZE,
 		ID_POINT_SPRITES,
 		ID_POINT_SIZE_ATTENUATION,
@@ -800,7 +797,6 @@ namespace Ogre
 			ID_POOLED,
 			//ID_GAMMA, - already registered for material
 			ID_NO_FSAA,
-			ID_DEPTH_POOL,
 			ID_ONLY_INITIAL,
 			ID_VISIBILITY_MASK,
 			ID_LOD_BIAS,
@@ -839,9 +835,6 @@ namespace Ogre
 			ID_DEPTH_FAIL_OP,
 			ID_PASS_OP,
 			ID_TWO_SIDED,
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
-        ID_RT_SHADER_SYSTEM,
-#endif
 		ID_END_BUILTIN_IDS
 	};
 	/** @} */

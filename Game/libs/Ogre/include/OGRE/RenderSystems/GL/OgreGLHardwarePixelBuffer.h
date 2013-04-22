@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -90,7 +90,7 @@ namespace Ogre {
         RenderTexture* getRenderTarget(size_t);
         /// Upload a box of pixels to this buffer on the card
 		virtual void upload(const PixelBox &data, const Image::Box &dest);
-		/// Download a box of pixels from the card
+		// Download a box of pixels from the card
 		virtual void download(const PixelBox &data);
   
         /// Hardware implementation of blitFromMemory
@@ -133,6 +133,6 @@ namespace Ogre {
         // In case this is a render buffer
         GLuint mRenderbufferID;
     };
-}
+};
 
 #endif

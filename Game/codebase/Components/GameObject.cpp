@@ -8,10 +8,10 @@ int GameObject::m_object_counter = 0;
 GameObject::GameObject(void){
 	m_messenger = new ComponentMessenger;
 	m_object_counter++;
-	m_id = m_object_counter;
+	m_type = m_object_counter;
 }
 
-GameObject::GameObject(int id) : m_id(id){
+GameObject::GameObject(int type) : m_type(type){
 	m_messenger = new ComponentMessenger;
 	m_object_counter++;
 }

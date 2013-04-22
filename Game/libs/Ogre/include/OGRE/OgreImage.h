@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -143,14 +143,14 @@ namespace Ogre {
             @param
 				Height of image
 			@param
-                Image Depth (in 3d images, numbers of layers, otherwise 1)
+                Image Depth (in 3d images, numbers of layers, otherwhise 1)
             @param
 				Pixel Format
             @param
                 if memory associated with this buffer is to be destroyed
 				with the Image object. Note: it's important that if you set
 				this option to true, that you allocated the memory using OGRE_ALLOC_T
-				with a category of MEMCATEGORY_GENERAL to ensure the freeing of memory 
+				with a category of MEMCATEGORY_GENERAL ensure the freeing of memory 
 				matches up.
 			@param
 				the number of faces the image data has inside (6 for cubemaps, 1 otherwise)
@@ -162,9 +162,9 @@ namespace Ogre {
 			@remarks 
 				The size of the buffer must be numFaces*PixelUtil::getMemorySize(width, height, depth, format)
          */
-		Image& loadDynamicImage( uchar* data, size_t width, size_t height, 
+		Image& loadDynamicImage( uchar* pData, size_t uWidth, size_t uHeight, 
 							size_t depth,
-							 PixelFormat format, bool autoDelete = false, 
+							 PixelFormat eFormat, bool autoDelete = false, 
 							 size_t numFaces = 1, size_t numMipMaps = 0);
 		
 		/** Stores a pointer to raw data in memory. The pixel format has to be specified.
@@ -199,13 +199,13 @@ namespace Ogre {
                  The memory associated with this buffer is NOT destroyed with the
                  Image object.
 			@remarks This function is deprecated; one should really use the
-				Image::loadDynamicImage(data, width, height, depth, format, ...) to be compatible
+				Image::loadDynamicImage(pData, width, height, depth, format, ...) to be compatible
 				with future Ogre versions.
          */
- 		Image& loadDynamicImage( uchar* data, size_t width,
-								 size_t height, PixelFormat format)
+ 		Image& loadDynamicImage( uchar* pData, size_t uWidth,
+								 size_t uHeight, PixelFormat eFormat)
 		{
-			return loadDynamicImage(data, width, height, 1, format);
+			return loadDynamicImage(pData, uWidth, uHeight, 1, eFormat);
 		}
 		/** Loads raw data from a stream. See the function
 			loadDynamicImage for a description of the parameters.
@@ -228,8 +228,8 @@ namespace Ogre {
         */
         Image & loadRawData( 
             DataStreamPtr& stream, 
-            size_t width, size_t height, size_t depth,
-            PixelFormat format,
+            size_t uWidth, size_t uHeight, size_t uDepth,
+            PixelFormat eFormat,
 			size_t numFaces = 1, size_t numMipMaps = 0);
         /** Loads raw data from a stream. The pixel format has to be specified. 
 			@remarks This function is deprecated; one should really use the
@@ -252,28 +252,28 @@ namespace Ogre {
         */
         Image & loadRawData( 
             DataStreamPtr& stream, 
-            size_t width, size_t height, 
-            PixelFormat format )
+            size_t uWidth, size_t uHeight, 
+            PixelFormat eFormat )
 		{
-			return loadRawData(stream, width, height, 1, format);
+			return loadRawData(stream, uWidth, uHeight, 1, eFormat);
 		}
 
         /** Loads an image file.
             @remarks
                 This method loads an image into memory. Any format for which 
-				an associated ImageCodec is registered can be loaded. 
+				and associated ImageCodec is registered can be loaded. 
 				This can include complex formats like DDS with embedded custom 
 				mipmaps, cube faces and volume textures.
                 The type can be determined by calling getFormat().             
             @param
-                filename Name of an image file to load.
+                strFileName Name of a file file to load.
             @param
                 groupName Name of the resource group to search for the image
             @note
                 The memory associated with this buffer is destroyed with the
                 Image object.
         */
-        Image & load( const String& filename, const String& groupName );
+        Image & load( const String& strFileName, const String& groupName );
 
         /** Loads an image file from a stream.
             @remarks
@@ -281,7 +281,7 @@ namespace Ogre {
                 method except it loads the image from a DataStream object. 
 				This DataStream is expected to contain the 
                 encoded data as it would be held in a file. 
-                Any format for which an associated ImageCodec is registered 
+                Any format for which and associated ImageCodec is registered 
 				can be loaded. 
 				This can include complex formats like DDS with embedded custom 
 				mipmaps, cube faces and volume textures.
@@ -293,7 +293,7 @@ namespace Ogre {
                 codec to use. Can be left blank if the stream data includes
 				a header to identify the data.
             @see
-                Image::load( const String& filename )
+                Image::load( const String& strFileName )
         */
 		Image & load(DataStreamPtr& stream, const String& type = StringUtil::BLANK );
 
@@ -344,7 +344,7 @@ namespace Ogre {
 		@remarks
 			Saving and loading are implemented by back end (sometimes third 
 			party) codecs.  Implemented saving functionality is more limited
-			than loading in some cases.	Particularly DDS file format support 
+			than loading in some cases.	Particulary DDS file format support 
 			is currently limited to true colour or single channel float32, 
 			square, power of two textures with no mipmaps.  Volumetric support
 			is currently limited to DDS files.
@@ -476,27 +476,27 @@ namespace Ogre {
 
     protected:
         // The width of the image in pixels
-	size_t mWidth;
+        size_t m_uWidth;
         // The height of the image in pixels
-	size_t mHeight;
+        size_t m_uHeight;
         // The depth of the image
-	size_t mDepth;
+        size_t m_uDepth;
         // The size of the image buffer
-	size_t mBufSize;
+        size_t m_uSize;
         // The number of mipmaps the image contains
-	size_t mNumMipmaps;
+        size_t m_uNumMipmaps;
         // Image specific flags.
-	int mFlags;
+        int m_uFlags;
 
         // The pixel format of the image
-	PixelFormat mFormat;
+        PixelFormat m_eFormat;
 
         // The number of bytes per pixel
-	uchar mPixelSize;
-	uchar* mBuffer;
+        uchar m_ucPixelSize;
+        uchar* m_pBuffer;
 
 		// A bool to determine if we delete the buffer or the calling app does
-		bool mAutoDelete;
+		bool m_bAutoDelete;
     };
 
 	typedef vector<Image*>::type ImagePtrList;

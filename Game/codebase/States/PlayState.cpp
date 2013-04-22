@@ -2,7 +2,7 @@
 #include "PlayState.h"
 #include "..\Managers\InputManager.h"
 #include "..\PhysicsEngine.h"
-#include "..\Audio\SoundManager.h"
+#include "..\Managers\SoundManager.h"
 #include "..\Managers\GameObjectManager.h"
 #include "..\Components\SkyXPrereq.h"
 
@@ -10,25 +10,25 @@ PlayState::PlayState(void) : m_physics_engine(NULL), m_game_object_manager(NULL)
 PlayState::~PlayState(void){}
 
 void PlayState::Enter(){
-	m_scene_manager = Ogre::Root::getSingleton().createSceneManager(Ogre::ST_GENERIC);
+	m_func.Init(this, &PlayState::test);
+	m_scene_manager = Ogre::Root::getSingleton().createSceneManager("OctreeSceneManager");
 	m_physics_engine = new PhysicsEngine;
 	m_physics_engine->Init();
-	m_physics_engine->SetDebugDraw(m_scene_manager);
+	//m_physics_engine->SetDebugDraw(m_scene_manager);
 	m_camera = m_scene_manager->createCamera("MainCamera");
-	m_camera->setPosition(Ogre::Vector3(0,0,50));
-	m_camera->lookAt(Ogre::Vector3(0,0,0));
-	m_camera->setNearClipDistance(5);
+	//m_camera->setPosition(Ogre::Vector3(500,500,500));
+	//m_camera->lookAt(Ogre::Vector3(0,0,0));
+	m_camera->setNearClipDistance(0.1);
 	m_viewport = m_render_window->addViewport(m_camera);
 	m_viewport->setBackgroundColour(Ogre::ColourValue(0.0,0.0,1.0));
 	m_camera->setAspectRatio(Ogre::Real(m_viewport->getActualWidth()) / Ogre::Real(m_viewport->getActualHeight()));
+	//m_cam_node = m_scene_manager->getRootSceneNode()->createChildSceneNode("camNode");
+	
 	m_game_object_manager = new GameObjectManager;
 	m_sound_manager = new SoundManager(m_scene_manager, m_camera);
 	m_sound_manager->LoadAudio();
 	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager);
-	CharControllerDef player_def(COLLIDER_CAPSULE, 0.35f, 1000.0f, 5.0f);
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(0,10,0), &player_def);
-	CharControllerDef tott_def(COLLIDER_CAPSULE, 0.35f, 500.0f, 5.0f);
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(1,10,1), &tott_def);
+
 	//m_basic_controller = new SkyX::BasicController();
 	//m_sky_x= new SkyX::SkyX(m_scene_manager, m_basic_controller);
 	//m_sky_x->create();
@@ -50,16 +50,53 @@ void PlayState::Enter(){
 	Ogre::Light* light = m_scene_manager->createLight("light1");
 	light->setType(Ogre::Light::LT_DIRECTIONAL);
 	light->setDirection(Ogre::Vector3(1,-1,0));
-	m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
+	m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);*/
 	
 	// Create plane mesh
 	Ogre::Plane plane(Ogre::Vector3::UNIT_Y, -10);
-	Ogre::MeshManager::getSingleton().createPlane("plane", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane, 500, 500, 20, 20, true, 1, 5, 5, Ogre::Vector3::UNIT_Z);
-	PlaneDef plane_def("plane", "Examples/BeachStones");
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(0,0,0), &plane_def);
+	Ogre::MeshManager::getSingleton().createPlane("plane", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane, 50, 50, 20, 20, true, 1, 5, 5, Ogre::Vector3::UNIT_Z);
+
+	float x = 180.0f;
+	float y = 90.0f;
+	float z = 230.0f;
 	
-	m_physics_engine->ShowDebugDraw(false);
-	m_scene_manager->setSkyDome(true, "Examples/CloudySky");
+
+	//m_cam_node->attachObject(m_camera);
+	//Ogre::SceneNode* node = m_scene_manager->getSceneNode("camNode");
+
+	mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_camera, "../../resources/terrain/");
+	mArtifexLoader->loadZone("try");
+
+	PlaneDef plane_def;//("plane", "Examples/BeachStones");
+	plane_def.material_name = "Examples/BeachStones";
+	plane_def.plane_name = "plane";
+	plane_def.friction = 1.0f;
+	plane_def.restitution = 0.8f;
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(x,y - 2.0f,z), &plane_def);
+	//0.35f, 1000.0f, 500.0f, 10.0f, 
+	CharControllerDef player_def;
+	player_def.friction = 1.0f;
+	player_def.velocity = 10.0f;
+	player_def.jump_power = 200.0f;
+	player_def.restitution = 0.0f;
+	player_def.step_height = 0.35f;
+	player_def.turn_speed = 1000.0f;
+	player_def.max_jump_height = 10.0f;
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(x,y+1.0f,z), &player_def);
+	
+	CharControllerDef tott_def;
+	tott_def.friction = 1.0f;
+	tott_def.velocity = 500.0f;
+	tott_def.jump_power = 200.0f;
+	tott_def.restitution = 0.0f;
+	tott_def.step_height = 0.35f;
+	tott_def.turn_speed = 1000.0f;
+	tott_def.max_jump_height = 10.0f;
+
+	m_physics_engine->ShowDebugDraw(true);
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y+1.0f,z+3.0f), &tott_def);
+	m_physics_engine->CreateTerrainCollision(mArtifexLoader->mTerrain);
+	//m_scene_manager->setSkyDome(true, "Examples/CloudySky");
 	
 	
 }
@@ -85,20 +122,24 @@ void PlayState::Exit(){
 }
 
 bool PlayState::Update(float dt){
-	m_sound_manager->Update(m_camera, dt);
+	m_sound_manager->Update(m_camera, m_scene_manager, dt);
 	m_game_object_manager->Update(dt);
 	m_physics_engine->Step(dt);
 	m_game_object_manager->LateUpdate(dt);
 	if (m_input_manager->IsButtonPressed(BTN_BACK)){
 		return false;
 	}
-	if (m_input_manager->IsButtonDown(BTN_A)){
+	/*if (m_input_manager->IsButtonDown(BTN_A)){
 		m_physics_engine->ShowDebugDraw(true);
 	}
 	else{
 		m_physics_engine->ShowDebugDraw(false);
 	}
-	m_game_object_manager->LateUpdate(dt);
+
+	if (m_input_manager->IsButtonDown(BTN_S)){
+		Ogre::String test = "Anders";
+		m_func.Call(NULL);
+	}*/
 	return true;
 }
 

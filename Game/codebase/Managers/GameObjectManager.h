@@ -19,6 +19,11 @@ public:
 	GameObject* CreateGameObject(int type, const Ogre::Vector3& position, void* data);
 	void Shut();
 
+	Ogre::SceneManager* GetSceneManager() const { return m_scene_manager; }
+	InputManager* GetInputManager() const { return m_input_manager; }
+	PhysicsEngine* GetPhysicsEngine() const { return m_physics_engine; }
+	SoundManager* GetSoundManager() const { return m_sound_manager; }
+
 private:
 	void AddGameObject(GameObject* gameobject);
 	GameObject* CreatePlayer(const Ogre::Vector3& position, void* data);
