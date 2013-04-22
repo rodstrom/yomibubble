@@ -20,7 +20,8 @@ public:
 	void Enter();
 	void Exit();
 
-	void test(void* data);
+	void Test();
+	//void setPreset(const SkyXSettings& preset);
 
 private:
 	/*Ogre::Entity*				m_penguin;
@@ -38,11 +39,12 @@ private:
 	btDefaultMotionState*		m_ground_motion_state;
 	PhysicsEngine*				m_physics_engine;
 	GameObjectManager*			m_game_object_manager;
+	Ogre::SceneNode*			m_node;
+	SkyX::SkyX*					m_sky_x;
+	SkyX::BasicController*		m_basic_controller;
 
 	Ogre::SceneNode* m_cam_node;
 	ArtifexLoader* mArtifexLoader;
-
-	Functor<PlayState> m_func;
 };
 
 #endif // _PLAY_STATE_H_

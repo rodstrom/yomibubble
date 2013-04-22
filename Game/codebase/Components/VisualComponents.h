@@ -2,6 +2,7 @@
 #define _N_VISUAL_COMPONENTS_H_
 
 #include "ComponentsPrereq.h"
+#include <functional>
 
 class MeshRenderComponent : public Component, public IComponentObserver {
 public:
@@ -58,19 +59,24 @@ public:
 	virtual void Notify(int type, void* message);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
-	void Init(const Ogre::String& p_overlay_name);
-	//2dcollision box, ta in en point, som kan vara muspos. inputmanager*, ärva from updatable
+	void Init(const Ogre::String& p_overlay_name, const Ogre::String& p_cont_name);
 
 protected:
 	Ogre::Overlay*					m_overlay;
 	Ogre::String					m_id;
+	Ogre::String					m_cont_name;
 };
 
 class InputManager;
-class OverlayCollisionCallback : public Component, public IComponentObserver, public IComponentUpdateable{
+class OverlayCollisionCallbackComponent : public Component, public IComponentObserver, public IComponentUpdateable{
 public:
-	OverlayCollisionCallback(void){}
-	virtual ~OverlayCollisionCallback(void){}
+	enum OverlayCollisionState{
+		OCS_DEFAULT = 0,
+		OCS_COLLISION
+	};
+
+	OverlayCollisionCallbackComponent(void){}
+	virtual ~OverlayCollisionCallbackComponent(void){}
 	virtual void Notify(int type, void* message);
 	virtual void Update(float dt);
 	virtual void Shut();
@@ -78,8 +84,58 @@ public:
 	void Init(InputManager* p_input_manager, Ogre::Viewport* p_view_port);
 
 protected:
-	InputManager*		m_input_manager;
-	Ogre::Viewport*		m_view_port;
+	InputManager*			m_input_manager;
+	Ogre::Viewport*			m_view_port;
+	OverlayCollisionState	m_ocs;
+};
+
+class Overlay2DAnimatedComponent : public IComponentUpdateable, public Overlay2DComponent{
+public:
+	Overlay2DAnimatedComponent(void){}
+	virtual ~Overlay2DAnimatedComponent(void){}
+	virtual void Notify(int type, void*message);
+	virtual void Update(float dt);
+	virtual void Shut();
+	virtual void SetMessenger(ComponentMessenger* messenger);
+	void Init(const Ogre::String& p_overlay_name, const Ogre::String& p_material_name_hover, const Ogre::String& p_material_name_exit, const Ogre::String& p_cont_name);
+
+protected:
+	Ogre::String			m_material_name_hover;
+	Ogre::String			m_material_name_exit;
+	Ogre::String			m_overlay_name;
+	Ogre::String			m_cont_name;
+	Ogre::String			m_material_start_button;
+};
+
+class OverlayCallbackComponent : public Component, public IComponentObserver{
+public:
+	OverlayCallbackComponent(void){}
+	virtual ~OverlayCallbackComponent(void){}
+	virtual void Notify(int type, void* message);
+	virtual void Shut();
+	virtual void SetMessenger(ComponentMessenger* messenger);
+	void Init(std::function<void()> func);
+protected:
+	std::function<void()>		m_func;
+};
+
+class ParticleComponent : public Component, public IComponentObserver{
+public:
+	ParticleComponent(void){}
+	virtual ~ParticleComponent(void){}
+	virtual void Notify(int type, void* message);
+	virtual void Shut();
+	virtual void SetMessenger(ComponentMessenger* messenger);
+	void Init(Ogre::SceneManager* p_scene_manager, const Ogre::String& p_particle_name, const Ogre::String& p_particle_file_name);
+	Ogre::ParticleSystem* GetParticleSystem() const { return m_particle_system; }
+	Ogre::SceneNode* GetSceneNode() const { return m_scene_node; }
+	void CreateParticle(Ogre::SceneNode* p_scene_node, const Ogre::Vector3& p_position, const Ogre::Vector3& p_offset_position = Ogre::Vector3(0,0,0));
+protected:
+	Ogre::SceneNode*			m_scene_node;
+	Ogre::SceneNode*			m_node;
+	Ogre::SceneNode*			m_nodes;
+	Ogre::SceneManager*			m_scene_manager;
+	Ogre::ParticleSystem*		m_particle_system;
 };
 
 #endif // _N_VISUAL_COMPONENTS_H_
