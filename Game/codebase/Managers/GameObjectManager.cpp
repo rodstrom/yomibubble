@@ -109,7 +109,7 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	CharacterController* contr = new CharacterController;
 	go->AddComponent(contr);
 	go->AddUpdateable(contr);
-	go->AddLateUpdate(contr);
+	//go->AddLateUpdate(contr);
 	FollowCameraComponent* fcc = new FollowCameraComponent;
 	go->AddComponent(fcc);
 	go->AddUpdateable(fcc);
@@ -125,13 +125,14 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	Music2DComponent* music2D = new Music2DComponent;
 	go->AddComponent(music2D);
 	
-	acomp->Init("Yomi_2Yomi.mesh", m_scene_manager);
+	acomp->Init("sphere.mesh", m_scene_manager);
+	Ogre::Vector3 scale(0.002f);
+	acomp->GetSceneNode()->setScale(scale);
 	//acomp->Init("yomi.mesh", m_scene_manager);
-	contr->Init(position, acomp->GetEntity(), def.step_height, def.collider_type, m_physics_engine);
+	contr->Init(position, acomp->GetEntity(), def.step_height, m_physics_engine);
 	contr->SetTurnSpeed(def.turn_speed);
 	contr->SetVelocity(def.velocity);
-	//contr->SetJumpPwr(1.0f);
-	//contr->SetJumpPwr(10.0f);
+	contr->SetJumpPower(200.0f);
 	contr->HasFollowCam(true);
 	pccomp->Init(m_input_manager);
 	sound2D->Init(m_sound_manager);
@@ -152,9 +153,9 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 	go->AddComponent(rc);
 
 	mrc->Init("sphere.mesh", m_scene_manager);
-	Ogre::Vector3 scale(0.002,0.002,0.002);
+	Ogre::Vector3 scale(0.002f);
 	mrc->GetSceneNode()->setScale(scale);
-	//mrc->GetEntity()->setMaterialName();
+	mrc->GetEntity()->setMaterialName("Examples/BlueBubble");
 	rc->Init(position,  mrc->GetEntity(), m_physics_engine, 1.0f, COLLIDER_SPHERE, DYNAMIC_BODY);
 	rc->GetRigidbody()->setGravity(btVector3(0.0f, 0.0f, 0.0f));
 	rc->GetRigidbody()->setRestitution(1.0f);
@@ -170,12 +171,14 @@ GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, v
 	go->AddComponent(rc);
 
 	mrc->Init("sphere.mesh", m_scene_manager);
-	Ogre::Vector3 scale(0.002,0.002,0.002);
+	Ogre::Vector3 scale(0.002f);
 	mrc->GetSceneNode()->setScale(scale);
-	//mrc->GetEntity()->setMaterialName();
+	mrc->GetEntity()->setMaterialName("Examples/PinkBubble");
 	rc->Init(position,  mrc->GetEntity(), m_physics_engine, 1.0f, COLLIDER_SPHERE, DYNAMIC_BODY);
 	rc->GetRigidbody()->setGravity(btVector3(0.0f, 0.0f, 0.0f));
 	rc->GetRigidbody()->setLinearFactor(btVector3(1,0,1));
+	rc->GetRigidbody()->setRestitution(1.0f);
+	rc->GetRigidbody()->setFriction(0.5);
 	return go;
 }
 
@@ -189,12 +192,15 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 	CharacterController* contr = new CharacterController;
 	go->AddComponent(contr);
 	go->AddUpdateable(contr);
-	go->AddLateUpdate(contr);
 
-	acomp->Init("Yomi_2Yomi.mesh", m_scene_manager);
-	contr->Init(position, acomp->GetEntity(), def.step_height, def.collider_type, m_physics_engine);
+	acomp->Init("sphere.mesh", m_scene_manager);
+	Ogre::Vector3 scale(0.002f);
+	acomp->GetSceneNode()->setScale(scale);
+	contr->Init(position, acomp->GetEntity(), def.step_height, m_physics_engine);
 	contr->SetTurnSpeed(def.turn_speed);
 	contr->SetVelocity(def.velocity);
+	contr->GetRigidbody()->setRestitution(def.restitution);
+	contr->GetRigidbody()->setFriction(def.friction);
 	return go;
 }
 
@@ -208,9 +214,12 @@ GameObject* GameObjectManager::CreatePlane(const Ogre::Vector3& position, void* 
 	PlaneDef& plane_def = *static_cast<PlaneDef*>(data);
 	mrc->Init(plane_def.plane_name, m_scene_manager);
 	mrc->GetEntity()->setMaterialName(plane_def.material_name);
+	
 	rc->Init(position, mrc->GetEntity(), m_physics_engine, 0.0f, COLLIDER_TRIANGLE_MESH_SHAPE, STATIC_BODY);
-	rc->GetRigidbody()->setRestitution(0.5);
-	rc->GetRigidbody()->setFriction(0.5f);
+	rc->GetRigidbody()->setRestitution(plane_def.restitution);
+	rc->GetRigidbody()->setFriction(plane_def.friction);
+	mrc->GetSceneNode()->setPosition(BtOgre::Convert::toOgre(rc->GetRigidbody()->getWorldTransform().getOrigin()));
+
 	return go;
 }
 GameObject* GameObjectManager::Create2DOverlay(const Ogre::Vector3& position, void* data) {

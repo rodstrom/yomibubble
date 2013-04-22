@@ -24,6 +24,8 @@ enum EComponentMsg{
 	MSG_MESH_RENDERER_GET_ENTITY,
 	MSG_RIGIDBODY_GET_BODY,
 	MSG_RIGIDBODY_GRAVITY_SET,
+	MSG_RIGIDBODY_POSITION_SET,
+	MSG_RIGIDBODY_APPLY_IMPULSE,
 	MSG_ANIMATION_PLAY,
 	MSG_ANIMATION_PAUSE,
 	MSG_CHARACTER_CONROLLER_VELOCITY_SET,
@@ -33,7 +35,6 @@ enum EComponentMsg{
 	MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_GET,
 	MSG_CHARACTER_CONROLLER_JUMP,
 	MSG_CHARACTER_CONTROLLER_GRAVITY_SET,
-	MSG_CHARACTER_CONTROLLER_WARP,
 	MSG_CAMERA_GET_CAMERA_NODE,
 	MSG_CAMERA_GET_CAMERA,
 	MSG_CAMERA_SET_ACTIVE,
@@ -73,6 +74,7 @@ enum EPlayerState{
 	PLAYER_STATE_NORMAL = 0,
 	PLAYER_STATE_ON_BUBBLE,
 	PLAYER_STATE_INSIDE_BUBBLE,
+	PLAYER_STATE_BOUNCING,
 	PLAYER_STATE_SIZE
 };
 
@@ -117,12 +119,21 @@ public:
 
 struct RigidBodyDef{
 	int collider_type;
-	btScalar mass;
+	float mass;
+	float restitution;
+	float friction;
 };
 
 struct AnimationMsg{
 	int index;
 	Ogre::String id;
+};
+
+struct CharControllerJumpDef{
+	CharControllerJumpDef(void) : jump(false), _override(false){}
+	CharControllerJumpDef(bool p_jump, bool p_override) : jump(p_jump), _override(p_override){}
+	bool jump;
+	bool _override;
 };
 
 struct AddForceMsg{

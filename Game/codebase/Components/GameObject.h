@@ -23,7 +23,7 @@ public:
 	bool DoLateUpdate();
 	GameObjectManager* GetGameObjectManager() const { return m_game_object_manager; }
 	ComponentMessenger* GetComponentMessenger() const { return m_messenger; }
-	int GetId() { return m_id; }
+	int GetType() { return m_type; }
 	void SetGameObjectManager(GameObjectManager* game_object_manager) { m_game_object_manager = game_object_manager; }
 
 private:
@@ -32,7 +32,7 @@ private:
 	std::vector<IComponentLateUpdate*> m_late_updates;
 	ComponentMessenger* m_messenger;
 	GameObjectManager* m_game_object_manager;
-	int m_id;
+	int m_type;
 	static int m_object_counter;
 };
 

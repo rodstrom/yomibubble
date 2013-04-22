@@ -21,6 +21,7 @@ protected:
 	void Normal(float dt);
 	void OnBubble(float dt);
 	void InsideBubble(float dt);
+	void Bouncing(float dt);
 
 	enum EBubbleType{
 		BUBBLE_TYPE_BLUE = 0,
@@ -39,6 +40,7 @@ protected:
 	SoundData3D sound_data;
 	int m_player_state;
 	ControllerFptr m_states[PLAYER_STATE_SIZE];
+
 };
 
 #endif // _N_PLAYER_CONTROLLER_H_
