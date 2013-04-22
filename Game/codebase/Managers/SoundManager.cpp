@@ -130,7 +130,7 @@ void SoundManager::Update(Ogre::Camera* camera, Ogre::SceneManager* scene_manage
 	m_ear_node->setPosition(scene_manager->getSceneNode(m_yomi_node_name)->getPosition());
 	m_ear_node->setOrientation(scene_manager->getSceneNode(m_yomi_node_name)->getOrientation());
 
-	//std::cout << "Ear node pos : " << m_ear_node->getPosition() << std::endl;
+	std::cout << "Ear node pos : " << m_ear_node->getPosition() << std::endl;
 	processSoundDeletesPending();
 }
 

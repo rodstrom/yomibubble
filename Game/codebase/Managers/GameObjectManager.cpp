@@ -16,7 +16,7 @@ GameObjectManager::GameObjectManager(void) :
 GameObjectManager::~GameObjectManager(void){}
 
 void GameObjectManager::Init(PhysicsEngine* physics_engine, Ogre::SceneManager* scene_manager, InputManager* input_manager, Ogre::Viewport* viewport, SoundManager* sound_manager){
-	SkyX::SkyX* skyX = NULL;
+//	SkyX::SkyX* skyX = NULL;
 	
 	
 	m_physics_engine = physics_engine;

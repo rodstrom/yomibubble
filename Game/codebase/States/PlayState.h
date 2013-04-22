@@ -40,8 +40,8 @@ private:
 	PhysicsEngine*				m_physics_engine;
 	GameObjectManager*			m_game_object_manager;
 	Ogre::SceneNode*			m_node;
-	SkyX::SkyX*					m_sky_x;
-	SkyX::BasicController*		m_basic_controller;
+//	SkyX::SkyX*					m_sky_x;
+//	SkyX::BasicController*		m_basic_controller;
 
 	Ogre::SceneNode* m_cam_node;
 	ArtifexLoader* mArtifexLoader;

@@ -4,7 +4,7 @@
 #include "..\PhysicsEngine.h"
 #include "..\Managers\SoundManager.h"
 #include "..\Managers\GameObjectManager.h"
-#include "..\Components\SkyXPrereq.h"
+//#include "..\Components\SkyXPrereq.h"
 
 PlayState::PlayState(void) : m_physics_engine(NULL), m_game_object_manager(NULL){}
 PlayState::~PlayState(void){}
@@ -32,7 +32,7 @@ void PlayState::Enter(){
 	//m_sky_x= new SkyX::SkyX(m_scene_manager, m_basic_controller);
 	//m_sky_x->create();
 	//m_sky_x->getVCloudsManager()->getVClouds()->setDistanceFallingParams(Ogre::Vector2(2,-1));
-
+	/*
 	ButtonDef buttonDef;
 	buttonDef.overlay_name = "testOverlay";
 	buttonDef.cont_name = "MyOverlayElements/TestPanel";
@@ -41,15 +41,15 @@ void PlayState::Enter(){
 	buttonDef.mat_start_button = "Examples/Start";
 	buttonDef.func = [this] { Test(); };
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_OVERLAY, Ogre::Vector3(0,0,0), &buttonDef);
-
+	*/
 	ParticleDef particleDef;
 	particleDef.particle_name = "Particle/Smoke";
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(10,-8,0), &particleDef);	
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(108,-78,130), &particleDef);	
 
-	Ogre::Light* light = m_scene_manager->createLight("light1");
-	light->setType(Ogre::Light::LT_DIRECTIONAL);
-	light->setDirection(Ogre::Vector3(1,-1,0));
-	m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
+	//Ogre::Light* light = m_scene_manager->createLight("light1");
+	//light->setType(Ogre::Light::LT_DIRECTIONAL);
+	//light->setDirection(Ogre::Vector3(1,-1,0));
+	//m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
 	
 	// Create plane mesh
 	Ogre::Plane plane(Ogre::Vector3::UNIT_Y, -10);
@@ -63,8 +63,8 @@ void PlayState::Enter(){
 	//m_cam_node->attachObject(m_camera);
 	//Ogre::SceneNode* node = m_scene_manager->getSceneNode("camNode");
 
-	//mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_camera, "../../resources/terrain/");
-	//mArtifexLoader->loadZone("try");
+	mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_camera, "../../resources/terrain/");
+	mArtifexLoader->loadZone("try");
 
 	PlaneDef plane_def;//("plane", "Examples/BeachStones");
 	plane_def.material_name = "Examples/BeachStones";
@@ -94,7 +94,7 @@ void PlayState::Enter(){
 
 	m_physics_engine->ShowDebugDraw(true);
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y+1.0f,z+3.0f), &tott_def);
-	//m_physics_engine->CreateTerrainCollision(mArtifexLoader->mTerrain);
+	m_physics_engine->CreateTerrainCollision(mArtifexLoader->mTerrain);
 	//m_scene_manager->setSkyDome(true, "Examples/CloudySky");
 	
 	
