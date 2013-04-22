@@ -10,7 +10,6 @@ PlayState::PlayState(void) : m_physics_engine(NULL), m_game_object_manager(NULL)
 PlayState::~PlayState(void){}
 
 void PlayState::Enter(){
-	m_func.Init(this, &PlayState::test);
 	m_scene_manager = Ogre::Root::getSingleton().createSceneManager("OctreeSceneManager");
 	m_physics_engine = new PhysicsEngine;
 	m_physics_engine->Init();
@@ -50,7 +49,7 @@ void PlayState::Enter(){
 	Ogre::Light* light = m_scene_manager->createLight("light1");
 	light->setType(Ogre::Light::LT_DIRECTIONAL);
 	light->setDirection(Ogre::Vector3(1,-1,0));
-	m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);*/
+	m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
 	
 	// Create plane mesh
 	Ogre::Plane plane(Ogre::Vector3::UNIT_Y, -10);
@@ -64,8 +63,8 @@ void PlayState::Enter(){
 	//m_cam_node->attachObject(m_camera);
 	//Ogre::SceneNode* node = m_scene_manager->getSceneNode("camNode");
 
-	mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_camera, "../../resources/terrain/");
-	mArtifexLoader->loadZone("try");
+	//mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_camera, "../../resources/terrain/");
+	//mArtifexLoader->loadZone("try");
 
 	PlaneDef plane_def;//("plane", "Examples/BeachStones");
 	plane_def.material_name = "Examples/BeachStones";
@@ -95,7 +94,7 @@ void PlayState::Enter(){
 
 	m_physics_engine->ShowDebugDraw(true);
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y+1.0f,z+3.0f), &tott_def);
-	m_physics_engine->CreateTerrainCollision(mArtifexLoader->mTerrain);
+	//m_physics_engine->CreateTerrainCollision(mArtifexLoader->mTerrain);
 	//m_scene_manager->setSkyDome(true, "Examples/CloudySky");
 	
 	

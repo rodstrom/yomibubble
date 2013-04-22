@@ -45,8 +45,6 @@ private:
 
 	Ogre::SceneNode* m_cam_node;
 	ArtifexLoader* mArtifexLoader;
-
-	Functor<PlayState> m_func;
 };
 
 #endif // _PLAY_STATE_H_
