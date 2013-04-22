@@ -42,9 +42,10 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 	m_test_sfx = sound_manager->Create2DData("Dun_Dun", true, false, false, false, 1.0f, 1.0f);
 	m_3D_music_data = sound_manager->Create3DData("Main_Theme", "", false, false, false, 1.0f, 1.0f);
 	
-	m_states[PLAYER_STATE_NORMAL] = &PlayerInputComponent::Normal;
-	m_states[PLAYER_STATE_ON_BUBBLE] = &PlayerInputComponent::OnBubble;
-	m_states[PLAYER_STATE_INSIDE_BUBBLE] = &PlayerInputComponent::InsideBubble;
+	m_states[PLAYER_STATE_NORMAL] =			&PlayerInputComponent::Normal;
+	m_states[PLAYER_STATE_ON_BUBBLE] =		&PlayerInputComponent::OnBubble;
+	m_states[PLAYER_STATE_INSIDE_BUBBLE] =	&PlayerInputComponent::InsideBubble;
+	m_states[PLAYER_STATE_BOUNCING] =		&PlayerInputComponent::Bouncing;
 }
 
 void PlayerInputComponent::SetMessenger(ComponentMessenger* messenger){
@@ -54,23 +55,24 @@ void PlayerInputComponent::SetMessenger(ComponentMessenger* messenger){
 
 void PlayerInputComponent::Normal(float dt){
 	Ogre::Vector3 dir = Ogre::Vector3::ZERO;
+	dir.x = m_input_manager->GetMovementAxis().x;
+	dir.z = m_input_manager->GetMovementAxis().z;
 
-	if (m_input_manager->IsButtonDown(BTN_LEFT)){
+	/*if (m_input_manager->IsButtonDown(BTN_LEFT)){
 		dir += Ogre::Vector3(-1.0f, 0.0f, 0.0f);
 	}
 	else if (m_input_manager->IsButtonDown(BTN_RIGHT)){
 		dir += Ogre::Vector3(1.0f, 0.0f, 0.0f);
-	}
+	}*/
 
-	if (m_input_manager->IsButtonDown(BTN_UP)){
+	/*if (m_input_manager->IsButtonDown(BTN_UP)){
 		dir += Ogre::Vector3(0.0f, 0.0f, -1.0f);
 		m_messenger->Notify(MSG_SFX2D_PLAY, &m_test_sfx);
 		//m_messenger->Notify(MSG_SFX3D_STOP, &m_3D_music_data);
 	}
 	else if (m_input_manager->IsButtonDown(BTN_DOWN)){
 		dir += Ogre::Vector3(0.0f, 0.0f, 1.0f);
-		m_messenger->Notify(MSG_MUSIC3D_PLAY, &m_3D_music_data);
-	}
+	}*/
 
 	if (dir != Ogre::Vector3::ZERO){
 		m_messenger->Notify(MSG_SFX2D_PLAY, &m_walk_sound);
@@ -121,6 +123,7 @@ void PlayerInputComponent::Normal(float dt){
 			m_messenger->Notify(MSG_CHILD_NODE_GET_NODE, &node);
 			if (node){
 				Ogre::Vector3 pos = node->_getDerivedPosition();
+				
 				m_current_bubble->GetComponentMessenger()->Notify(MSG_SET_OBJECT_POSITION, &pos);
 				m_current_bubble->GetComponentMessenger()->Notify(MSG_INCREASE_SCALE_BY_VALUE, &scale_inc);
 			}
@@ -134,16 +137,15 @@ void PlayerInputComponent::Normal(float dt){
 				m_current_bubble->GetComponentMessenger()->Notify(MSG_INCREASE_SCALE_BY_VALUE, &scale_inc);
 			}
 		}
-
 	}
 
 	if (m_input_manager->IsButtonPressed(BTN_START)){
-		bool is_jumping = true;
-		m_messenger->Notify(MSG_CHARACTER_CONROLLER_JUMP, &is_jumping);
+		bool jumping = true;
+		m_messenger->Notify(MSG_CHARACTER_CONROLLER_JUMP, &jumping);
 	}
 	else if (m_input_manager->IsButtonReleased(BTN_START)){
-		bool is_jumping = false;
-		m_messenger->Notify(MSG_CHARACTER_CONROLLER_JUMP, &is_jumping);
+		bool jumping = false;
+		m_messenger->Notify(MSG_CHARACTER_CONROLLER_JUMP, &jumping);
 	}
 	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &dir);
 }
@@ -154,10 +156,18 @@ void PlayerInputComponent::OnBubble(float dt){
 	if (node){
 		Ogre::Vector3 pos = node->_getDerivedPosition();
 		pos.y += 2.0f;
-		m_messenger->Notify(MSG_CHARACTER_CONTROLLER_WARP, &pos);
+		btRigidBody* body = NULL;
+		m_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &body);
+		if (body){
+			body->setLinearVelocity(btVector3(0,0,0));
+			body->getWorldTransform().setOrigin(BtOgre::Convert::toBullet(pos));
+		}
 	}
 	if (m_input_manager->IsButtonPressed(BTN_START)){
-		std::cout << "Disconnect\n";
+		m_player_state = PLAYER_STATE_NORMAL;
+		bool jump = true;
+		m_messenger->Notify(MSG_CHARACTER_CONROLLER_JUMP, &jump);
+		return;
 	}
 
 	Ogre::Vector3 dir = Ogre::Vector3::ZERO;
@@ -205,4 +215,24 @@ void PlayerInputComponent::OnBubble(float dt){
 
 void PlayerInputComponent::InsideBubble(float dt){
 
+}
+
+void PlayerInputComponent::Bouncing(float dt){
+	Ogre::Vector3 dir = Ogre::Vector3::ZERO;
+
+	if (m_input_manager->IsButtonDown(BTN_LEFT)){
+		dir += Ogre::Vector3(-1.0f, 0.0f, 0.0f);
+	}
+	else if (m_input_manager->IsButtonDown(BTN_RIGHT)){
+		dir += Ogre::Vector3(1.0f, 0.0f, 0.0f);
+	}
+
+	if (m_input_manager->IsButtonDown(BTN_UP)){
+		dir += Ogre::Vector3(0.0f, 0.0f, -1.0f);
+	}
+	else if (m_input_manager->IsButtonDown(BTN_DOWN)){
+		dir += Ogre::Vector3(0.0f, 0.0f, 1.0f);
+	}
+
+	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &dir);
 }

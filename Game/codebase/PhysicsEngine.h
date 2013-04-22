@@ -8,7 +8,6 @@
 //#include "ETTerrainManager.h"
 //#include "ETTerrainInfo.h"
 
-class CollisionManager;
 class PhysicsEngine
 {
 public:
@@ -23,10 +22,11 @@ public:
 	void ShowDebugDraw(bool value);
 	void CloseDebugDraw();
 
-	//void CreateTerrainCollision(const ET::TerrainInfo& terrain_info);
+	//void CreateTerrainCollision(ET::TerrainInfo* terrain_info);
+	void CreateTerrainCollision(Ogre::Terrain* mTerrain);
 	void DestroyTerrainCollision();
 
-	btBroadphaseInterface* GetBroadphaseInterface() const { return m_broadphase; }
+	//btBroadphaseInterface* GetBroadphaseInterface() const { return m_broadphase; }
 	btDiscreteDynamicsWorld* GetDynamicWorld() const { return m_dynamic_world; }
 
 private:
@@ -37,7 +37,6 @@ private:
 	btDiscreteDynamicsWorld*				m_dynamic_world;
 	BtOgre::DebugDrawer*					m_debug_drawer;
 	btGhostPairCallback*					m_ghost_pair_callback;
-	CollisionManager*						m_collision_manager;
 
 	//Terrain Collision
 	bool									m_has_terrain_coll;

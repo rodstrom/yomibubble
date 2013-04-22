@@ -4,6 +4,7 @@
 #include "InputSystem.h"
 #include "MessageSystem.h"
 #include "Managers\SoundManager.h"
+#include "Managers\CollisionManager.h"
 
 Core::Core(void) : m_root(NULL), m_game(NULL), m_message_system(NULL), m_input_system(NULL) {}
 Core::~Core(void){}
@@ -55,7 +56,7 @@ bool Core::Init(){
 	m_game->Init(m_render_window, m_message_system);
 	m_input_system = new InputSystem(m_game, m_render_window);
 	m_input_system->Init();
-
+	gContactAddedCallback = Collision::ContactCallback;
 	return true;
 }
 

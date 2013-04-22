@@ -27,11 +27,11 @@ bool InputManager::IsButtonReleased(int p_button){
 	return false;
 }
 
-void InputManager::ButtonPressed(int btn){
+void InputManager::InjectPressedButton(int btn){
 	m_buttons[btn] = true;
 }
 
-void InputManager::ButtonReleased(int btn){
+void InputManager::InjectReleasedButton(int btn){
 	m_buttons[btn] = false;
 }
 
@@ -39,6 +39,42 @@ void InputManager::Update(){
 	memcpy(m_last_buttons, m_buttons, sizeof(bool) * BTN_SIZE);
 }
 
-void InputManager::SetMouseState(const OIS::MouseState mouse_state){
+void InputManager::InjectMouseState(const OIS::MouseState mouse_state){
 	m_mouse_state = mouse_state;
+}
+
+void InputManager::InjectRelativeMovement(float x, float z){
+	m_movement_axis.x = x;
+	m_movement_axis.z = z;
+}
+
+void InputManager::InjectRelativeCameraAxis(float x, float y, float z){
+	m_camera_axis.x = x;
+	m_camera_axis.y = y;
+	m_camera_axis.z = z;
+}
+
+void InputManager::InjectRelativeMovementX(float x){
+	m_movement_axis.x = x;
+}
+
+void InputManager::InjectRelativeMovementZ(float z){
+	m_movement_axis.z = z;
+}
+
+void InputManager::InjectRelativeCameraAxisX(float x){
+	m_camera_axis.x = x;
+}
+
+void InputManager::InjectRelativeCameraAxisY(float y){
+	m_camera_axis.y = y;
+}
+
+void InputManager::InjectRelativeCameraAxisZ(float z){
+	m_camera_axis.z = z;
+}
+
+void InputManager::InjectMousePosition(int x, int y){
+	m_mouse_position.x = x;
+	m_mouse_position.y = y;
 }

@@ -1,19 +1,20 @@
 #ifndef _N_COLLISION_MANAGER_H_
 #define _N_COLLISION_MANAGER_H_
 
-class PhysicsEngine;
 class GameObject;
+namespace Collision {
+	bool ContactCallback(btManifoldPoint& cp,	const btCollisionObjectWrapper* colObj0Wrap,int partId0,int index0,const btCollisionObjectWrapper* colObj1Wrap,int partId1,int index1);
+}
 class CollisionManager
 {
 public:
-	CollisionManager(PhysicsEngine* physics_engine);
+	CollisionManager(void);
 	~CollisionManager(void);
 
 	void ProcessCollision(const btCollisionObject* ob_a, const btCollisionObject* ob_b);
-	void Init();
-	void Shut();
 
 private:
+	void Init();
 	inline std::pair<int,int> MakeIntPair(int, int);
 
 	void PlayerTott(GameObject* player, GameObject* tott);
@@ -26,11 +27,12 @@ private:
 	void BlueBubblePlayer(GameObject* blue_bubble, GameObject* player) { PlayerBlueBubble(player, blue_bubble); }
 	void PlayerPinkBubble(GameObject* player, GameObject* pink_bubble) {}
 	void PinkBubblePlayer(GameObject* pink_bubble, GameObject* player) { PlayerPinkBubble(player, pink_bubble); }
+	void PlayerPlane(GameObject* player, GameObject* plane);
+	void PlanePlayer(GameObject* plane, GameObject* player) { PlayerPlane(player, plane); }
 
 	typedef void (CollisionManager::*DoubleDispatch)(GameObject*, GameObject*);
 	typedef std::map<std::pair<int, int>, DoubleDispatch> HitMap;
 	HitMap m_collision;
-	PhysicsEngine* m_physics_engine;
 };
 
 #endif // _N_COLLISION_MANAGER_H_
