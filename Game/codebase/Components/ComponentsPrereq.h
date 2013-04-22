@@ -1,6 +1,8 @@
 #ifndef _N_COMPONENTS_PREREQ_H_
 #define _N_COMPONENTS_PREREQ_H_
 
+#include <functional>
+
 enum EComponentType{
 	COMPONENT_NONE = 0,
 	COMPONENT_RENDERER ,
@@ -49,6 +51,10 @@ enum EComponentMsg{
 	MSG_MUSIC3D_STOP,
 	MSG_INCREASE_SCALE_BY_VALUE,
 	MSG_SET_OBJECT_POSITION,
+	MSG_OVERLAY_HOVER_ENTER,
+	MSG_OVERLAY_HOVER_EXIT,
+	MSG_OVERLAY_CALLBACK,
+	MSG_CREATE_PARTICLE,
 	MSG_SIZE
 };
 
@@ -117,6 +123,18 @@ struct AnimationMsg{
 struct AddForceMsg{
 	Ogre::Vector3 pwr;
 	Ogre::Vector3 dir;
+};
+
+struct ButtonDef{
+	Ogre::String mat_hover;
+	Ogre::String mat_exit;
+	Ogre::String cont_name;
+	Ogre::String overlay_name;
+	Ogre::String mat_start_button;
+	std::function<void()> func;
+};
+struct ParticleDef{
+	Ogre::String particle_name;
 };
 
 #endif // _N_COMPONENTS_PREREQ_H_

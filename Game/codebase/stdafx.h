@@ -11,6 +11,7 @@
 #include "OIS\OIS.h"
 #include "btBulletDynamicsCommon.h"
 #include "btBulletCollisionCommon.h"
+#include "SkyX.h"
 
 #include "nSystem.h"
 #include "Convert.h"
