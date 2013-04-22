@@ -196,6 +196,17 @@ void CharacterController::Update(float dt){
 }
 
 void CharacterController::Move(const btVector3& dir, float movement_speed){
+	btVector3 vel = m_rigidbody->getLinearVelocity();
+	float desired_x_vel = 0.0f;
+	float desired_z_vel = 0.0f;
+
+	if (dir.x > 0.0f){
+
+	}
+	else if (dir.x < 0.0f){
+
+	}
+
 	m_rigidbody->applyCentralImpulse(dir * movement_speed);
 }
 
