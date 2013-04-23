@@ -17,6 +17,7 @@ void WayPoint::Init(Ogre::SceneNode* node, float walk_speed){
 
 	m_follow_node = NULL;
 	m_old_destination = Ogre::Vector3::ZERO;
+	m_follow_node_moving = false;
 
 	//AddWayPoint(Ogre::Vector3(25.0f, -10.0f, 0.0f));
 	//AddWayPoint(Ogre::Vector3(1.0f, -10.0f, 21.0f));
@@ -40,20 +41,17 @@ void WayPoint::AddWayPoint(Ogre::Vector3 way_point){
 
 void WayPoint::AddWayPoint(Ogre::SceneNode* scene_node){
 	m_follow_node = scene_node;
-	m_destination = m_follow_node->getPosition();
-	m_direction = m_destination - m_node->getPosition();
-	m_walk_list.push_front(m_follow_node->getPosition());
+	//m_destination = m_follow_node->getPosition();
+	//m_direction = m_destination - m_node->getPosition();
+	//m_walk_list.push_front(m_follow_node->getPosition());
 }
 
 float WayPoint::getSpeed(){
-	if(m_follow_node_moving){
-		int i;
-	}
 	if(m_follow_node != NULL) {
 		if(withinDistance(1.0f)) return 0.0f;
 		else if(m_follow_node_moving) return m_walk_speed;
 		else if(withinDistance(3.0f)) return m_walk_speed * 0.3f;
-		else if(withinDistance(5.0f)) return m_walk_speed * 0.8f;
+		else if(withinDistance(6.0f)) return m_walk_speed * 0.8f;
 		else if(withinDistance(10.0f)) return m_walk_speed;
 		else if(withinDistance(30.0f)) return m_walk_speed * 1.5f;
 		else return m_walk_speed * 2.0f;
@@ -65,8 +63,8 @@ bool WayPoint::withinDistance(float meters){
 	if (m_node->getPosition().x >= m_destination.x - meters
 		&& m_node->getPosition().x <= m_destination.x + meters)
 	{
-		if (m_node->getPosition().y >= m_destination.y - meters
-		&& m_node->getPosition().y <= m_destination.y + meters)
+		if (m_node->getPosition().z >= m_destination.z - meters
+		&& m_node->getPosition().z <= m_destination.z + meters)
 		{
 			return true;
 		}
@@ -80,18 +78,16 @@ void WayPoint::Update(float dt){
 		m_direction = m_destination - m_node->getPosition();
 
 		m_follow_node_moving = (m_destination != m_old_destination);
-		m_destination = m_old_destination;
+		m_old_destination = m_destination;
 	}
 
-	if (m_direction == Ogre::Vector3::ZERO) 
-        {
-            if (NextLocation()) { }
-        }
-		else
-		{
-			//do naaathing
-			//std::cout << "Deque empty: " << m_walk_list.empty() << std::endl;
-		}
+	if (m_direction == Ogre::Vector3::ZERO) {
+        if (NextLocation()) { }
+    }
+	else {
+		//do naaathing
+		//std::cout << "Deque empty: " << m_walk_list.empty() << std::endl;
+	}
 
 	if (withinDistance(1.0f)){
 		if(m_follow_node != NULL) {

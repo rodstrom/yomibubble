@@ -125,7 +125,7 @@ int DBManager::Load() {
 						for(int j = 0; j < waypoints.size(); j++) tempWP->AddWayPoint(getWaypoint(waypoints.at(j)));
 					}
 					else if (i->first == "waypoint") {		//dont render the waypoints
-						interactive = true;
+						//interactive = true;
 					}
 					else if (i->first == "followable") { 
 						followables[i->second] = static_cast<MeshRenderComponent*>(temp->GetComponent(EComponentType::COMPONENT_RENDERER))->GetSceneNode();
@@ -135,7 +135,7 @@ int DBManager::Load() {
 				for ( attributemap::iterator i = spawn.attributes.begin(); i != spawn.attributes.end(); i++ )
 				{
 					if (i->first == "follow") { 
-						followers[temp] = i->second;
+						//followers[temp] = i->second;
 					}
 				}
 			}
