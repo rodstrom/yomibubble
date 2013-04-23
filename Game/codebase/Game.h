@@ -14,9 +14,18 @@ public:
 	bool Update(float dt);
 	bool Init(Ogre::RenderWindow* render_window, MessageSystem* message_system);
 	void Shut();
-	void SetMouseState(const OIS::MouseState mouse_state);
-	void ButtonPressed(int btn);
-	void ButtonReleased(int btn);
+
+	void InjectPressedButton(int btn);
+	void InjectReleasedButton(int btn);
+	void InjectRelativeMovement(float x, float z);
+	void InjectRelativeMovementX(float x);
+	void InjectRelativeMovementZ(float z);
+	void InjectRelativeCameraAxis(float x, float y, float z);
+	void InjectRelativeCameraAxisX(float x);
+	void InjectRelativeCameraAxisY(float y);
+	void InjectRelativeCameraAxisZ(float z);
+	void InjectMouseState(const OIS::MouseState mouse_state);
+	void InjectMousePosition(int x, int y);
 
 	void AddInputManager(InputManager* input_manager);
 	void RemoveInputManager(InputManager* input_manager);

@@ -35,26 +35,90 @@ void Game::Shut(){
 	}
 }
 
-void Game::SetMouseState(const OIS::MouseState mouse_state){
+void Game::InjectMouseState(const OIS::MouseState mouse_state){
 	if (!m_input_managers.empty()){
 		for (unsigned int i = 0; i < m_input_managers.size(); i++){
-			m_input_managers[i]->SetMouseState(mouse_state);
+			m_input_managers[i]->InjectMouseState(mouse_state);
 		}
 	}
 }
 
-void Game::ButtonPressed(int btn){
+void Game::InjectPressedButton(int btn){
 	if (!m_input_managers.empty()){
 		for (unsigned int i = 0; i < m_input_managers.size(); i++){
-			m_input_managers[i]->ButtonPressed(btn);
+			m_input_managers[i]->InjectPressedButton(btn);
 		}
 	}
 }
 
-void Game::ButtonReleased(int btn){
+void Game::InjectReleasedButton(int btn){
 	if (!m_input_managers.empty()){
 		for (unsigned int i = 0; i < m_input_managers.size(); i++){
-			m_input_managers[i]->ButtonReleased(btn);
+			m_input_managers[i]->InjectReleasedButton(btn);
+		}
+	}
+}
+
+void Game::InjectRelativeMovement(float x, float z){
+	if (!m_input_managers.empty()){
+		for (unsigned int i = 0; i < m_input_managers.size(); i++){
+			m_input_managers[i]->InjectRelativeMovement(x, z);
+		}
+	}
+}
+
+void Game::InjectRelativeMovementX(float x){
+	if (!m_input_managers.empty()){
+		for (unsigned int i = 0; i < m_input_managers.size(); i++){
+			m_input_managers[i]->InjectRelativeMovementX(x);
+		}
+	}
+}
+
+void Game::InjectRelativeMovementZ(float z){
+	if (!m_input_managers.empty()){
+		for (unsigned int i = 0; i < m_input_managers.size(); i++){
+			m_input_managers[i]->InjectRelativeMovementZ(z);
+		}
+	}
+}
+
+void Game::InjectRelativeCameraAxis(float x, float y, float z){
+	if (!m_input_managers.empty()){
+		for (unsigned int i = 0; i < m_input_managers.size(); i++){
+			m_input_managers[i]->InjectRelativeCameraAxis(x, y, z);
+		}
+	}
+}
+
+void Game::InjectRelativeCameraAxisX(float x){
+	if (!m_input_managers.empty()){
+		for (unsigned int i = 0; i < m_input_managers.size(); i++){
+			m_input_managers[i]->InjectRelativeCameraAxisX(x);
+		}
+	}
+}
+
+void Game::InjectRelativeCameraAxisY(float y){
+	if (!m_input_managers.empty()){
+		for (unsigned int i = 0; i < m_input_managers.size(); i++){
+			m_input_managers[i]->InjectRelativeCameraAxisY(y);
+		}
+	}
+}
+
+void Game::InjectRelativeCameraAxisZ(float z){
+	if (!m_input_managers.empty()){
+		for (unsigned int i = 0; i < m_input_managers.size(); i++){
+			m_input_managers[i]->InjectRelativeCameraAxisZ(z);
+		}
+	}
+}
+
+void Game::InjectMousePosition(int x, int y){
+	if (!m_input_managers.empty()){
+		for (unsigned int i = 0; i < m_input_managers.size(); i++){
+			m_input_managers[i]->InjectMousePosition(x,y);
 		}
 	}
 }

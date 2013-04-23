@@ -8,7 +8,7 @@
 class PhysicsEngine;
 class RigidbodyComponent : public Component, public IComponentObserver{
 public:
-	RigidbodyComponent(void) : m_rigidbody(NULL), m_shape(NULL), m_motion_state(NULL), m_collision_object(NULL){ m_type = COMPONENT_RIGIDBODY; }
+	RigidbodyComponent(void) : m_rigidbody(NULL), m_shape(NULL), m_motion_state(NULL), m_compound_shape(NULL){ m_type = COMPONENT_RIGIDBODY; }
 	virtual ~RigidbodyComponent(void){}
 	virtual void Notify(int type, void* message);
 	virtual void Init(const Ogre::Vector3& position, Ogre::Entity* entity, PhysicsEngine* physics_engine, float mass, int collider_type, int body_type = DYNAMIC_BODY);
@@ -19,51 +19,67 @@ public:
 protected:
 	btRigidBody*			m_rigidbody;
 	btCollisionShape*		m_shape;
-	btCollisionObject*		m_collision_object;
+	btCompoundShape*		m_compound_shape;
 	btMotionState*			m_motion_state;
 	PhysicsEngine*			m_physics_engine;
 };
 
-class CharacterController : public Component, public IComponentObserver, public IComponentUpdateable, public IComponentLateUpdate{
+class TriggerComponent : public RigidbodyComponent{
 public:
-	CharacterController(void) : m_controller(NULL), m_ghost_object(NULL), m_shape(NULL), m_velocity(0.0), m_turn_speed(0.0f), 
-		m_move_backwards(false), m_move_forward(false), m_move_left(false), m_move_right(false), m_has_follow_cam(false), m_y_vel(0.0f), m_is_jumping(false),
-		m_max_jump_height(0.0f), m_current_jump_height(0.0f), m_current_y_pos(0.0f), m_direction(btVector3(0,0,0))
+	TriggerComponent(void) : m_sync(false){}
+	virtual ~TriggerComponent(void){}
+
+	virtual void Init(const Ogre::Vector3& pos, PhysicsEngine* physics_engine, const TriggerDef& def);
+	virtual void Notify(int type, void* message);
+	virtual void Shut();
+	virtual void SetMessenger(ComponentMessenger* messenger);
+	void SetSync(bool value) { m_sync = value; }
+	void SetTargetNodeId(const Ogre::String& node_id) { m_node_id = node_id; }
+
+protected:
+	bool m_sync;
+	Ogre::Vector3 m_offset;
+	Ogre::String m_node_id;		// the ID of the node the Trigger will sync its position to.
+};
+
+class CharacterController : public RigidbodyComponent, public IComponentUpdateable{
+public:
+	CharacterController(void) : m_velocity(0.0), m_turn_speed(0.0f), 
+		m_has_follow_cam(false), m_is_jumping(false), m_on_ground(false),
+		m_max_jump_height(0.0f), m_direction(btVector3(0,0,0)), m_deacc(0.0f), m_max_velocity(0.0f), m_acc_x(0.0f), m_acc_z(0.0f)
 	{ m_type = COMPONENT_CHARACTER_CONTROLLER; }
 	virtual ~CharacterController(void){}
 	virtual void Notify(int type, void* msg);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
-	virtual void Init(const Ogre::Vector3& position, Ogre::Entity* entity, float step_height, int collider_type, PhysicsEngine* physics_engine);
+	virtual void Init(const Ogre::Vector3& position, Ogre::Entity* entity, float step_height, PhysicsEngine* physics_engine);
 	virtual void Update(float dt);
-	virtual void LateUpdate(float dt);
-	btKinematicCharacterController* GetController() { return m_controller; }
-	btPairCachingGhostObject* GetGhostObject() { return m_ghost_object; }
-	void SetVelocity(btScalar velocity) { m_velocity = velocity; }
+	void SetVelocity(float velocity) { m_velocity = velocity; }
 	void SetTurnSpeed(float turn_speed) { m_turn_speed = turn_speed; }
 	void HasFollowCam(bool value) { m_has_follow_cam = value; }
-	void SetMaxJumpHeight(float value) { m_controller->setMaxJumpHeight(value); m_max_jump_height = value; }
-	bool IsFalling();		
+	void SetMaxJumpHeight(float value) { m_max_jump_height = value; }
+	void SetJumpPower(float value) { m_jump_pwr = value; }
+	void SetMaxVelocity(float value) { m_max_velocity = value; }
+	void SetDeacceleration(float value) { m_deacc = value; }
 
 protected:
-	btKinematicCharacterController*		m_controller;
-	btPairCachingGhostObject*			m_ghost_object;
-	PhysicsEngine*						m_physics_engine;
-	btConvexShape*						m_shape;
-	btScalar							m_velocity;
-	btVector3							m_direction;
-	float								m_y_vel;
-	float								m_turn_speed;
-	float								m_max_jump_height;
-	float								m_current_jump_height;
-	float								m_current_y_pos;
-	float								m_last_y_pos;
-	bool								m_move_forward;
-	bool								m_move_backwards;
-	bool								m_move_left;
-	bool								m_move_right;
-	bool								m_has_follow_cam;
-	bool								m_is_jumping;
+	void ApplyAcceleration(Ogre::Vector3& dir, float dt);
+
+	Ogre::Vector3	m_direction;
+
+	float		m_max_velocity;
+	float		m_velocity;
+	float		m_deacc;
+	float		m_turn_speed;
+	float		m_max_jump_height;
+	float		m_jump_pwr;
+	float		m_last_y_pos;
+	float		m_acc_x;
+	float		m_acc_z;
+	bool		m_has_follow_cam;
+	bool		m_is_jumping;
+	bool		m_on_ground;
+	bool		m_is_moving;
 };
 
 class Point2PointConstraintComponent : public Component, public IComponentObserver{
@@ -78,7 +94,7 @@ public:
 	btPoint2PointConstraint* GetConstraint() const { return m_constraint; }
 
 private:
-	btPoint2PointConstraint*	m_constraint;
+	btPoint2PointConstraint* m_constraint;
 	PhysicsEngine* m_physics_engine;
 };
 

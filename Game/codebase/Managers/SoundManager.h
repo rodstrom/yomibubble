@@ -29,6 +29,9 @@ struct SoundData2D{
 	bool m_change_pitch;
 	bool m_change_volume;
 
+	float m_fade_time;
+	float m_fade_amount;
+
 	float m_pitch;
 	float m_volume;
 };
@@ -51,8 +54,8 @@ public:
 	void Play3DSound(Ogre::String name, Ogre::String node_name, bool attached);
 	void Stop3DSound(Ogre::String name);
 
-	void FadeOut(Ogre::String name);
-	void FadeIn(Ogre::String name);
+	void FadeOut(Ogre::String name, float duration);
+	void FadeIn(Ogre::String name, float duration);
 	void ChangeVolume(Ogre::String name, float volume);
 	void ChangePitch(Ogre::String name, float pitch);
 	//void AddEffect(Ogre::String name, Ogre::String effect); //I might want an enumarator for the effect //eeeeh, check out how they work
@@ -69,8 +72,6 @@ public:
 	void GetYomiNode(Ogre::String node_name);
 	void GetTottNode(Ogre::String node_name);
 	void Update(Ogre::Camera* camera, Ogre::SceneManager* scene_manager, float dt); 
-
-	bool testbajs;
 	
 	std::vector<Ogre::String> m_scene_nodes;
 	std::vector<Ogre::String> m_music_playlist;

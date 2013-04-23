@@ -2,11 +2,19 @@
 #include "CollisionManager.h"
 #include "..\Components\GameObjectPrereq.h"
 #include "..\Components\GameObject.h"
+#include "GameObjectManager.h"
 #include "..\PhysicsEngine.h"
 #include "..\Components\PhysicsComponents.h"
 #include "..\Components\PlayerInputComponent.h"
+#include <memory>
 
-CollisionManager::CollisionManager(PhysicsEngine* physics_engine) : m_physics_engine(physics_engine){}
+bool Collision::ContactCallback(btManifoldPoint& cp, const btCollisionObjectWrapper* colObj0Wrap, int partId0, int index0, const btCollisionObjectWrapper* colObj1Wrap, int partId1, int index1){
+	static std::unique_ptr<CollisionManager> collision_manager(new CollisionManager);
+	//collision_manager->ProcessCollision(colObj0Wrap->getCollisionObject(), colObj1Wrap->getCollisionObject());
+	return false;
+}
+
+CollisionManager::CollisionManager(void){ Init(); }
 CollisionManager::~CollisionManager(void){}
 
 void CollisionManager::Init(){
@@ -20,16 +28,14 @@ void CollisionManager::Init(){
 	m_collision[MakeIntPair(GAME_OBJECT_BLUE_BUBBLE, GAME_OBJECT_PLAYER)] = &CollisionManager::BlueBubblePlayer;
 	m_collision[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_PINK_BUBBLE)] = &CollisionManager::PlayerPinkBubble;
 	m_collision[MakeIntPair(GAME_OBJECT_PINK_BUBBLE, GAME_OBJECT_PLAYER)] = &CollisionManager::PinkBubblePlayer;
-}
-
-void CollisionManager::Shut(){
-
+	m_collision[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_PLANE)] = &CollisionManager::PlayerPlane;
+	m_collision[MakeIntPair(GAME_OBJECT_PLANE, GAME_OBJECT_PLAYER)] = &CollisionManager::PlanePlayer;
 }
 
 void CollisionManager::ProcessCollision(const btCollisionObject* ob_a, const btCollisionObject* ob_b){
 	GameObject* go_a = static_cast<GameObject*>(ob_a->getUserPointer());
 	GameObject* go_b = static_cast<GameObject*>(ob_b->getUserPointer());
-	HitMap::iterator it = m_collision.find(MakeIntPair(go_a->GetId(), go_b->GetId()));
+	HitMap::iterator it = m_collision.find(MakeIntPair(go_a->GetType(), go_b->GetType()));
 	if (it != m_collision.end()){
 		(this->*it->second)(go_a, go_b);
 	}
@@ -58,21 +64,41 @@ void CollisionManager::BlueBubbleBlueBubble(GameObject* blue_bubble_a, GameObjec
 		}
 		btVector3 pivot_a = rc_b->GetRigidbody()->getWorldTransform().getOrigin() - rc_a->GetRigidbody()->getWorldTransform().getOrigin();
 		btVector3 pivot_b = rc_a->GetRigidbody()->getWorldTransform().getOrigin() - rc_b->GetRigidbody()->getWorldTransform().getOrigin();
-		constraint->Init(m_physics_engine, rc_a->GetRigidbody(), rc_b->GetRigidbody(), pivot_a, pivot_b);
+		PhysicsEngine* pe = blue_bubble_a->GetGameObjectManager()->GetPhysicsEngine();
+		constraint->Init(pe, rc_a->GetRigidbody(), rc_b->GetRigidbody(), pivot_a, pivot_b);
 	}
 }
 
 void CollisionManager::PlayerBlueBubble(GameObject* player, GameObject* blue_bubble){
 	PlayerInputComponent* pic = static_cast<PlayerInputComponent*>(player->GetComponent(COMPONENT_PLAYER_INPUT));
-	if (pic->GetPlayerState() == PLAYER_STATE_NORMAL){
+	if (pic->GetPlayerState() == PLAYER_STATE_NORMAL || pic->GetPlayerState() == PLAYER_STATE_BOUNCING){
 		CharacterController* cc = static_cast<CharacterController*>(player->GetComponent(COMPONENT_CHARACTER_CONTROLLER));
-		if (cc->IsFalling()){
-			float test = cc->GetController()->getGhostObject()->getInterpolationLinearVelocity().y();
-			int player_state = PLAYER_STATE_ON_BUBBLE;
-			float gravity = 0.0f;
-			player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_SET_BUBBLE, &blue_bubble);
-			player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_SET_STATE, &player_state);
-			player->GetComponentMessenger()->Notify(MSG_CHARACTER_CONTROLLER_GRAVITY_SET, &gravity);
+		float y_vel = cc->GetRigidbody()->getLinearVelocity().y();
+		if (y_vel < 0.0f){
+			if (y_vel < -4.0f && y_vel > -10.0f){   // bounce on bubble
+				int player_state = PLAYER_STATE_BOUNCING;
+				player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_SET_BUBBLE, &blue_bubble);
+				player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_SET_STATE, &player_state);
+				Ogre::Vector3 impulse(0.0f, cc->GetRigidbody()->getLinearVelocity().y() * -2.2f, 0.0f);
+				player->GetComponentMessenger()->Notify(MSG_RIGIDBODY_APPLY_IMPULSE, &impulse);
+			}
+			else if (y_vel < -10.0f){
+				std::cout << "Inside Bubble\n";
+			}
+			else {   //Stand on bubble if lower than 2.0
+				int player_state = PLAYER_STATE_ON_BUBBLE;
+				Ogre::Vector3 gravity(0,0,0);
+				player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_SET_BUBBLE, &blue_bubble);
+				player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_SET_STATE, &player_state);
+				player->GetComponentMessenger()->Notify(MSG_CHARACTER_CONTROLLER_GRAVITY_SET, &gravity);
+				player->GetComponentMessenger()->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &gravity);
+			}
 		}
 	}
+}
+
+void CollisionManager::PlayerPlane(GameObject* player, GameObject* plane){
+	int player_state = PLAYER_STATE_NORMAL;
+	player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_SET_STATE, &player_state);
+	CharacterController* cc = static_cast<CharacterController*>(player->GetComponent(COMPONENT_CHARACTER_CONTROLLER));
 }

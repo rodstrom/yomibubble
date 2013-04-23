@@ -2,16 +2,79 @@
 #include "VisualComponents.h"
 #include "ComponentMessenger.h"
 #include "..\Managers\InputManager.h"
+#include "..\InputPrereq.h"
+
+void NodeComponent::Init(const Ogre::Vector3& pos, Ogre::SceneManager* scene_manager){
+	m_scene_manager = scene_manager;
+	m_node = m_scene_manager->getRootSceneNode()->createChildSceneNode();
+	m_node->setPosition(pos);
+}
+
+void NodeComponent::Notify(int type, void* msg){
+	switch (type){
+	case MSG_NODE_GET_NODE:
+		*static_cast<Ogre::SceneNode**>(msg) = m_node;
+		break;
+	case MSG_INCREASE_SCALE_BY_VALUE:
+		{
+			Ogre::Vector3 scale = m_node->getScale();
+			scale += *static_cast<Ogre::Vector3*>(msg);
+			m_node->setScale(scale);
+		}
+		break;
+	case MSG_SET_OBJECT_POSITION:
+		m_node->setPosition(*static_cast<Ogre::Vector3*>(msg));
+		break;
+	case MSG_NODE_ATTACH_ENTITY:
+		{
+			if (!m_has_attached_entity){
+				m_node->attachObject(*static_cast<Ogre::Entity**>(msg));
+				m_has_attached_entity = true;
+			}
+		}
+		break;
+	default: 
+		break;
+	}
+}
+
+void NodeComponent::Shut(){
+	if (m_messenger){
+		m_messenger->Unregister(MSG_NODE_GET_NODE, this);
+		m_messenger->Unregister(MSG_INCREASE_SCALE_BY_VALUE, this);
+		m_messenger->Unregister(MSG_SET_OBJECT_POSITION, this);
+		m_messenger->Unregister(MSG_NODE_ATTACH_ENTITY, this);
+	}
+	if (m_node){
+		m_scene_manager->destroySceneNode(m_node);
+		m_node = NULL;
+	}
+}
+
+void NodeComponent::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
+	m_messenger->Register(MSG_NODE_GET_NODE, this);
+	m_messenger->Register(MSG_INCREASE_SCALE_BY_VALUE, this);
+	m_messenger->Register(MSG_SET_OBJECT_POSITION, this);
+	m_messenger->Register(MSG_NODE_ATTACH_ENTITY, this);
+}
+
+
 
 void MeshRenderComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager){
 	m_scene_manager = scene_manager;
 	m_entity = m_scene_manager->createEntity(filename);
-	m_node = m_scene_manager->getRootSceneNode()->createChildSceneNode();
-	m_node->attachObject(m_entity);
+	m_messenger->Notify(MSG_NODE_ATTACH_ENTITY, &m_entity);
+}
+
+void MeshRenderComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager, const Ogre::String& node_id){
+	m_scene_manager = scene_manager;
+	m_entity = m_scene_manager->createEntity(filename);
+	m_messenger->Notify(MSG_NODE_ATTACH_ENTITY, &m_entity, node_id);
 }
 
 void MeshRenderComponent::Notify(int type, void* msg){
-	switch (type){
+	/*switch (type){
 	case MSG_NODE_GET_NODE:
 			*static_cast<Ogre::SceneNode**>(msg) = m_node;
 		break;
@@ -27,26 +90,26 @@ void MeshRenderComponent::Notify(int type, void* msg){
 		break;
 	default:
 		break;
-	}
+	}*/
 }
 
 void MeshRenderComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger = messenger;
-	m_messenger->Register(MSG_NODE_GET_NODE, this);
+	/*m_messenger->Register(MSG_NODE_GET_NODE, this);
 	m_messenger->Register(MSG_INCREASE_SCALE_BY_VALUE, this);
-	m_messenger->Register(MSG_SET_OBJECT_POSITION, this);
+	m_messenger->Register(MSG_SET_OBJECT_POSITION, this);*/
 }
 
 void MeshRenderComponent::Shut(){
 	if (m_messenger){
-		m_messenger->Unregister(MSG_NODE_GET_NODE, this);
+		/*m_messenger->Unregister(MSG_NODE_GET_NODE, this);
 		m_messenger->Unregister(MSG_INCREASE_SCALE_BY_VALUE, this);
-		m_messenger->Unregister(MSG_SET_OBJECT_POSITION, this);
+		m_messenger->Unregister(MSG_SET_OBJECT_POSITION, this);*/
 	}
-	if (m_node != NULL){
+	/*if (m_node != NULL){
 		m_scene_manager->destroySceneNode(m_node);
 		m_node = NULL;
-	}
+	}*/
 	if (m_entity != NULL){
 		m_scene_manager->destroyEntity(m_entity);
 		m_entity = NULL;
@@ -61,6 +124,10 @@ void AnimationComponent::SetMessenger(ComponentMessenger* messenger){
 
 void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager){
 	MeshRenderComponent::Init(filename, scene_manager);
+}
+
+void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager, const Ogre::String& node_id){
+	MeshRenderComponent::Init(filename, scene_manager, node_id);
 }
 
 void AnimationComponent::AddAnimationStates(unsigned int value){
@@ -149,11 +216,12 @@ void ChildSceneNodeComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_CHILD_NODE_GET_NODE, this);
 }
 
-void Overlay2DComponent::Init(const Ogre::String& p_overlay_name){
+void Overlay2DComponent::Init(const Ogre::String& p_overlay_name, const Ogre::String& p_cont_name){
 	Ogre::OverlayManager* overlay_manager = Ogre::OverlayManager::getSingletonPtr();
 	m_id = p_overlay_name;
+	m_cont_name = p_cont_name;
 
-	m_overlay = overlay_manager->getByName(m_id);	
+	m_overlay = overlay_manager->getByName(m_id);
 	m_overlay->show();
 }
 
@@ -161,15 +229,18 @@ void Overlay2DComponent::Shut()
 {
 	if (m_messenger){
 		m_messenger->Unregister(MSG_GET_2D_OVERLAY_CONTAINER, this);
+		
 	}
-	Ogre::OverlayManager& overlay_mrg = Ogre::OverlayManager::getSingleton();
-	overlay_mrg.destroy(m_overlay);
+	//Ogre::OverlayManager& overlay_mrg = Ogre::OverlayManager::getSingleton();
+	//overlay_mrg.destroy(m_overlay);
 }
 
 void Overlay2DComponent::Notify(int type, void* msg){
 	switch(type){
 	case MSG_GET_2D_OVERLAY_CONTAINER:
-		*static_cast<Ogre::OverlayContainer**>(msg) = m_overlay->getChild("MyOverlayElements/TestPanel");
+		*static_cast<Ogre::OverlayContainer**>(msg) = m_overlay->getChild(m_cont_name);	
+		break;
+	default:
 		break;
 	}
 }
@@ -177,45 +248,150 @@ void Overlay2DComponent::Notify(int type, void* msg){
 void Overlay2DComponent::SetMessenger(ComponentMessenger* messenger) {
 	m_messenger = messenger;
 	m_messenger->Register(MSG_GET_2D_OVERLAY_CONTAINER, this);
+	
 }
 
-void OverlayCollisionCallback::Init(InputManager* p_input_manager, Ogre::Viewport* p_view_port){
+void OverlayCollisionCallbackComponent::Init(InputManager* p_input_manager, Ogre::Viewport* p_view_port){
 	m_input_manager = p_input_manager;
 	m_view_port = p_view_port;
-
+	m_ocs = OCS_DEFAULT;
 }
 
-void OverlayCollisionCallback::Update(float dt){
+void OverlayCollisionCallbackComponent::Update(float dt){
 	Ogre::OverlayContainer* overlay_container = NULL;
 
 	m_messenger->Notify(MSG_GET_2D_OVERLAY_CONTAINER, &overlay_container);
 	if(overlay_container){
+
 		float mouseX = m_input_manager->GetMouseState().X.abs / (float)m_view_port->getActualWidth();
 		float mouseY = m_input_manager->GetMouseState().Y.abs / (float)m_view_port->getActualHeight(); 
-		std::cout << mouseX << "   " << mouseY << std::endl;  
 		float x = overlay_container->getLeft();
 		float y = overlay_container->getTop();
 		float w = overlay_container->getWidth();
 		float h = overlay_container->getHeight();
 
-		if(mouseX <= x) return;
-		if(mouseX >= x + w) return;
-		if(mouseY <= y) return;
-		if(mouseY >= y + h) return;
-
-		std::cout << "collision" << std::endl;
-		
+		if (m_ocs == OCS_DEFAULT){
+			if (mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h){
+				m_messenger->Notify(MSG_OVERLAY_HOVER_ENTER, NULL);
+			
+				m_ocs = OCS_COLLISION;
+			}
+		}
+		else if (m_ocs == OCS_COLLISION){
+			if(mouseX <= x || mouseX >= x + w || mouseY <= y || mouseY >= y + h){
+				m_messenger->Notify(MSG_OVERLAY_HOVER_EXIT, NULL);
+				m_ocs = OCS_DEFAULT;
+			}
+		}
 	}
-
+	if(m_ocs == OCS_COLLISION && m_input_manager->IsButtonPressed(BTN_LEFT_MOUSE))
+	{
+		m_messenger->Notify(MSG_OVERLAY_CALLBACK, NULL);
+	}
 }
 
 
-void OverlayCollisionCallback::Shut(){
+void OverlayCollisionCallbackComponent::Shut(){
 }
 
-void OverlayCollisionCallback::Notify(int type, void* msg){
+void OverlayCollisionCallbackComponent::Notify(int type, void* msg){
 }
 
-void OverlayCollisionCallback::SetMessenger(ComponentMessenger* messenger){
+void OverlayCollisionCallbackComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger = messenger;
+
+}
+
+void Overlay2DAnimatedComponent::Init(const Ogre::String& p_overlay_name, const Ogre::String& p_material_name_hover, const Ogre::String& p_material_name_exit, const Ogre::String& p_cont_name){
+	m_overlay_name = p_overlay_name;
+	m_material_name_hover = p_material_name_hover;
+	m_material_name_exit = p_material_name_exit;
+	m_cont_name = p_cont_name;
+	Overlay2DComponent::Init(p_overlay_name, p_cont_name);
+	
+}
+
+void Overlay2DAnimatedComponent::Update(float dt){
+}
+
+void Overlay2DAnimatedComponent::Notify(int type, void*msg){
+	Overlay2DComponent::Notify(type, msg);
+	switch(type){
+	case MSG_OVERLAY_HOVER_ENTER:
+		m_overlay->getChild(m_cont_name)->setMaterialName(m_material_name_hover);
+		break;
+	case MSG_OVERLAY_HOVER_EXIT:
+		m_overlay->getChild(m_cont_name)->setMaterialName(m_material_name_exit);
+		break;
+	default:
+		break;
+	}
+}
+
+void Overlay2DAnimatedComponent::SetMessenger(ComponentMessenger* messenger){
+	Overlay2DComponent::SetMessenger(messenger);
+
+	m_messenger->Register(MSG_OVERLAY_HOVER_ENTER, this);
+	m_messenger->Register(MSG_OVERLAY_HOVER_EXIT, this);
+}
+
+void Overlay2DAnimatedComponent::Shut(){
+	m_messenger->Unregister(MSG_OVERLAY_HOVER_ENTER, this);
+	m_messenger->Unregister(MSG_OVERLAY_HOVER_EXIT, this);
+	Ogre::OverlayManager& overlay_mrg = Ogre::OverlayManager::getSingleton();
+	overlay_mrg.destroy(m_overlay);
+	Overlay2DComponent::Shut();
+}
+
+void OverlayCallbackComponent::Init(std::function<void()> func){
+	m_func = func;
+}
+
+void OverlayCallbackComponent::Notify(int type, void* message){
+	switch(type)
+	{
+	case MSG_OVERLAY_CALLBACK:
+		m_func();
+		break;
+	default:
+		break;
+	}
+}
+
+void OverlayCallbackComponent::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
+	m_messenger->Register(MSG_OVERLAY_CALLBACK, this);
+}
+
+void OverlayCallbackComponent::Shut(){
+	m_messenger->Unregister(MSG_OVERLAY_CALLBACK, this);
+}
+
+void ParticleComponent::Init(Ogre::SceneManager* p_scene_manager, const Ogre::String& p_particle_name, const Ogre::String& p_particle_file_name){
+	m_scene_manager = p_scene_manager;
+	m_particle_system = m_scene_manager->createParticleSystem(p_particle_name, p_particle_file_name);
+}
+
+void ParticleComponent::CreateParticle(Ogre::SceneNode* p_scene_node, const Ogre::Vector3& p_position, const Ogre::Vector3& p_offset_position){
+	m_nodes = p_scene_node;
+	m_node = m_nodes->createChildSceneNode(p_offset_position);
+	m_node->attachObject(m_particle_system);
+}
+
+void ParticleComponent::Notify(int type, void* message){
+	switch (type)
+	{
+	default:
+		break;
+	}
+}
+
+void ParticleComponent::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
+	m_messenger->Register(MSG_CREATE_PARTICLE, this);
+}
+
+void ParticleComponent::Shut(){
+	m_messenger->Unregister(MSG_CREATE_PARTICLE, this);
+	m_particle_system->removeAllEmitters();
 }
