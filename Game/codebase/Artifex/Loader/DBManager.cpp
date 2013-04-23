@@ -46,6 +46,8 @@ int DBManager::Load() {
 	//***********************************************	
 	
 	std::map<std::string, Ogre::SceneNode*> followables;
+	//std::map<std::string, Ogre::SceneNode*> clans; //list all clans, if any from same clan is near, follow
+	std::map<GameObject*, std::string> followers;
 
 	for (int counter=0; counter<t.numRows(); counter ++)
 	{		
@@ -133,8 +135,7 @@ int DBManager::Load() {
 				for ( attributemap::iterator i = spawn.attributes.begin(); i != spawn.attributes.end(); i++ )
 				{
 					if (i->first == "follow") { 
-						Ogre::SceneNode* debugging = followables[i->second];
-						static_cast<WayPointComponent*>(temp->GetComponent(EComponentType::COMPONENT_AI))->AddWayPoint(followables[i->second]);
+						followers[temp] = i->second;
 					}
 				}
 			}
@@ -182,6 +183,13 @@ int DBManager::Load() {
 			}
 		}		
 	} 			
+
+	std::map<GameObject*, std::string>::iterator goIter;
+	for (goIter = followers.begin(); goIter != followers.end(); goIter++) {
+		static_cast<WayPointComponent*>(goIter->first->GetComponent(EComponentType::COMPONENT_AI))->AddWayPoint(followables[goIter->second]);
+	}
+	followers.clear();
+
 	t.finalize();	
 	return 0;	
 };

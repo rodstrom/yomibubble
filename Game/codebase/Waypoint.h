@@ -27,8 +27,10 @@ public:
 	Ogre::SceneNode* m_follow_node;
 
 	float getSpeed();
-
+private:
 	bool withinDistance(float meters);
+	bool m_follow_node_moving;
+	Ogre::Vector3 m_old_destination;
 };
 
 #endif //WAYPOINT_H

@@ -16,6 +16,7 @@ void WayPoint::Init(Ogre::SceneNode* node, float walk_speed){
 	m_destination = Ogre::Vector3::ZERO;
 
 	m_follow_node = NULL;
+	m_old_destination = Ogre::Vector3::ZERO;
 
 	//AddWayPoint(Ogre::Vector3(25.0f, -10.0f, 0.0f));
 	//AddWayPoint(Ogre::Vector3(1.0f, -10.0f, 21.0f));
@@ -45,10 +46,15 @@ void WayPoint::AddWayPoint(Ogre::SceneNode* scene_node){
 }
 
 float WayPoint::getSpeed(){
+	if(m_follow_node_moving){
+		int i;
+	}
 	if(m_follow_node != NULL) {
 		if(withinDistance(1.0f)) return 0.0f;
+		else if(m_follow_node_moving) return m_walk_speed;
 		else if(withinDistance(3.0f)) return m_walk_speed * 0.3f;
-		else if(withinDistance(8.0f)) return m_walk_speed * 0.8f;
+		else if(withinDistance(5.0f)) return m_walk_speed * 0.8f;
+		else if(withinDistance(10.0f)) return m_walk_speed;
 		else if(withinDistance(30.0f)) return m_walk_speed * 1.5f;
 		else return m_walk_speed * 2.0f;
 	}
@@ -69,11 +75,12 @@ bool WayPoint::withinDistance(float meters){
 }
 
 void WayPoint::Update(float dt){
-	//null at first for some reason...
 	if(m_follow_node != NULL) {
 		m_destination = m_follow_node->getPosition();
 		m_direction = m_destination - m_node->getPosition();
-//		m_destination = m_walk_list.front();
+
+		m_follow_node_moving = (m_destination != m_old_destination);
+		m_destination = m_old_destination;
 	}
 
 	if (m_direction == Ogre::Vector3::ZERO) 
