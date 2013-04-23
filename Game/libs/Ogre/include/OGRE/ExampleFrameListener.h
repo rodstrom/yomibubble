@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -173,7 +173,7 @@ public:
 			if (userPerPixelLightModel)
 			{
 				RTShader::SubRenderState* perPixelLightModel = shaderGenerator->createSubRenderState(RTShader::PerPixelLighting::Type);
-				renderState->addTemplateSubRenderState(perPixelLightModel);
+				renderState->addSubRenderState(perPixelLightModel);
 
 				mDebugText = "Per pixel lighting model applied to shader generator default scheme";
 			}
@@ -347,7 +347,7 @@ public:
 		{
 			mRotX = Degree(-ms.X.rel * 0.13);
 			mRotY = Degree(-ms.Y.rel * 0.13);
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
             // Adjust the input depending upon viewport orientation
             Radian origRotY, origRotX;
             switch(mCamera->getViewport()->getOrientation())
@@ -433,7 +433,7 @@ public:
 		}
 
 		//Check to see which device is not buffered, and handle it
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
+#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
 		if( !mKeyboard->buffered() )
 			if( processUnbufferedKeyInput(evt) == false )
 				return false;

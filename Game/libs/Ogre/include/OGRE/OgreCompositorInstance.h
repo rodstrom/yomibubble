@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -158,25 +158,13 @@ namespace Ogre {
         typedef vector<TargetOperation>::type CompiledState;
         
         /** Set enabled flag. The compositor instance will only render if it is
-            enabled, otherwise it is pass-through. Resources are only created if
-			they weren't alive when enabling.
+            enabled, otherwise it is pass-through.
         */
         void setEnabled(bool value);
         
         /** Get enabled flag.
         */
-		bool getEnabled() const { return mEnabled; }
-
-		/** Set alive/active flag. The compositor instance will create resources when alive,
-			and destroy them when inactive.
-			@remarks: Killing an instance means also disabling it: setAlive(false) implies
-			setEnabled(false)
-        */
-        void setAlive(bool value);
-
-        /** Get alive flag.
-        */
-		bool getAlive() const { return mAlive; }
+        bool getEnabled();
 
 		/** Get the instance name for a local texture.
 		@note It is only valid to call this when local textures have been loaded, 
@@ -186,7 +174,7 @@ namespace Ogre {
 			same if you disable and re-enable the compositor instance.
 		@param name The name of the texture in the original compositor definition
 		@param mrtIndex If name identifies a MRT, which texture attachment to retrieve
-		@return The instance name for the texture, corresponds to a real texture
+		@returns The instance name for the texture, corresponds to a real texture
 		*/
 		const String& getTextureInstanceName(const String& name, size_t mrtIndex);
 
@@ -198,7 +186,7 @@ namespace Ogre {
 			same if you disable and re-enable the compositor instance.
 		@param name The name of the texture in the original compositor definition
 		@param mrtIndex If name identifies a MRT, which texture attachment to retrieve
-		@return The texture pointer, corresponds to a real texture
+		@returns The texture pointer, corresponds to a real texture
 		*/
 		TexturePtr getTextureInstance(const String& name, size_t mrtIndex);
 
@@ -250,7 +238,7 @@ namespace Ogre {
 		void setScheme(const String& schemeName, bool reuseTextures = true);
 
 		/// Returns the name of the scheme this compositor is using
-		const String& getScheme() const { return mTechnique ? mTechnique->getSchemeName() : StringUtil::BLANK; }
+		const String& getScheme() const { return mActiveScheme; }
 
 		/** Notify this instance that the primary surface has been resized. 
 		@remarks
@@ -258,6 +246,7 @@ namespace Ogre {
 			are dependent on the size. 
 		*/
 		void notifyResized();
+
 
 		/** Get Chain that this instance is part of
         */
@@ -295,8 +284,6 @@ namespace Ogre {
         CompositorChain *mChain;
         /// Is this instance enabled?
         bool mEnabled;
-		/// Is this instance allocating resources?
-        bool mAlive;
         /// Map from name->local texture
         typedef map<String,TexturePtr>::type LocalTextureMap;
         LocalTextureMap mLocalTextures;
@@ -316,6 +303,9 @@ namespace Ogre {
         
         /// Previous instance (set by chain)
         CompositorInstance *mPreviousInstance;
+
+		/// The scheme which is being used in this instance
+		String mActiveScheme;
 		
 		/** Collect rendering passes. Here, passes are converted into render target operations
 			and queued with queueRenderSystemOp.
@@ -347,7 +337,7 @@ namespace Ogre {
         const String &getSourceForTex(const String &name, size_t mrtIndex = 0);
 
 		/** Queue a render system operation.
-			@return destination pass
+			@returns destination pass
 		 */
 		void queueRenderSystemOp(TargetOperation &finalState, RenderSystemOperation *op);
 
@@ -359,10 +349,7 @@ namespace Ogre {
 		*/
 		void deriveTextureRenderTargetOptions(const String& texname, 
 			bool *hwGammaWrite, uint *fsaa, String* fsaaHint);
-
-		/// Notify this instance that the primary viewport's camera has changed.
-		void notifyCameraChanged(Camera* camera);
-
+        
         friend class CompositorChain;
     };
 	/** @} */

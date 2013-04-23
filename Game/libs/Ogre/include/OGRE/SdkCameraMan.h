@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2012 Torus Knot Software Ltd
+ Copyright (c) 2000-2011 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -260,7 +260,7 @@ namespace OgreBites
 		/*-----------------------------------------------------------------------------
 		| Processes mouse movement differently for each style.
 		-----------------------------------------------------------------------------*/
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 		virtual void injectMouseMove(const OIS::MultiTouchEvent& evt)
 #else
 		virtual void injectMouseMove(const OIS::MouseEvent& evt)
@@ -303,7 +303,7 @@ namespace OgreBites
 		| Processes mouse presses. Only applies for orbit style.
 		| Left button is for orbiting, and right button is for zooming.
 		-----------------------------------------------------------------------------*/
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 		virtual void injectMouseDown(const OIS::MultiTouchEvent& evt)
 		{
 			if (mStyle == CS_ORBIT)
@@ -326,7 +326,7 @@ namespace OgreBites
 		| Processes mouse releases. Only applies for orbit style.
 		| Left button is for orbiting, and right button is for zooming.
 		-----------------------------------------------------------------------------*/
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 		virtual void injectMouseUp(const OIS::MultiTouchEvent& evt)
 		{
 			if (mStyle == CS_ORBIT)

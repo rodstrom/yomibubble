@@ -8,6 +8,7 @@
 
 void PlayerInputComponent::Update(float dt){
 	(this->*m_states[m_player_state])(dt);
+	m_messenger->Notify(MSG_SFX2D_PLAY, &m_def_music);
 }
 
 void PlayerInputComponent::Notify(int type, void* msg){
@@ -31,20 +32,16 @@ void PlayerInputComponent::Shut(){
 	m_messenger->Unregister(MSG_PLAYER_INPUT_SET_STATE, this);
 }
 
-void PlayerInputComponent::Init(InputManager* input_manager){
+void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound_manager){
 	m_input_manager = input_manager;
 	m_messenger->Register(MSG_PLAYER_INPUT_SET_BUBBLE, this);
 	m_messenger->Register(MSG_PLAYER_INPUT_SET_STATE, this);
-	m_walk_sound = "Yomi_Walk";
-	m_def_music = "Main_Theme";
 
-	//m_messenger->Notify(MSG_MUSIC2D_PLAY, &m_def_music);
-
-	//testing section
-	sound_data.m_name = "Dun_Dun";
-	sound_data.m_position.x = 200;
-	sound_data.m_position.y = 50;
-	sound_data.m_position.z = 1000;
+	m_walk_sound = sound_manager->Create2DData("Yomi_Walk", false, false, false, false, 1.0f, 1.0f);
+	m_def_music= sound_manager->Create2DData("Menu_Theme", false, false, false, false, 1.0f, 1.0f);
+	m_test_sfx = sound_manager->Create2DData("Dun_Dun", true, false, false, false, 1.0f, 1.0f);
+	m_3D_music_data = sound_manager->Create3DData("Main_Theme", "", false, false, false, 1.0f, 1.0f);
+	
 	m_states[PLAYER_STATE_NORMAL] =			&PlayerInputComponent::Normal;
 	m_states[PLAYER_STATE_ON_BUBBLE] =		&PlayerInputComponent::OnBubble;
 	m_states[PLAYER_STATE_INSIDE_BUBBLE] =	&PlayerInputComponent::InsideBubble;
@@ -61,25 +58,12 @@ void PlayerInputComponent::Normal(float dt){
 	dir.x = m_input_manager->GetMovementAxis().x;
 	dir.z = m_input_manager->GetMovementAxis().z;
 
-	/*if (m_input_manager->IsButtonDown(BTN_LEFT)){
-		dir += Ogre::Vector3(-1.0f, 0.0f, 0.0f);
-	}
-	else if (m_input_manager->IsButtonDown(BTN_RIGHT)){
-		dir += Ogre::Vector3(1.0f, 0.0f, 0.0f);
-	}*/
-
-	/*if (m_input_manager->IsButtonDown(BTN_UP)){
-		dir += Ogre::Vector3(0.0f, 0.0f, -1.0f);
-	}
-	else if (m_input_manager->IsButtonDown(BTN_DOWN)){
-		dir += Ogre::Vector3(0.0f, 0.0f, 1.0f);
-	}*/
-
 	if (dir != Ogre::Vector3::ZERO){
-		m_messenger->Notify(MSG_SFX2D_STOP, &m_walk_sound);
-	}
-	else{
 		m_messenger->Notify(MSG_SFX2D_PLAY, &m_walk_sound);
+	}
+	else
+	{
+		m_messenger->Notify(MSG_SFX2D_STOP, &m_walk_sound);
 	}
 
 	if (!m_is_creating_bubble){
@@ -147,7 +131,11 @@ void PlayerInputComponent::Normal(float dt){
 		bool jumping = false;
 		m_messenger->Notify(MSG_CHARACTER_CONROLLER_JUMP, &jumping);
 	}
-	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &dir);
+
+
+	Ogre::Vector3 acc = Ogre::Vector3::ZERO;
+	Acceleration(dir, acc, dt);
+	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &acc);
 }
 
 void PlayerInputComponent::OnBubble(float dt){
@@ -235,4 +223,42 @@ void PlayerInputComponent::Bouncing(float dt){
 	}
 
 	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &dir);
+}
+
+void PlayerInputComponent::Acceleration(Ogre::Vector3& dir, Ogre::Vector3& acc, float dt){
+	if (dir.x != 0.0f){
+		if (dir.x < 0.0f){
+			m_acc_x = std::max(m_acc_x - (m_velocity*dt), -m_max_velocity);
+		}
+		else if (dir.x > 0.0f){
+			m_acc_x = std::min(m_acc_x + (m_velocity*dt), m_max_velocity);
+		}
+	}
+	else{
+		if (m_acc_x < 0.0f){
+			m_acc_x = std::min(m_acc_x + (m_deacc*dt), 0.0f);
+		}
+		else if (m_acc_x > 0.0f){
+			m_acc_x = std::max(m_acc_x - (m_deacc*dt), 0.0f);
+		}
+	}
+
+	if (dir.z != 0.0f){
+		if (dir.z < 0.0f){
+			m_acc_z = std::max(m_acc_z - (m_velocity*dt), -m_max_velocity);
+		}
+		else if (dir.z > 0.0f){
+			m_acc_z = std::min(m_acc_z + (m_velocity*dt), m_max_velocity);
+		}
+	}
+	else {
+		if (m_acc_z < 0.0f){
+			m_acc_z = std::min(m_acc_z + (m_deacc*dt), 0.0f);
+		}
+		else if (m_acc_z > 0.0f){
+			m_acc_z = std::max(m_acc_z - (m_deacc*dt), 0.0f);
+		}
+	}
+	acc.x += m_acc_x;
+	acc.z += m_acc_z;
 }

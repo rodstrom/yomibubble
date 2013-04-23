@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -55,7 +55,7 @@ namespace Ogre {
 
 
         /// Get the assigned GL program id
-        GLuint getProgramID(void) const
+        const GLuint getProgramID(void) const
         { return mProgramID; }
 
 		/** Get the attribute index for a given semantic. 
@@ -103,7 +103,7 @@ namespace Ogre {
 		void bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params);
 
         /// Get the GL type for the program
-        GLuint getProgramType(void) const
+        const GLuint getProgramType(void) const
         { return mProgramType; }
 
     protected:
@@ -115,6 +115,6 @@ namespace Ogre {
 
 
 
-} // namespace Ogre
+}; // namespace Ogre
 
 #endif // __GLGpuProgram_H__

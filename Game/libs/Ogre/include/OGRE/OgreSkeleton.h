@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,6 @@ THE SOFTWARE.
 #include "OgreVector3.h"
 #include "OgreIteratorWrappers.h"
 #include "OgreStringVector.h"
-#include "OgreAnimation.h"
 
 namespace Ogre {
 	/** \addtogroup Core
@@ -48,9 +47,9 @@ namespace Ogre {
     /**  */
     enum SkeletonAnimationBlendMode {
         /// Animations are applied by calculating a weighted average of all animations
-	    ANIMBLEND_AVERAGE = 0,
+	    ANIMBLEND_AVERAGE,
         /// Animations are applied by calculating a weighted cumulative total
-	    ANIMBLEND_CUMULATIVE = 1
+	    ANIMBLEND_CUMULATIVE
     };
 
 #define OGRE_MAX_NUM_BONES 256
@@ -83,7 +82,7 @@ namespace Ogre {
         Skeleton definitions are loaded from datafiles, namely the .skeleton file format. They
         are loaded on demand, especially when referenced by a Mesh.
     */
-    class _OgreExport Skeleton : public Resource, public AnimationContainer
+    class _OgreExport Skeleton : public Resource
     {
 		friend class SkeletonInstance;
 	protected:
@@ -221,15 +220,7 @@ namespace Ogre {
 			where this is coming from.
 		*/
         virtual Animation* getAnimation(const String& name, 
-			const LinkedSkeletonAnimationSource** linker) const;
-
-		/** Returns the named Animation object.
-		 @remarks
-			 Will pick up animations in linked skeletons 
-			 (@see addLinkedSkeletonAnimationSource). 
-		 @param name The name of the animation
-		 */
-		virtual Animation* getAnimation(const String& name) const;
+			const LinkedSkeletonAnimationSource** linker = 0) const;
 
 		/// Internal accessor for animations (returns null if animation does not exist)
 		virtual Animation* _getAnimationImpl(const String& name, 
@@ -237,7 +228,7 @@ namespace Ogre {
 
 
 		/** Returns whether this skeleton contains the named animation. */
-		virtual bool hasAnimation(const String& name) const;
+		virtual bool hasAnimation(const String& name);
 
         /** Removes an Animation from this skeleton. */
         virtual void removeAnimation(const String& name);
@@ -375,10 +366,10 @@ namespace Ogre {
             will adjust keyframes of the source skeleton to match this skeleton
             automatically.
         @par
-            It's useful for exporting skeleton animations separately. i.e. export
+            It's useful for export skeleton animations seperately. i.e. export
             mesh and 'master' skeleton at the same time, and then other animations
-            will export separately (even if used completely difference binding
-            pose), finally, merge separately exported animations into 'master'
+            will export seperately (even if used completely difference binding
+            pose), finally, merge seperately exported animations into 'master'
             skeleton.
         @param
             source Pointer to source skeleton. It'll keep unmodified.

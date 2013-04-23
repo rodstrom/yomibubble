@@ -1,6 +1,8 @@
 #ifndef _N_COMPONENTS_PREREQ_H_
 #define _N_COMPONENTS_PREREQ_H_
 
+#include <functional>
+
 enum EComponentType{
 	COMPONENT_NONE = 0,
 	COMPONENT_RENDERER ,
@@ -15,12 +17,15 @@ enum EComponentType{
 	COMPONENT_CAMERA,
 	COMPONENT_POINT2POINT_CONSTRAINT,
 	COMPONENT_FOLLOW_CAMERA,
+	COMPONENT_NODE,
+	COMPONENT_TRIGGER,
 	COMPONENT_SIZE
 };
 
 enum EComponentMsg{
 	MSG_ADD_FORCE = 0,
 	MSG_NODE_GET_NODE,
+	MSG_NODE_ATTACH_ENTITY,
 	MSG_MESH_RENDERER_GET_ENTITY,
 	MSG_RIGIDBODY_GET_BODY,
 	MSG_RIGIDBODY_GRAVITY_SET,
@@ -52,6 +57,10 @@ enum EComponentMsg{
 	MSG_MUSIC3D_STOP,
 	MSG_INCREASE_SCALE_BY_VALUE,
 	MSG_SET_OBJECT_POSITION,
+	MSG_OVERLAY_HOVER_ENTER,
+	MSG_OVERLAY_HOVER_EXIT,
+	MSG_OVERLAY_CALLBACK,
+	MSG_CREATE_PARTICLE,
 	MSG_PLAYER_INPUT_SET_BUBBLE,
 	MSG_PLAYER_INPUT_SET_STATE,
 	MSG_SIZE
@@ -98,9 +107,14 @@ protected:
 
 class IComponentObserver{
 public:
-	IComponentObserver(void){}
+	IComponentObserver(void){ m_id = "component" + NumberToString(m_object_counter); }
 	virtual ~IComponentObserver(void){}
 	virtual void Notify(int type, void* message) = 0;
+	void SetId(const Ogre::String& id) { m_id = id; }
+	const Ogre::String& GetId() const { return m_id; }
+protected:
+	Ogre::String m_id;
+	static int m_object_counter;
 };
 
 class IComponentUpdateable{
@@ -139,6 +153,27 @@ struct CharControllerJumpDef{
 struct AddForceMsg{
 	Ogre::Vector3 pwr;
 	Ogre::Vector3 dir;
+};
+
+struct ButtonDef{
+	Ogre::String mat_hover;
+	Ogre::String mat_exit;
+	Ogre::String cont_name;
+	Ogre::String overlay_name;
+	Ogre::String mat_start_button;
+	std::function<void()> func;
+};
+struct ParticleDef{
+	Ogre::String particle_name;
+};
+
+struct TriggerDef{
+	TriggerDef(void) : x(0.0f), y(0.0f), radius(0.0f), type(0){}
+	int type;
+	float x;
+	float y;
+	float z;
+	float radius;
 };
 
 #endif // _N_COMPONENTS_PREREQ_H_

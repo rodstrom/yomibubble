@@ -5,27 +5,29 @@
 #include "..\Components\VisualComponents.h"
 #include "..\Components\PhysicsComponents.h"
 #include "..\Components\CameraComponents.h"
+#include "..\Components\AIComponents.h"
 #include "InputManager.h"
 #include "..\Components\AudioComponents.h"
 #include "..\Components\PlayerInputComponent.h"
-#include "..\Audio\SoundManager.h"
+#include "..\Managers\SoundManager.h"
 
 GameObjectManager::GameObjectManager(void) : 
 	m_physics_engine(NULL), m_scene_manager(NULL), m_input_manager(NULL), m_viewport(NULL){}
 GameObjectManager::~GameObjectManager(void){}
 
-void GameObjectManager::Init(PhysicsEngine* physics_engine, Ogre::SceneManager* scene_manager, InputManager* input_manager, Ogre::Viewport* viewport, SoundManager* sound_manager){
+void GameObjectManager::Init(PhysicsEngine* physics_engine, Ogre::SceneManager* scene_manager, InputManager* input_manager, Ogre::Viewport* viewport, SoundManager* sound_manager){	
 	m_physics_engine = physics_engine;
 	m_scene_manager = scene_manager;
 	m_input_manager = input_manager;
 	m_viewport = viewport;
 	m_sound_manager = sound_manager;
-	m_create_fptr[GAME_OBJECT_PLAYER] =			&GameObjectManager::CreatePlayer;
+	m_create_fptr[GAME_OBJECT_PLAYER]      =	&GameObjectManager::CreatePlayer;
 	m_create_fptr[GAME_OBJECT_BLUE_BUBBLE] =	&GameObjectManager::CreateBlueBubble;
 	m_create_fptr[GAME_OBJECT_PINK_BUBBLE] =	&GameObjectManager::CreatePinkBubble;
-	m_create_fptr[GAME_OBJECT_TOTT] =			&GameObjectManager::CreateTott;
-	m_create_fptr[GAME_OBJECT_PLANE] =			&GameObjectManager::CreatePlane;
+	m_create_fptr[GAME_OBJECT_TOTT]        =	&GameObjectManager::CreateTott;
+	m_create_fptr[GAME_OBJECT_PLANE]       =	&GameObjectManager::CreatePlane;
 	m_create_fptr[GAME_OBJECT_OVERLAY]	   =	&GameObjectManager::Create2DOverlay;
+	m_create_fptr[GAME_OBJECT_LEAF]		   =	&GameObjectManager::CreateLeaf;
 }
 
 void GameObjectManager::Update(float dt){
@@ -102,6 +104,8 @@ void GameObjectManager::Shut(){
 GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void* data){
 	CharControllerDef& def = *static_cast<CharControllerDef*>(data);
 	GameObject* go = new GameObject(GAME_OBJECT_PLAYER);
+	NodeComponent* node_comp = new NodeComponent;
+	go->AddComponent(node_comp);
 	AnimationComponent* acomp = new AnimationComponent;
 	acomp->AddAnimationStates(2);
 	go->AddComponent(acomp);
@@ -109,7 +113,6 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	CharacterController* contr = new CharacterController;
 	go->AddComponent(contr);
 	go->AddUpdateable(contr);
-	//go->AddLateUpdate(contr);
 	FollowCameraComponent* fcc = new FollowCameraComponent;
 	go->AddComponent(fcc);
 	go->AddUpdateable(fcc);
@@ -124,37 +127,55 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	go->AddComponent(sound3D);
 	Music2DComponent* music2D = new Music2DComponent;
 	go->AddComponent(music2D);
-	
+	Music3DComponent* music3D = new Music3DComponent;
+	go->AddComponent(music3D);
+
+	node_comp->Init(position, m_scene_manager);
+	node_comp->SetId("player_node");
 	acomp->Init("sphere.mesh", m_scene_manager);
-	Ogre::Vector3 scale(0.002f);
-	acomp->GetSceneNode()->setScale(scale);
+	Ogre::Vector3 scale(0.002);
+	node_comp->GetSceneNode()->setScale(scale);
 	//acomp->Init("yomi.mesh", m_scene_manager);
+	
 	contr->Init(position, acomp->GetEntity(), def.step_height, m_physics_engine);
 	contr->SetTurnSpeed(def.turn_speed);
 	contr->SetVelocity(def.velocity);
 	contr->SetJumpPower(200.0f);
 	contr->HasFollowCam(true);
-	pccomp->Init(m_input_manager);
+	contr->SetMaxVelocity(def.max_velocity);
+	contr->SetDeacceleration(def.deacceleration);
+	contr->SetMaxJumpHeight(def.max_jump_height);
+	contr->SetId("body");
+	pccomp->Init(m_input_manager, m_sound_manager);
+	pccomp->SetMaxVelocity(def.max_velocity);
+	pccomp->SetVelocity(def.velocity);
+	pccomp->SetDeacceleration(def.deacceleration);
 	sound2D->Init(m_sound_manager);
 	sound3D->Init(m_sound_manager);
 	music2D->Init(m_sound_manager);
+	music3D->Init(m_sound_manager);
 	fcc->Init(m_scene_manager, m_viewport, true);
 	fcc->GetCamera()->setNearClipDistance(0.1f);
 	//fcc->GetCamera()->setFarClipDistance(1000);
-	csnc->Init(Ogre::Vector3(0.0f, 0.0f, 1.0f), "CreateBubble", acomp->GetSceneNode());
+	csnc->Init(Ogre::Vector3(0.0f, 0.0f, 1.0f), "CreateBubble", node_comp->GetSceneNode());
+	m_sound_manager->GetYomiNode(node_comp->GetSceneNode()->getName());
+
 	return go;
 }
 
 GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, void* data){
 	GameObject* go = new GameObject(GAME_OBJECT_BLUE_BUBBLE);
+	NodeComponent* node_comp = new NodeComponent;
+	go->AddComponent(node_comp);
 	MeshRenderComponent* mrc = new MeshRenderComponent;
 	go->AddComponent(mrc);
 	RigidbodyComponent* rc = new RigidbodyComponent;
 	go->AddComponent(rc);
 
-	mrc->Init("sphere.mesh", m_scene_manager);
+	node_comp->Init(position, m_scene_manager);
+	mrc->Init("cube.mesh", m_scene_manager);
 	Ogre::Vector3 scale(0.002f);
-	mrc->GetSceneNode()->setScale(scale);
+	node_comp->GetSceneNode()->setScale(scale);
 	mrc->GetEntity()->setMaterialName("Examples/BlueBubble");
 	rc->Init(position,  mrc->GetEntity(), m_physics_engine, 1.0f, COLLIDER_SPHERE, DYNAMIC_BODY);
 	rc->GetRigidbody()->setGravity(btVector3(0.0f, 0.0f, 0.0f));
@@ -165,14 +186,17 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 
 GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, void* data){
 	GameObject* go = new GameObject(GAME_OBJECT_BLUE_BUBBLE);
+	NodeComponent* node_comp = new NodeComponent;
+	go->AddComponent(node_comp);
 	MeshRenderComponent* mrc = new MeshRenderComponent;
 	go->AddComponent(mrc);
 	RigidbodyComponent* rc = new RigidbodyComponent;
 	go->AddComponent(rc);
 
-	mrc->Init("sphere.mesh", m_scene_manager);
+	node_comp->Init(position, m_scene_manager);
+	mrc->Init("cube.mesh", m_scene_manager);
 	Ogre::Vector3 scale(0.002f);
-	mrc->GetSceneNode()->setScale(scale);
+	node_comp->GetSceneNode()->setScale(scale);
 	mrc->GetEntity()->setMaterialName("Examples/PinkBubble");
 	rc->Init(position,  mrc->GetEntity(), m_physics_engine, 1.0f, COLLIDER_SPHERE, DYNAMIC_BODY);
 	rc->GetRigidbody()->setGravity(btVector3(0.0f, 0.0f, 0.0f));
@@ -182,9 +206,13 @@ GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, v
 	return go;
 }
 
+
+
 GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* data){
 	CharControllerDef& def = *static_cast<CharControllerDef*>(data);
 	GameObject* go = new GameObject(GAME_OBJECT_TOTT);
+	NodeComponent* node_comp = new NodeComponent;
+	go->AddComponent(node_comp);
 	AnimationComponent* acomp = new AnimationComponent;
 	acomp->AddAnimationStates(1);
 	go->AddComponent(acomp);
@@ -192,10 +220,18 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 	CharacterController* contr = new CharacterController;
 	go->AddComponent(contr);
 	go->AddUpdateable(contr);
+	WayPointComponent* way_point = new WayPointComponent;
+	go->AddComponent(way_point);
+	go->AddUpdateable(way_point);
 
+	node_comp->Init(position, m_scene_manager);
 	acomp->Init("sphere.mesh", m_scene_manager);
-	Ogre::Vector3 scale(0.002f);
-	acomp->GetSceneNode()->setScale(scale);
+	Ogre::Vector3 scale(0.002);
+	node_comp->GetSceneNode()->setScale(scale);
+	m_sound_manager->GetTottNode(node_comp->GetSceneNode()->getName());
+	way_point->Init(node_comp->GetSceneNode(), 0.001);
+	way_point->AddWayPoint(Ogre::Vector3(15.0f, -10.0f, 21.0f));
+	
 	contr->Init(position, acomp->GetEntity(), def.step_height, m_physics_engine);
 	contr->SetTurnSpeed(def.turn_speed);
 	contr->SetVelocity(def.velocity);
@@ -206,11 +242,14 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 
 GameObject* GameObjectManager::CreatePlane(const Ogre::Vector3& position, void* data){
 	GameObject* go = new GameObject(GAME_OBJECT_PLANE);
+	NodeComponent* node_comp = new NodeComponent;
+	go->AddComponent(node_comp);
 	MeshRenderComponent* mrc = new MeshRenderComponent;
 	go->AddComponent(mrc);
 	RigidbodyComponent* rc = new RigidbodyComponent;
 	go->AddComponent(rc);
 	
+	node_comp->Init(position, m_scene_manager);
 	PlaneDef& plane_def = *static_cast<PlaneDef*>(data);
 	mrc->Init(plane_def.plane_name, m_scene_manager);
 	mrc->GetEntity()->setMaterialName(plane_def.material_name);
@@ -218,20 +257,46 @@ GameObject* GameObjectManager::CreatePlane(const Ogre::Vector3& position, void* 
 	rc->Init(position, mrc->GetEntity(), m_physics_engine, 0.0f, COLLIDER_TRIANGLE_MESH_SHAPE, STATIC_BODY);
 	rc->GetRigidbody()->setRestitution(plane_def.restitution);
 	rc->GetRigidbody()->setFriction(plane_def.friction);
-	mrc->GetSceneNode()->setPosition(BtOgre::Convert::toOgre(rc->GetRigidbody()->getWorldTransform().getOrigin()));
+	//mrc->GetSceneNode()->setPosition(BtOgre::Convert::toOgre(rc->GetRigidbody()->getWorldTransform().getOrigin()));
 
 	return go;
 }
 GameObject* GameObjectManager::Create2DOverlay(const Ogre::Vector3& position, void* data) {
+	ButtonDef& buttonDef = *static_cast<ButtonDef*>(data);
 	GameObject* go = new GameObject;
-	Overlay2DComponent* overlayComp = new Overlay2DComponent;
-	go->AddComponent(overlayComp);
-	OverlayCollisionCallback* overlayCallBack = new OverlayCollisionCallback;
+	//Overlay2DComponent* overlayComp = new Overlay2DComponent;
+	//go->AddComponent(overlayComp);
+	OverlayCollisionCallbackComponent* overlayCallBack = new OverlayCollisionCallbackComponent;
 	go->AddComponent(overlayCallBack);
 	go->AddUpdateable(overlayCallBack);
-
-	overlayComp->Init(*static_cast<Ogre::String*>(data));
+	Overlay2DAnimatedComponent* overlay2DAnim = new Overlay2DAnimatedComponent;
+	go->AddComponent(overlay2DAnim);
+	OverlayCallbackComponent* overlaycallback = new OverlayCallbackComponent;
+	go->AddComponent(overlaycallback);
+	//overlayComp->Init(buttonDef.overlay_name, buttonDef.cont_name);
+	overlaycallback->Init(buttonDef.func);
 	overlayCallBack->Init(m_input_manager, m_viewport);
+	overlay2DAnim->Init(buttonDef.overlay_name, buttonDef.mat_hover, buttonDef.mat_exit, buttonDef.cont_name);
 
+	return go;
+}
+
+GameObject* GameObjectManager::CreateLeaf(const Ogre::Vector3& position, void* data){
+	ParticleDef& particleDef = *static_cast<ParticleDef*>(data);
+	GameObject* go = new GameObject(GAME_OBJECT_LEAF);
+	ParticleComponent* particle = new ParticleComponent;
+	go->AddComponent(particle);
+	NodeComponent* node_comp = new NodeComponent;
+	go->AddComponent(node_comp);
+	MeshRenderComponent* mrc = new MeshRenderComponent;
+	go->AddComponent(mrc);
+
+	node_comp->Init(position, m_scene_manager);
+	mrc->Init("cube.mesh", m_scene_manager);
+	Ogre::Vector3 scale(0.002, 0.002, 0.002);
+	node_comp->GetSceneNode()->setScale(scale);
+	particle->Init(m_scene_manager, "Smoke", particleDef.particle_name);
+	node_comp->GetSceneNode()->setPosition(Ogre::Vector3(position));
+	particle->CreateParticle(node_comp->GetSceneNode(), node_comp->GetSceneNode()->getPosition(), Ogre::Vector3(0,-3,0));
 	return go;
 }

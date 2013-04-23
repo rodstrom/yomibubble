@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -176,8 +176,7 @@ namespace Ogre
 			const String& getName() const { return mName; }
 			/// Get the description of this profile
 			const String& getDescription() const { return mDesc; }
-			/// Compressed vertex format supported?
-			virtual bool isVertexCompressionSupported() const = 0;		
+			
 			/// Generate / resuse a material for the terrain
 			virtual MaterialPtr generate(const Terrain* terrain) = 0;
 			/// Generate / resuse a material for the terrain
@@ -263,14 +262,6 @@ namespace Ogre
 		virtual bool canGenerateUsingDeclaration(const TerrainLayerDeclaration& decl)
 		{
 			return decl == mLayerDecl;
-		}
-		
-		/** Return whether this material generator supports using a compressed
-			vertex format. This is only possible when using shaders.
-		*/
-		virtual bool isVertexCompressionSupported() const
-		{
-			return getActiveProfile()->isVertexCompressionSupported();
 		}
 
 		/** Triggers the generator to request the options that it needs.

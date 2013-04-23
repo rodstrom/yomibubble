@@ -32,6 +32,7 @@ private:
 	GameObject* Create2DOverlay(const Ogre::Vector3& position, void* data);
 	GameObject* CreateTott(const Ogre::Vector3& position, void* data);
 	GameObject* CreatePlane(const Ogre::Vector3& position, void* data);
+	GameObject* CreateLeaf(const Ogre::Vector3& position, void* data);
 
 	typedef GameObject* (GameObjectManager::*CreateObjectFptr)(const Ogre::Vector3&, void* data);
 	
@@ -44,6 +45,7 @@ private:
 	InputManager*			m_input_manager;
 	Ogre::Viewport*			m_viewport;
 	SoundManager*			m_sound_manager;
+	Ogre::SceneNode*		m_node;
 };
 
 #endif // _N_GAME_OBJECT_MANAGER_H_

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -50,7 +50,7 @@ namespace Ogre {
 		GLSL supports multiple modular shader objects that can be attached to one program
 		object to form a single shader.  This is supported through the "attach" material script
 		command.  All the modules to be attached are listed on the same line as the attach command
-		separated by white space.
+		seperated by white space.
         
     */
     class _OgreGLExport GLSLProgram : public HighLevelGpuProgram
@@ -69,7 +69,7 @@ namespace Ogre {
             const String& group, bool isManual, ManualResourceLoader* loader);
 		~GLSLProgram();
 
-		GLhandleARB getGLHandle() const { return mGLHandle; }
+		const GLhandleARB getGLHandle() const { return mGLHandle; }
 		void attachToProgramObject( const GLhandleARB programObject );
 		void detachFromProgramObject( const GLhandleARB programObject );
 		String getAttachedShaderNames() const { return mAttachedShaderNames; }
@@ -116,9 +116,6 @@ namespace Ogre {
 		*/
 		virtual void setMaxOutputVertices(int maxOutputVertices) 
 		{ mMaxOutputVertices = maxOutputVertices; }
-
-		/// compile source into shader object
-		bool compile( const bool checkErrors = true);
 
 		/// Command object for setting macro defines
 		class CmdPreprocessorDefines : public ParamCommand
@@ -173,11 +170,13 @@ namespace Ogre {
         void populateParameterNames(GpuProgramParametersSharedPtr params);
         /// Populate the passed parameters with name->index map, must be overridden
         void buildConstantDefinitions() const;
+		/// compile source into shader object
+		bool compile( const bool checkErrors = true);
 
 	private:
 		/// GL handle for shader object
 		GLhandleARB mGLHandle;
-		/// Flag indicating if shader object successfully compiled
+		/// flag indicating if shader object successfully compiled
 		GLint mCompiled;
 		/// The input operation type for this (geometry) program
 		RenderOperation::OperationType mInputOperationType;
