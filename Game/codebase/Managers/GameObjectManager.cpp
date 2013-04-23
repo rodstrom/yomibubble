@@ -135,7 +135,7 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	acomp->Init("sphere.mesh", m_scene_manager);
 	Ogre::Vector3 scale(0.003);
 	node_comp->GetSceneNode()->setScale(scale);
-	node_comp->GetSceneNode()->setMaterialName("SolidColor/Red");
+	acomp->GetEntity()->setMaterialName("SolidColor/Red");
 	//acomp->Init("yomi.mesh", m_scene_manager);
 	
 	contr->Init(position, acomp->GetEntity(), def.step_height, m_physics_engine);
@@ -160,6 +160,9 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	//fcc->GetCamera()->setFarClipDistance(1000);
 	csnc->Init(Ogre::Vector3(0.0f, 0.0f, 1.0f), "CreateBubble", node_comp->GetSceneNode());
 	m_sound_manager->GetYomiNode(node_comp->GetSceneNode()->getName());
+
+	//DEBUGGING GRAVITY
+	contr->GetRigidbody()->setGravity(btVector3(0,0,0));
 
 	return go;
 }
@@ -229,7 +232,7 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 	acomp->Init("sphere.mesh", m_scene_manager);
 	Ogre::Vector3 scale(0.003);
 	node_comp->GetSceneNode()->setScale(scale);
-	node_comp->GetSceneNode()->setMaterialName("SolidColor/Green");
+	acomp->GetEntity()->setMaterialName("SolidColor/Green");
 	m_sound_manager->GetTottNode(node_comp->GetSceneNode()->getName());
 	way_point->Init(node_comp->GetSceneNode(), 3.0f);
 	
@@ -238,6 +241,10 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 	contr->SetVelocity(def.velocity);
 	contr->GetRigidbody()->setRestitution(def.restitution);
 	contr->GetRigidbody()->setFriction(def.friction);
+	
+	//DEBUGGING GRAVITY
+	contr->GetRigidbody()->setGravity(btVector3(0,0,0));
+
 	return go;
 }
 

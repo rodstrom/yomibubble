@@ -114,18 +114,18 @@ bool ArtifexLoader::loadZone(string zonename, bool use_cfg_settings, bool fog, b
 		if (mLoadGrass==1) createGrass();
 	}
 
-//#ifdef TSM_TERRAIN
-//	initTSM();
-//#elif defined(ETM_TERRAIN)
-//	initETM();
-//#elif defined(OT_TERRAIN)
-//	// init and load
-//	initOgreTerrain();
-//#endif
-//
-//#ifndef OT_TERRAIN
-//    loadTerrain();
-//#endif
+#ifdef TSM_TERRAIN
+	initTSM();
+#elif defined(ETM_TERRAIN)
+	initETM();
+#elif defined(OT_TERRAIN)
+	// init and load
+	initOgreTerrain();
+#endif
+
+#ifndef OT_TERRAIN
+    loadTerrain();
+#endif
 
 	string dbpath = mZonePath;
 	str_replace(dbpath,'/','\\');

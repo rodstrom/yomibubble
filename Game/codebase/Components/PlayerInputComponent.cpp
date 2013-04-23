@@ -154,7 +154,7 @@ void PlayerInputComponent::OnBubble(float dt){
 	if (m_input_manager->IsButtonPressed(BTN_START)){
 		m_player_state = PLAYER_STATE_NORMAL;
 		bool jump = true;
-		m_messenger->Notify(MSG_CHARACTER_CONROLLER_JUMP, &jump);
+		m_messenger->Notify(MSG_CHARACTER_CONTROLLER_JUMP, &jump);
 		return;
 	}
 

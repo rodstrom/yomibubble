@@ -26,7 +26,8 @@ void WayPointComponent::Update(float dt){
 	m_way_point->Update(dt);
 	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &m_way_point->m_direction);
 	float speed = m_way_point->getSpeed();
-	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_VELOCITY_SET, &speed);
+	Ogre::Vector3 speed3(speed);
+	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_VELOCITY_SET, &speed3);
 };
 
 void WayPointComponent::AddWayPoint(Ogre::Vector3 way_point){

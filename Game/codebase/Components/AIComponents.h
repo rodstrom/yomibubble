@@ -18,8 +18,6 @@ public:
 	void AddWayPoint(Ogre::Vector3 way_point);
 	void AddWayPoint(Ogre::SceneNode* scene_node);
 
-	void AddWayPoint(Ogre::Vector3 way_point);
-
 private:
 	WayPoint* m_way_point;
 };

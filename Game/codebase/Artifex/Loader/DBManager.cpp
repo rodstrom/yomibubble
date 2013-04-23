@@ -100,12 +100,28 @@ int DBManager::Load() {
 				{
 					if (i->first == "interactive") {
 						if (i->second == "player") {
-							CharControllerDef player_def(COLLIDER_CAPSULE, 0.35f, 1000.0f, 5.0f, 10.0f);
-							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(x, y, z), &player_def);
+							CharControllerDef player_def;
+							player_def.friction = 1.0f;
+							player_def.velocity = 5.0f;
+							player_def.max_velocity = 5.0f;
+							player_def.deacceleration = 16.0f;
+							player_def.jump_power = 200.0f;
+							player_def.restitution = 0.0f;
+							player_def.step_height = 0.35f;
+							player_def.turn_speed = 1000.0f;
+							player_def.max_jump_height = 10.0f;
+							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(x,y,z), &player_def);
 						}
 						else if (i->second == "tott") {
-							CharControllerDef tott_def(COLLIDER_CAPSULE, 0.35f, 500.0f, 5.0f, 10.0f);
-							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x, y, z), &tott_def);
+							CharControllerDef tott_def;
+							tott_def.friction = 1.0f;
+							tott_def.velocity = 500.0f;
+							tott_def.jump_power = 200.0f;
+							tott_def.restitution = 0.0f;
+							tott_def.step_height = 0.35f;
+							tott_def.turn_speed = 1000.0f;
+							tott_def.max_jump_height = 10.0f;
+							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y,z), &tott_def);
 						}
 						interactive = true;
 					}
@@ -116,7 +132,7 @@ int DBManager::Load() {
 					if (i->first == "sound") {
 						SoundData3D m_3D_music_data;
 						m_3D_music_data = m_sound_manager->Create3DData(i->second, 
-							static_cast<MeshRenderComponent*>(temp->GetComponent(EComponentType::COMPONENT_RENDERER))->GetSceneNode()->getName(), 
+							static_cast<NodeComponent*>(temp->GetComponent(EComponentType::COMPONENT_NODE))->GetSceneNode()->getName(), 
 							false, false, false, 1.0f, 1.0f);
 					} 
 					else if (i->first == "waypoints") {
@@ -125,17 +141,17 @@ int DBManager::Load() {
 						for(int j = 0; j < waypoints.size(); j++) tempWP->AddWayPoint(getWaypoint(waypoints.at(j)));
 					}
 					else if (i->first == "waypoint") {		//dont render the waypoints
-						//interactive = true;
+						interactive = true;
 					}
 					else if (i->first == "followable") { 
-						followables[i->second] = static_cast<MeshRenderComponent*>(temp->GetComponent(EComponentType::COMPONENT_RENDERER))->GetSceneNode();
+						followables[i->second] = static_cast<NodeComponent*>(temp->GetComponent(EComponentType::COMPONENT_NODE))->GetSceneNode();
 					}
 				}
 
 				for ( attributemap::iterator i = spawn.attributes.begin(); i != spawn.attributes.end(); i++ )
 				{
 					if (i->first == "follow") { 
-						//followers[temp] = i->second;
+						followers[temp] = i->second;
 					}
 				}
 			}
