@@ -35,6 +35,7 @@ private:
 	void PinkBubblePlayer(GameObject* pink_bubble, GameObject* player) { PlayerPinkBubble(player, pink_bubble); }
 	void PlayerPlane(GameObject* player, GameObject* plane);
 	void PlanePlayer(GameObject* plane, GameObject* player) { PlayerPlane(player, plane); }
+	void LeafPlayer(GameObject* leaf, GameObject* player);
 
 	typedef void (CollisionManager::*DoubleDispatch)(GameObject*, GameObject*);
 	typedef std::map<std::pair<int, int>, DoubleDispatch> HitMap;

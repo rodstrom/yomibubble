@@ -120,10 +120,13 @@ void AnimationComponent::SetMessenger(ComponentMessenger* messenger){
 	MeshRenderComponent::SetMessenger(messenger);
 	m_messenger->Register(MSG_ANIMATION_PLAY, this);
 	m_messenger->Register(MSG_ANIMATION_PAUSE, this);
+	m_messenger->Register(MSG_ANIMATION_BLEND, this);
 }
 
 void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager){
 	MeshRenderComponent::Init(filename, scene_manager);
+	m_animation_blender = new AnimationBlender(GetEntity());
+	//m_animation_blender->init("RunBase");
 }
 
 void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager, const Ogre::String& node_id){
@@ -169,6 +172,10 @@ void AnimationComponent::Notify(int type, void* msg){
 			}
 		}
 		break;
+	case MSG_ANIMATION_BLEND:
+		m_animation_blender->blend("RunBase", AnimationBlender::BlendWhileAnimating, 0.2, true);
+		//m_animation_blender->blend("IdleTop", AnimationBlender::BlendWhileAnimating, 0.2, true);
+		break;
 	default:
 		break;
 	}
@@ -185,6 +192,7 @@ void AnimationComponent::Shut(){
 	m_animation_states.clear();
 	m_messenger->Unregister(MSG_ANIMATION_PLAY, this);
 	m_messenger->Unregister(MSG_ANIMATION_PAUSE, this);
+	m_messenger->Unregister(MSG_ANIMATION_BLEND, this);
 	MeshRenderComponent::Shut();
 }
 
@@ -307,8 +315,7 @@ void Overlay2DAnimatedComponent::Init(const Ogre::String& p_overlay_name, const 
 	m_material_name_hover = p_material_name_hover;
 	m_material_name_exit = p_material_name_exit;
 	m_cont_name = p_cont_name;
-	Overlay2DComponent::Init(p_overlay_name, p_cont_name);
-	
+	Overlay2DComponent::Init(p_overlay_name, p_cont_name);	
 }
 
 void Overlay2DAnimatedComponent::Update(float dt){
@@ -395,3 +402,79 @@ void ParticleComponent::Shut(){
 	m_messenger->Unregister(MSG_CREATE_PARTICLE, this);
 	m_particle_system->removeAllEmitters();
 }
+
+void CountableResourceGUI::Notify(int type, void* message){
+	
+	if (type == MSG_LEAF_PICKUP)
+	{
+		if (m_current_number < m_total_number)
+		{
+			m_current_number++;
+			
+			for(int i = 0; i < m_current_number; i++)
+			{
+				m_elements[i]->setMaterialName(m_material_name_active);
+			}
+		}
+	}
+};
+
+void CountableResourceGUI::Shut(){
+	m_messenger->Unregister(MSG_LEAF_PICKUP, this);
+	for (int i = 0; i < m_elements.size(); i++)
+	{
+		//delete m_elements.end();
+		m_elements[i]=NULL;
+		//delete m_elements[i];
+	}
+};
+
+void CountableResourceGUI::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
+	m_messenger->Register(MSG_LEAF_PICKUP, this);
+};
+
+void CountableResourceGUI::Init(const Ogre::String& material_name_inactive, const Ogre::String& material_name_active, int total_number){
+	m_total_number = total_number;
+	m_current_number = 0;
+	m_material_name_active = material_name_active;
+	m_material_name_inactive = material_name_inactive;
+
+	Ogre::OverlayManager& overlayManager = Ogre::OverlayManager::getSingleton();
+    Ogre::Overlay* overlay = overlayManager.create( "OverlayName" );
+
+	Ogre::Vector2 temppos(0.0f, 0.0f);
+
+	if (total_number < 6)
+	{ temppos.x = 0.0 + (((6-total_number)/2) * 0.15); }
+
+	float rows = total_number / 6;
+
+	int counter = 0;
+
+	for (int i = 0; i < total_number; i++)
+	{
+		if (counter == 6)
+		{
+			counter = 0;
+			temppos.x = 15.0;
+			temppos.y += 0.2;
+
+			if (total_number - i < 6)
+			{ temppos.x = 0.0 + (((6-(total_number-i))/2) * 0.15); }
+		}
+		std::ostringstream stream;
+		stream << "Panel" << i;
+		Ogre::String panel_name = stream.str();
+
+		m_elements.push_back(static_cast<Ogre::OverlayContainer*>( overlayManager.createOverlayElement( "Panel", panel_name ) ));
+		m_elements[i]->setPosition( temppos.x, temppos.y );
+		m_elements[i]->setDimensions( 0.15, 0.15 );
+		m_elements[i]->setMaterialName(m_material_name_inactive);
+		overlay->add2D(m_elements[i]);
+		counter++;
+		temppos.x += 0.15;
+	};
+
+    overlay->show();
+};

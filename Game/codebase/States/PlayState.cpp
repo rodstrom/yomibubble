@@ -5,6 +5,7 @@
 #include "..\Managers\SoundManager.h"
 #include "..\Managers\GameObjectManager.h"
 //#include "..\Components\SkyXPrereq.h"
+#include <sstream>
 
 PlayState::PlayState(void) : m_physics_engine(NULL), m_game_object_manager(NULL){}
 PlayState::~PlayState(void){}
@@ -27,26 +28,11 @@ void PlayState::Enter(){
 	m_sound_manager = new SoundManager(m_scene_manager, m_camera);
 	m_sound_manager->LoadAudio();
 	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager);
-
-	//m_basic_controller = new SkyX::BasicController();
-	//m_sky_x= new SkyX::SkyX(m_scene_manager, m_basic_controller);
-	//m_sky_x->create();
-	//m_sky_x->getVCloudsManager()->getVClouds()->setDistanceFallingParams(Ogre::Vector2(2,-1));
-	/*
-	ButtonDef buttonDef;
-	buttonDef.overlay_name = "testOverlay";
-	buttonDef.cont_name = "MyOverlayElements/TestPanel";
-	buttonDef.mat_exit = "Examples/Red";
-	buttonDef.mat_hover = "Examples/Green";
-	buttonDef.mat_start_button = "Examples/Start";
-	buttonDef.func = [this] { Test(); };
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_OVERLAY, Ogre::Vector3(0,0,0), &buttonDef);
-	*/
+	
 	/*ParticleDef particleDef;
 	particleDef.particle_name = "Particle/Smoke";
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(108,-78,130), &particleDef);	
-	*/
-
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(180,78,225), &particleDef);	
+	
 	/*Ogre::Light* light = m_scene_manager->createLight("light1");
 	light->setType(Ogre::Light::LT_DIRECTIONAL);
 	light->setDirection(Ogre::Vector3(1,-1,0));*/
@@ -105,7 +91,7 @@ void PlayState::Enter(){
 	tott_def.max_jump_height = 10.0f;
 
 	m_physics_engine->ShowDebugDraw(true);
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y+1.0f,z+3.0f), &tott_def);*/
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y+1.0f,z+3.0f), &tott_def);
 	//m_physics_engine->CreateTerrainCollision(mArtifexLoader->mTerrain);
 	//m_scene_manager->setSkyDome(true, "Examples/CloudySky");
 	
@@ -146,6 +132,6 @@ bool PlayState::Update(float dt){
 	else{
 		m_physics_engine->ShowDebugDraw(false);
 	}
-
+	/*
 	return true;
 }

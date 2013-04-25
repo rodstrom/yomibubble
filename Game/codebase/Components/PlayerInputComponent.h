@@ -21,6 +21,8 @@ public:
 	void SetMaxVelocity(float value) { m_max_velocity = value; }
 	void SetDeacceleration(float value) { m_deacc = value; }
 
+	SoundData2D m_leaf_sfx;
+
 protected:
 	void Normal(float dt);
 	void OnBubble(float dt);
@@ -42,6 +44,7 @@ protected:
 	float m_current_scale;
 	SoundData2D m_walk_sound;
 	SoundData2D m_test_sfx;
+	
 	SoundData2D m_def_music;
 	SoundData3D m_3D_music_data;
 	int m_player_state;

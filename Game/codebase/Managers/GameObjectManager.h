@@ -33,6 +33,7 @@ private:
 	GameObject* CreateTott(const Ogre::Vector3& position, void* data);
 	GameObject* CreatePlane(const Ogre::Vector3& position, void* data);
 	GameObject* CreateLeaf(const Ogre::Vector3& position, void* data);
+	GameObject* CreateGUI(const Ogre::Vector3& position, void* data);
 
 	typedef GameObject* (GameObjectManager::*CreateObjectFptr)(const Ogre::Vector3&, void* data);
 	

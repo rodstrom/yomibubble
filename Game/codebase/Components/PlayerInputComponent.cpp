@@ -41,7 +41,8 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 	m_def_music= sound_manager->Create2DData("Menu_Theme", false, false, false, false, 1.0f, 1.0f);
 	m_test_sfx = sound_manager->Create2DData("Dun_Dun", true, false, false, false, 1.0f, 1.0f);
 	m_3D_music_data = sound_manager->Create3DData("Main_Theme", "", false, false, false, 1.0f, 1.0f);
-	
+	m_leaf_sfx = sound_manager->Create2DData("Take_Leaf", false, false, false, false, 1.0f, 1.0f);
+
 	m_states[PLAYER_STATE_NORMAL] =			&PlayerInputComponent::Normal;
 	m_states[PLAYER_STATE_ON_BUBBLE] =		&PlayerInputComponent::OnBubble;
 	m_states[PLAYER_STATE_INSIDE_BUBBLE] =	&PlayerInputComponent::InsideBubble;
@@ -60,6 +61,16 @@ void PlayerInputComponent::Normal(float dt){
 
 	if (dir != Ogre::Vector3::ZERO){
 		m_messenger->Notify(MSG_SFX2D_PLAY, &m_walk_sound);
+		AnimationMsg msg;
+		msg.id="RunBase"; //SliceHorizontal är en top anim
+		msg.index=0;
+		m_messenger->Notify(MSG_ANIMATION_PLAY, &msg);
+		//m_messenger->Notify(MSG_ANIMATION_BLEND, &msg);
+		AnimationMsg msg2;
+		msg.id="SliceHorizontal"; //SliceHorizontal är en top anim
+		msg.index=1;
+		m_messenger->Notify(MSG_ANIMATION_PLAY, &msg);
+
 	}
 	else
 	{

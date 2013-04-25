@@ -33,6 +33,7 @@ enum EComponentMsg{
 	MSG_RIGIDBODY_APPLY_IMPULSE,
 	MSG_ANIMATION_PLAY,
 	MSG_ANIMATION_PAUSE,
+	MSG_ANIMATION_BLEND,
 	MSG_CHARACTER_CONROLLER_VELOCITY_SET,
 	MSG_CHARACTER_CONROLLER_TURN_SPEED_SET,
 	MSG_CHARACTER_CONTROLLER_SET_DIRECTION,
@@ -61,6 +62,7 @@ enum EComponentMsg{
 	MSG_OVERLAY_HOVER_EXIT,
 	MSG_OVERLAY_CALLBACK,
 	MSG_CREATE_PARTICLE,
+	MSG_LEAF_PICKUP,
 	MSG_PLAYER_INPUT_SET_BUBBLE,
 	MSG_PLAYER_INPUT_SET_STATE,
 	MSG_SIZE
@@ -163,6 +165,15 @@ struct ButtonDef{
 	Ogre::String mat_start_button;
 	std::function<void()> func;
 };
+
+struct GuiDef{
+	Ogre::String tex_act;
+	Ogre::String tex_inact;
+	Ogre::String name;
+	Ogre::String cont_name;
+	int num_elems;
+};
+
 struct ParticleDef{
 	Ogre::String particle_name;
 };

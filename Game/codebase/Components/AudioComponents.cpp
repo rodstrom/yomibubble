@@ -30,6 +30,8 @@ void Sound2DComponent::Notify(int type, void* message){
 
 void Sound2DComponent::Shut(){
 	m_sound_manager = NULL;
+	m_messenger->Unregister(MSG_SFX2D_STOP, this);
+	m_messenger->Unregister(MSG_SFX2D_PLAY, this);
 };
 	
 void Sound2DComponent::Init(SoundManager* sound_manager){
@@ -68,6 +70,8 @@ void Sound3DComponent::Notify(int type, void* message){
 	
 void Sound3DComponent::Shut(){
 	m_sound_manager = NULL;
+	m_messenger->Unregister(MSG_SFX3D_STOP, this);
+	m_messenger->Unregister(MSG_SFX3D_PLAY, this);
 };
 	
 void Sound3DComponent::Init(SoundManager* sound_manager){
@@ -103,6 +107,8 @@ void Music2DComponent::Notify(int type, void* message){
 
 void Music2DComponent::Shut(){
 	m_sound_manager = NULL;
+	m_messenger->Unregister(MSG_MUSIC2D_STOP, this);
+	m_messenger->Unregister(MSG_MUSIC2D_PLAY, this);
 };
 
 void Music2DComponent::Init(SoundManager* sound_manager){
@@ -140,6 +146,8 @@ void Music3DComponent::Notify(int type, void* message){
 	
 void Music3DComponent::Shut(){
 	m_sound_manager = NULL;
+	m_messenger->Unregister(MSG_MUSIC3D_STOP, this);
+	m_messenger->Unregister(MSG_MUSIC3D_PLAY, this);
 };
 	
 void Music3DComponent::Init(SoundManager* sound_manager){
