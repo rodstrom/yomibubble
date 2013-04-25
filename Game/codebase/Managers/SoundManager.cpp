@@ -25,7 +25,8 @@ SoundManager::~SoundManager(){
 
 void SoundManager::LoadAudio(){
 	m_sound_manager->createSound("Yomi_Walk", "SFX/Yomi/Yomi_Walk.wav", false, false, true);
-	
+	m_sound_manager->createSound("Take_Leaf", "SFX/Yomi/Take_Leaf.wav", false, false, true);
+
 	m_sound_manager->createSound("Dun_Dun", "SFX/Tott/Bristlestick_Zoom_mono.wav", false, false, true);
 	m_sound_manager->getSound("Dun_Dun")->setMinVolume(0.0f);
 	m_sound_manager->getSound("Dun_Dun")->setMaxVolume(1.0f);
@@ -130,7 +131,7 @@ void SoundManager::Update(Ogre::Camera* camera, Ogre::SceneManager* scene_manage
 	m_ear_node->setPosition(scene_manager->getSceneNode(m_yomi_node_name)->getPosition());
 	m_ear_node->setOrientation(scene_manager->getSceneNode(m_yomi_node_name)->getOrientation());
 
-	std::cout << "Ear node pos : " << m_ear_node->getPosition() << std::endl;
+	//std::cout << "Ear node pos : " << m_ear_node->getPosition() << std::endl;
 	processSoundDeletesPending();
 }
 

@@ -2,6 +2,7 @@
 #define _N_VISUAL_COMPONENTS_H_
 
 #include "ComponentsPrereq.h"
+#include "../AnimationBlender.h"
 #include <functional>
 
 class MeshRenderComponent : public Component, public IComponentObserver {
@@ -49,7 +50,8 @@ public:
 	virtual void SetMessenger(ComponentMessenger* messenger);
 
 protected:
-	std::vector<Ogre::AnimationState*> m_animation_states;
+	std::vector<Ogre::AnimationState*>	m_animation_states;
+	AnimationBlender*					m_animation_blender;
 };
 
 class Overlay2DComponent : public Component, public IComponentObserver {
@@ -105,6 +107,25 @@ protected:
 	Ogre::String			m_overlay_name;
 	Ogre::String			m_cont_name;
 	Ogre::String			m_material_start_button;
+};
+
+class CountableResourceGUI : public Component, public IComponentObserver{
+public:
+	CountableResourceGUI(void){}
+	virtual ~CountableResourceGUI(void){}
+	virtual void Notify(int type, void*message);
+	virtual void Shut();
+	virtual void SetMessenger(ComponentMessenger* messenger);
+	void Init(const Ogre::String& material_name_inactive, const Ogre::String& material_name_active, int total_number);
+
+protected:
+	int						m_total_number;
+	int						m_current_number;
+
+	Ogre::String			m_material_name_active;
+	Ogre::String			m_material_name_inactive;
+	
+	std::vector<Ogre::OverlayContainer*> m_elements;
 };
 
 class OverlayCallbackComponent : public Component, public IComponentObserver{

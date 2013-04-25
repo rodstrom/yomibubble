@@ -30,6 +30,7 @@ void GameObjectManager::Init(PhysicsEngine* physics_engine, Ogre::SceneManager* 
 	m_create_fptr[GAME_OBJECT_TOTT]        =	&GameObjectManager::CreateTott;
 	m_create_fptr[GAME_OBJECT_PLANE]       =	&GameObjectManager::CreatePlane;
 	m_create_fptr[GAME_OBJECT_OVERLAY]	   =	&GameObjectManager::Create2DOverlay;
+	m_create_fptr[GAME_OBJECT_GUI]		   =	&GameObjectManager::CreateGUI;
 	m_create_fptr[GAME_OBJECT_LEAF]		   =	&GameObjectManager::CreateLeaf;
 }
 
@@ -133,9 +134,11 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	go->AddComponent(music2D);
 	Music3DComponent* music3D = new Music3DComponent;
 	go->AddComponent(music3D);
+	CountableResourceGUI* gui = new CountableResourceGUI;
+	go->AddComponent(gui);
 
-	acomp->Init("sphere.mesh", m_scene_manager);
-	Ogre::Vector3 scale(0.002);
+	acomp->Init("Sinbad.mesh", m_scene_manager);
+	Ogre::Vector3 scale(0.202);
 	acomp->GetSceneNode()->setScale(scale);
 	//acomp->Init("yomi.mesh", m_scene_manager);
 	contr->Init(position, acomp->GetEntity(), def.step_height, m_physics_engine);
@@ -148,6 +151,7 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	sound3D->Init(m_sound_manager);
 	music2D->Init(m_sound_manager);
 	music3D->Init(m_sound_manager);
+	gui->Init("Examples/Empty", "Examples/Filled", 10);
 	fcc->Init(m_scene_manager, m_viewport, true);
 	fcc->GetCamera()->setNearClipDistance(0.1f);
 	//fcc->GetCamera()->setFarClipDistance(1000);
@@ -164,7 +168,7 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 	RigidbodyComponent* rc = new RigidbodyComponent;
 	go->AddComponent(rc);
 
-	mrc->Init("cube.mesh", m_scene_manager);
+	mrc->Init("sphere.mesh", m_scene_manager);
 	Ogre::Vector3 scale(0.002f);
 	mrc->GetSceneNode()->setScale(scale);
 	mrc->GetEntity()->setMaterialName("Examples/BlueBubble");
@@ -182,7 +186,7 @@ GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, v
 	RigidbodyComponent* rc = new RigidbodyComponent;
 	go->AddComponent(rc);
 
-	mrc->Init("cube.mesh", m_scene_manager);
+	mrc->Init("sphere.mesh", m_scene_manager);
 	Ogre::Vector3 scale(0.002f);
 	mrc->GetSceneNode()->setScale(scale);
 	mrc->GetEntity()->setMaterialName("Examples/PinkBubble");
@@ -265,6 +269,18 @@ GameObject* GameObjectManager::Create2DOverlay(const Ogre::Vector3& position, vo
 	return go;
 }
 
+GameObject* GameObjectManager::CreateGUI(const Ogre::Vector3& position, void* data){
+	GuiDef& guiDef = *static_cast<GuiDef*>(data);
+	GameObject* go = new GameObject;
+
+	CountableResourceGUI* gui = new CountableResourceGUI;
+	go->AddComponent(gui);
+
+	gui->Init(guiDef.tex_inact, guiDef.tex_act, guiDef.num_elems);
+	
+	return go;
+};
+
 GameObject* GameObjectManager::CreateLeaf(const Ogre::Vector3& position, void* data){
 	ParticleDef& particleDef = *static_cast<ParticleDef*>(data);
 	GameObject* go = new GameObject(GAME_OBJECT_LEAF);
@@ -272,10 +288,13 @@ GameObject* GameObjectManager::CreateLeaf(const Ogre::Vector3& position, void* d
 	go->AddComponent(particle);
 	MeshRenderComponent* mrc = new MeshRenderComponent;
 	go->AddComponent(mrc);
+	RigidbodyComponent* rb = new RigidbodyComponent;
+	go->AddComponent(rb);
 
 	mrc->Init("cube.mesh", m_scene_manager);
 	Ogre::Vector3 scale(0.002, 0.002, 0.002);
 	mrc->GetSceneNode()->setScale(scale);
+	rb->Init(position, mrc->GetEntity(), m_physics_engine, 1, COLLIDER_BOX, STATIC_BODY);
 	particle->Init(m_scene_manager, "Smoke", particleDef.particle_name);
 	mrc->GetSceneNode()->setPosition(Ogre::Vector3(position));
 	particle->CreateParticle(mrc->GetSceneNode(), mrc->GetSceneNode()->getPosition(), Ogre::Vector3(0,-3,0));
