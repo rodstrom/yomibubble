@@ -2,6 +2,8 @@
 #include "PhysicsEngine.h"
 #include "Components\GameObject.h"
 #include "Components\GameObjectPrereq.h"
+#include "Components\PhysicsComponents.h"
+#include "Managers\CollisionManager.h"
 
 PhysicsEngine::PhysicsEngine(void) : 
 	m_broadphase(NULL), 
@@ -76,6 +78,7 @@ void PhysicsEngine::ShowDebugDraw(bool value){
 }
 
 void PhysicsEngine::Step(float dt){
+	
 	float fixed_time_step = 1.0f/60.0f;
 	float physics_time = dt / 1000.0f;
 
@@ -83,11 +86,12 @@ void PhysicsEngine::Step(float dt){
 	while (fixed_time_step > (float)max_steps * fixed_time_step){
 		max_steps++;
 	}
-
+	
 	m_dynamic_world->stepSimulation(dt, max_steps);
 	if (m_debug_drawer){
 		m_debug_drawer->step();
 	}
+	RaycastQuery();
 }
 
 void PhysicsEngine::CreateTerrainCollision(Ogre::Terrain* terrain){
@@ -139,4 +143,29 @@ void PhysicsEngine::CreateTerrainCollision(Ogre::Terrain* terrain){
 
 void PhysicsEngine::DestroyTerrainCollision(){
 
+}
+
+void PhysicsEngine::RaycastQuery(){
+	if (!m_raycast_components.empty()){
+		for (unsigned int i = 0; i < m_raycast_components.size(); i++){
+			RaycastDef& def = m_raycast_components[i]->GetRaycastDef();
+			btVector3 from = def.origin;
+			btVector3 to = def.origin + def.length;
+			if (m_debug_drawer){
+				m_debug_drawer->drawLine(from, to, btVector4(0,0,0,1));
+			}
+			btCollisionWorld::AllHitsRayResultCallback re(from,to);
+			m_dynamic_world->rayTest(from, to, re);
+			for (unsigned int i = 0; i < re.m_collisionObjects.size(); i++){
+				CollisionManager::GetSingletonPtr()->ProcessCollision(def.collision_object, re.m_collisionObjects[i]);
+			}
+		}
+	}
+}
+
+void PhysicsEngine::RemoveRaycastComponent(RaycastComponent* comp){
+	std::vector<RaycastComponent*>::iterator it = std::find(m_raycast_components.begin(), m_raycast_components.end(), comp);
+	if (it != m_raycast_components.end()){
+		m_raycast_components.erase(it);
+	}
 }

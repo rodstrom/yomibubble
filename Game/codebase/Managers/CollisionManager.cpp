@@ -8,9 +8,25 @@
 #include "..\Components\PlayerInputComponent.h"
 #include <memory>
 
+CollisionManager* CollisionManager::m_instance = NULL;
+
+CollisionManager* CollisionManager::GetSingletonPtr(){
+	if (!m_instance){
+		m_instance = new CollisionManager;
+	}
+	return m_instance;
+}
+
+void CollisionManager::CleanSingleton(){
+	if (m_instance){
+		delete m_instance;
+		m_instance = NULL;
+	}
+}
+
+
 bool Collision::ContactCallback(btManifoldPoint& cp, const btCollisionObjectWrapper* colObj0Wrap, int partId0, int index0, const btCollisionObjectWrapper* colObj1Wrap, int partId1, int index1){
-	static std::unique_ptr<CollisionManager> collision_manager(new CollisionManager);
-	//collision_manager->ProcessCollision(colObj0Wrap->getCollisionObject(), colObj1Wrap->getCollisionObject());
+	CollisionManager::GetSingletonPtr()->ProcessCollision(colObj0Wrap->getCollisionObject(), colObj1Wrap->getCollisionObject());
 	return false;
 }
 
@@ -24,12 +40,13 @@ void CollisionManager::Init(){
 	m_collision[MakeIntPair(GAME_OBJECT_PINK_BUBBLE, GAME_OBJECT_PINK_BUBBLE)] = &CollisionManager::PinkBubblePinkBubble;
 	m_collision[MakeIntPair(GAME_OBJECT_PINK_BUBBLE, GAME_OBJECT_BLUE_BUBBLE)] = &CollisionManager::PinkBubbleBlueBubble;
 	m_collision[MakeIntPair(GAME_OBJECT_BLUE_BUBBLE, GAME_OBJECT_PINK_BUBBLE)] = &CollisionManager::BlueBubblePinkBubble;
-	m_collision[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_BLUE_BUBBLE)] = &CollisionManager::PlayerBlueBubble;
-	m_collision[MakeIntPair(GAME_OBJECT_BLUE_BUBBLE, GAME_OBJECT_PLAYER)] = &CollisionManager::BlueBubblePlayer;
-	m_collision[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_PINK_BUBBLE)] = &CollisionManager::PlayerPinkBubble;
-	m_collision[MakeIntPair(GAME_OBJECT_PINK_BUBBLE, GAME_OBJECT_PLAYER)] = &CollisionManager::PinkBubblePlayer;
-	m_collision[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_PLANE)] = &CollisionManager::PlayerPlane;
-	m_collision[MakeIntPair(GAME_OBJECT_PLANE, GAME_OBJECT_PLAYER)] = &CollisionManager::PlanePlayer;
+
+	m_raycast_map[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_BLUE_BUBBLE)] = &CollisionManager::PlayerBlueBubble;
+	m_raycast_map[MakeIntPair(GAME_OBJECT_BLUE_BUBBLE, GAME_OBJECT_PLAYER)] = &CollisionManager::BlueBubblePlayer;
+	m_raycast_map[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_PINK_BUBBLE)] = &CollisionManager::PlayerPinkBubble;
+	m_raycast_map[MakeIntPair(GAME_OBJECT_PINK_BUBBLE, GAME_OBJECT_PLAYER)] = &CollisionManager::PinkBubblePlayer;
+	m_raycast_map[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_PLANE)] = &CollisionManager::PlayerPlane;
+	m_raycast_map[MakeIntPair(GAME_OBJECT_PLANE, GAME_OBJECT_PLAYER)] = &CollisionManager::PlanePlayer;
 }
 
 void CollisionManager::ProcessCollision(const btCollisionObject* ob_a, const btCollisionObject* ob_b){
@@ -37,6 +54,15 @@ void CollisionManager::ProcessCollision(const btCollisionObject* ob_a, const btC
 	GameObject* go_b = static_cast<GameObject*>(ob_b->getUserPointer());
 	HitMap::iterator it = m_collision.find(MakeIntPair(go_a->GetType(), go_b->GetType()));
 	if (it != m_collision.end()){
+		(this->*it->second)(go_a, go_b);
+	}
+}
+
+void CollisionManager::ProcessRaycast(const btCollisionObject* ob_a, const btCollisionObject* ob_b){
+	GameObject* go_a = static_cast<GameObject*>(ob_a->getUserPointer());
+	GameObject* go_b = static_cast<GameObject*>(ob_b->getUserPointer());
+	HitMap::iterator it = m_raycast_map.find(MakeIntPair(go_a->GetType(), go_b->GetType()));
+	if (it != m_raycast_map.end()){
 		(this->*it->second)(go_a, go_b);
 	}
 }

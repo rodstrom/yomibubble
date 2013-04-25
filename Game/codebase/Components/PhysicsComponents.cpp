@@ -2,6 +2,8 @@
 #include "PhysicsComponents.h"
 #include "..\PhysicsEngine.h"
 #include "ComponentMessenger.h"
+#include "GameObject.h"
+#include "GameObjectPrereq.h"
 
 void RigidbodyComponent::Notify(int type, void* msg){
 	switch (type){
@@ -61,7 +63,7 @@ void RigidbodyComponent::Init(const Ogre::Vector3& position, Ogre::Entity* entit
 		btScalar mass = (btScalar)p_mass;
 		btVector3 inertia;
 		m_shape->calculateLocalInertia(mass, inertia);
-
+		
 		m_motion_state = new BtOgre::RigidBodyState(m_messenger);
 		m_rigidbody = new btRigidBody(mass, m_motion_state, m_shape, inertia);
 	}
@@ -198,6 +200,18 @@ void CharacterController::Update(float dt){
 	}
 }
 
+void CharacterController::LateUpdate(float dt){
+	/*btVector3 from = m_rigidbody->getWorldTransform().getOrigin();
+	btVector3 to = from;
+	to.setY(to.y() - m_ray_length);
+	m_physics_engine->GetDebugDraw()->drawLine(from,to,btVector4(0,0,0,1));
+	btCollisionWorld::AllHitsRayResultCallback results(from, to);
+	m_physics_engine->GetDynamicWorld()->rayTest(from,to,results);
+	for (unsigned int i = 0; i < results.m_collisionObjects.size(); i++){
+		std::cout << static_cast<GameObject*>(results.m_collisionObjects[i]->getUserPointer())->GetType() << std::endl;
+	}*/
+}
+
 void CharacterController::Shut(){
 	RigidbodyComponent::Shut();
 	if (m_messenger){
@@ -219,7 +233,7 @@ void CharacterController::SetMessenger(ComponentMessenger* messenger){
 void CharacterController::Init(const Ogre::Vector3& position, Ogre::Entity* entity, float step_height, PhysicsEngine* physics_engine){
 	m_physics_engine = physics_engine;
 	BtOgre::StaticMeshToShapeConverter converter(entity);
-	m_shape = converter.createSphere();
+	m_shape = converter.createBox();
 	btTransform start_transform;
 	start_transform.setIdentity();
 	start_transform.setOrigin(BtOgre::Convert::toBullet(position));
@@ -232,9 +246,9 @@ void CharacterController::Init(const Ogre::Vector3& position, Ogre::Entity* enti
 	m_rigidbody = new btRigidBody(mass, m_motion_state, m_shape, inertia);
 	m_rigidbody->setUserPointer(m_owner);
 	m_rigidbody->setWorldTransform(start_transform);
-	m_rigidbody->setFriction(0.1f);
 	m_rigidbody->setActivationState(DISABLE_DEACTIVATION);
 	m_rigidbody->setCollisionFlags(m_rigidbody->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+	m_rigidbody->setAngularFactor(0);
 	m_physics_engine->GetDynamicWorld()->addRigidBody(m_rigidbody);
 }
 
@@ -243,7 +257,11 @@ void Point2PointConstraintComponent::Notify(int type, void* msg){
 }
 
 void Point2PointConstraintComponent::Shut(){
-
+	if (m_constraint){
+		m_physics_engine->GetDynamicWorld()->removeConstraint(m_constraint);
+		delete m_constraint;
+		m_constraint = NULL;
+	}
 }
 
 void Point2PointConstraintComponent::SetMessenger(ComponentMessenger* messenger){
@@ -256,25 +274,40 @@ void Point2PointConstraintComponent::Init(PhysicsEngine* physics_engine, btRigid
 	m_physics_engine->GetDynamicWorld()->addConstraint(m_constraint);
 }
 
-void TriggerComponent::Init(const Ogre::Vector3& pos, PhysicsEngine* physics_engine, const TriggerDef& def){
+void TriggerComponent::Init(const Ogre::Vector3& pos, PhysicsEngine* physics_engine, TriggerDef* def){
 	m_physics_engine = physics_engine;
-	switch (def.type)
+	switch (def->type)
 	{
 	case COLLIDER_BOX:
-		m_shape = new btBoxShape(btVector3(def.x, def.y, def.z));
+		m_shape = new btBoxShape(btVector3(def->x, def->y, def->z));
 		break;
 	case COLLIDER_SPHERE:
-		m_shape = new btSphereShape(def.radius);
+		m_shape = new btSphereShape(def->radius);
 		break;
 	case COLLIDER_CAPSULE:
-		m_shape = new btCapsuleShape(def.radius, def.y);
+		m_shape = new btCapsuleShape(def->radius, def->y);
 		break;
 	case COLLIDER_CYLINDER:
-		m_shape = new btCylinderShape(btVector3(def.x, def.y, def.z));
+		m_shape = new btCylinderShape(btVector3(def->x, def->y, def->z));
 		break;
 	default:
 		break;
 	}
+
+	if (def->body_type == DYNAMIC_BODY){
+		btVector3 inertia;
+		m_shape->calculateLocalInertia(def->mass, inertia);
+		m_motion_state = new btDefaultMotionState;
+		m_rigidbody = new btRigidBody(def->mass, m_motion_state, m_shape, inertia);
+	}
+	else if (def->body_type == STATIC_BODY){
+		m_motion_state = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)));
+		m_rigidbody = new btRigidBody(0, m_motion_state, m_shape, btVector3(0,0,0));
+	}
+	m_rigidbody->setUserPointer(m_owner);
+	m_rigidbody->getWorldTransform().setOrigin(BtOgre::Convert::toBullet(pos));
+	m_rigidbody->setCollisionFlags(m_rigidbody->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK | btCollisionObject::CF_NO_CONTACT_RESPONSE);
+	m_physics_engine->GetDynamicWorld()->addRigidBody(m_rigidbody);
 }
 
 void TriggerComponent::Notify(int type, void* message){
@@ -282,10 +315,63 @@ void TriggerComponent::Notify(int type, void* message){
 }
 
 void TriggerComponent::Shut(){
-
+	RigidbodyComponent::Shut();
 }
 
 void TriggerComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger = messenger;
 }
 
+void Generic6DofConstraintComponent::Notify(int type, void* msg){
+
+}
+
+void Generic6DofConstraintComponent::Shut(){
+	if (m_constraint){
+		m_physics_engine->GetDynamicWorld()->removeConstraint(m_constraint);
+		delete m_constraint;
+		m_constraint = NULL;
+	}
+}
+
+void Generic6DofConstraintComponent::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
+}
+
+void Generic6DofConstraintComponent::Init(PhysicsEngine* physics_engine, btRigidBody* body_a, btRigidBody* body_b, const btVector3& pivot_a, const btVector3& pivot_b, bool linear_reference){
+	m_physics_engine = physics_engine;
+	btTransform transform_a;
+	transform_a.setIdentity();
+	transform_a.setOrigin(pivot_a);
+	btTransform transform_b;
+	transform_b.setIdentity();
+	transform_b.setOrigin(pivot_b);
+	m_constraint = new btGeneric6DofConstraint(*body_a, *body_b, transform_a, transform_b, linear_reference);
+}
+
+void RaycastComponent::Notify(int type, void* msg){
+
+}
+
+void RaycastComponent::Shut(){
+
+}
+
+void RaycastComponent::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
+}
+
+void RaycastComponent::SetLength(const Ogre::Vector3& length){
+	m_raycast_def.length = BtOgre::Convert::toBullet(length);
+}
+
+RaycastDef& RaycastComponent::GetRaycastDef(){
+	if (m_attached){
+		btRigidBody* body = NULL;
+		m_messenger->Notify(MSG_RIGIDBODY_GET_BODY, body);
+		if (body){
+			m_raycast_def.origin = body->getWorldTransform().getOrigin();
+		}
+	}
+	return m_raycast_def;
+}

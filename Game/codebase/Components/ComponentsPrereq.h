@@ -167,13 +167,10 @@ struct ParticleDef{
 	Ogre::String particle_name;
 };
 
-struct TriggerDef{
-	TriggerDef(void) : x(0.0f), y(0.0f), radius(0.0f), type(0){}
-	int type;
-	float x;
-	float y;
-	float z;
-	float radius;
+struct RaycastDef{
+	btCollisionObject* collision_object;
+	btVector3 origin;
+	btVector3 length;
 };
 
 #endif // _N_COMPONENTS_PREREQ_H_

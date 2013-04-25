@@ -2,7 +2,9 @@
 #include "AIComponents.h"
 #include "ComponentMessenger.h"
 #include "PhysicsComponents.h"
-	
+
+#include <functional>
+
 void WayPointComponent::Notify(int type, void* message){
 };
 

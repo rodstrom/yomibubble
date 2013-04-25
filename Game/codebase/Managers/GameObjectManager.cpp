@@ -113,6 +113,7 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	CharacterController* contr = new CharacterController;
 	go->AddComponent(contr);
 	go->AddUpdateable(contr);
+	go->AddLateUpdate(contr);
 	FollowCameraComponent* fcc = new FollowCameraComponent;
 	go->AddComponent(fcc);
 	go->AddUpdateable(fcc);
@@ -129,11 +130,13 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	go->AddComponent(music2D);
 	Music3DComponent* music3D = new Music3DComponent;
 	go->AddComponent(music3D);
+	RaycastComponent* raycast = new RaycastComponent;
+	go->AddComponent(raycast);
 
 	node_comp->Init(position, m_scene_manager);
 	node_comp->SetId("player_node");
 	acomp->Init("sphere.mesh", m_scene_manager);
-	Ogre::Vector3 scale(0.002);
+	Ogre::Vector3 scale(0.002f);
 	node_comp->GetSceneNode()->setScale(scale);
 	//acomp->Init("yomi.mesh", m_scene_manager);
 	
@@ -146,6 +149,9 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	contr->SetDeacceleration(def.deacceleration);
 	contr->SetMaxJumpHeight(def.max_jump_height);
 	contr->SetId("body");
+	contr->GetRigidbody()->setFriction(def.friction);
+	contr->GetRigidbody()->setRestitution(def.restitution);
+	contr->SetRaycastLength(5.0f);
 	pccomp->Init(m_input_manager, m_sound_manager);
 	pccomp->SetMaxVelocity(def.max_velocity);
 	pccomp->SetVelocity(def.velocity);
@@ -159,6 +165,7 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	//fcc->GetCamera()->setFarClipDistance(1000);
 	csnc->Init(Ogre::Vector3(0.0f, 0.0f, 1.0f), "CreateBubble", node_comp->GetSceneNode());
 	m_sound_manager->GetYomiNode(node_comp->GetSceneNode()->getName());
+	
 
 	return go;
 }
@@ -173,7 +180,7 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 	go->AddComponent(rc);
 
 	node_comp->Init(position, m_scene_manager);
-	mrc->Init("cube.mesh", m_scene_manager);
+	mrc->Init("sphere.mesh", m_scene_manager);
 	Ogre::Vector3 scale(0.002f);
 	node_comp->GetSceneNode()->setScale(scale);
 	mrc->GetEntity()->setMaterialName("Examples/BlueBubble");
@@ -194,7 +201,7 @@ GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, v
 	go->AddComponent(rc);
 
 	node_comp->Init(position, m_scene_manager);
-	mrc->Init("cube.mesh", m_scene_manager);
+	mrc->Init("sphere.mesh", m_scene_manager);
 	Ogre::Vector3 scale(0.002f);
 	node_comp->GetSceneNode()->setScale(scale);
 	mrc->GetEntity()->setMaterialName("Examples/PinkBubble");
@@ -226,10 +233,10 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 
 	node_comp->Init(position, m_scene_manager);
 	acomp->Init("sphere.mesh", m_scene_manager);
-	Ogre::Vector3 scale(0.002);
+	Ogre::Vector3 scale(0.002f);
 	node_comp->GetSceneNode()->setScale(scale);
 	m_sound_manager->GetTottNode(node_comp->GetSceneNode()->getName());
-	way_point->Init(node_comp->GetSceneNode(), 0.001);
+	way_point->Init(node_comp->GetSceneNode(), 0.001f);
 	way_point->AddWayPoint(Ogre::Vector3(15.0f, -10.0f, 21.0f));
 	
 	contr->Init(position, acomp->GetEntity(), def.step_height, m_physics_engine);
@@ -293,7 +300,7 @@ GameObject* GameObjectManager::CreateLeaf(const Ogre::Vector3& position, void* d
 
 	node_comp->Init(position, m_scene_manager);
 	mrc->Init("cube.mesh", m_scene_manager);
-	Ogre::Vector3 scale(0.002, 0.002, 0.002);
+	Ogre::Vector3 scale(0.002f);
 	node_comp->GetSceneNode()->setScale(scale);
 	particle->Init(m_scene_manager, "Smoke", particleDef.particle_name);
 	node_comp->GetSceneNode()->setPosition(Ogre::Vector3(position));
