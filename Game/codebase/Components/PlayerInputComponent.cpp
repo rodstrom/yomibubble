@@ -77,6 +77,7 @@ void PlayerInputComponent::Normal(float dt){
 
 	if (dir != Ogre::Vector3::ZERO){
 		m_messenger->Notify(MSG_SFX2D_PLAY, &m_walk_sound);
+		/*
 		AnimationMsg msg;
 		msg.id="RunBase"; //SliceHorizontal är en top anim
 		msg.index=0;
@@ -86,7 +87,7 @@ void PlayerInputComponent::Normal(float dt){
 		msg.id="SliceHorizontal"; //SliceHorizontal är en top anim
 		msg.index=1;
 		m_messenger->Notify(MSG_ANIMATION_PLAY, &msg);
-
+		*/
 	}
 	else
 	{
