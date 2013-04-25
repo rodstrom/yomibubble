@@ -114,6 +114,8 @@ bool ArtifexLoader::loadZone(string zonename, bool use_cfg_settings, bool fog, b
 		if (mLoadGrass==1) createGrass();
 	}
 
+#ifndef NO_TERRAIN_DEBUG
+
 #ifdef TSM_TERRAIN
 	initTSM();
 #elif defined(ETM_TERRAIN)
@@ -125,6 +127,8 @@ bool ArtifexLoader::loadZone(string zonename, bool use_cfg_settings, bool fog, b
 
 #ifndef OT_TERRAIN
     loadTerrain();
+#endif
+
 #endif
 
 	string dbpath = mZonePath;

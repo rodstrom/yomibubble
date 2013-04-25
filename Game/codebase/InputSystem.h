@@ -55,7 +55,7 @@ private:
 	
 	std::vector<OIS::JoyStick*>				m_joysticks;
 
-	std::vector<OIS::JoyStickListener*>		m_joystick_listeners;
+	//std::vector<OIS::JoyStickListener*>		m_joystick_listeners;
 
 	Ogre::RenderWindow* m_render_window;
 };
