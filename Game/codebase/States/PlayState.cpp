@@ -12,6 +12,7 @@ PlayState::~PlayState(void){}
 
 void PlayState::Enter(){
 	m_scene_manager = Ogre::Root::getSingleton().createSceneManager("OctreeSceneManager");
+	m_scene_manager->setDisplaySceneNodes(true);
 	m_physics_engine = new PhysicsEngine;
 	m_physics_engine->Init();
 	m_physics_engine->SetDebugDraw(m_scene_manager);
@@ -81,7 +82,7 @@ void PlayState::Enter(){
 	player_def.trigger_def = &trigger_def;
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(x,y+1.0f,z), &player_def);
 	
-	/*CharControllerDef tott_def;
+	CharControllerDef tott_def;
 	tott_def.friction = 1.0f;
 	tott_def.velocity = 500.0f;
 	tott_def.jump_power = 200.0f;
@@ -132,6 +133,6 @@ bool PlayState::Update(float dt){
 	else{
 		m_physics_engine->ShowDebugDraw(false);
 	}
-	/*
+	
 	return true;
 }

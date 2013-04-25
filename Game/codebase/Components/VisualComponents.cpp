@@ -74,42 +74,14 @@ void MeshRenderComponent::Init(const Ogre::String& filename, Ogre::SceneManager*
 }
 
 void MeshRenderComponent::Notify(int type, void* msg){
-	/*switch (type){
-	case MSG_NODE_GET_NODE:
-			*static_cast<Ogre::SceneNode**>(msg) = m_node;
-		break;
-	case MSG_INCREASE_SCALE_BY_VALUE:
-		{
-			Ogre::Vector3 scale = m_node->getScale();
-			scale += *static_cast<Ogre::Vector3*>(msg);
-			m_node->setScale(scale);
-		}
-			break;
-	case MSG_SET_OBJECT_POSITION:
-		m_node->setPosition(*static_cast<Ogre::Vector3*>(msg));
-		break;
-	default:
-		break;
-	}*/
+
 }
 
 void MeshRenderComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger = messenger;
-	/*m_messenger->Register(MSG_NODE_GET_NODE, this);
-	m_messenger->Register(MSG_INCREASE_SCALE_BY_VALUE, this);
-	m_messenger->Register(MSG_SET_OBJECT_POSITION, this);*/
 }
 
 void MeshRenderComponent::Shut(){
-	if (m_messenger){
-		/*m_messenger->Unregister(MSG_NODE_GET_NODE, this);
-		m_messenger->Unregister(MSG_INCREASE_SCALE_BY_VALUE, this);
-		m_messenger->Unregister(MSG_SET_OBJECT_POSITION, this);*/
-	}
-	/*if (m_node != NULL){
-		m_scene_manager->destroySceneNode(m_node);
-		m_node = NULL;
-	}*/
 	if (m_entity != NULL){
 		m_scene_manager->destroyEntity(m_entity);
 		m_entity = NULL;
@@ -125,7 +97,7 @@ void AnimationComponent::SetMessenger(ComponentMessenger* messenger){
 
 void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager){
 	MeshRenderComponent::Init(filename, scene_manager);
-	m_animation_blender = new AnimationBlender(GetEntity());
+	//m_animation_blender = new AnimationBlender(GetEntity());
 	//m_animation_blender->init("RunBase");
 }
 
@@ -173,7 +145,7 @@ void AnimationComponent::Notify(int type, void* msg){
 		}
 		break;
 	case MSG_ANIMATION_BLEND:
-		m_animation_blender->blend("RunBase", AnimationBlender::BlendWhileAnimating, 0.2, true);
+		//m_animation_blender->blend("RunBase", AnimationBlender::BlendWhileAnimating, 0.2, true);
 		//m_animation_blender->blend("IdleTop", AnimationBlender::BlendWhileAnimating, 0.2, true);
 		break;
 	default:

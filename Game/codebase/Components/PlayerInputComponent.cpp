@@ -60,7 +60,7 @@ void PlayerInputComponent::Normal(float dt){
 	dir.z = m_input_manager->GetMovementAxis().z;
 
 	if (dir != Ogre::Vector3::ZERO){
-		m_messenger->Notify(MSG_SFX2D_PLAY, &m_walk_sound);
+		/*m_messenger->Notify(MSG_SFX2D_PLAY, &m_walk_sound);
 		AnimationMsg msg;
 		msg.id="RunBase"; //SliceHorizontal är en top anim
 		msg.index=0;
@@ -69,12 +69,12 @@ void PlayerInputComponent::Normal(float dt){
 		AnimationMsg msg2;
 		msg.id="SliceHorizontal"; //SliceHorizontal är en top anim
 		msg.index=1;
-		m_messenger->Notify(MSG_ANIMATION_PLAY, &msg);
+		m_messenger->Notify(MSG_ANIMATION_PLAY, &msg);*/
 
 	}
 	else
 	{
-		m_messenger->Notify(MSG_SFX2D_STOP, &m_walk_sound);
+		//m_messenger->Notify(MSG_SFX2D_STOP, &m_walk_sound);
 	}
 
 	if (!m_is_creating_bubble){

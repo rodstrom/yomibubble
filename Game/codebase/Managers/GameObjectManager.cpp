@@ -138,9 +138,9 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 
 	node_comp->Init(position, m_scene_manager);
 	node_comp->SetId("player_node");
-	acomp->Init("Sinbad.mesh", m_scene_manager);
-	Ogre::Vector3 scale(0.202);
-	acomp->GetSceneNode()->setScale(scale);
+	acomp->Init("yomi.mesh", m_scene_manager);
+	Ogre::Vector3 scale(0.008f);
+	node_comp->GetSceneNode()->setScale(scale);
 	//acomp->Init("yomi.mesh", m_scene_manager);
 	
 	contr->Init(position, acomp->GetEntity(), def.step_height, m_physics_engine);
@@ -167,7 +167,7 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	fcc->Init(m_scene_manager, m_viewport, true);
 	fcc->GetCamera()->setNearClipDistance(0.1f);
 	//fcc->GetCamera()->setFarClipDistance(1000);
-	csnc->Init(Ogre::Vector3(0.0f, 0.0f, 1.0f), "CreateBubble", node_comp->GetSceneNode());
+	csnc->Init(Ogre::Vector3(10.0f, 10.0f, 15.0f), "CreateBubble", node_comp->GetSceneNode());
 	m_sound_manager->GetYomiNode(node_comp->GetSceneNode()->getName());
 	
 
@@ -236,7 +236,7 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 	go->AddUpdateable(way_point);
 
 	node_comp->Init(position, m_scene_manager);
-	acomp->Init("sphere.mesh", m_scene_manager);
+	acomp->Init("yomi.mesh", m_scene_manager);
 	Ogre::Vector3 scale(0.002f);
 	node_comp->GetSceneNode()->setScale(scale);
 	m_sound_manager->GetTottNode(node_comp->GetSceneNode()->getName());
