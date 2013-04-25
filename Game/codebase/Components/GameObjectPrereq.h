@@ -13,11 +13,22 @@ enum EGameObject{
 	GAME_OBJECT_SIZE
 };
 
+struct TriggerDef{
+	TriggerDef(void) : body_type(0), x(0.0f), y(0.0f), radius(0.0f), type(0), mass(0.0f), origin(Ogre::Vector3::ZERO){}
+	int body_type;
+	int type;
+	float x;
+	float y;
+	float z;
+	float radius;
+	float mass;
+	Ogre::Vector3 origin;
+};
+
+
 struct CharControllerDef{
-	CharControllerDef(void) : step_height(0.0f), turn_speed(0.0f), velocity(0.0f), max_jump_height(0.0f), friction(0.0f), restitution(0.0f), jump_power(0.0f) {}
-	CharControllerDef(float p_step_height, float p_turn_speed , float p_velocity, float p_max_jump_height, float p_friction, float p_restitution, float p_jump_power) : 
-		step_height(p_step_height), turn_speed(p_turn_speed), velocity(p_velocity), max_jump_height(p_max_jump_height),
-		friction(p_friction), restitution(p_restitution), jump_power(p_jump_power){}
+	CharControllerDef(void) : step_height(0.0f), turn_speed(0.0f), velocity(0.0f), max_jump_height(0.0f), friction(0.0f), 
+		restitution(0.0f), jump_power(0.0f), max_velocity(0.0f), deacceleration(0.0f), trigger_def(NULL) {}
 	float step_height;
 	float turn_speed;
 	float velocity;
@@ -25,6 +36,9 @@ struct CharControllerDef{
 	float jump_power;
 	float friction;
 	float restitution;
+	float max_velocity;
+	float deacceleration;
+	TriggerDef* trigger_def;
 };
 
 struct RigidbodyDef{

@@ -8,7 +8,8 @@ public:
 	ComponentMessenger(void);
 	~ComponentMessenger(void);
 
-	void Notify(int type, void* message);
+	void Notify(int type, void* msg);
+	void Notify(int type, void* msg, const Ogre::String& id);
 	typedef std::vector<std::vector<IComponentObserver*> > MessageList;
 	void Register(int type, IComponentObserver* ob);
 	void Unregister(IComponentObserver* ob);

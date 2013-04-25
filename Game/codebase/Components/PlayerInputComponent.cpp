@@ -59,22 +59,6 @@ void PlayerInputComponent::Normal(float dt){
 	dir.x = m_input_manager->GetMovementAxis().x;
 	dir.z = m_input_manager->GetMovementAxis().z;
 
-	/*if (m_input_manager->IsButtonDown(BTN_LEFT)){
-		dir += Ogre::Vector3(-1.0f, 0.0f, 0.0f);
-	}
-	else if (m_input_manager->IsButtonDown(BTN_RIGHT)){
-		dir += Ogre::Vector3(1.0f, 0.0f, 0.0f);
-	}*/
-
-	/*if (m_input_manager->IsButtonDown(BTN_UP)){
-		dir += Ogre::Vector3(0.0f, 0.0f, -1.0f);
-		m_messenger->Notify(MSG_SFX2D_PLAY, &m_test_sfx);
-		//m_messenger->Notify(MSG_SFX3D_STOP, &m_3D_music_data);
-	}
-	else if (m_input_manager->IsButtonDown(BTN_DOWN)){
-		dir += Ogre::Vector3(0.0f, 0.0f, 1.0f);
-	}*/
-
 	if (dir != Ogre::Vector3::ZERO){
 		m_messenger->Notify(MSG_SFX2D_PLAY, &m_walk_sound);
 		/*
@@ -159,7 +143,11 @@ void PlayerInputComponent::Normal(float dt){
 		bool jumping = false;
 		m_messenger->Notify(MSG_CHARACTER_CONROLLER_JUMP, &jumping);
 	}
-	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &dir);
+
+
+	Ogre::Vector3 acc = Ogre::Vector3::ZERO;
+	Acceleration(dir, acc, dt);
+	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &acc);
 }
 
 void PlayerInputComponent::OnBubble(float dt){
@@ -247,4 +235,42 @@ void PlayerInputComponent::Bouncing(float dt){
 	}
 
 	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &dir);
+}
+
+void PlayerInputComponent::Acceleration(Ogre::Vector3& dir, Ogre::Vector3& acc, float dt){
+	if (dir.x != 0.0f){
+		if (dir.x < 0.0f){
+			m_acc_x = std::max(m_acc_x - (m_velocity*dt), -m_max_velocity);
+		}
+		else if (dir.x > 0.0f){
+			m_acc_x = std::min(m_acc_x + (m_velocity*dt), m_max_velocity);
+		}
+	}
+	else{
+		if (m_acc_x < 0.0f){
+			m_acc_x = std::min(m_acc_x + (m_deacc*dt), 0.0f);
+		}
+		else if (m_acc_x > 0.0f){
+			m_acc_x = std::max(m_acc_x - (m_deacc*dt), 0.0f);
+		}
+	}
+
+	if (dir.z != 0.0f){
+		if (dir.z < 0.0f){
+			m_acc_z = std::max(m_acc_z - (m_velocity*dt), -m_max_velocity);
+		}
+		else if (dir.z > 0.0f){
+			m_acc_z = std::min(m_acc_z + (m_velocity*dt), m_max_velocity);
+		}
+	}
+	else {
+		if (m_acc_z < 0.0f){
+			m_acc_z = std::min(m_acc_z + (m_deacc*dt), 0.0f);
+		}
+		else if (m_acc_z > 0.0f){
+			m_acc_z = std::max(m_acc_z - (m_deacc*dt), 0.0f);
+		}
+	}
+	acc.x += m_acc_x;
+	acc.z += m_acc_z;
 }

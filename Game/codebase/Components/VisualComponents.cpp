@@ -4,15 +4,77 @@
 #include "..\Managers\InputManager.h"
 #include "..\InputPrereq.h"
 
+void NodeComponent::Init(const Ogre::Vector3& pos, Ogre::SceneManager* scene_manager){
+	m_scene_manager = scene_manager;
+	m_node = m_scene_manager->getRootSceneNode()->createChildSceneNode();
+	m_node->setPosition(pos);
+}
+
+void NodeComponent::Notify(int type, void* msg){
+	switch (type){
+	case MSG_NODE_GET_NODE:
+		*static_cast<Ogre::SceneNode**>(msg) = m_node;
+		break;
+	case MSG_INCREASE_SCALE_BY_VALUE:
+		{
+			Ogre::Vector3 scale = m_node->getScale();
+			scale += *static_cast<Ogre::Vector3*>(msg);
+			m_node->setScale(scale);
+		}
+		break;
+	case MSG_SET_OBJECT_POSITION:
+		m_node->setPosition(*static_cast<Ogre::Vector3*>(msg));
+		break;
+	case MSG_NODE_ATTACH_ENTITY:
+		{
+			if (!m_has_attached_entity){
+				m_node->attachObject(*static_cast<Ogre::Entity**>(msg));
+				m_has_attached_entity = true;
+			}
+		}
+		break;
+	default: 
+		break;
+	}
+}
+
+void NodeComponent::Shut(){
+	if (m_messenger){
+		m_messenger->Unregister(MSG_NODE_GET_NODE, this);
+		m_messenger->Unregister(MSG_INCREASE_SCALE_BY_VALUE, this);
+		m_messenger->Unregister(MSG_SET_OBJECT_POSITION, this);
+		m_messenger->Unregister(MSG_NODE_ATTACH_ENTITY, this);
+	}
+	if (m_node){
+		m_scene_manager->destroySceneNode(m_node);
+		m_node = NULL;
+	}
+}
+
+void NodeComponent::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
+	m_messenger->Register(MSG_NODE_GET_NODE, this);
+	m_messenger->Register(MSG_INCREASE_SCALE_BY_VALUE, this);
+	m_messenger->Register(MSG_SET_OBJECT_POSITION, this);
+	m_messenger->Register(MSG_NODE_ATTACH_ENTITY, this);
+}
+
+
+
 void MeshRenderComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager){
 	m_scene_manager = scene_manager;
 	m_entity = m_scene_manager->createEntity(filename);
-	m_node = m_scene_manager->getRootSceneNode()->createChildSceneNode();
-	m_node->attachObject(m_entity);
+	m_messenger->Notify(MSG_NODE_ATTACH_ENTITY, &m_entity);
+}
+
+void MeshRenderComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager, const Ogre::String& node_id){
+	m_scene_manager = scene_manager;
+	m_entity = m_scene_manager->createEntity(filename);
+	m_messenger->Notify(MSG_NODE_ATTACH_ENTITY, &m_entity, node_id);
 }
 
 void MeshRenderComponent::Notify(int type, void* msg){
-	switch (type){
+	/*switch (type){
 	case MSG_NODE_GET_NODE:
 			*static_cast<Ogre::SceneNode**>(msg) = m_node;
 		break;
@@ -28,26 +90,26 @@ void MeshRenderComponent::Notify(int type, void* msg){
 		break;
 	default:
 		break;
-	}
+	}*/
 }
 
 void MeshRenderComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger = messenger;
-	m_messenger->Register(MSG_NODE_GET_NODE, this);
+	/*m_messenger->Register(MSG_NODE_GET_NODE, this);
 	m_messenger->Register(MSG_INCREASE_SCALE_BY_VALUE, this);
-	m_messenger->Register(MSG_SET_OBJECT_POSITION, this);
+	m_messenger->Register(MSG_SET_OBJECT_POSITION, this);*/
 }
 
 void MeshRenderComponent::Shut(){
 	if (m_messenger){
-		m_messenger->Unregister(MSG_NODE_GET_NODE, this);
+		/*m_messenger->Unregister(MSG_NODE_GET_NODE, this);
 		m_messenger->Unregister(MSG_INCREASE_SCALE_BY_VALUE, this);
-		m_messenger->Unregister(MSG_SET_OBJECT_POSITION, this);
+		m_messenger->Unregister(MSG_SET_OBJECT_POSITION, this);*/
 	}
-	if (m_node != NULL){
+	/*if (m_node != NULL){
 		m_scene_manager->destroySceneNode(m_node);
 		m_node = NULL;
-	}
+	}*/
 	if (m_entity != NULL){
 		m_scene_manager->destroyEntity(m_entity);
 		m_entity = NULL;
@@ -63,8 +125,12 @@ void AnimationComponent::SetMessenger(ComponentMessenger* messenger){
 
 void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager){
 	MeshRenderComponent::Init(filename, scene_manager);
-	m_animation_blender = new AnimationBlender(GetEntity());
+//	m_animation_blender = new AnimationBlender(GetEntity());
 	//m_animation_blender->init("RunBase");
+}
+
+void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager, const Ogre::String& node_id){
+	MeshRenderComponent::Init(filename, scene_manager, node_id);
 }
 
 void AnimationComponent::AddAnimationStates(unsigned int value){

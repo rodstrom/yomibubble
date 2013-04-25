@@ -17,12 +17,15 @@ enum EComponentType{
 	COMPONENT_CAMERA,
 	COMPONENT_POINT2POINT_CONSTRAINT,
 	COMPONENT_FOLLOW_CAMERA,
+	COMPONENT_NODE,
+	COMPONENT_TRIGGER,
 	COMPONENT_SIZE
 };
 
 enum EComponentMsg{
 	MSG_ADD_FORCE = 0,
 	MSG_NODE_GET_NODE,
+	MSG_NODE_ATTACH_ENTITY,
 	MSG_MESH_RENDERER_GET_ENTITY,
 	MSG_RIGIDBODY_GET_BODY,
 	MSG_RIGIDBODY_GRAVITY_SET,
@@ -106,9 +109,14 @@ protected:
 
 class IComponentObserver{
 public:
-	IComponentObserver(void){}
+	IComponentObserver(void){ m_id = "component" + NumberToString(m_object_counter); }
 	virtual ~IComponentObserver(void){}
 	virtual void Notify(int type, void* message) = 0;
+	void SetId(const Ogre::String& id) { m_id = id; }
+	const Ogre::String& GetId() const { return m_id; }
+protected:
+	Ogre::String m_id;
+	static int m_object_counter;
 };
 
 class IComponentUpdateable{
@@ -168,6 +176,12 @@ struct GuiDef{
 
 struct ParticleDef{
 	Ogre::String particle_name;
+};
+
+struct RaycastDef{
+	btCollisionObject* collision_object;
+	btVector3 origin;
+	btVector3 length;
 };
 
 #endif // _N_COMPONENTS_PREREQ_H_
