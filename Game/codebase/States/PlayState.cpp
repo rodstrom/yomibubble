@@ -74,12 +74,11 @@ void PlayState::Enter(){
 	player_def.velocity = 5.0f;
 	player_def.max_velocity = 1.0f;
 	player_def.deacceleration = 10.0f;
-	player_def.jump_power = 200.0f;
+	player_def.jump_power = 300.0f;
 	player_def.restitution = 0.0f;
 	player_def.step_height = 0.35f;
 	player_def.turn_speed = 1000.0f;
 	player_def.max_jump_height = 10.0f;
-	player_def.trigger_def = &trigger_def;
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(x,y+1.0f,z), &player_def);
 	
 	CharControllerDef tott_def;

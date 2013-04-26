@@ -144,7 +144,7 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	contr->Init(position, acomp->GetEntity(), def.step_height, m_physics_engine);
 	contr->SetTurnSpeed(def.turn_speed);
 	contr->SetVelocity(def.velocity);
-	contr->SetJumpPower(200.0f);
+	contr->SetJumpPower(def.jump_power);
 	contr->HasFollowCam(true);
 	contr->SetMaxVelocity(def.max_velocity);
 	contr->SetDeacceleration(def.deacceleration);
@@ -168,7 +168,7 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	csnc->Init(Ogre::Vector3(0.0f, 0.0f, 1.0f), "CreateBubble", node_comp->GetSceneNode());
 	m_sound_manager->GetYomiNode(node_comp->GetSceneNode()->getName());
 	raycast->Init(m_physics_engine, contr->GetRigidbody());
-	raycast->SetLength(Ogre::Vector3(0.0f,-1.0f,0.0f));
+	raycast->SetLength(Ogre::Vector3(0.0f,-0.8f,0.0f));
 	raycast->SetAttached(true);
 
 	return go;

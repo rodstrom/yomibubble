@@ -28,7 +28,7 @@ struct TriggerDef{
 
 struct CharControllerDef{
 	CharControllerDef(void) : step_height(0.0f), turn_speed(0.0f), velocity(0.0f), max_jump_height(0.0f), friction(0.0f), 
-		restitution(0.0f), jump_power(0.0f), max_velocity(0.0f), deacceleration(0.0f), trigger_def(NULL) {}
+		restitution(0.0f), jump_power(0.0f), max_velocity(0.0f), deacceleration(0.0f) {}
 	float step_height;
 	float turn_speed;
 	float velocity;
@@ -38,7 +38,6 @@ struct CharControllerDef{
 	float restitution;
 	float max_velocity;
 	float deacceleration;
-	TriggerDef* trigger_def;
 };
 
 struct RigidbodyDef{
