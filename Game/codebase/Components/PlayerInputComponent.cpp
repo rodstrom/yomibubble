@@ -298,7 +298,7 @@ void BubbleController::SimulationStep(btScalar time_step){
 	btRigidBody* body = NULL;
 	m_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &body);
 	if (body){
-		const btScalar max_speed = 2.0f;
+		const btScalar max_speed = (btScalar)m_max_velocity;
 		btVector3 vel = body->getLinearVelocity();
 		btScalar speed = vel.length();
 		if (speed >= max_speed){

@@ -153,6 +153,7 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	contr->GetRigidbody()->setFriction(def.friction);
 	contr->GetRigidbody()->setRestitution(def.restitution);
 	contr->SetRaycastLength(5.0f);
+	contr->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
 	pccomp->Init(m_input_manager, m_sound_manager);
 	pccomp->SetMaxVelocity(def.max_velocity);
 	pccomp->SetVelocity(def.velocity);
@@ -195,6 +196,7 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 	rc->GetRigidbody()->setGravity(btVector3(0.0f, 0.0f, 0.0f));
 	rc->GetRigidbody()->setRestitution(1.0f);
 	rc->GetRigidbody()->setFriction(0.5);
+	rc->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
 	return go;
 }
 
@@ -206,7 +208,11 @@ GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, v
 	go->AddComponent(mrc);
 	RigidbodyComponent* rc = new RigidbodyComponent;
 	go->AddComponent(rc);
+	BubbleController* bc = new BubbleController;
+	go->AddComponent(bc);
+	go->AddUpdateable(bc);
 
+	bc->Init(m_physics_engine, 5.0f, 10.0f);
 	node_comp->Init(position, m_scene_manager);
 	mrc->Init("sphere.mesh", m_scene_manager);
 	Ogre::Vector3 scale(0.002f);
@@ -217,6 +223,7 @@ GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, v
 	rc->GetRigidbody()->setLinearFactor(btVector3(1,0,1));
 	rc->GetRigidbody()->setRestitution(1.0f);
 	rc->GetRigidbody()->setFriction(0.5);
+	rc->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
 	return go;
 }
 
