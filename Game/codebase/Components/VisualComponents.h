@@ -71,7 +71,6 @@ public:
 
 protected:
 	std::vector<Ogre::AnimationState*>	m_animation_states;
-	AnimationBlender*					m_animation_blender;
 };
 
 class Overlay2DComponent : public Component, public IComponentObserver {

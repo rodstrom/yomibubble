@@ -74,42 +74,14 @@ void MeshRenderComponent::Init(const Ogre::String& filename, Ogre::SceneManager*
 }
 
 void MeshRenderComponent::Notify(int type, void* msg){
-	/*switch (type){
-	case MSG_NODE_GET_NODE:
-			*static_cast<Ogre::SceneNode**>(msg) = m_node;
-		break;
-	case MSG_INCREASE_SCALE_BY_VALUE:
-		{
-			Ogre::Vector3 scale = m_node->getScale();
-			scale += *static_cast<Ogre::Vector3*>(msg);
-			m_node->setScale(scale);
-		}
-			break;
-	case MSG_SET_OBJECT_POSITION:
-		m_node->setPosition(*static_cast<Ogre::Vector3*>(msg));
-		break;
-	default:
-		break;
-	}*/
+
 }
 
 void MeshRenderComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger = messenger;
-	/*m_messenger->Register(MSG_NODE_GET_NODE, this);
-	m_messenger->Register(MSG_INCREASE_SCALE_BY_VALUE, this);
-	m_messenger->Register(MSG_SET_OBJECT_POSITION, this);*/
 }
 
 void MeshRenderComponent::Shut(){
-	if (m_messenger){
-		/*m_messenger->Unregister(MSG_NODE_GET_NODE, this);
-		m_messenger->Unregister(MSG_INCREASE_SCALE_BY_VALUE, this);
-		m_messenger->Unregister(MSG_SET_OBJECT_POSITION, this);*/
-	}
-	/*if (m_node != NULL){
-		m_scene_manager->destroySceneNode(m_node);
-		m_node = NULL;
-	}*/
 	if (m_entity != NULL){
 		m_scene_manager->destroyEntity(m_entity);
 		m_entity = NULL;
@@ -120,13 +92,10 @@ void AnimationComponent::SetMessenger(ComponentMessenger* messenger){
 	MeshRenderComponent::SetMessenger(messenger);
 	m_messenger->Register(MSG_ANIMATION_PLAY, this);
 	m_messenger->Register(MSG_ANIMATION_PAUSE, this);
-	m_messenger->Register(MSG_ANIMATION_BLEND, this);
 }
 
 void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager){
 	MeshRenderComponent::Init(filename, scene_manager);
-//	m_animation_blender = new AnimationBlender(GetEntity());
-	//m_animation_blender->init("RunBase");
 }
 
 void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager, const Ogre::String& node_id){
@@ -152,29 +121,47 @@ void AnimationComponent::Update(float dt){
 
 void AnimationComponent::Notify(int type, void* msg){
 	MeshRenderComponent::Notify(type, msg);
+	AnimationMsg* anim_msg = static_cast<AnimationMsg*>(msg);
+
 	switch (type){
 	case MSG_ANIMATION_PLAY:
 		{
-			int index = static_cast<AnimationMsg*>(msg)->index;
-			m_animation_states[index] = m_entity->getAnimationState(static_cast<AnimationMsg*>(msg)->id);
-			if (m_animation_states[index] != NULL){
-				m_animation_states[index]->setEnabled(true);
-				m_animation_states[index]->setLoop(true);
+			if (anim_msg->blend){
+				m_animation_states[0] = m_entity->getAnimationState(anim_msg->bottom_anim);
+				if (m_animation_states[0] != NULL){
+					m_animation_states[0]->setEnabled(true);
+					m_animation_states[0]->setLoop(true);
+				}
+
+				m_animation_states[1] = m_entity->getAnimationState(anim_msg->top_anim);
+				if (m_animation_states[1] != NULL){
+					m_animation_states[1]->setEnabled(true);
+					m_animation_states[1]->setLoop(true);
+				}
+			}
+			else{
+				m_animation_states[0] = m_entity->getAnimationState(anim_msg->id);
+				if (m_animation_states[0] != NULL){
+					m_animation_states[0]->setEnabled(true);
+					m_animation_states[0]->setLoop(true);
+				}
 			}
 		}
 		break;
 	case MSG_ANIMATION_PAUSE:
 		{
-			int index = static_cast<AnimationMsg*>(msg)->index;
-			if (m_animation_states[index] != NULL){
-				m_animation_states[index]->setEnabled(false);
-				m_animation_states[index]->setLoop(false);
+			if (m_animation_states[0] != NULL){
+					m_animation_states[0]->setEnabled(false);
+					m_animation_states[0]->setLoop(false);
+				}
+
+			if (anim_msg->blend){
+				if (m_animation_states[1] != NULL){
+					m_animation_states[1]->setEnabled(false);
+					m_animation_states[1]->setLoop(false);
+				}
 			}
 		}
-		break;
-	case MSG_ANIMATION_BLEND:
-		m_animation_blender->blend("RunBase", AnimationBlender::BlendWhileAnimating, 0.2, true);
-		//m_animation_blender->blend("IdleTop", AnimationBlender::BlendWhileAnimating, 0.2, true);
 		break;
 	default:
 		break;
@@ -192,7 +179,6 @@ void AnimationComponent::Shut(){
 	m_animation_states.clear();
 	m_messenger->Unregister(MSG_ANIMATION_PLAY, this);
 	m_messenger->Unregister(MSG_ANIMATION_PAUSE, this);
-	m_messenger->Unregister(MSG_ANIMATION_BLEND, this);
 	MeshRenderComponent::Shut();
 }
 

@@ -62,20 +62,31 @@ void PlayerInputComponent::Normal(float dt){
 	if (dir != Ogre::Vector3::ZERO){
 		m_messenger->Notify(MSG_SFX2D_PLAY, &m_walk_sound);
 		/*
-		AnimationMsg msg;
-		msg.id="RunBase"; //SliceHorizontal är en top anim
-		msg.index=0;
-		m_messenger->Notify(MSG_ANIMATION_PLAY, &msg);
-		//m_messenger->Notify(MSG_ANIMATION_BLEND, &msg);
-		AnimationMsg msg2;
-		msg.id="SliceHorizontal"; //SliceHorizontal är en top anim
-		msg.index=1;
-		m_messenger->Notify(MSG_ANIMATION_PLAY, &msg);
+		m_anim_msg.bottom_anim = "RunBase";
+		m_anim_msg.top_anim = "IdleTop";
+		m_anim_msg.blend = true;
+		m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
 		*/
+		
+		m_anim_msg.id="Run";
+		m_anim_msg.blend = false;
+		m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
+		
 	}
 	else
 	{
 		m_messenger->Notify(MSG_SFX2D_STOP, &m_walk_sound);
+	/*
+		m_anim_msg.bottom_anim = "IdleBase";
+		m_anim_msg.top_anim = "IdleTop";
+		m_anim_msg.blend = true;
+		m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
+		*/
+		
+		m_anim_msg.id="Idle";
+		m_anim_msg.blend = false;
+		m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
+		
 	}
 
 	if (!m_is_creating_bubble){
@@ -143,7 +154,6 @@ void PlayerInputComponent::Normal(float dt){
 		bool jumping = false;
 		m_messenger->Notify(MSG_CHARACTER_CONROLLER_JUMP, &jumping);
 	}
-
 
 	Ogre::Vector3 acc = Ogre::Vector3::ZERO;
 	Acceleration(dir, acc, dt);

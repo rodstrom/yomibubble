@@ -33,7 +33,6 @@ enum EComponentMsg{
 	MSG_RIGIDBODY_APPLY_IMPULSE,
 	MSG_ANIMATION_PLAY,
 	MSG_ANIMATION_PAUSE,
-	MSG_ANIMATION_BLEND,
 	MSG_CHARACTER_CONROLLER_VELOCITY_SET,
 	MSG_CHARACTER_CONROLLER_TURN_SPEED_SET,
 	MSG_CHARACTER_CONTROLLER_SET_DIRECTION,
@@ -141,8 +140,10 @@ struct RigidBodyDef{
 };
 
 struct AnimationMsg{
-	int index;
+	bool blend;
 	Ogre::String id;
+	Ogre::String bottom_anim;
+	Ogre::String top_anim;
 };
 
 struct CharControllerJumpDef{

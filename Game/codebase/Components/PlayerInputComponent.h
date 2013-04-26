@@ -22,6 +22,7 @@ public:
 	void SetDeacceleration(float value) { m_deacc = value; }
 
 	SoundData2D m_leaf_sfx;
+	AnimationMsg m_anim_msg;
 
 protected:
 	void Normal(float dt);
