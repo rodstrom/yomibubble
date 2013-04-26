@@ -19,6 +19,7 @@ enum EComponentType{
 	COMPONENT_FOLLOW_CAMERA,
 	COMPONENT_NODE,
 	COMPONENT_TRIGGER,
+	COMPONENT_RAYCAST,
 	COMPONENT_SIZE
 };
 
@@ -40,6 +41,7 @@ enum EComponentMsg{
 	MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_GET,
 	MSG_CHARACTER_CONROLLER_JUMP,
 	MSG_CHARACTER_CONTROLLER_GRAVITY_SET,
+	MSG_CHARACTER_CONTROLLER_IS_ON_GROUND,
 	MSG_CAMERA_GET_CAMERA_NODE,
 	MSG_CAMERA_GET_CAMERA,
 	MSG_CAMERA_SET_ACTIVE,
@@ -64,6 +66,7 @@ enum EComponentMsg{
 	MSG_LEAF_PICKUP,
 	MSG_PLAYER_INPUT_SET_BUBBLE,
 	MSG_PLAYER_INPUT_SET_STATE,
+	MSG_BUBBLE_CONTROLLER_APPLY_IMPULSE,
 	MSG_SIZE
 };
 
@@ -130,6 +133,13 @@ public:
 	IComponentLateUpdate(void){}
 	virtual ~IComponentLateUpdate(void){}
 	virtual void LateUpdate(float dt) = 0;
+};
+
+class IComponentSimulationStep{
+public:
+	IComponentSimulationStep(void){}
+	virtual ~IComponentSimulationStep(void){}
+	virtual void SimulationStep(btScalar time_step) = 0;
 };
 
 struct RigidBodyDef{

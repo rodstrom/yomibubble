@@ -105,7 +105,6 @@ void RigidbodyComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_RIGIDBODY_APPLY_IMPULSE, this);
 }
 
-
 void CharacterController::Notify(int type, void* msg){
 	RigidbodyComponent::Notify(type, msg);
 	switch (type){
@@ -123,7 +122,17 @@ void CharacterController::Notify(int type, void* msg){
 		break;
 	case MSG_CHARACTER_CONROLLER_JUMP:
 		{
-			m_is_jumping = *static_cast<bool*>(msg);
+			bool jump = *static_cast<bool*>(msg);
+			if (jump){
+				if (m_on_ground){
+					m_is_jumping = true;
+					m_start_y_pos = m_rigidbody->getWorldTransform().getOrigin().y();
+				}
+			}
+			else{
+				m_is_jumping = false;
+			}
+			
 		}
 		break;
 	case MSG_CHARACTER_CONTROLLER_GRAVITY_SET:
@@ -133,13 +142,16 @@ void CharacterController::Notify(int type, void* msg){
 		m_direction = *static_cast<Ogre::Vector3*>(msg);
 		m_direction *= 10.0f;
 		break;
+	case MSG_CHARACTER_CONTROLLER_IS_ON_GROUND:
+		m_on_ground = *static_cast<bool*>(msg);
+		break;
 	default:
 		break;
 	}
 }
 
 void CharacterController::Update(float dt){
-	btVector3 vel = m_rigidbody->getLinearVelocity();
+	/*btVector3 vel = m_rigidbody->getLinearVelocity();
 	float jump_strength = 0.0f;
 	if (m_direction.x != 0.0f || m_direction.z != 0.0f){
 		m_is_moving = true;
@@ -197,7 +209,7 @@ void CharacterController::Update(float dt){
 		float jump_strength = m_jump_pwr * dt;
 		vel = m_rigidbody->getLinearVelocity();
 		m_rigidbody->setLinearVelocity(btVector3(vel.x(), jump_strength, vel.z()));
-	}
+	}*/
 }
 
 void CharacterController::LateUpdate(float dt){
@@ -219,7 +231,9 @@ void CharacterController::Shut(){
 		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_SET, this);
 		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_GET, this);
 		m_messenger->Unregister(MSG_CHARACTER_CONROLLER_JUMP, this);
+		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND, this);
 	}
+	m_physics_engine->RemoveObjectSimulationStep(this);
 }
 
 void CharacterController::SetMessenger(ComponentMessenger* messenger){
@@ -228,12 +242,13 @@ void CharacterController::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_SET, this);
 	m_messenger->Register(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_GET, this);
 	m_messenger->Register(MSG_CHARACTER_CONROLLER_JUMP, this);
+	m_messenger->Register(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND, this);
 }
 
 void CharacterController::Init(const Ogre::Vector3& position, Ogre::Entity* entity, float step_height, PhysicsEngine* physics_engine){
 	m_physics_engine = physics_engine;
 	BtOgre::StaticMeshToShapeConverter converter(entity);
-	m_shape = converter.createBox();
+	m_shape = converter.createCapsule();
 	btTransform start_transform;
 	start_transform.setIdentity();
 	start_transform.setOrigin(BtOgre::Convert::toBullet(position));
@@ -250,6 +265,74 @@ void CharacterController::Init(const Ogre::Vector3& position, Ogre::Entity* enti
 	m_rigidbody->setCollisionFlags(m_rigidbody->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 	m_rigidbody->setAngularFactor(0);
 	m_physics_engine->GetDynamicWorld()->addRigidBody(m_rigidbody);
+	m_physics_engine->AddObjectSimulationStep(this);
+}
+
+void CharacterController::SimulationStep(btScalar time_step){
+	float dt = (float)time_step;
+	btVector3 vel = m_rigidbody->getLinearVelocity();
+	float jump_strength = 0.0f;
+	if (m_direction.x != 0.0f || m_direction.z != 0.0f){
+		m_is_moving = true;
+	}
+	else{
+		m_is_moving = false;
+	}
+	
+	if (m_is_moving){   //if the character is moving in any direction
+		Ogre::Vector3 dir = m_direction;
+		if (m_has_follow_cam){
+		Ogre::SceneNode* node = NULL;
+		Ogre::SceneNode* camera_node = NULL;
+		m_messenger->Notify(MSG_NODE_GET_NODE, &node);
+		m_messenger->Notify(MSG_CAMERA_GET_CAMERA_NODE, &camera_node);
+			if (node && camera_node){
+				Ogre::Vector3 goal_dir = Ogre::Vector3::ZERO;
+				goal_dir += dir.z * camera_node->getOrientation().zAxis();
+				goal_dir += dir.x * camera_node->getOrientation().xAxis();
+				goal_dir.y = 0.0f;
+				//goal_dir.normalise();
+				if (!m_is_jumping){
+					Ogre::Quaternion goal = node->getOrientation().zAxis().getRotationTo(goal_dir);
+					Ogre::Real yaw_to_goal = goal.getYaw().valueDegrees();
+					Ogre::Real yaw_at_speed = yaw_to_goal / Ogre::Math::Abs(yaw_to_goal) * dt * m_turn_speed;
+
+					if (yaw_to_goal < 0) yaw_to_goal = std::min<Ogre::Real>(0, std::max<Ogre::Real>(yaw_to_goal, yaw_at_speed));
+					else if (yaw_to_goal > 0) yaw_to_goal = std::max<Ogre::Real>(0, std::min<Ogre::Real>(yaw_to_goal, yaw_at_speed));
+					node->yaw(Ogre::Degree(yaw_to_goal));
+				}
+				m_rigidbody->setLinearVelocity(btVector3(goal_dir.x, vel.y(), goal_dir.z));
+			}
+		}
+		else{
+			Ogre::SceneNode* node = NULL;
+			m_messenger->Notify(MSG_NODE_GET_NODE, &node);
+			if (node){
+				dir.y = 0.0f;
+				dir.normalise();
+				Ogre::Quaternion goal = node->getOrientation().zAxis().getRotationTo(dir);
+				Ogre::Real yaw_to_goal = goal.getYaw().valueDegrees();
+				Ogre::Real yaw_at_speed = yaw_to_goal / Ogre::Math::Abs(yaw_to_goal) * dt * m_turn_speed;
+
+				if (yaw_to_goal < 0) yaw_to_goal = std::min<Ogre::Real>(0, std::max<Ogre::Real>(yaw_to_goal, yaw_at_speed));
+				else if (yaw_to_goal > 0) yaw_to_goal = std::max<Ogre::Real>(0, std::min<Ogre::Real>(yaw_to_goal, yaw_at_speed));
+				node->yaw(Ogre::Degree(yaw_to_goal));
+				m_rigidbody->setLinearVelocity(btVector3(dir.x, vel.y(), dir.z));
+			}
+		}
+	}
+	else{
+		m_rigidbody->setLinearVelocity(btVector3(m_direction.x, vel.y(), m_direction.z));
+	}
+	if (m_is_jumping){
+		float y_pos = m_rigidbody->getWorldTransform().getOrigin().y();
+		if ((y_pos - m_start_y_pos) >= m_max_jump_height){
+			m_is_jumping = false;
+		}
+		float jump_strength = m_jump_pwr * dt;
+		vel = m_rigidbody->getLinearVelocity();
+		m_rigidbody->setLinearVelocity(btVector3(vel.x(), jump_strength, vel.z()));
+	}
 }
 
 void Point2PointConstraintComponent::Notify(int type, void* msg){
@@ -273,6 +356,13 @@ void Point2PointConstraintComponent::Init(PhysicsEngine* physics_engine, btRigid
 	m_constraint = new btPoint2PointConstraint(*body_a, *body_b, pivot_a, pivot_b);
 	m_physics_engine->GetDynamicWorld()->addConstraint(m_constraint);
 }
+
+void Point2PointConstraintComponent::Init(PhysicsEngine* physics_engine, btRigidBody* body, const btVector3& pivot, const btVector3& world_point){
+	//fäst pivot pointen till en fast punkt (vector3)
+	m_physics_engine = physics_engine;
+	m_constraint = new btPoint2PointConstraint(*body, pivot); //vill också fästa till vector3
+	m_physics_engine->GetDynamicWorld()->addConstraint(m_constraint);
+};
 
 void TriggerComponent::Init(const Ogre::Vector3& pos, PhysicsEngine* physics_engine, TriggerDef* def){
 	m_physics_engine = physics_engine;
@@ -347,6 +437,13 @@ void Generic6DofConstraintComponent::Init(PhysicsEngine* physics_engine, btRigid
 	transform_b.setIdentity();
 	transform_b.setOrigin(pivot_b);
 	m_constraint = new btGeneric6DofConstraint(*body_a, *body_b, transform_a, transform_b, linear_reference);
+	m_physics_engine->GetDynamicWorld()->addConstraint(m_constraint);
+}
+
+void RaycastComponent::Init(PhysicsEngine* physics_engine, btCollisionObject* obj){
+	m_physics_engine = physics_engine;
+	m_physics_engine->AddRaycastComponent(this);
+	m_raycast_def.collision_object = obj;
 }
 
 void RaycastComponent::Notify(int type, void* msg){
@@ -354,7 +451,7 @@ void RaycastComponent::Notify(int type, void* msg){
 }
 
 void RaycastComponent::Shut(){
-
+	m_physics_engine->RemoveRaycastComponent(this);
 }
 
 void RaycastComponent::SetMessenger(ComponentMessenger* messenger){
@@ -368,10 +465,28 @@ void RaycastComponent::SetLength(const Ogre::Vector3& length){
 RaycastDef& RaycastComponent::GetRaycastDef(){
 	if (m_attached){
 		btRigidBody* body = NULL;
-		m_messenger->Notify(MSG_RIGIDBODY_GET_BODY, body);
+		m_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &body);
 		if (body){
 			m_raycast_def.origin = body->getWorldTransform().getOrigin();
 		}
 	}
 	return m_raycast_def;
+}
+
+void HingeConstraintComponent::Notify(int type, void* msg){
+
+}
+
+void HingeConstraintComponent::Shut(){
+
+}
+
+void HingeConstraintComponent::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
+}
+
+void HingeConstraintComponent::Init(PhysicsEngine* physics_engine, btRigidBody* body_a, btRigidBody* body_b, const btVector3& pivot_a, const btVector3& pivot_b, const btVector3& axis_a, const btVector3& axis_b){
+	m_physics_engine = physics_engine;
+	m_constraint = new btHingeConstraint(*body_a, *body_b, pivot_a, pivot_b, axis_a, axis_b);
+	m_physics_engine->GetDynamicWorld()->addConstraint(m_constraint, true);
 }

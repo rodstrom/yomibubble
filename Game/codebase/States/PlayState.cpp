@@ -32,11 +32,11 @@ void PlayState::Enter(){
 	
 	/*ParticleDef particleDef;
 	particleDef.particle_name = "Particle/Smoke";
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(180,78,225), &particleDef);	
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(180,78,225), &particleDef);	*/
 	
-	/*Ogre::Light* light = m_scene_manager->createLight("light1");
+	Ogre::Light* light = m_scene_manager->createLight("light1");
 	light->setType(Ogre::Light::LT_DIRECTIONAL);
-	light->setDirection(Ogre::Vector3(1,-1,0));*/
+	light->setDirection(Ogre::Vector3(1,-1,0));
 	//m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
 	
 	// Create plane mesh
@@ -74,12 +74,11 @@ void PlayState::Enter(){
 	player_def.velocity = 5.0f;
 	player_def.max_velocity = 1.0f;
 	player_def.deacceleration = 10.0f;
-	player_def.jump_power = 200.0f;
+	player_def.jump_power = 300.0f;
 	player_def.restitution = 0.0f;
 	player_def.step_height = 0.35f;
 	player_def.turn_speed = 1000.0f;
 	player_def.max_jump_height = 10.0f;
-	player_def.trigger_def = &trigger_def;
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(x,y+1.0f,z), &player_def);
 	
 	CharControllerDef tott_def;

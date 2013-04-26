@@ -5,6 +5,11 @@
 #include "Components\PhysicsComponents.h"
 #include "Managers\CollisionManager.h"
 
+void GameTickCallback(btDynamicsWorld* world, btScalar time_step){
+	PhysicsEngine* pe = static_cast<PhysicsEngine*>(world->getWorldUserInfo());
+	pe->ProcessSimulationTick(time_step);
+}
+
 PhysicsEngine::PhysicsEngine(void) : 
 	m_broadphase(NULL), 
 	m_collision_configuration(NULL), 
@@ -26,6 +31,7 @@ bool PhysicsEngine::Init(){
 	m_seq_impulse_con_solver = new btSequentialImpulseConstraintSolver;
 	m_dynamic_world = new btDiscreteDynamicsWorld(m_collision_dispatcher, m_broadphase, m_seq_impulse_con_solver, m_collision_configuration);
 	m_dynamic_world->setGravity(btVector3(0.0f, -10.0f, 0.0f));
+	m_dynamic_world->setInternalTickCallback(GameTickCallback, static_cast<void*>(this), true);
 	return true;
 }
 
@@ -137,7 +143,6 @@ void PhysicsEngine::CreateTerrainCollision(Ogre::Terrain* terrain){
 		m_dynamic_world->addRigidBody(m_terrain_body);
 		m_has_terrain_coll = true;
 	}
-
 }
 
 
@@ -157,7 +162,7 @@ void PhysicsEngine::RaycastQuery(){
 			btCollisionWorld::AllHitsRayResultCallback re(from,to);
 			m_dynamic_world->rayTest(from, to, re);
 			for (unsigned int i = 0; i < re.m_collisionObjects.size(); i++){
-				CollisionManager::GetSingletonPtr()->ProcessCollision(def.collision_object, re.m_collisionObjects[i]);
+				CollisionManager::GetSingletonPtr()->ProcessRaycast(def.collision_object, re.m_collisionObjects[i]);
 			}
 		}
 	}
@@ -167,5 +172,18 @@ void PhysicsEngine::RemoveRaycastComponent(RaycastComponent* comp){
 	std::vector<RaycastComponent*>::iterator it = std::find(m_raycast_components.begin(), m_raycast_components.end(), comp);
 	if (it != m_raycast_components.end()){
 		m_raycast_components.erase(it);
+	}
+}
+
+void PhysicsEngine::RemoveObjectSimulationStep(IComponentSimulationStep* ob){
+	std::vector<IComponentSimulationStep*>::iterator it = std::find(m_ob_simulation_steps.begin(), m_ob_simulation_steps.end(), ob);
+	if (it != m_ob_simulation_steps.end()){
+		m_ob_simulation_steps.erase(it);
+	}
+}
+
+void PhysicsEngine::ProcessSimulationTick(btScalar time_step){
+	for (unsigned int i = 0; i < m_ob_simulation_steps.size(); i++){
+		m_ob_simulation_steps[i]->SimulationStep(time_step);
 	}
 }

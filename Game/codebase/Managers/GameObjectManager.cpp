@@ -137,23 +137,24 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	CountableResourceGUI* gui = new CountableResourceGUI;
 	go->AddComponent(gui);
 
-	Ogre::Vector3 scale(0.207);
+	Ogre::Vector3 scale(0.007);
 
 	node_comp->Init(position, m_scene_manager);
 	node_comp->GetSceneNode()->setScale(scale);
 	node_comp->SetId("player_node");
 	
-	acomp->Init("Sinbad.mesh", m_scene_manager, node_comp->GetId());
+	acomp->Init("Yomi.mesh", m_scene_manager, node_comp->GetId());
 	
 	//acomp->Init("yomi.mesh", m_scene_manager);
 	//Ogre::Vector3 scale(0.008f);
 	//node_comp->GetSceneNode()->setScale(scale);
 	//acomp->Init("yomi.mesh", m_scene_manager);
 	
+
 	contr->Init(position, acomp->GetEntity(), def.step_height, m_physics_engine);
 	contr->SetTurnSpeed(def.turn_speed);
 	contr->SetVelocity(def.velocity);
-	contr->SetJumpPower(200.0f);
+	contr->SetJumpPower(def.jump_power);
 	contr->HasFollowCam(true);
 	contr->SetMaxVelocity(def.max_velocity);
 	contr->SetDeacceleration(def.deacceleration);
@@ -162,6 +163,7 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	contr->GetRigidbody()->setFriction(def.friction);
 	contr->GetRigidbody()->setRestitution(def.restitution);
 	contr->SetRaycastLength(5.0f);
+	contr->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
 	pccomp->Init(m_input_manager, m_sound_manager);
 	pccomp->SetMaxVelocity(def.max_velocity);
 	pccomp->SetVelocity(def.velocity);
@@ -173,9 +175,11 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	gui->Init("Examples/Empty", "Examples/Filled", 10);
 	fcc->Init(m_scene_manager, m_viewport, true);
 	fcc->GetCamera()->setNearClipDistance(0.1f);
-	//fcc->GetCamera()->setFarClipDistance(1000);
-	csnc->Init(Ogre::Vector3(10.0f, 10.0f, 15.0f), "CreateBubble", node_comp->GetSceneNode());
+	csnc->Init(Ogre::Vector3(0.0f, 0.0f, 1.0f), "CreateBubble", node_comp->GetSceneNode());
 	m_sound_manager->GetYomiNode(node_comp->GetSceneNode()->getName());
+	raycast->Init(m_physics_engine, contr->GetRigidbody());
+	raycast->SetLength(Ogre::Vector3(0.0f,-0.8f,0.0f));
+	raycast->SetAttached(true);
 
 	return go;
 }
@@ -188,7 +192,12 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 	go->AddComponent(mrc);
 	RigidbodyComponent* rc = new RigidbodyComponent;
 	go->AddComponent(rc);
+	BubbleController* bc = new BubbleController;
+	go->AddComponent(bc);
+	go->AddUpdateable(bc);
+	Point2PointConstraintComponent* p2p = new Point2PointConstraintComponent;
 
+	bc->Init(m_physics_engine, 5.0f, 10.0f);
 	node_comp->Init(position, m_scene_manager);
 	mrc->Init("sphere.mesh", m_scene_manager);
 	Ogre::Vector3 scale(0.002f);
@@ -198,6 +207,9 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 	rc->GetRigidbody()->setGravity(btVector3(0.0f, 0.0f, 0.0f));
 	rc->GetRigidbody()->setRestitution(1.0f);
 	rc->GetRigidbody()->setFriction(0.5);
+	rc->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
+	p2p->Init(m_physics_engine, rc->GetRigidbody(), btVector3(0.0f,0.0f,0.0f), btVector3(0.0f,0.0f,0.0f));
+
 	return go;
 }
 
@@ -209,7 +221,11 @@ GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, v
 	go->AddComponent(mrc);
 	RigidbodyComponent* rc = new RigidbodyComponent;
 	go->AddComponent(rc);
+	BubbleController* bc = new BubbleController;
+	go->AddComponent(bc);
+	go->AddUpdateable(bc);
 
+	bc->Init(m_physics_engine, 5.0f, 10.0f);
 	node_comp->Init(position, m_scene_manager);
 	mrc->Init("sphere.mesh", m_scene_manager);
 	Ogre::Vector3 scale(0.002f);
@@ -220,10 +236,9 @@ GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, v
 	rc->GetRigidbody()->setLinearFactor(btVector3(1,0,1));
 	rc->GetRigidbody()->setRestitution(1.0f);
 	rc->GetRigidbody()->setFriction(0.5);
+	rc->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
 	return go;
 }
-
-
 
 GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* data){
 	CharControllerDef& def = *static_cast<CharControllerDef*>(data);
@@ -242,9 +257,7 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 	go->AddUpdateable(way_point);
 
 	node_comp->Init(position, m_scene_manager);
-	acomp->Init("yomi.mesh", m_scene_manager);
-	Ogre::Vector3 scale(0.002f);
-	node_comp->GetSceneNode()->setScale(scale);
+	acomp->Init("Yomi_2Yomi.mesh", m_scene_manager);
 	m_sound_manager->GetTottNode(node_comp->GetSceneNode()->getName());
 	way_point->Init(node_comp->GetSceneNode(), 0.001f);
 	way_point->AddWayPoint(Ogre::Vector3(15.0f, -10.0f, 21.0f));
