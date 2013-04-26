@@ -3,14 +3,12 @@
 
 #include "State.h"
 
+
 class MenuState : public State
 {
 public:
 	MenuState(void);
 	~MenuState(void);
-
-	//bool frameStarted(const Ogre::FrameEvent& evt);
-	//bool frameRenderingQueued(const Ogre::FrameEvent& evt);
 
 	bool Update(float dt);
 	void Enter();
@@ -19,6 +17,10 @@ public:
 	//DECLARE_STATE_CLASS(MenuState);
 
 private:
+	GameObjectManager*			m_game_object_manager;
+	PhysicsEngine*				m_physics_engine;
+	SoundManager*				m_sound_manager;
+
 };
 
 

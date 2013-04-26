@@ -2,6 +2,7 @@
 #define _STATE_H_
 
 #include "..\Managers\InputManager.h"
+#include "..\Managers\GameObjectManager.h"
 
 class MessageSystem;
 class SoundManager;
@@ -54,6 +55,7 @@ protected:
 	InputManager*		m_input_manager;
 	MessageSystem*		m_message_system;
 	SoundManager*		m_sound_manager;
+	PhysicsEngine*		m_physics_engine;
 };
 
 

@@ -148,11 +148,16 @@ struct AddForceMsg{
 };
 
 struct ButtonDef{
-	Ogre::String mat_hover;
+	Ogre::String mat_start_hover;
+	Ogre::String mat_start;
+	Ogre::String mat_exit_hover;
 	Ogre::String mat_exit;
+	Ogre::String mat_options_hover;
+	Ogre::String mat_options;
+	Ogre::String mat_credits_hover;
+	Ogre::String mat_credits;
 	Ogre::String cont_name;
 	Ogre::String overlay_name;
-	Ogre::String mat_start_button;
 	std::function<void()> func;
 };
 struct ParticleDef{

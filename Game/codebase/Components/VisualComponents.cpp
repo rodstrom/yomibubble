@@ -329,3 +329,118 @@ void ParticleComponent::Shut(){
 	m_messenger->Unregister(MSG_CREATE_PARTICLE, this);
 	m_particle_system->removeAllEmitters();
 }
+
+void SkyXComponent::Init(Ogre::SceneManager* p_scene_manager, const Ogre::Vector3 t, const Ogre::Real& tm, const Ogre::Real& mp, const SkyX::AtmosphereManager::Options& atmOpt, const bool& lc){
+	
+	m_scene_manager = p_scene_manager;
+	m_basic_controller = new SkyX::BasicController;
+	m_sky_x = new SkyX::SkyX(m_scene_manager, m_basic_controller);
+ 	Ogre::String name = m_sky_x->getGPUManager()->getSkydomeMaterialName();
+	m_sky_x->create();
+	m_sky_x->getVCloudsManager()->getVClouds()->setDistanceFallingParams(Ogre::Vector2(2,-1));
+	
+	//m_camera = p_camera;
+	m_time = t;
+	m_time_multiplier = tm;
+	m_moon_phase = mp;
+	m_atmosphere_opt = atmOpt;
+	m_layered_clouds = lc;
+	//m_volumetric_clouds = vc;
+	//m_vc_wind_speed = vcws;
+	//m_vc_auto_update = vcauto;
+	//m_vc_wind_dir = vcwd;
+	//m_vc_ambient_color = vcac;
+	//m_vc_light_response = vclr;
+	//m_vc_ambient_factors = vcaf;
+	//m_vc_wheater = vcw;
+	//m_vc_lightnings = vcl;
+	//m_vc_lightningsAT = vclat;
+	//m_vc_lightnings_color;
+	//m_vc_lightningsTM = vcltm;
+
+	
+}
+
+void SkyXComponent::Update(float dt){
+	m_sky_x->update(dt);
+}
+
+void SkyXComponent::Notify(int type, void* message){
+}
+
+void SkyXComponent::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
+}
+
+void SkyXComponent::Shut(){
+}
+
+void SkyXComponent::CreateSkyBox(){
+	
+	
+	m_sky_x->setTimeMultiplier(m_time_multiplier);
+	m_basic_controller->setTime(m_time);
+	m_basic_controller->setMoonPhase(m_moon_phase);
+	m_sky_x->getAtmosphereManager()->setOptions(m_atmosphere_opt);
+
+	// Layered clouds
+	if (m_layered_clouds)
+	{
+		// Create layer cloud
+		if (m_sky_x->getCloudsManager()->getCloudLayers().empty())
+		{
+			m_sky_x->getCloudsManager()->add(SkyX::CloudLayer::Options(/* Default options */));
+		}
+	}
+	else
+	{
+		// Remove layer cloud
+		if (!m_sky_x->getCloudsManager()->getCloudLayers().empty())
+		{
+			m_sky_x->getCloudsManager()->removeAll();
+		}
+	}
+
+	m_sky_x->getVCloudsManager()->setWindSpeed(m_vc_wind_speed);
+	m_sky_x->getVCloudsManager()->setAutoupdate(m_vc_auto_update);
+
+	SkyX::VClouds::VClouds* vclouds = m_sky_x->getVCloudsManager()->getVClouds();
+
+	vclouds->setWindDirection(m_vc_wind_dir);
+	vclouds->setAmbientColor(m_vc_ambient_color);
+	vclouds->setLightResponse(m_vc_light_response);
+	vclouds->setAmbientFactors(m_vc_ambient_factors);
+	vclouds->setWheater(m_vc_wheater.x, m_vc_wheater.y, false);
+
+	if (m_volumetric_clouds)
+	{
+		
+		// Create VClouds
+		if (!m_sky_x->getVCloudsManager()->isCreated())
+		{
+			// SkyX::MeshManager::getSkydomeRadius(...) works for both finite and infinite(=0) camera far clip distances
+			//m_sky_x->getVCloudsManager()->create(m_sky_x->getMeshManager()->getSkydomeRadius(m_camera));
+		}
+	}
+	else
+	{
+		// Remove VClouds
+		if (m_sky_x->getVCloudsManager()->isCreated())
+		{
+			m_sky_x->getVCloudsManager()->remove();
+		}
+	}
+
+	vclouds->getLightningManager()->setEnabled(m_vc_lightnings);
+	vclouds->getLightningManager()->setAverageLightningApparitionTime(m_vc_lightningsAT);
+	vclouds->getLightningManager()->setLightningColor(m_vc_lightnings_color);
+	vclouds->getLightningManager()->setLightningTimeMultiplier(m_vc_lightningsTM);
+
+	//mTextArea->setCaption(buildInfoStr());
+
+	// Reset camera position/orientation
+	//mRenderingCamera->setPosition(0,0,0);
+	//mRenderingCamera->setDirection(0,0,1);
+
+	m_sky_x->update(0);
+}

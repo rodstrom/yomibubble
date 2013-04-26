@@ -16,7 +16,7 @@ GameObjectManager::GameObjectManager(void) :
 GameObjectManager::~GameObjectManager(void){}
 
 void GameObjectManager::Init(PhysicsEngine* physics_engine, Ogre::SceneManager* scene_manager, InputManager* input_manager, Ogre::Viewport* viewport, SoundManager* sound_manager){
-	SkyX::SkyX* skyX = NULL;
+	//SkyX::SkyX* skyX = NULL;
 	
 	
 	m_physics_engine = physics_engine;
@@ -24,13 +24,14 @@ void GameObjectManager::Init(PhysicsEngine* physics_engine, Ogre::SceneManager* 
 	m_input_manager = input_manager;
 	m_viewport = viewport;
 	m_sound_manager = sound_manager;
-	m_create_fptr[GAME_OBJECT_PLAYER]      =	&GameObjectManager::CreatePlayer;
-	m_create_fptr[GAME_OBJECT_BLUE_BUBBLE] =	&GameObjectManager::CreateBlueBubble;
-	m_create_fptr[GAME_OBJECT_PINK_BUBBLE] =	&GameObjectManager::CreatePinkBubble;
-	m_create_fptr[GAME_OBJECT_TOTT]        =	&GameObjectManager::CreateTott;
-	m_create_fptr[GAME_OBJECT_PLANE]       =	&GameObjectManager::CreatePlane;
-	m_create_fptr[GAME_OBJECT_OVERLAY]	   =	&GameObjectManager::Create2DOverlay;
-	m_create_fptr[GAME_OBJECT_LEAF]		   =	&GameObjectManager::CreateLeaf;
+	m_create_fptr[GAME_OBJECT_PLAYER]       =	&GameObjectManager::CreatePlayer;
+	m_create_fptr[GAME_OBJECT_BLUE_BUBBLE]  =	&GameObjectManager::CreateBlueBubble;
+	m_create_fptr[GAME_OBJECT_PINK_BUBBLE]  =	&GameObjectManager::CreatePinkBubble;
+	m_create_fptr[GAME_OBJECT_TOTT]         =	&GameObjectManager::CreateTott;
+	m_create_fptr[GAME_OBJECT_PLANE]        =	&GameObjectManager::CreatePlane;
+	m_create_fptr[GAME_OBJECT_OVERLAY]	   =	&GameObjectManager::CreateButton;
+	m_create_fptr[GAME_OBJECT_LEAF]		    =	&GameObjectManager::CreateLeaf;
+	m_create_fptr[GAME_OBJECT_SKYBOX]	    =	&GameObjectManager::CreateSkyBox;
 }
 
 void GameObjectManager::Update(float dt){
@@ -245,7 +246,7 @@ GameObject* GameObjectManager::CreatePlane(const Ogre::Vector3& position, void* 
 
 	return go;
 }
-GameObject* GameObjectManager::Create2DOverlay(const Ogre::Vector3& position, void* data) {
+GameObject* GameObjectManager::CreateButton(const Ogre::Vector3& position, void* data) {
 	ButtonDef& buttonDef = *static_cast<ButtonDef*>(data);
 	GameObject* go = new GameObject;
 	//Overlay2DComponent* overlayComp = new Overlay2DComponent;
@@ -260,7 +261,7 @@ GameObject* GameObjectManager::Create2DOverlay(const Ogre::Vector3& position, vo
 	//overlayComp->Init(buttonDef.overlay_name, buttonDef.cont_name);
 	overlaycallback->Init(buttonDef.func);
 	overlayCallBack->Init(m_input_manager, m_viewport);
-	overlay2DAnim->Init(buttonDef.overlay_name, buttonDef.mat_hover, buttonDef.mat_exit, buttonDef.cont_name);
+	overlay2DAnim->Init(buttonDef.overlay_name, buttonDef.mat_start_hover, buttonDef.mat_start, buttonDef.cont_name);
 
 	return go;
 }
@@ -279,5 +280,17 @@ GameObject* GameObjectManager::CreateLeaf(const Ogre::Vector3& position, void* d
 	particle->Init(m_scene_manager, "Smoke", particleDef.particle_name);
 	mrc->GetSceneNode()->setPosition(Ogre::Vector3(position));
 	particle->CreateParticle(mrc->GetSceneNode(), mrc->GetSceneNode()->getPosition(), Ogre::Vector3(0,-3,0));
+	return go;
+}
+
+GameObject* GameObjectManager::CreateSkyBox(const Ogre::Vector3& position, void* data){
+	GameObject* go = new GameObject(GAME_OBJECT_SKYBOX);
+	SkyXComponent* skyX = new SkyXComponent;
+	go->AddComponent(skyX);
+	go->AddUpdateable(skyX);
+
+	skyX->Init(m_scene_manager, Ogre::Vector3(21.5f, 7.5, 20.5), 0.03, -0.25, SkyX::AtmosphereManager::Options(), true);
+	skyX->CreateSkyBox();
+
 	return go;
 }

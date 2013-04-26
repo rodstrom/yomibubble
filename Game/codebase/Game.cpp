@@ -15,7 +15,7 @@ bool Game::Init(Ogre::RenderWindow* render_window, MessageSystem* message_system
 	m_state_manager = new StateManager(render_window, this, message_system);
 	PlayState::Create<PlayState>(m_state_manager, "PlayState");
 	MenuState::Create<MenuState>(m_state_manager, "MenuState");
-	m_state_manager->ChangeState(m_state_manager->FindById("PlayState"));
+	m_state_manager->ChangeState(m_state_manager->FindById("MenuState"));
 	return true;
 }
 

@@ -138,4 +138,57 @@ protected:
 	Ogre::ParticleSystem*		m_particle_system;
 };
 
+class SkyXComponent : public Component, public IComponentObserver, public IComponentUpdateable{
+public:
+	SkyXComponent(void){}
+	virtual ~SkyXComponent(void){}
+	virtual void Update(float dt);
+	virtual void Notify(int type, void* message);
+	virtual void Shut();
+	virtual void SetMessenger(ComponentMessenger* messenger);
+	void Init(Ogre::SceneManager* p_scene_manager, const Ogre::Vector3 t, const Ogre::Real& tm, const Ogre::Real& mp, const SkyX::AtmosphereManager::Options& atmOpt, const bool& lc);
+	void CreateSkyBox();
+
+protected:
+	SkyX::SkyX*								 m_sky_x;
+	SkyX::BasicController*					 m_basic_controller;
+	Ogre::SceneManager*						 m_scene_manager;
+	Ogre::Camera*							 m_camera;
+	
+	/// Time
+	Ogre::Vector3							 m_time;
+	/// Time multiplier
+	Ogre::Real								 m_time_multiplier;
+	/// Moon phase
+	Ogre::Real								 m_moon_phase;
+	/// Atmosphere options
+	SkyX::AtmosphereManager::Options		 m_atmosphere_opt;
+	/// Layered clouds?
+	bool									 m_layered_clouds;
+	/// Volumetric clouds?
+	bool									 m_volumetric_clouds;
+	/// VClouds wind speed
+	Ogre::Real								 m_vc_wind_speed;
+	/// VClouds autoupdate
+	bool									 m_vc_auto_update;
+	/// VClouds wind direction
+	Ogre::Radian							 m_vc_wind_dir;
+	/// VClouds ambient color
+	Ogre::Vector3							 m_vc_ambient_color;
+	/// VClouds light response
+	Ogre::Vector4							 m_vc_light_response;
+	/// VClouds ambient factors
+	Ogre::Vector4							 m_vc_ambient_factors;
+	/// VClouds wheater
+	Ogre::Vector2							 m_vc_wheater;
+	/// VClouds lightnings?
+	bool									 m_vc_lightnings;
+	/// VClouds lightnings average aparition time
+	Ogre::Real								 m_vc_lightningsAT;
+	/// VClouds lightnings color
+	Ogre::Vector3							 m_vc_lightnings_color;
+	/// VClouds lightnings time multiplier
+	Ogre::Real								 m_vc_lightningsTM;
+};
+
 #endif // _N_VISUAL_COMPONENTS_H_
