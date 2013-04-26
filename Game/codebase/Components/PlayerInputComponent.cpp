@@ -5,6 +5,7 @@
 #include "..\BtOgreGP.h"
 #include "GameObject.h"
 #include "..\Managers\GameObjectManager.h"
+#include "..\PhysicsEngine.h"
 
 void PlayerInputComponent::Update(float dt){
 	(this->*m_states[m_player_state])(dt);
@@ -150,6 +151,10 @@ void PlayerInputComponent::Normal(float dt){
 }
 
 void PlayerInputComponent::OnBubble(float dt){
+	Ogre::Vector3 dir = Ogre::Vector3::ZERO;
+	dir.x = m_input_manager->GetMovementAxis().x;
+	dir.z = m_input_manager->GetMovementAxis().z;
+
 	Ogre::SceneNode* node = NULL;
 	m_current_bubble->GetComponentMessenger()->Notify(MSG_NODE_GET_NODE, &node);
 	if (node){
@@ -169,20 +174,6 @@ void PlayerInputComponent::OnBubble(float dt){
 		return;
 	}
 
-	Ogre::Vector3 dir = Ogre::Vector3::ZERO;
-	if (m_input_manager->IsButtonDown(BTN_LEFT)){
-		dir += Ogre::Vector3(-1.0f, 0.0f, 0.0f);
-	}
-	else if (m_input_manager->IsButtonDown(BTN_RIGHT)){
-		dir += Ogre::Vector3(1.0f, 0.0f, 0.0f);
-	}
-
-	if (m_input_manager->IsButtonDown(BTN_UP)){
-		dir += Ogre::Vector3(0.0f, 0.0f, -1.0f);
-	}
-	else if (m_input_manager->IsButtonDown(BTN_DOWN)){
-		dir += Ogre::Vector3(0.0f, 0.0f, 1.0f);
-	}
 	float speed = 10.0f * dt;
 	bool follow_cam = false;
 	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_GET, &follow_cam);
@@ -195,19 +186,11 @@ void PlayerInputComponent::OnBubble(float dt){
 			goal_dir += dir.x * cam_node->getOrientation().xAxis();
 			goal_dir.y = 0.0f;
 			goal_dir.normalise();
-			btRigidBody* body = NULL;
-			m_current_bubble->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GET_BODY, &body);
-			if (body){
-				body->applyCentralImpulse(BtOgre::Convert::toBullet(goal_dir * speed));
-			}
+			m_current_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_APPLY_IMPULSE, &goal_dir);
 		}
 	}
 	else{
-		btRigidBody* body = NULL;
-		m_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &body);
-		if (body){
-			body->applyCentralImpulse(BtOgre::Convert::toBullet(dir * speed));
-		}
+		m_current_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_APPLY_IMPULSE, &dir);
 	}
 	
 }
@@ -218,21 +201,11 @@ void PlayerInputComponent::InsideBubble(float dt){
 
 void PlayerInputComponent::Bouncing(float dt){
 	Ogre::Vector3 dir = Ogre::Vector3::ZERO;
+	dir.x = m_input_manager->GetMovementAxis().x;
+	dir.z = m_input_manager->GetMovementAxis().z;
 
-	if (m_input_manager->IsButtonDown(BTN_LEFT)){
-		dir += Ogre::Vector3(-1.0f, 0.0f, 0.0f);
-	}
-	else if (m_input_manager->IsButtonDown(BTN_RIGHT)){
-		dir += Ogre::Vector3(1.0f, 0.0f, 0.0f);
-	}
-
-	if (m_input_manager->IsButtonDown(BTN_UP)){
-		dir += Ogre::Vector3(0.0f, 0.0f, -1.0f);
-	}
-	else if (m_input_manager->IsButtonDown(BTN_DOWN)){
-		dir += Ogre::Vector3(0.0f, 0.0f, 1.0f);
-	}
-
+	Ogre::Vector3 acc = Ogre::Vector3::ZERO;
+	Acceleration(dir, acc, dt);
 	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &dir);
 }
 
@@ -272,4 +245,65 @@ void PlayerInputComponent::Acceleration(Ogre::Vector3& dir, Ogre::Vector3& acc, 
 	}
 	acc.x += m_acc_x;
 	acc.z += m_acc_z;
+}
+
+void BubbleController::Notify(int type, void* msg){
+	switch (type){
+	case MSG_BUBBLE_CONTROLLER_APPLY_IMPULSE:
+		m_apply_impulse = true;
+		m_impulse = *static_cast<Ogre::Vector3*>(msg);
+		break;
+	default:
+		break;
+	}
+}
+
+void BubbleController::Shut(){
+	m_messenger->Unregister(MSG_BUBBLE_CONTROLLER_APPLY_IMPULSE, this);
+	m_physics_engine->RemoveObjectSimulationStep(this);
+}
+
+void BubbleController::Init(PhysicsEngine* physics_engine, float velocity, float max_velocity){
+	m_physics_engine = physics_engine;
+	m_velocity = velocity;
+	m_max_velocity = max_velocity;
+	physics_engine->AddObjectSimulationStep(this);
+}
+
+void BubbleController::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
+	m_messenger->Register(MSG_BUBBLE_CONTROLLER_APPLY_IMPULSE, this);
+}
+
+
+void BubbleController::ApplyImpulse(const btVector3& dir){
+	btRigidBody* body = NULL;
+	m_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &body);
+	if (body){
+		body->applyCentralImpulse(btVector3(dir.x(), 0.0f, dir.z()));
+	}
+}
+
+void BubbleController::Update(float dt){
+	if (m_apply_impulse){
+	btRigidBody* body = NULL;
+	m_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &body);
+	if (body){
+	}
+		m_messenger->Notify(MSG_RIGIDBODY_APPLY_IMPULSE, &m_impulse);
+	}
+}
+
+void BubbleController::SimulationStep(btScalar time_step){
+	btRigidBody* body = NULL;
+	m_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &body);
+	if (body){
+		const btScalar max_speed = 2.0f;
+		btVector3 vel = body->getLinearVelocity();
+		btScalar speed = vel.length();
+		if (speed >= max_speed){
+			vel *= max_speed/speed;
+			body->setLinearVelocity(vel);
+		}
+	}
 }

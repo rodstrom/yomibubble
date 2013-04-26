@@ -33,12 +33,11 @@ public:
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
 
-
 protected:
 
 };
 
-class CharacterController : public RigidbodyComponent, public IComponentUpdateable, public IComponentLateUpdate{
+class CharacterController : public RigidbodyComponent, public IComponentUpdateable, public IComponentLateUpdate, public IComponentSimulationStep{
 public:
 	CharacterController(void) : m_velocity(0.0), m_turn_speed(0.0f), 
 		m_has_follow_cam(false), m_is_jumping(false), m_on_ground(false),
@@ -51,6 +50,7 @@ public:
 	virtual void Init(const Ogre::Vector3& position, Ogre::Entity* entity, float step_height, PhysicsEngine* physics_engine);
 	virtual void Update(float dt);
 	virtual void LateUpdate(float dt);
+	virtual void SimulationStep(btScalar time_step);
 	void SetVelocity(float velocity) { m_velocity = velocity; }
 	void SetTurnSpeed(float turn_speed) { m_turn_speed = turn_speed; }
 	void HasFollowCam(bool value) { m_has_follow_cam = value; }
@@ -64,8 +64,6 @@ protected:
 	void ApplyAcceleration(Ogre::Vector3& dir, float dt);
 
 	Ogre::Vector3	m_direction;
-	btGhostObject* m_ghost_object;
-	btCollisionShape*	m_ghost_shape;
 
 	float		m_max_velocity;
 	float		m_velocity;
@@ -101,7 +99,7 @@ private:
 
 class Generic6DofConstraintComponent : public Component, public IComponentObserver{
 public:
-	Generic6DofConstraintComponent(void) : m_physics_engine(NULL), m_constraint(NULL) {}
+	Generic6DofConstraintComponent(void) : m_physics_engine(NULL), m_constraint(NULL){}
 	virtual ~Generic6DofConstraintComponent(void){}
 
 	virtual void Notify(int type, void* msg);
@@ -123,6 +121,7 @@ public:
 	virtual void Notify(int type, void* msg);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
+	virtual void Init(PhysicsEngine* physics_engine, btCollisionObject* obj);
 	void SetLength(const Ogre::Vector3& length);
 	bool IsAttached() const { return m_attached; }
 	void SetAttached(bool value) { m_attached = value; }

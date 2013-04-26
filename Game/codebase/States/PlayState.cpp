@@ -32,11 +32,11 @@ void PlayState::Enter(){
 	
 	/*ParticleDef particleDef;
 	particleDef.particle_name = "Particle/Smoke";
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(180,78,225), &particleDef);	
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(180,78,225), &particleDef);	*/
 	
-	/*Ogre::Light* light = m_scene_manager->createLight("light1");
+	Ogre::Light* light = m_scene_manager->createLight("light1");
 	light->setType(Ogre::Light::LT_DIRECTIONAL);
-	light->setDirection(Ogre::Vector3(1,-1,0));*/
+	light->setDirection(Ogre::Vector3(1,-1,0));
 	//m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
 	
 	// Create plane mesh

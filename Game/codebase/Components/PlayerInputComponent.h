@@ -54,7 +54,30 @@ protected:
 	float m_acc_x;
 	float m_acc_z;
 	float m_max_velocity;
+};
 
+class PhysicsEngine;
+class BubbleController : public Component, public IComponentObserver, public IComponentSimulationStep, public IComponentUpdateable{
+public:
+	BubbleController(void) :  m_velocity(0.0f), m_max_velocity(0.0f), m_impulse(Ogre::Vector3::ZERO), m_apply_impulse(false){}
+	virtual ~BubbleController(void){}
+
+	virtual void Notify(int type, void* message);
+	virtual void Shut();
+	virtual void Init(PhysicsEngine* physics_engine, float velocity, float max_velocity);
+	virtual void SetMessenger(ComponentMessenger* messenger);
+	virtual void Update(float dt);
+	virtual void SimulationStep(btScalar time_step);
+	void SetVelocity(float value) { m_velocity = value; }
+	void SetMaxVelocity(float value) { m_max_velocity = value; }
+
+protected:
+	void ApplyImpulse(const btVector3& dir);
+	PhysicsEngine* m_physics_engine;
+	bool m_apply_impulse;
+	Ogre::Vector3 m_impulse;
+	float m_velocity;
+	float m_max_velocity;
 };
 
 #endif // _N_PLAYER_CONTROLLER_H_

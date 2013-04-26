@@ -6,6 +6,9 @@
 #include "BulletCollision\CollisionDispatch\btGhostObject.h"
 #include "BulletCollision\CollisionShapes\btHeightfieldTerrainShape.h"
 
+static void GameTickCallback(btDynamicsWorld* world, btScalar time_step);
+
+class IComponentSimulationStep;
 class RaycastComponent;
 class PhysicsEngine
 {
@@ -28,9 +31,12 @@ public:
 	//btBroadphaseInterface* GetBroadphaseInterface() const { return m_broadphase; }
 	btDiscreteDynamicsWorld* GetDynamicWorld() const { return m_dynamic_world; }
 	BtOgre::DebugDrawer* GetDebugDraw() const { return m_debug_drawer; }
+	void ProcessSimulationTick(btScalar time_step);
 
 	void AddRaycastComponent(RaycastComponent* comp) { m_raycast_components.push_back(comp); }
 	void RemoveRaycastComponent(RaycastComponent* comp);
+	void AddObjectSimulationStep(IComponentSimulationStep* ob) { m_ob_simulation_steps.push_back(ob); }
+	void RemoveObjectSimulationStep(IComponentSimulationStep* ob);
 
 private:
 	void RaycastQuery();
@@ -42,6 +48,7 @@ private:
 	BtOgre::DebugDrawer*					m_debug_drawer;
 	btGhostPairCallback*					m_ghost_pair_callback;
 	std::vector<RaycastComponent*>			m_raycast_components;
+	std::vector<IComponentSimulationStep*>	m_ob_simulation_steps;
 
 	//Terrain Collision
 	bool									m_has_terrain_coll;
