@@ -61,14 +61,14 @@ void PlayState::Enter(){
 	plane_def.restitution = 0.8f;
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(x,y - 2.0f,z), &plane_def);
 	//0.35f, 1000.0f, 500.0f, 10.0f, 
-	TriggerDef trigger_def;
+	/*TriggerDef trigger_def;
 	trigger_def.body_type = DYNAMIC_BODY;
 	trigger_def.type = COLLIDER_BOX;
 	trigger_def.x = 0.5f;
 	trigger_def.y = 0.5f;
 	trigger_def.z = 0.5f;
 	trigger_def.origin = Ogre::Vector3(0,-1,0);
-	trigger_def.mass = 0.0f;
+	trigger_def.mass = 0.0f;*/
 	CharControllerDef player_def;
 	player_def.friction = 1.0f;
 	player_def.velocity = 5.0f;
@@ -95,7 +95,13 @@ void PlayState::Enter(){
 	//m_physics_engine->CreateTerrainCollision(mArtifexLoader->mTerrain);
 	//m_scene_manager->setSkyDome(true, "Examples/CloudySky");
 	
-	
+	TriggerDef trigger_def;
+	trigger_def.body_type = STATIC_BODY;
+	trigger_def.collider_type = COLLIDER_BOX;
+	trigger_def.x = 2.0f;
+	trigger_def.y = 2.0f;
+	trigger_def.z = 2.0f;
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_TRIGGER_TEST, Ogre::Vector3(x + 2.0f, y - 10.0f ,z + 2.0f), &trigger_def);
 }
 
 

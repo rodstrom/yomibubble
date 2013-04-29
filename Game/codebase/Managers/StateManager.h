@@ -37,6 +37,7 @@ protected:
 	Ogre::RenderWindow*			m_render_window;
 	InputListener*				m_input_listener;
 	MessageSystem*				m_message_system;
+	State*						m_next_state;
 };
 
 #endif // _STATE_MANAGER_H_

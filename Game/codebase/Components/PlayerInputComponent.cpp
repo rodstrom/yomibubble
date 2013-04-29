@@ -82,16 +82,24 @@ void PlayerInputComponent::Normal(float dt){
 		Ogre::SceneNode* node = NULL;
 		if (m_input_manager->IsButtonPressed(BTN_LEFT_MOUSE)){
 			m_messenger->Notify(MSG_CHILD_NODE_GET_NODE, &node);
-			if (node){
-				m_current_bubble = m_owner->GetGameObjectManager()->CreateGameObject(GAME_OBJECT_BLUE_BUBBLE, node->_getDerivedPosition(), NULL);
+			btRigidBody* body = NULL;
+			m_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &body, "btrig");
+			if (node && body){
+				Ogre::Vector3 pos = node->_getDerivedPosition();
+				m_current_bubble = m_owner->GetGameObjectManager()->CreateGameObject(GAME_OBJECT_BLUE_BUBBLE, pos, &body);
+				m_messenger->Notify(MSG_RIGIDBODY_POSITION_SET, &pos, "btrig");
 				m_bubble_type = BUBBLE_TYPE_BLUE;
 				m_is_creating_bubble = true;
 			}
 		}
 		else if (m_input_manager->IsButtonPressed(BTN_RIGHT_MOUSE)){
 			m_messenger->Notify(MSG_CHILD_NODE_GET_NODE, &node);
-			if (node){
-				m_current_bubble = m_owner->GetGameObjectManager()->CreateGameObject(GAME_OBJECT_PINK_BUBBLE, node->_getDerivedPosition(), NULL);
+			btRigidBody* body = NULL;
+			m_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &body, "btrig");
+			if (node && body){
+				Ogre::Vector3 pos = node->_getDerivedPosition();
+				m_current_bubble = m_owner->GetGameObjectManager()->CreateGameObject(GAME_OBJECT_PINK_BUBBLE, pos, &body);
+				m_messenger->Notify(MSG_RIGIDBODY_POSITION_SET, &pos, "btrig");
 				m_bubble_type = BUBBLE_TYPE_PINK;
 				m_is_creating_bubble = true;
 			}
@@ -103,6 +111,7 @@ void PlayerInputComponent::Normal(float dt){
 		m_current_scale += SCALE;
 		if (m_bubble_type == BUBBLE_TYPE_BLUE && m_input_manager->IsButtonReleased(BTN_LEFT_MOUSE)){
 			Ogre::Vector3 gravity(0,-10,0);
+			m_current_bubble->RemoveComponent(COMPONENT_POINT2POINT_CONSTRAINT);
 			m_current_bubble->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GRAVITY_SET, &gravity);
 			m_current_scale = 0.0f;
 			m_is_creating_bubble = false;
@@ -111,6 +120,7 @@ void PlayerInputComponent::Normal(float dt){
 		else if (m_bubble_type == BUBBLE_TYPE_PINK && m_input_manager->IsButtonReleased(BTN_RIGHT_MOUSE)){
 			m_current_scale = 0.0f;
 			m_is_creating_bubble = false;
+			m_current_bubble->RemoveComponent(COMPONENT_POINT2POINT_CONSTRAINT);
 			m_current_bubble = NULL;
 		}
 
@@ -119,8 +129,7 @@ void PlayerInputComponent::Normal(float dt){
 			m_messenger->Notify(MSG_CHILD_NODE_GET_NODE, &node);
 			if (node){
 				Ogre::Vector3 pos = node->_getDerivedPosition();
-				
-				m_current_bubble->GetComponentMessenger()->Notify(MSG_SET_OBJECT_POSITION, &pos);
+				m_messenger->Notify(MSG_RIGIDBODY_POSITION_SET, &pos, "btrig");		// btrig is the ID for the TriggerCompoent
 				m_current_bubble->GetComponentMessenger()->Notify(MSG_INCREASE_SCALE_BY_VALUE, &scale_inc);
 			}
 		}
@@ -129,7 +138,7 @@ void PlayerInputComponent::Normal(float dt){
 			m_messenger->Notify(MSG_CHILD_NODE_GET_NODE, &node);
 			if (node){
 				Ogre::Vector3 pos = node->_getDerivedPosition();
-				m_current_bubble->GetComponentMessenger()->Notify(MSG_SET_OBJECT_POSITION, &pos);
+				m_messenger->Notify(MSG_RIGIDBODY_POSITION_SET, &pos, "btrig");		// btrig is the ID for the TriggerCompoent
 				m_current_bubble->GetComponentMessenger()->Notify(MSG_INCREASE_SCALE_BY_VALUE, &scale_inc);
 			}
 		}
@@ -249,10 +258,16 @@ void PlayerInputComponent::Acceleration(Ogre::Vector3& dir, Ogre::Vector3& acc, 
 
 void BubbleController::Notify(int type, void* msg){
 	switch (type){
-	case MSG_BUBBLE_CONTROLLER_APPLY_IMPULSE:
-		m_apply_impulse = true;
-		m_impulse = *static_cast<Ogre::Vector3*>(msg);
-		break;
+		case MSG_BUBBLE_CONTROLLER_APPLY_IMPULSE:
+			m_apply_impulse = true;
+			m_impulse = *static_cast<Ogre::Vector3*>(msg);
+			break;
+		case MSG_BUBBLE_CONTROLLER_CAN_ATTACH_GET:
+			*static_cast<bool*>(msg) = m_can_be_attached;
+			break;
+		case MSG_BUBBLE_CONTROLLER_CAN_ATTACH_SET:
+			m_can_be_attached = *static_cast<bool*>(msg);
+			break;
 	default:
 		break;
 	}
@@ -260,6 +275,8 @@ void BubbleController::Notify(int type, void* msg){
 
 void BubbleController::Shut(){
 	m_messenger->Unregister(MSG_BUBBLE_CONTROLLER_APPLY_IMPULSE, this);
+	m_messenger->Unregister(MSG_BUBBLE_CONTROLLER_CAN_ATTACH_GET, this);
+	m_messenger->Unregister(MSG_BUBBLE_CONTROLLER_CAN_ATTACH_SET, this);
 	m_physics_engine->RemoveObjectSimulationStep(this);
 }
 
@@ -273,6 +290,8 @@ void BubbleController::Init(PhysicsEngine* physics_engine, float velocity, float
 void BubbleController::SetMessenger(ComponentMessenger* messenger){
 	m_messenger = messenger;
 	m_messenger->Register(MSG_BUBBLE_CONTROLLER_APPLY_IMPULSE, this);
+	m_messenger->Register(MSG_BUBBLE_CONTROLLER_CAN_ATTACH_GET, this);
+	m_messenger->Register(MSG_BUBBLE_CONTROLLER_CAN_ATTACH_SET, this);
 }
 
 

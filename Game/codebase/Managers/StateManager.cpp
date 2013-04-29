@@ -4,11 +4,23 @@
 #include "InputManager.h"
 
 StateManager::StateManager(Ogre::RenderWindow* render_window, InputListener* input_listener, MessageSystem* message_system) 
-	: m_render_window(render_window), m_input_listener(input_listener), m_message_system(message_system){}
+	: m_render_window(render_window), m_input_listener(input_listener), m_message_system(message_system), m_next_state(NULL){}
 
 StateManager::~StateManager(void){}
 
 bool StateManager::Update(float dt){
+	if (m_next_state){
+		if (!m_state_stack.empty()){
+			Cleanup(m_state_stack.back());
+			m_state_stack.back()->Exit();
+			m_state_stack.pop_back();
+		}
+		m_state_stack.push_back(m_next_state);
+		Init(m_next_state);
+		m_state_stack.back()->Enter();
+		m_next_state = NULL;
+	}
+
 	if (!m_state_stack.empty()){
 		return m_state_stack.back()->Update(dt);
 	}
@@ -31,14 +43,9 @@ State* StateManager::FindById(const Ogre::String& id){
 }
 
 void StateManager::ChangeState(State* state){
-	if (!m_state_stack.empty()){
-		Cleanup(m_state_stack.back());
-		m_state_stack.back()->Exit();
-		m_state_stack.pop_back();
+	if (!m_next_state){
+		m_next_state = state;
 	}
-	m_state_stack.push_back(state);
-	Init(state);
-	m_state_stack.back()->Enter();
 }
 
 bool StateManager::PushState(State* state){

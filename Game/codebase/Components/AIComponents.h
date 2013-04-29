@@ -6,7 +6,7 @@
 
 class WayPointComponent : public Component, public IComponentUpdateable, public IComponentObserver{
 public:
-	WayPointComponent(void){ m_type = COMPONENT_AI; };
+	WayPointComponent(void){ m_type = COMPONENT_AI; m_update = true; };
 	virtual ~WayPointComponent(void){};
 
 	virtual void Notify(int type, void* message);
