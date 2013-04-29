@@ -17,12 +17,16 @@ enum EComponentType{
 	COMPONENT_CAMERA,
 	COMPONENT_POINT2POINT_CONSTRAINT,
 	COMPONENT_FOLLOW_CAMERA,
+	COMPONENT_NODE,
+	COMPONENT_TRIGGER,
+	COMPONENT_RAYCAST,
 	COMPONENT_SIZE
 };
 
 enum EComponentMsg{
 	MSG_ADD_FORCE = 0,
 	MSG_NODE_GET_NODE,
+	MSG_NODE_ATTACH_ENTITY,
 	MSG_MESH_RENDERER_GET_ENTITY,
 	MSG_RIGIDBODY_GET_BODY,
 	MSG_RIGIDBODY_GRAVITY_SET,
@@ -30,6 +34,7 @@ enum EComponentMsg{
 	MSG_RIGIDBODY_APPLY_IMPULSE,
 	MSG_ANIMATION_PLAY,
 	MSG_ANIMATION_PAUSE,
+	MSG_ANIMATION_BLEND,
 	MSG_CHARACTER_CONROLLER_VELOCITY_SET,
 	MSG_CHARACTER_CONROLLER_TURN_SPEED_SET,
 	MSG_CHARACTER_CONTROLLER_SET_DIRECTION,
@@ -58,8 +63,10 @@ enum EComponentMsg{
 	MSG_OVERLAY_HOVER_EXIT,
 	MSG_OVERLAY_CALLBACK,
 	MSG_CREATE_PARTICLE,
+	MSG_LEAF_PICKUP,
 	MSG_PLAYER_INPUT_SET_BUBBLE,
 	MSG_PLAYER_INPUT_SET_STATE,
+	MSG_BUBBLE_CONTROLLER_APPLY_IMPULSE,
 	MSG_SIZE
 };
 
@@ -104,9 +111,14 @@ protected:
 
 class IComponentObserver{
 public:
-	IComponentObserver(void){}
+	IComponentObserver(void){ m_id = "component" + NumberToString(m_object_counter); }
 	virtual ~IComponentObserver(void){}
 	virtual void Notify(int type, void* message) = 0;
+	void SetId(const Ogre::String& id) { m_id = id; }
+	const Ogre::String& GetId() const { return m_id; }
+protected:
+	Ogre::String m_id;
+	static int m_object_counter;
 };
 
 class IComponentUpdateable{
@@ -121,6 +133,13 @@ public:
 	IComponentLateUpdate(void){}
 	virtual ~IComponentLateUpdate(void){}
 	virtual void LateUpdate(float dt) = 0;
+};
+
+class IComponentSimulationStep{
+public:
+	IComponentSimulationStep(void){}
+	virtual ~IComponentSimulationStep(void){}
+	virtual void SimulationStep(btScalar time_step) = 0;
 };
 
 struct RigidBodyDef{
@@ -160,8 +179,23 @@ struct ButtonDef{
 	Ogre::String overlay_name;
 	std::function<void()> func;
 };
+
+struct GuiDef{
+	Ogre::String tex_act;
+	Ogre::String tex_inact;
+	Ogre::String name;
+	Ogre::String cont_name;
+	int num_elems;
+};
+
 struct ParticleDef{
 	Ogre::String particle_name;
+};
+
+struct RaycastDef{
+	btCollisionObject* collision_object;
+	btVector3 origin;
+	btVector3 length;
 };
 
 #endif // _N_COMPONENTS_PREREQ_H_

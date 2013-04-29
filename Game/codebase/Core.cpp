@@ -56,7 +56,9 @@ bool Core::Init(){
 	m_game->Init(m_render_window, m_message_system);
 	m_input_system = new InputSystem(m_game, m_render_window);
 	m_input_system->Init();
+
 	gContactAddedCallback = Collision::ContactCallback;
+	CollisionManager::GetSingletonPtr();	// creates and initializes the instance
 	return true;
 }
 

@@ -8,12 +8,18 @@ namespace Collision {
 class CollisionManager
 {
 public:
+	static CollisionManager* GetSingletonPtr();
+	static void CleanSingleton();
+
+	void ProcessCollision(const btCollisionObject* ob_a, const btCollisionObject* ob_b);
+	void ProcessRaycast(const btCollisionObject* ob_a, const btCollisionObject* ob_b);
+	
+private:
 	CollisionManager(void);
 	~CollisionManager(void);
 
-	void ProcessCollision(const btCollisionObject* ob_a, const btCollisionObject* ob_b);
+	static CollisionManager* m_instance;
 
-private:
 	void Init();
 	inline std::pair<int,int> MakeIntPair(int, int);
 
@@ -29,10 +35,12 @@ private:
 	void PinkBubblePlayer(GameObject* pink_bubble, GameObject* player) { PlayerPinkBubble(player, pink_bubble); }
 	void PlayerPlane(GameObject* player, GameObject* plane);
 	void PlanePlayer(GameObject* plane, GameObject* player) { PlayerPlane(player, plane); }
+	void LeafPlayer(GameObject* leaf, GameObject* player);
 
 	typedef void (CollisionManager::*DoubleDispatch)(GameObject*, GameObject*);
 	typedef std::map<std::pair<int, int>, DoubleDispatch> HitMap;
 	HitMap m_collision;
+	HitMap m_raycast_map;
 };
 
 #endif // _N_COLLISION_MANAGER_H_

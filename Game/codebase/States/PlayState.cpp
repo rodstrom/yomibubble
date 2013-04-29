@@ -4,15 +4,18 @@
 #include "..\PhysicsEngine.h"
 #include "..\Managers\SoundManager.h"
 #include "..\Managers\GameObjectManager.h"
+//#include "..\Components\SkyXPrereq.h"
+#include <sstream>
 
 PlayState::PlayState(void) : m_physics_engine(NULL), m_game_object_manager(NULL){}
 PlayState::~PlayState(void){}
 
 void PlayState::Enter(){
 	m_scene_manager = Ogre::Root::getSingleton().createSceneManager("OctreeSceneManager");
+	m_scene_manager->setDisplaySceneNodes(true);
 	m_physics_engine = new PhysicsEngine;
 	m_physics_engine->Init();
-	//m_physics_engine->SetDebugDraw(m_scene_manager);
+	m_physics_engine->SetDebugDraw(m_scene_manager);
 	m_camera = m_scene_manager->createCamera("MainCamera");
 	//m_camera->setPosition(Ogre::Vector3(500,500,500));
 	//m_camera->lookAt(Ogre::Vector3(0,0,0));
@@ -26,11 +29,15 @@ void PlayState::Enter(){
 	m_sound_manager = new SoundManager(m_scene_manager, m_camera);
 	m_sound_manager->LoadAudio();
 	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager);
-
-	//Ogre::Light* light = m_scene_manager->createLight("light1");
-	//light->setType(Ogre::Light::LT_DIRECTIONAL);
-	//light->setDirection(Ogre::Vector3(1,-1,0));
-	//m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
+	
+	/*ParticleDef particleDef;
+	particleDef.particle_name = "Particle/Smoke";
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(180,78,225), &particleDef);	*/
+	
+	Ogre::Light* light = m_scene_manager->createLight("light1");
+	light->setType(Ogre::Light::LT_DIRECTIONAL);
+	light->setDirection(Ogre::Vector3(1,-1,0));
+	//m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
 	
 	// Create plane mesh
 	Ogre::Plane plane(Ogre::Vector3::UNIT_Y, -10);
@@ -46,21 +53,32 @@ void PlayState::Enter(){
 	//mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_camera, "../../resources/terrain/");
 	//mArtifexLoader->loadZone("try");
 
-	PlaneDef plane_def;//("plane", "Examples/BeachStones");
+	PlaneDef plane_def;
 	plane_def.material_name = "Examples/BeachStones";
 	plane_def.plane_name = "plane";
 	plane_def.friction = 1.0f;
 	plane_def.restitution = 0.8f;
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(x,y - 2.0f,z), &plane_def);
 	//0.35f, 1000.0f, 500.0f, 10.0f, 
+	TriggerDef trigger_def;
+	trigger_def.body_type = DYNAMIC_BODY;
+	trigger_def.type = COLLIDER_BOX;
+	trigger_def.x = 0.5f;
+	trigger_def.y = 0.5f;
+	trigger_def.z = 0.5f;
+	trigger_def.origin = Ogre::Vector3(0,-1,0);
+	trigger_def.mass = 0.0f;
 	CharControllerDef player_def;
 	player_def.friction = 1.0f;
-	player_def.velocity = 10.0f;
+	player_def.velocity = 5.0f;
+	player_def.max_velocity = 1.0f;
+	player_def.deacceleration = 10.0f;
 	player_def.jump_power = 200.0f;
 	player_def.restitution = 0.0f;
 	player_def.step_height = 0.35f;
 	player_def.turn_speed = 1000.0f;
 	player_def.max_jump_height = 10.0f;
+	player_def.trigger_def = &trigger_def;
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(x,y+1.0f,z), &player_def);
 	
 	CharControllerDef tott_def;
@@ -106,20 +124,12 @@ bool PlayState::Update(float dt){
 	if (m_input_manager->IsButtonPressed(BTN_BACK)){
 		return false;
 	}
-	/*if (m_input_manager->IsButtonDown(BTN_A)){
+	if (m_input_manager->IsButtonDown(BTN_ARROW_UP)){
 		m_physics_engine->ShowDebugDraw(true);
 	}
 	else{
 		m_physics_engine->ShowDebugDraw(false);
 	}
-
-	if (m_input_manager->IsButtonDown(BTN_S)){
-		Ogre::String test = "Anders";
-		m_func.Call(NULL);
-	}*/
+	
 	return true;
-}
-
-void PlayState::Test(){
-	std::cout << "Working" << std::endl;
 }

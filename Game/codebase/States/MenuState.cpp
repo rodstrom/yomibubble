@@ -27,13 +27,13 @@ void MenuState::Enter(){
 	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager);
 
 	ButtonDef buttonDef;
-	buttonDef.overlay_name = "testOverlay2";
-	buttonDef.cont_name = "MyOverlayElements/TestPanel2";
-	buttonDef.mat_start_hover = "Examples/MenuStartButton";
-	buttonDef.mat_start = "Examples/MenuStartButtonHoover";
+	buttonDef.overlay_name = "testOverlay";
+	buttonDef.cont_name = "MyOverlayElements/TestPanel";
+	buttonDef.mat_start_hover = "Examples/Green";
+	buttonDef.mat_start = "Examples/Red";
 	buttonDef.mat_exit_hover = "Examples/MenuExitButtonHoover";
 	buttonDef.mat_exit = "Examples/MenuExitButton";
-	buttonDef.func = [this] { };
+	buttonDef.func = [this] { Test(); };
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_OVERLAY, Ogre::Vector3(0,0,0), &buttonDef);
 	//m_game_object_manager->CreateGameObject(GAME_OBJECT_EXIT_BUTTON, Ogre::Vector3(0,0,0), &buttonDef);
 
@@ -48,6 +48,9 @@ void MenuState::Exit(){
 	m_physics_engine->Shut();
 	delete m_physics_engine;
 	m_physics_engine = NULL;
+	delete m_sound_manager;
+	m_sound_manager = NULL;
+	m_render_window->removeAllViewports();
 	Ogre::Root::getSingleton().destroySceneManager(m_scene_manager);
 	m_scene_manager = NULL;
 }
@@ -64,3 +67,7 @@ bool MenuState::Update(float dt){
 	return true;
 }
 
+void MenuState::Test()
+{
+	ChangeState(FindByName("PlayState"));
+}

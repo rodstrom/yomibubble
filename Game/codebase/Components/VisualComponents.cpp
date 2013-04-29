@@ -4,17 +4,16 @@
 #include "..\Managers\InputManager.h"
 #include "..\InputPrereq.h"
 
-void MeshRenderComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager){
+void NodeComponent::Init(const Ogre::Vector3& pos, Ogre::SceneManager* scene_manager){
 	m_scene_manager = scene_manager;
-	m_entity = m_scene_manager->createEntity(filename);
 	m_node = m_scene_manager->getRootSceneNode()->createChildSceneNode();
-	m_node->attachObject(m_entity);
+	m_node->setPosition(pos);
 }
 
-void MeshRenderComponent::Notify(int type, void* msg){
+void NodeComponent::Notify(int type, void* msg){
 	switch (type){
 	case MSG_NODE_GET_NODE:
-			*static_cast<Ogre::SceneNode**>(msg) = m_node;
+		*static_cast<Ogre::SceneNode**>(msg) = m_node;
 		break;
 	case MSG_INCREASE_SCALE_BY_VALUE:
 		{
@@ -22,32 +21,67 @@ void MeshRenderComponent::Notify(int type, void* msg){
 			scale += *static_cast<Ogre::Vector3*>(msg);
 			m_node->setScale(scale);
 		}
-			break;
+		break;
 	case MSG_SET_OBJECT_POSITION:
 		m_node->setPosition(*static_cast<Ogre::Vector3*>(msg));
 		break;
-	default:
+	case MSG_NODE_ATTACH_ENTITY:
+		{
+			if (!m_has_attached_entity){
+				m_node->attachObject(*static_cast<Ogre::Entity**>(msg));
+				m_has_attached_entity = true;
+			}
+		}
+		break;
+	default: 
 		break;
 	}
 }
 
-void MeshRenderComponent::SetMessenger(ComponentMessenger* messenger){
-	m_messenger = messenger;
-	m_messenger->Register(MSG_NODE_GET_NODE, this);
-	m_messenger->Register(MSG_INCREASE_SCALE_BY_VALUE, this);
-	m_messenger->Register(MSG_SET_OBJECT_POSITION, this);
-}
-
-void MeshRenderComponent::Shut(){
+void NodeComponent::Shut(){
 	if (m_messenger){
 		m_messenger->Unregister(MSG_NODE_GET_NODE, this);
 		m_messenger->Unregister(MSG_INCREASE_SCALE_BY_VALUE, this);
 		m_messenger->Unregister(MSG_SET_OBJECT_POSITION, this);
+		m_messenger->Unregister(MSG_NODE_ATTACH_ENTITY, this);
 	}
-	if (m_node != NULL){
+	if (m_node){
 		m_scene_manager->destroySceneNode(m_node);
 		m_node = NULL;
 	}
+}
+
+void NodeComponent::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
+	m_messenger->Register(MSG_NODE_GET_NODE, this);
+	m_messenger->Register(MSG_INCREASE_SCALE_BY_VALUE, this);
+	m_messenger->Register(MSG_SET_OBJECT_POSITION, this);
+	m_messenger->Register(MSG_NODE_ATTACH_ENTITY, this);
+}
+
+
+
+void MeshRenderComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager){
+	m_scene_manager = scene_manager;
+	m_entity = m_scene_manager->createEntity(filename);
+	m_messenger->Notify(MSG_NODE_ATTACH_ENTITY, &m_entity);
+}
+
+void MeshRenderComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager, const Ogre::String& node_id){
+	m_scene_manager = scene_manager;
+	m_entity = m_scene_manager->createEntity(filename);
+	m_messenger->Notify(MSG_NODE_ATTACH_ENTITY, &m_entity, node_id);
+}
+
+void MeshRenderComponent::Notify(int type, void* msg){
+
+}
+
+void MeshRenderComponent::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
+}
+
+void MeshRenderComponent::Shut(){
 	if (m_entity != NULL){
 		m_scene_manager->destroyEntity(m_entity);
 		m_entity = NULL;
@@ -58,10 +92,17 @@ void AnimationComponent::SetMessenger(ComponentMessenger* messenger){
 	MeshRenderComponent::SetMessenger(messenger);
 	m_messenger->Register(MSG_ANIMATION_PLAY, this);
 	m_messenger->Register(MSG_ANIMATION_PAUSE, this);
+	m_messenger->Register(MSG_ANIMATION_BLEND, this);
 }
 
 void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager){
 	MeshRenderComponent::Init(filename, scene_manager);
+	//m_animation_blender = new AnimationBlender(GetEntity());
+	//m_animation_blender->init("RunBase");
+}
+
+void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager, const Ogre::String& node_id){
+	MeshRenderComponent::Init(filename, scene_manager, node_id);
 }
 
 void AnimationComponent::AddAnimationStates(unsigned int value){
@@ -103,6 +144,10 @@ void AnimationComponent::Notify(int type, void* msg){
 			}
 		}
 		break;
+	case MSG_ANIMATION_BLEND:
+		//m_animation_blender->blend("RunBase", AnimationBlender::BlendWhileAnimating, 0.2, true);
+		//m_animation_blender->blend("IdleTop", AnimationBlender::BlendWhileAnimating, 0.2, true);
+		break;
 	default:
 		break;
 	}
@@ -119,6 +164,7 @@ void AnimationComponent::Shut(){
 	m_animation_states.clear();
 	m_messenger->Unregister(MSG_ANIMATION_PLAY, this);
 	m_messenger->Unregister(MSG_ANIMATION_PAUSE, this);
+	m_messenger->Unregister(MSG_ANIMATION_BLEND, this);
 	MeshRenderComponent::Shut();
 }
 
@@ -218,7 +264,7 @@ void OverlayCollisionCallbackComponent::Update(float dt){
 			}
 		}
 	}
-	if(m_ocs == OCS_COLLISION && m_input_manager->IsButtonPressed(BTN_LEFT_MOUSE))
+	if(m_ocs == OCS_DEFAULT && m_input_manager->IsButtonPressed(BTN_LEFT_MOUSE))
 	{
 		m_messenger->Notify(MSG_OVERLAY_CALLBACK, NULL);
 	}
@@ -241,8 +287,7 @@ void Overlay2DAnimatedComponent::Init(const Ogre::String& p_overlay_name, const 
 	m_material_name_hover = p_material_name_hover;
 	m_material_name_exit = p_material_name_exit;
 	m_cont_name = p_cont_name;
-	Overlay2DComponent::Init(p_overlay_name, p_cont_name);
-	
+	Overlay2DComponent::Init(p_overlay_name, p_cont_name);	
 }
 
 void Overlay2DAnimatedComponent::Update(float dt){
@@ -330,117 +375,78 @@ void ParticleComponent::Shut(){
 	m_particle_system->removeAllEmitters();
 }
 
-void SkyXComponent::Init(Ogre::SceneManager* p_scene_manager, const Ogre::Vector3 t, const Ogre::Real& tm, const Ogre::Real& mp, const SkyX::AtmosphereManager::Options& atmOpt, const bool& lc){
+void CountableResourceGUI::Notify(int type, void* message){
 	
-	m_scene_manager = p_scene_manager;
-	m_basic_controller = new SkyX::BasicController;
-	m_sky_x = new SkyX::SkyX(m_scene_manager, m_basic_controller);
- 	Ogre::String name = m_sky_x->getGPUManager()->getSkydomeMaterialName();
-	m_sky_x->create();
-	m_sky_x->getVCloudsManager()->getVClouds()->setDistanceFallingParams(Ogre::Vector2(2,-1));
-	
-	//m_camera = p_camera;
-	m_time = t;
-	m_time_multiplier = tm;
-	m_moon_phase = mp;
-	m_atmosphere_opt = atmOpt;
-	m_layered_clouds = lc;
-	//m_volumetric_clouds = vc;
-	//m_vc_wind_speed = vcws;
-	//m_vc_auto_update = vcauto;
-	//m_vc_wind_dir = vcwd;
-	//m_vc_ambient_color = vcac;
-	//m_vc_light_response = vclr;
-	//m_vc_ambient_factors = vcaf;
-	//m_vc_wheater = vcw;
-	//m_vc_lightnings = vcl;
-	//m_vc_lightningsAT = vclat;
-	//m_vc_lightnings_color;
-	//m_vc_lightningsTM = vcltm;
+	if (type == MSG_LEAF_PICKUP)
+	{
+		if (m_current_number < m_total_number)
+		{
+			m_current_number++;
+			
+			for(int i = 0; i < m_current_number; i++)
+			{
+				m_elements[i]->setMaterialName(m_material_name_active);
+			}
+		}
+	}
+};
 
-	
-}
+void CountableResourceGUI::Shut(){
+	m_messenger->Unregister(MSG_LEAF_PICKUP, this);
+	for (int i = 0; i < m_elements.size(); i++)
+	{
+		//delete m_elements.end();
+		m_elements[i]=NULL;
+		//delete m_elements[i];
+	}
+};
 
-void SkyXComponent::Update(float dt){
-	m_sky_x->update(dt);
-}
-
-void SkyXComponent::Notify(int type, void* message){
-}
-
-void SkyXComponent::SetMessenger(ComponentMessenger* messenger){
+void CountableResourceGUI::SetMessenger(ComponentMessenger* messenger){
 	m_messenger = messenger;
-}
+	m_messenger->Register(MSG_LEAF_PICKUP, this);
+};
 
-void SkyXComponent::Shut(){
-}
+void CountableResourceGUI::Init(const Ogre::String& material_name_inactive, const Ogre::String& material_name_active, int total_number){
+	m_total_number = total_number;
+	m_current_number = 0;
+	m_material_name_active = material_name_active;
+	m_material_name_inactive = material_name_inactive;
 
-void SkyXComponent::CreateSkyBox(){
-	
-	
-	m_sky_x->setTimeMultiplier(m_time_multiplier);
-	m_basic_controller->setTime(m_time);
-	m_basic_controller->setMoonPhase(m_moon_phase);
-	m_sky_x->getAtmosphereManager()->setOptions(m_atmosphere_opt);
+	Ogre::OverlayManager& overlayManager = Ogre::OverlayManager::getSingleton();
+    Ogre::Overlay* overlay = overlayManager.create( "OverlayName" );
 
-	// Layered clouds
-	if (m_layered_clouds)
+	Ogre::Vector2 temppos(0.0f, 0.0f);
+
+	if (total_number < 6)
+	{ temppos.x = 0.0 + (((6-total_number)/2) * 0.15); }
+
+	float rows = total_number / 6;
+
+	int counter = 0;
+
+	for (int i = 0; i < total_number; i++)
 	{
-		// Create layer cloud
-		if (m_sky_x->getCloudsManager()->getCloudLayers().empty())
+		if (counter == 6)
 		{
-			m_sky_x->getCloudsManager()->add(SkyX::CloudLayer::Options(/* Default options */));
+			counter = 0;
+			temppos.x = 15.0;
+			temppos.y += 0.2;
+
+			if (total_number - i < 6)
+			{ temppos.x = 0.0 + (((6-(total_number-i))/2) * 0.15); }
 		}
-	}
-	else
-	{
-		// Remove layer cloud
-		if (!m_sky_x->getCloudsManager()->getCloudLayers().empty())
-		{
-			m_sky_x->getCloudsManager()->removeAll();
-		}
-	}
+		std::ostringstream stream;
+		stream << "Panel" << i;
+		Ogre::String panel_name = stream.str();
 
-	m_sky_x->getVCloudsManager()->setWindSpeed(m_vc_wind_speed);
-	m_sky_x->getVCloudsManager()->setAutoupdate(m_vc_auto_update);
+		m_elements.push_back(static_cast<Ogre::OverlayContainer*>( overlayManager.createOverlayElement( "Panel", panel_name ) ));
+		m_elements[i]->setPosition( temppos.x, temppos.y );
+		m_elements[i]->setDimensions( 0.15, 0.15 );
+		m_elements[i]->setMaterialName(m_material_name_inactive);
+		overlay->add2D(m_elements[i]);
+		counter++;
+		temppos.x += 0.15;
+	};
 
-	SkyX::VClouds::VClouds* vclouds = m_sky_x->getVCloudsManager()->getVClouds();
-
-	vclouds->setWindDirection(m_vc_wind_dir);
-	vclouds->setAmbientColor(m_vc_ambient_color);
-	vclouds->setLightResponse(m_vc_light_response);
-	vclouds->setAmbientFactors(m_vc_ambient_factors);
-	vclouds->setWheater(m_vc_wheater.x, m_vc_wheater.y, false);
-
-	if (m_volumetric_clouds)
-	{
-		
-		// Create VClouds
-		if (!m_sky_x->getVCloudsManager()->isCreated())
-		{
-			// SkyX::MeshManager::getSkydomeRadius(...) works for both finite and infinite(=0) camera far clip distances
-			//m_sky_x->getVCloudsManager()->create(m_sky_x->getMeshManager()->getSkydomeRadius(m_camera));
-		}
-	}
-	else
-	{
-		// Remove VClouds
-		if (m_sky_x->getVCloudsManager()->isCreated())
-		{
-			m_sky_x->getVCloudsManager()->remove();
-		}
-	}
-
-	vclouds->getLightningManager()->setEnabled(m_vc_lightnings);
-	vclouds->getLightningManager()->setAverageLightningApparitionTime(m_vc_lightningsAT);
-	vclouds->getLightningManager()->setLightningColor(m_vc_lightnings_color);
-	vclouds->getLightningManager()->setLightningTimeMultiplier(m_vc_lightningsTM);
-
-	//mTextArea->setCaption(buildInfoStr());
-
-	// Reset camera position/orientation
-	//mRenderingCamera->setPosition(0,0,0);
-	//mRenderingCamera->setDirection(0,0,1);
-
-	m_sky_x->update(0);
-}
+    overlay->show();
+};

@@ -13,6 +13,7 @@ public:
 	bool Update(float dt);
 	void Enter();
 	void Exit();
+	void Test();
 
 	//DECLARE_STATE_CLASS(MenuState);
 
