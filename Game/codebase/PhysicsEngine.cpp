@@ -94,9 +94,11 @@ void PhysicsEngine::Step(float dt){
 	}
 	
 	m_dynamic_world->stepSimulation(dt, max_steps);
+	
 	if (m_debug_drawer){
 		m_debug_drawer->step();
 	}
+	
 	RaycastQuery();
 }
 

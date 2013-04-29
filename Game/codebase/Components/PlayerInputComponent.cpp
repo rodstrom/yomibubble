@@ -90,6 +90,7 @@ void PlayerInputComponent::Normal(float dt){
 		m_anim_msg.id="Idle";
 		m_anim_msg.blend = false;
 		m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
+		
 	//   m_animation_blender->blend("Run", AnimationBlender::BlendWhileAnimating, 0.2, false );
 		
 	}
@@ -152,12 +153,12 @@ void PlayerInputComponent::Normal(float dt){
 	}
 
 	if (m_input_manager->IsButtonPressed(BTN_START)){
-		bool jumping = true;
-		m_messenger->Notify(MSG_CHARACTER_CONROLLER_JUMP, &jumping);
+		bool is_jumping = true;
+		m_messenger->Notify(MSG_CHARACTER_CONTROLLER_JUMP, &is_jumping);
 	}
 	else if (m_input_manager->IsButtonReleased(BTN_START)){
-		bool jumping = false;
-		m_messenger->Notify(MSG_CHARACTER_CONROLLER_JUMP, &jumping);
+		bool is_jumping = false;
+		m_messenger->Notify(MSG_CHARACTER_CONTROLLER_JUMP, &is_jumping);
 	}
 
 	Ogre::Vector3 acc = Ogre::Vector3::ZERO;
@@ -185,7 +186,7 @@ void PlayerInputComponent::OnBubble(float dt){
 	if (m_input_manager->IsButtonPressed(BTN_START)){
 		m_player_state = PLAYER_STATE_NORMAL;
 		bool jump = true;
-		m_messenger->Notify(MSG_CHARACTER_CONROLLER_JUMP, &jump);
+		m_messenger->Notify(MSG_CHARACTER_CONTROLLER_JUMP, &jump);
 		return;
 	}
 

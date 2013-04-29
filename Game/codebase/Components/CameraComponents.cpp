@@ -90,8 +90,10 @@ void FollowCameraComponent::Update(float dt){
 	InputManager* input = NULL;
 	m_messenger->Notify(MSG_INPUT_MANAGER_GET, &input);
 	if (input){
-		OIS::MouseState ms = input->GetMouseState();
-		UpdateCameraGoal(-0.1f * ms.X.rel, -0.1f * ms.Y.rel, -0.0005f * ms.Z.rel);
+		CameraAxis axis = input->GetCameraAxis();
+		UpdateCameraGoal(-0.1f * axis.x, -0.1f * axis.y, -0.0005f * axis.z);
+		//OIS::MouseState ms = input->GetMouseState();
+		//UpdateCameraGoal(-0.1f * ms.X.rel, -0.1f * ms.Y.rel, -0.0005f * ms.Z.rel);
 	}
 	Ogre::SceneNode* node = NULL;
 	m_messenger->Notify(MSG_NODE_GET_NODE, &node);

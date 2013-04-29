@@ -92,12 +92,14 @@ void AnimationComponent::SetMessenger(ComponentMessenger* messenger){
 	MeshRenderComponent::SetMessenger(messenger);
 	m_messenger->Register(MSG_ANIMATION_PLAY, this);
 	m_messenger->Register(MSG_ANIMATION_PAUSE, this);
+	m_messenger->Register(MSG_ANIMATION_BLEND, this);
 }
 
 void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager){
 	MeshRenderComponent::Init(filename, scene_manager);
-	/*
+	
 	m_animation_blender = new AnimationBlender(GetEntity());
+	/*
 	m_animation_blender->init("Idle");
 	m_animation_blender->init("Run");
 	m_animation_blender->init("Walk");
@@ -115,6 +117,7 @@ void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* 
 	m_animation_blender->init("Walk");
 	m_animation_blender->init("Jump");
 	*/
+	
 }
 
 void AnimationComponent::AddAnimationStates(unsigned int value){
@@ -132,6 +135,7 @@ void AnimationComponent::Update(float dt){
 			}
 		}
 	}
+	//m_animation_blender->addTime(dt);
 }
 
 void AnimationComponent::Notify(int type, void* msg){
@@ -159,7 +163,8 @@ void AnimationComponent::Notify(int type, void* msg){
 				if (m_animation_states[0] != NULL){
 					m_animation_states[0]->setEnabled(true);
 					m_animation_states[0]->setLoop(true);
-				//	m_animation_blender->blend("Run", AnimationBlender::BlendWhileAnimating, 0.2, false );
+					//m_animation_blender->init("Walk");
+					//m_animation_blender->blend("Idle", AnimationBlender::BlendWhileAnimating, 0.2, true);
 				}
 			}
 		}
@@ -195,6 +200,7 @@ void AnimationComponent::Shut(){
 	m_animation_states.clear();
 	m_messenger->Unregister(MSG_ANIMATION_PLAY, this);
 	m_messenger->Unregister(MSG_ANIMATION_PAUSE, this);
+	m_messenger->Unregister(MSG_ANIMATION_BLEND, this);
 	MeshRenderComponent::Shut();
 }
 

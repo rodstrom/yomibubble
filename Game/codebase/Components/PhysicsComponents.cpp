@@ -108,10 +108,10 @@ void RigidbodyComponent::SetMessenger(ComponentMessenger* messenger){
 void CharacterController::Notify(int type, void* msg){
 	RigidbodyComponent::Notify(type, msg);
 	switch (type){
-	case MSG_CHARACTER_CONROLLER_VELOCITY_SET:
+	case MSG_CHARACTER_CONTROLLER_VELOCITY_SET:
 		m_velocity = *static_cast<float*>(msg);
 		break;
-	case MSG_CHARACTER_CONROLLER_TURN_SPEED_SET:
+	case MSG_CHARACTER_CONTROLLER_TURN_SPEED_SET:
 		m_turn_speed = *static_cast<float*>(msg);
 		break;
 	case MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_SET:
@@ -120,7 +120,7 @@ void CharacterController::Notify(int type, void* msg){
 	case MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_GET:
 		*static_cast<bool*>(msg) = m_has_follow_cam;
 		break;
-	case MSG_CHARACTER_CONROLLER_JUMP:
+	case MSG_CHARACTER_CONTROLLER_JUMP:
 		{
 			bool jump = *static_cast<bool*>(msg);
 			if (jump){
@@ -230,7 +230,8 @@ void CharacterController::Shut(){
 		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, this);
 		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_SET, this);
 		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_GET, this);
-		m_messenger->Unregister(MSG_CHARACTER_CONROLLER_JUMP, this);
+		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_JUMP, this);
+		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_VELOCITY_SET, this);
 		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND, this);
 	}
 	m_physics_engine->RemoveObjectSimulationStep(this);
@@ -241,7 +242,8 @@ void CharacterController::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, this);
 	m_messenger->Register(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_SET, this);
 	m_messenger->Register(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_GET, this);
-	m_messenger->Register(MSG_CHARACTER_CONROLLER_JUMP, this);
+	m_messenger->Register(MSG_CHARACTER_CONTROLLER_JUMP, this);
+	m_messenger->Register(MSG_CHARACTER_CONTROLLER_VELOCITY_SET, this);
 	m_messenger->Register(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND, this);
 }
 

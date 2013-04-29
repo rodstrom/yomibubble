@@ -137,14 +137,16 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	CountableResourceGUI* gui = new CountableResourceGUI;
 	go->AddComponent(gui);
 
-	Ogre::Vector3 scale(0.007);
+	//Ogre::Vector3 scale(0.007);
 
 	node_comp->Init(position, m_scene_manager);
-	node_comp->GetSceneNode()->setScale(scale);
+	//node_comp->GetSceneNode()->setScale(scale);
 	node_comp->SetId("player_node");
 	
+	//acomp->Init("Yomi_2Yomi.mesh", m_scene_manager, node_comp->GetId());
 	acomp->Init("Yomi.mesh", m_scene_manager, node_comp->GetId());
 	
+	acomp->GetEntity()->setMaterialName("_YomiFBXASC039sFBXASC032staffMaterial__191");
 	//acomp->Init("yomi.mesh", m_scene_manager);
 	//Ogre::Vector3 scale(0.008f);
 	//node_comp->GetSceneNode()->setScale(scale);
@@ -180,6 +182,9 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	raycast->Init(m_physics_engine, contr->GetRigidbody());
 	raycast->SetLength(Ogre::Vector3(0.0f,-0.8f,0.0f));
 	raycast->SetAttached(true);
+
+	//DEBUGGING GRAVITY
+	//contr->GetRigidbody()->setGravity(btVector3(0,0,0));
 
 	return go;
 }
@@ -258,6 +263,7 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 
 	node_comp->Init(position, m_scene_manager);
 	acomp->Init("Yomi_2Yomi.mesh", m_scene_manager);
+	acomp->GetEntity()->setMaterialName("SolidColor/Green");
 	m_sound_manager->GetTottNode(node_comp->GetSceneNode()->getName());
 	way_point->Init(node_comp->GetSceneNode(), 0.001f);
 	way_point->AddWayPoint(Ogre::Vector3(15.0f, -10.0f, 21.0f));
@@ -267,6 +273,10 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 	contr->SetVelocity(def.velocity);
 	contr->GetRigidbody()->setRestitution(def.restitution);
 	contr->GetRigidbody()->setFriction(def.friction);
+	
+	//DEBUGGING GRAVITY
+	contr->GetRigidbody()->setGravity(btVector3(0,0,0));
+
 	return go;
 }
 
@@ -336,11 +346,12 @@ GameObject* GameObjectManager::CreateLeaf(const Ogre::Vector3& position, void* d
 	go->AddComponent(rb);
 
 	node_comp->Init(position, m_scene_manager);
-	mrc->Init("cube.mesh", m_scene_manager);
-	Ogre::Vector3 scale(0.002f);
-	node_comp->GetSceneNode()->setScale(scale);
+	mrc->Init("Collectable_Leaf.mesh", m_scene_manager);
+	//Ogre::Vector3 scale(0.002f);
+	//node_comp->GetSceneNode()->setScale(scale);
 	rb->Init(position, mrc->GetEntity(), m_physics_engine, 1, COLLIDER_BOX, STATIC_BODY);
 	particle->Init(m_scene_manager, "Smoke", particleDef.particle_name);
+	mrc->GetEntity()->setMaterialName("Examples/Leaf");
 	node_comp->GetSceneNode()->setPosition(Ogre::Vector3(position));
 	particle->CreateParticle(node_comp->GetSceneNode(), node_comp->GetSceneNode()->getPosition(), Ogre::Vector3(0,-3,0));
 	return go;

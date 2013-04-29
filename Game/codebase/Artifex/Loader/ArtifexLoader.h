@@ -38,7 +38,8 @@ THE SOFTWARE.
 // #define TSM_TERRAIN
 
 // uncomment this if you want to use Ogre's::Terrain component (Ogre 1.7 and higher)
-//#define OT_TERRAIN
+
+//#define ETM_TERRAIN
 #define OT_TERRAIN
 
 // includes needed to work with the Enhanced Terrain Manager
@@ -72,13 +73,17 @@ class DBManager;
 
 #define ETM_GROUP "ETM" // the resourcegroup for the zone
 
+// included for DBManager
+#include "..\..\Managers\GameObjectManager.h"
+#include "..\..\Managers\SoundManager.h"
+
 using namespace std;
 using namespace Ogre;
 using namespace Artifex;
 
 class ArtifexLoader {
 public:
-	ArtifexLoader(Root *root, SceneManager *scenemgr, SceneNode *camnode, Camera *camera, string zonepath="");
+	ArtifexLoader(Root *root, SceneManager *scenemgr, SceneNode *camnode, Camera *camera, GameObjectManager *game_object_manager, SoundManager *sound_manager, string zonepath="");
 	~ArtifexLoader();
 
 	Root *mRoot;

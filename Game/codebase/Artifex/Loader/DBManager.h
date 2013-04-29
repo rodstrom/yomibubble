@@ -21,9 +21,15 @@ class ArtifexLoader;
 
 #include "CppSQLite3.h"
 
+#include "..\..\Managers\GameObjectManager.h"
+#include "..\..\Managers\SoundManager.h"
+
+#include <string>
+#include <vector>
+
 class DBManager {
 public:
-	DBManager(ArtifexLoader *artifexloader);
+	DBManager(ArtifexLoader *artifexloader, GameObjectManager *game_object_manager, SoundManager *sound_manager);
 	~DBManager();
 
 	ArtifexLoader *mArtifexLoader;
@@ -40,11 +46,18 @@ public:
 	bool WriteAttributes(Spawn2& spawn);
 	bool EmptyTrash();
 	int DBManager::getObjectProperties(Spawn2 &spawn);
+	Vector3 DBManager::getWaypoint(string waypoint_id);
+
+	std::vector<std::string> &DBManager::split(const std::string &s, char delim, std::vector<std::string> &elems);
+	std::vector<std::string> DBManager::split(const std::string &s, char delim);
 
 	int Save();
 	int Load();
 
 	bool saving;
+
+	GameObjectManager *m_game_object_manager;
+	SoundManager *m_sound_manager;
 
 };
 #endif

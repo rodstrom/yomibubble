@@ -30,9 +30,7 @@ void PlayState::Enter(){
 	m_sound_manager->LoadAudio();
 	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager);
 	
-	/*ParticleDef particleDef;
-	particleDef.particle_name = "Particle/Smoke";
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(180,78,225), &particleDef);	*/
+	
 	
 	Ogre::Light* light = m_scene_manager->createLight("light1");
 	light->setType(Ogre::Light::LT_DIRECTIONAL);
@@ -44,14 +42,25 @@ void PlayState::Enter(){
 	Ogre::MeshManager::getSingleton().createPlane("plane", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane, 50, 50, 20, 20, true, 1, 5, 5, Ogre::Vector3::UNIT_Z);
 
 	float x = 180.0f;
-	float y = 90.0f;
+	float y = 790.0f;
 	float z = 230.0f;
-	
 
+	ParticleDef particleDef;
+	particleDef.particle_name = "Particle/Smoke";
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(x+5,y-10,z), &particleDef);	
+	
 	//m_cam_node->attachObject(m_camera);
 	//Ogre::SceneNode* node = m_scene_manager->getSceneNode("camNode");
+	//mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_camera, m_game_object_manager, m_sound_manager, "../../resources/terrain/");
+#ifdef _DEBUG
+	//mArtifexLoader->loadZone("try", false, false, false, false, true, false, true, true, true, true);
+#else
+	//mArtifexLoader->loadZone("try", true, true, true, false, true, false, true, true, true, true);
+#endif
+	//PlaneDef plane_def("plane", "Examples/BeachStones");
+	//m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(x,y - 2.0f,z), &plane_def);
 
-	//mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_camera, "../../resources/terrain/");
+	//mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, m_camera, m_scene_manager->getSceneNode(""), m_game_object_manager, m_sound_manager, "../../resources/terrain/");
 	//mArtifexLoader->loadZone("try");
 
 	PlaneDef plane_def;
@@ -80,6 +89,7 @@ void PlayState::Enter(){
 	player_def.turn_speed = 1000.0f;
 	player_def.max_jump_height = 10.0f;
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(x,y+1.0f,z), &player_def);
+	//m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(200,80,200), &player_def);
 	
 	CharControllerDef tott_def;
 	tott_def.friction = 1.0f;
@@ -94,8 +104,6 @@ void PlayState::Enter(){
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y+1.0f,z+3.0f), &tott_def);
 	//m_physics_engine->CreateTerrainCollision(mArtifexLoader->mTerrain);
 	//m_scene_manager->setSkyDome(true, "Examples/CloudySky");
-	
-	
 }
 
 
