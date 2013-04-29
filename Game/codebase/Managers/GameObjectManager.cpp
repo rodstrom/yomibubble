@@ -176,8 +176,8 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	fcc->GetCamera()->setNearClipDistance(0.1f);
 	csnc->Init(Ogre::Vector3(0.0f, 0.0f, 1.0f), "CreateBubble", node_comp->GetSceneNode());
 	m_sound_manager->GetYomiNode(node_comp->GetSceneNode()->getName());
-	raycast->Init(m_physics_engine, contr->GetRigidbody());
-	raycast->SetLength(Ogre::Vector3(0.0f,-0.8f,0.0f));
+	raycast->Init(m_physics_engine, contr->GetRigidbody(), "body");
+	raycast->SetLength(Ogre::Vector3(0.0f,-1.0f,0.0f));
 	raycast->SetAttached(true);
 
 	return go;

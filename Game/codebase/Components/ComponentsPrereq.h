@@ -200,6 +200,7 @@ struct RaycastDef{
 	btCollisionObject* collision_object;
 	btVector3 origin;
 	btVector3 length;
+	Ogre::String body_id;
 };
 
 #endif // _N_COMPONENTS_PREREQ_H_
