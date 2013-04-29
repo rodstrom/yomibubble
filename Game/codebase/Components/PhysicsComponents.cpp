@@ -214,7 +214,7 @@ void CharacterController::SimulationStep(btScalar time_step){
 	}
 	
 	if (m_on_ground){
-		Ogre::Vector3 dir = m_direction;
+		//Ogre::Vector3 dir = m_direction;
 		if (m_has_follow_cam){
 		Ogre::SceneNode* node = NULL;
 		Ogre::SceneNode* camera_node = NULL;
@@ -222,8 +222,8 @@ void CharacterController::SimulationStep(btScalar time_step){
 		m_messenger->Notify(MSG_CAMERA_GET_CAMERA_NODE, &camera_node);
 			if (node && camera_node){
 				Ogre::Vector3 goal_dir = Ogre::Vector3::ZERO;
-				goal_dir += dir.z * camera_node->getOrientation().zAxis();
-				goal_dir += dir.x * camera_node->getOrientation().xAxis();
+				goal_dir += m_direction.z * camera_node->getOrientation().zAxis();
+				goal_dir += m_direction.x * camera_node->getOrientation().xAxis();
 				goal_dir.y = 0.0f;
 				//goal_dir.normalise();
 				if (!m_is_jumping){
@@ -242,21 +242,36 @@ void CharacterController::SimulationStep(btScalar time_step){
 			Ogre::SceneNode* node = NULL;
 			m_messenger->Notify(MSG_NODE_GET_NODE, &node);
 			if (node){
-				dir.y = 0.0f;
-				dir.normalise();
-				Ogre::Quaternion goal = node->getOrientation().zAxis().getRotationTo(dir);
+				m_direction.y = 0.0f;
+				m_direction.normalise();
+				Ogre::Quaternion goal = node->getOrientation().zAxis().getRotationTo(m_direction);
 				Ogre::Real yaw_to_goal = goal.getYaw().valueDegrees();
 				Ogre::Real yaw_at_speed = yaw_to_goal / Ogre::Math::Abs(yaw_to_goal) * dt * m_turn_speed;
 
 				if (yaw_to_goal < 0) yaw_to_goal = std::min<Ogre::Real>(0, std::max<Ogre::Real>(yaw_to_goal, yaw_at_speed));
 				else if (yaw_to_goal > 0) yaw_to_goal = std::max<Ogre::Real>(0, std::min<Ogre::Real>(yaw_to_goal, yaw_at_speed));
 				node->yaw(Ogre::Degree(yaw_to_goal));
-				m_rigidbody->setLinearVelocity(btVector3(dir.x, vel.y(), dir.z));
+				m_rigidbody->setLinearVelocity(btVector3(m_direction.x, vel.y(), m_direction.z));
 			}
 		}
 	}
 	else{
-		m_rigidbody->setLinearVelocity(btVector3(m_direction.x, vel.y(), m_direction.z));
+		if (!m_has_follow_cam){
+			m_rigidbody->setLinearVelocity(btVector3(m_direction.x, vel.y(), m_direction.z));
+		}
+		else {
+			Ogre::SceneNode* node = NULL;
+			Ogre::SceneNode* camera_node = NULL;
+			m_messenger->Notify(MSG_NODE_GET_NODE, &node);
+			m_messenger->Notify(MSG_CAMERA_GET_CAMERA_NODE, &camera_node);
+			if (node && camera_node){
+				Ogre::Vector3 goal_dir = Ogre::Vector3::ZERO;
+				goal_dir += m_direction.z * camera_node->getOrientation().zAxis();
+				goal_dir += m_direction.x * camera_node->getOrientation().xAxis();
+				goal_dir.y = 0.0f;
+				m_rigidbody->setLinearVelocity(btVector3(goal_dir.x, vel.y(), goal_dir.z));
+			}
+		}
 	}
 	if (m_is_jumping){
 		float y_pos = m_rigidbody->getWorldTransform().getOrigin().y();
@@ -393,10 +408,11 @@ void Generic6DofConstraintComponent::Init(PhysicsEngine* physics_engine, btRigid
 	m_physics_engine->GetDynamicWorld()->addConstraint(m_constraint);
 }
 
-void RaycastComponent::Init(PhysicsEngine* physics_engine, btCollisionObject* obj){
+void RaycastComponent::Init(PhysicsEngine* physics_engine, btCollisionObject* obj, const Ogre::String& body_id){
 	m_physics_engine = physics_engine;
 	m_physics_engine->AddRaycastComponent(this);
 	m_raycast_def.collision_object = obj;
+	m_raycast_def.body_id = body_id;
 }
 
 void RaycastComponent::Notify(int type, void* msg){
@@ -418,9 +434,17 @@ void RaycastComponent::SetLength(const Ogre::Vector3& length){
 RaycastDef& RaycastComponent::GetRaycastDef(){
 	if (m_attached){
 		btRigidBody* body = NULL;
-		m_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &body);
-		if (body){
-			m_raycast_def.origin = body->getWorldTransform().getOrigin();
+		if (m_raycast_def.body_id != Ogre::StringUtil::BLANK){
+			m_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &body, m_raycast_def.body_id);
+			if (body){
+				m_raycast_def.origin = body->getWorldTransform().getOrigin();
+			}
+		}
+		else {
+			m_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &body);
+			if (body){
+				m_raycast_def.origin = body->getWorldTransform().getOrigin();
+			}
 		}
 	}
 	return m_raycast_def;

@@ -137,7 +137,7 @@ public:
 	virtual void Notify(int type, void* msg);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
-	virtual void Init(PhysicsEngine* physics_engine, btCollisionObject* obj);
+	virtual void Init(PhysicsEngine* physics_engine, btCollisionObject* obj, const Ogre::String& body_id = Ogre::StringUtil::BLANK);
 	void SetLength(const Ogre::Vector3& length);
 	bool IsAttached() const { return m_attached; }
 	void SetAttached(bool value) { m_attached = value; }

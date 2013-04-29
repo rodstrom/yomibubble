@@ -84,7 +84,7 @@ void PhysicsEngine::ShowDebugDraw(bool value){
 }
 
 void PhysicsEngine::Step(float dt){
-	RaycastQuery();
+	
 	float fixed_time_step = 1.0f/60.0f;
 	float physics_time = dt / 1000.0f;
 
@@ -97,6 +97,7 @@ void PhysicsEngine::Step(float dt){
 	if (m_debug_drawer){
 		m_debug_drawer->step();
 	}
+	RaycastQuery();
 }
 
 void PhysicsEngine::CreateTerrainCollision(Ogre::Terrain* terrain){
