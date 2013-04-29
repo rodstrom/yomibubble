@@ -7,9 +7,9 @@
 class InputManager;
 class PlayerInputComponent : public Component, public IComponentUpdateable, public IComponentObserver{
 public:
-	PlayerInputComponent(void) : m_input_manager(NULL), m_current_bubble(NULL), m_is_creating_bubble(false), m_bubble_type(0),
+	PlayerInputComponent(void) : m_input_manager(NULL), m_current_bubble(NULL), m_is_creating_bubble(false), m_bubble_type(0), m_bubble_create_position(Ogre::Vector3::ZERO),
 		m_max_scale(2.0f), m_current_scale(0.0f), m_player_state(0), m_acc_x(0.0f), m_acc_z(0.0f), m_max_velocity(0.0f), m_deacc(0.0f), m_velocity(0.0f)
-	{ m_type = COMPONENT_PLAYER_INPUT; }
+	{ m_type = COMPONENT_PLAYER_INPUT; m_update = true; }
 	virtual ~PlayerInputComponent(void){}
 	virtual void Update(float dt);
 	virtual void Notify(int type, void* message);
@@ -38,6 +38,7 @@ protected:
 
 	InputManager* m_input_manager;
 	GameObject* m_current_bubble;
+	Ogre::Vector3 m_bubble_create_position;
 	int m_bubble_type;
 	bool m_is_creating_bubble;
 	float m_max_scale;
@@ -59,7 +60,8 @@ protected:
 class PhysicsEngine;
 class BubbleController : public Component, public IComponentObserver, public IComponentSimulationStep, public IComponentUpdateable{
 public:
-	BubbleController(void) :  m_velocity(0.0f), m_max_velocity(0.0f), m_impulse(Ogre::Vector3::ZERO), m_apply_impulse(false){}
+	BubbleController(void) :  m_velocity(0.0f), m_max_velocity(0.0f), m_impulse(Ogre::Vector3::ZERO), m_apply_impulse(false), m_can_be_attached(false)
+	{ m_type = COMPONENT_BUBBLE_CONTROL; m_update = true; }
 	virtual ~BubbleController(void){}
 
 	virtual void Notify(int type, void* message);
@@ -78,6 +80,7 @@ protected:
 	Ogre::Vector3 m_impulse;
 	float m_velocity;
 	float m_max_velocity;
+	bool m_can_be_attached;
 };
 
 #endif // _N_PLAYER_CONTROLLER_H_

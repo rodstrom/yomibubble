@@ -40,6 +40,7 @@ void CollisionManager::Init(){
 	m_collision[MakeIntPair(GAME_OBJECT_PINK_BUBBLE, GAME_OBJECT_PINK_BUBBLE)] = &CollisionManager::PinkBubblePinkBubble;
 	m_collision[MakeIntPair(GAME_OBJECT_PINK_BUBBLE, GAME_OBJECT_BLUE_BUBBLE)] = &CollisionManager::PinkBubbleBlueBubble;
 	m_collision[MakeIntPair(GAME_OBJECT_BLUE_BUBBLE, GAME_OBJECT_PINK_BUBBLE)] = &CollisionManager::BlueBubblePinkBubble;
+	m_collision[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_TRIGGER_TEST)] = &CollisionManager::PlayerTrigger;
 
 	m_raycast_map[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_BLUE_BUBBLE)] = &CollisionManager::PlayerBlueBubble;
 	m_raycast_map[MakeIntPair(GAME_OBJECT_BLUE_BUBBLE, GAME_OBJECT_PLAYER)] = &CollisionManager::BlueBubblePlayer;
@@ -53,6 +54,7 @@ void CollisionManager::Init(){
 void CollisionManager::ProcessCollision(const btCollisionObject* ob_a, const btCollisionObject* ob_b){
 	GameObject* go_a = static_cast<GameObject*>(ob_a->getUserPointer());
 	GameObject* go_b = static_cast<GameObject*>(ob_b->getUserPointer());
+
 	HitMap::iterator it = m_collision.find(MakeIntPair(go_a->GetType(), go_b->GetType()));
 	if (it != m_collision.end()){
 		(this->*it->second)(go_a, go_b);
@@ -82,7 +84,7 @@ void CollisionManager::BlueBubbleBlueBubble(GameObject* blue_bubble_a, GameObjec
 	if (!comp_a && !comp_b){
 		RigidbodyComponent* rc_a = static_cast<RigidbodyComponent*>(blue_bubble_a->GetComponent(COMPONENT_RIGIDBODY));
 		RigidbodyComponent* rc_b = static_cast<RigidbodyComponent*>(blue_bubble_b->GetComponent(COMPONENT_RIGIDBODY));
-		Point2PointConstraintComponent* constraint = new Point2PointConstraintComponent;
+		HingeConstraintComponent* constraint = new HingeConstraintComponent;
 		if (!comp_a){
 			blue_bubble_a->AddComponent(constraint);
 		}
@@ -92,7 +94,7 @@ void CollisionManager::BlueBubbleBlueBubble(GameObject* blue_bubble_a, GameObjec
 		btVector3 pivot_a = rc_b->GetRigidbody()->getWorldTransform().getOrigin() - rc_a->GetRigidbody()->getWorldTransform().getOrigin();
 		btVector3 pivot_b = rc_a->GetRigidbody()->getWorldTransform().getOrigin() - rc_b->GetRigidbody()->getWorldTransform().getOrigin();
 		PhysicsEngine* pe = blue_bubble_a->GetGameObjectManager()->GetPhysicsEngine();
-		constraint->Init(pe, rc_a->GetRigidbody(), rc_b->GetRigidbody(), pivot_a, pivot_b);
+		constraint->Init(pe, rc_a->GetRigidbody(), rc_b->GetRigidbody(), pivot_a, btVector3(0,0,0), pivot_a, pivot_a);
 	}
 }
 
@@ -125,8 +127,10 @@ void CollisionManager::PlayerBlueBubble(GameObject* player, GameObject* blue_bub
 }
 
 void CollisionManager::PlayerPlane(GameObject* player, GameObject* plane){
+	bool on_ground = true;
 	int player_state = PLAYER_STATE_NORMAL;
 	player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_SET_STATE, &player_state);
+	player->GetComponentMessenger()->Notify(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND, &on_ground);
 	CharacterController* cc = static_cast<CharacterController*>(player->GetComponent(COMPONENT_CHARACTER_CONTROLLER));
 }
 
@@ -135,3 +139,7 @@ void CollisionManager::LeafPlayer(GameObject* leaf, GameObject* player){
 	player->GetComponentMessenger()->Notify(MSG_SFX2D_PLAY, &static_cast<PlayerInputComponent*>(player->GetComponent(COMPONENT_PLAYER_INPUT))->m_leaf_sfx);
 	leaf->GetGameObjectManager()->RemoveGameObject(leaf);
 };
+
+void CollisionManager::PlayerTrigger(GameObject* player, GameObject* trigger){
+	std::cout << "trigger collisioin\n";
+}

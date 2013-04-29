@@ -5,19 +5,20 @@
 
 enum EComponentType{
 	COMPONENT_NONE = 0,
-	COMPONENT_RENDERER ,
-	COMPONENT_COLLIDER,
-	COMPONENT_PLAYER_INPUT,
+	COMPONENT_MESH_RENDER,
 	COMPONENT_ANIMATION,
-	COMPONENT_TRANSFORM,
+	COMPONENT_PLAYER_INPUT,
+	COMPONENT_BUBBLE_CONTROL,
 	COMPONENT_RIGIDBODY,
 	COMPONENT_AI,
 	COMPONENT_CHARACTER_CONTROLLER,
 	COMPONENT_AUDIO,
 	COMPONENT_CAMERA,
 	COMPONENT_POINT2POINT_CONSTRAINT,
+	COMPONENT_HINGE_CONSTRAINT,
 	COMPONENT_FOLLOW_CAMERA,
 	COMPONENT_NODE,
+	COMPONENT_CHILD_NODE,
 	COMPONENT_TRIGGER,
 	COMPONENT_RAYCAST,
 	COMPONENT_SIZE
@@ -42,6 +43,7 @@ enum EComponentMsg{
 	MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_GET,
 	MSG_CHARACTER_CONROLLER_JUMP,
 	MSG_CHARACTER_CONTROLLER_GRAVITY_SET,
+	MSG_CHARACTER_CONTROLLER_IS_ON_GROUND,
 	MSG_CAMERA_GET_CAMERA_NODE,
 	MSG_CAMERA_GET_CAMERA,
 	MSG_CAMERA_SET_ACTIVE,
@@ -67,6 +69,11 @@ enum EComponentMsg{
 	MSG_PLAYER_INPUT_SET_BUBBLE,
 	MSG_PLAYER_INPUT_SET_STATE,
 	MSG_BUBBLE_CONTROLLER_APPLY_IMPULSE,
+	MSG_BUBBLE_CONTROLLER_CAN_ATTACH_SET,
+	MSG_BUBBLE_CONTROLLER_CAN_ATTACH_GET,
+	MSG_P2P_GET_CONSTRAINT,
+	MSG_P2P_GET_CONSTRAINT_SET_PIVOTA,
+	MSG_P2P_GET_CONSTRAINT_SET_PIVOTB,
 	MSG_SIZE
 };
 
@@ -95,7 +102,7 @@ class GameObject;
 class ComponentMessenger;
 class Component{
 public:
-	Component(void) : m_type(COMPONENT_NONE), m_messenger(NULL), m_owner(NULL){}
+	Component(void) : m_type(COMPONENT_NONE), m_messenger(NULL), m_owner(NULL), m_update(false){}
 	virtual ~Component(void){}
 	int GetComponentType() const { return m_type; }
 	GameObject* GetOwner() const { return m_owner; }
@@ -103,10 +110,12 @@ public:
 	virtual void SetOwner(GameObject* owner) { m_owner = owner; }
 	virtual void SetMessenger(ComponentMessenger* messenger) = 0;
 	virtual void Shut() = 0;
+	virtual bool DoUpdate() const { return m_update; }
 protected:
 	ComponentMessenger* m_messenger;
 	GameObject* m_owner;
 	int m_type;
+	bool m_update;
 };
 
 class IComponentObserver{

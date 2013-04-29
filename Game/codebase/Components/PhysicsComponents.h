@@ -37,19 +37,18 @@ protected:
 
 };
 
-class CharacterController : public RigidbodyComponent, public IComponentUpdateable, public IComponentLateUpdate, public IComponentSimulationStep{
+class CharacterController : public RigidbodyComponent, public IComponentUpdateable, public IComponentSimulationStep{
 public:
 	CharacterController(void) : m_velocity(0.0), m_turn_speed(0.0f), 
-		m_has_follow_cam(false), m_is_jumping(false), m_on_ground(false),
+		m_has_follow_cam(false), m_is_jumping(false), m_on_ground(true), m_start_y_pos(0.0f),
 		m_max_jump_height(0.0f), m_direction(btVector3(0,0,0)), m_deacc(0.0f), m_max_velocity(0.0f), m_acc_x(0.0f), m_acc_z(0.0f)
-	{ m_type = COMPONENT_CHARACTER_CONTROLLER; }
+	{ m_type = COMPONENT_CHARACTER_CONTROLLER; m_update = true; }
 	virtual ~CharacterController(void){}
 	virtual void Notify(int type, void* msg);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
 	virtual void Init(const Ogre::Vector3& position, Ogre::Entity* entity, float step_height, PhysicsEngine* physics_engine);
 	virtual void Update(float dt);
-	virtual void LateUpdate(float dt);
 	virtual void SimulationStep(btScalar time_step);
 	void SetVelocity(float velocity) { m_velocity = velocity; }
 	void SetTurnSpeed(float turn_speed) { m_turn_speed = turn_speed; }
@@ -71,7 +70,7 @@ protected:
 	float		m_turn_speed;
 	float		m_max_jump_height;
 	float		m_jump_pwr;
-	float		m_last_y_pos;
+	float		m_start_y_pos;
 	float		m_acc_x;
 	float		m_acc_z;
 	float		m_ray_length;
@@ -90,6 +89,7 @@ public:
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
 	virtual void Init(PhysicsEngine* physics_engine, btRigidBody* body_a, btRigidBody* body_b, const btVector3& pivot_a, const btVector3& pivot_b);
+	virtual void Init(PhysicsEngine* physics_engine, btRigidBody* body_a, const btVector3& pivot_a);
 	btPoint2PointConstraint* GetConstraint() const { return m_constraint; }
 
 private:
@@ -110,6 +110,22 @@ public:
 
 private:
 	btGeneric6DofConstraint* m_constraint;
+	PhysicsEngine* m_physics_engine;
+};
+
+class HingeConstraintComponent : public Component, public IComponentObserver{
+public:
+	HingeConstraintComponent(void){}
+	virtual ~HingeConstraintComponent(void){}
+
+	virtual void Notify(int type, void* msg);
+	virtual void Shut();
+	virtual void SetMessenger(ComponentMessenger* messenger);
+	virtual void Init(PhysicsEngine* physics_engine, btRigidBody* body_a, btRigidBody* body_b, const btVector3& pivot_a, const btVector3& pivot_b, const btVector3& axis_a, const btVector3& axis_b);
+	btHingeConstraint* GetConstraint() const { return m_constraint; }
+
+protected:
+	btHingeConstraint* m_constraint;
 	PhysicsEngine* m_physics_engine;
 };
 

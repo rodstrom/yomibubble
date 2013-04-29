@@ -60,25 +60,24 @@ void PlayState::Enter(){
 	plane_def.restitution = 0.8f;
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(x,y - 2.0f,z), &plane_def);
 	//0.35f, 1000.0f, 500.0f, 10.0f, 
-	TriggerDef trigger_def;
+	/*TriggerDef trigger_def;
 	trigger_def.body_type = DYNAMIC_BODY;
 	trigger_def.type = COLLIDER_BOX;
 	trigger_def.x = 0.5f;
 	trigger_def.y = 0.5f;
 	trigger_def.z = 0.5f;
 	trigger_def.origin = Ogre::Vector3(0,-1,0);
-	trigger_def.mass = 0.0f;
+	trigger_def.mass = 0.0f;*/
 	CharControllerDef player_def;
 	player_def.friction = 1.0f;
 	player_def.velocity = 5.0f;
 	player_def.max_velocity = 1.0f;
 	player_def.deacceleration = 10.0f;
-	player_def.jump_power = 200.0f;
+	player_def.jump_power = 300.0f;
 	player_def.restitution = 0.0f;
 	player_def.step_height = 0.35f;
 	player_def.turn_speed = 1000.0f;
 	player_def.max_jump_height = 10.0f;
-	player_def.trigger_def = &trigger_def;
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(x,y+1.0f,z), &player_def);
 	
 	CharControllerDef tott_def;

@@ -25,7 +25,7 @@ protected:
 
 class MeshRenderComponent : public Component, public IComponentObserver {
 public:
-	MeshRenderComponent(void) : m_entity(NULL), m_scene_manager(NULL){ m_type = COMPONENT_RENDERER; }
+	MeshRenderComponent(void) : m_entity(NULL), m_scene_manager(NULL){ m_type = COMPONENT_MESH_RENDER; }
 	virtual ~MeshRenderComponent(void){}
 	virtual void Notify(int type, void* message);
 	virtual void Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager);
@@ -43,7 +43,7 @@ protected:
 
 class ChildSceneNodeComponent : public Component, public IComponentObserver{
 public:
-	ChildSceneNodeComponent(void){}
+	ChildSceneNodeComponent(void){ m_type = COMPONENT_CHILD_NODE; }
 	virtual ~ChildSceneNodeComponent(void){}
 	virtual void Notify(int type, void* msg);
 	virtual void Init(const Ogre::Vector3& position, const Ogre::String& id, Ogre::SceneNode* parent);
@@ -59,7 +59,7 @@ protected:
 
 class AnimationComponent : public MeshRenderComponent, public IComponentUpdateable{
 public:
-	AnimationComponent(void){ m_type = COMPONENT_ANIMATION; }
+	AnimationComponent(void){ m_type = COMPONENT_ANIMATION; m_update = true; }
 	virtual ~AnimationComponent(void){}
 	virtual void Update(float dt);
 	virtual void Notify(int type, void* message);
@@ -97,7 +97,7 @@ public:
 		OCS_COLLISION
 	};
 
-	OverlayCollisionCallbackComponent(void){}
+	OverlayCollisionCallbackComponent(void){ m_update = true; }
 	virtual ~OverlayCollisionCallbackComponent(void){}
 	virtual void Notify(int type, void* message);
 	virtual void Update(float dt);
@@ -113,7 +113,7 @@ protected:
 
 class Overlay2DAnimatedComponent : public IComponentUpdateable, public Overlay2DComponent{
 public:
-	Overlay2DAnimatedComponent(void){}
+	Overlay2DAnimatedComponent(void){ m_update = true; }
 	virtual ~Overlay2DAnimatedComponent(void){}
 	virtual void Notify(int type, void*message);
 	virtual void Update(float dt);
