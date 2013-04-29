@@ -30,6 +30,7 @@ void GameObjectManager::Init(PhysicsEngine* physics_engine, Ogre::SceneManager* 
 	m_create_fptr[GAME_OBJECT_GUI]		   =	&GameObjectManager::CreateGUI;
 	m_create_fptr[GAME_OBJECT_LEAF]		   =	&GameObjectManager::CreateLeaf;
 	m_create_fptr[GAME_OBJECT_TRIGGER_TEST]=	&GameObjectManager::CreateTestTrigger;
+	m_create_fptr[GAME_OBJECT_TERRAIN]	   =	&GameObjectManager::CreateTerrain;
 }
 
 void GameObjectManager::Update(float dt){
@@ -184,6 +185,7 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 }
 
 GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, void* data){
+	BubbleDef& def = *static_cast<BubbleDef*>(data);
 	GameObject* go = new GameObject(GAME_OBJECT_BLUE_BUBBLE);
 	NodeComponent* node_comp = new NodeComponent;
 	go->AddComponent(node_comp);
@@ -199,23 +201,24 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 
 	//Point2PointConstraintComponent* cons = new Point2PointConstraintComponent;
 	//go->AddComponent(cons);
-	bc->Init(m_physics_engine, 5.0f, 10.0f);
+	bc->Init(m_physics_engine, 50.0f, 100.0f);
 	node_comp->Init(position, m_scene_manager);
 	mrc->Init("sphere.mesh", m_scene_manager);
-	Ogre::Vector3 scale(0.002f);
+	Ogre::Vector3 scale(def.start_scale);
 	node_comp->GetSceneNode()->setScale(scale);
 	mrc->GetEntity()->setMaterialName("Examples/BlueBubble");
 	rc->Init(position,  mrc->GetEntity(), m_physics_engine, 1.0f, COLLIDER_SPHERE, DYNAMIC_BODY);
 	rc->GetRigidbody()->setGravity(btVector3(0.0f, 0.0f, 0.0f));
-	rc->GetRigidbody()->setRestitution(0.0f);
-	rc->GetRigidbody()->setFriction(0.5);
+	rc->GetRigidbody()->setRestitution(def.restitution);
+	rc->GetRigidbody()->setFriction(def.friction);
 	rc->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
-	cons->Init(m_physics_engine,rc->GetRigidbody(), *static_cast<btRigidBody**>(data), btVector3(0,0,0), btVector3(0,0,0));
-	//cons->Init(m_physics_engine,rc->GetRigidbody(), btVector3(0,0,0));
+	rc->GetRigidbody()->setActivationState(DISABLE_DEACTIVATION);
+	cons->Init(m_physics_engine,rc->GetRigidbody(), def.connection_body, btVector3(0,0,0), btVector3(0,0,0));
 	return go;
 }
 
 GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, void* data){
+	BubbleDef& def = *static_cast<BubbleDef*>(data);
 	GameObject* go = new GameObject(GAME_OBJECT_BLUE_BUBBLE);
 	NodeComponent* node_comp = new NodeComponent;
 	go->AddComponent(node_comp);
@@ -229,19 +232,20 @@ GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, v
 	Point2PointConstraintComponent* cons = new Point2PointConstraintComponent;
 	go->AddComponent(cons);
 
-	bc->Init(m_physics_engine, 5.0f, 10.0f);
+	bc->Init(m_physics_engine, 10.0f, 50.0f);
 	node_comp->Init(position, m_scene_manager);
 	mrc->Init("sphere.mesh", m_scene_manager);
-	Ogre::Vector3 scale(0.002f);
+	Ogre::Vector3 scale(def.start_scale);
 	node_comp->GetSceneNode()->setScale(scale);
 	mrc->GetEntity()->setMaterialName("Examples/PinkBubble");
 	rc->Init(position,  mrc->GetEntity(), m_physics_engine, 1.0f, COLLIDER_SPHERE, DYNAMIC_BODY);
 	rc->GetRigidbody()->setGravity(btVector3(0.0f, 0.0f, 0.0f));
 	rc->GetRigidbody()->setLinearFactor(btVector3(1,0,1));
-	rc->GetRigidbody()->setRestitution(1.0f);
-	rc->GetRigidbody()->setFriction(0.5);
+	rc->GetRigidbody()->setRestitution(def.restitution);
+	rc->GetRigidbody()->setFriction(def.friction);
 	rc->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
-	cons->Init(m_physics_engine,rc->GetRigidbody(), *static_cast<btRigidBody**>(data), btVector3(0,0,0), btVector3(0,0,0));
+	rc->GetRigidbody()->setActivationState(DISABLE_DEACTIVATION);
+	cons->Init(m_physics_engine,rc->GetRigidbody(), def.connection_body, btVector3(0,0,0), btVector3(0,0,0));
 	return go;
 }
 
@@ -360,5 +364,14 @@ GameObject* GameObjectManager::CreateTestTrigger(const Ogre::Vector3& position, 
 	go->AddComponent(tc);
 
 	tc->Init(position, m_physics_engine, &def);
+	return go;
+}
+
+GameObject* GameObjectManager::CreateTerrain(const Ogre::Vector3& position, void* data){
+	GameObject* go = new GameObject(GAME_OBJECT_TERRAIN);
+	TerrainComponent* tc = new TerrainComponent;
+	go->AddComponent(tc);
+
+	tc->Init(m_scene_manager, m_physics_engine, "try");
 	return go;
 }

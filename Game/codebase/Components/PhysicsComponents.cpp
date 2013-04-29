@@ -35,6 +35,12 @@ void RigidbodyComponent::Notify(int type, void* msg){
 	case MSG_RIGIDBODY_APPLY_IMPULSE:
 		m_rigidbody->applyCentralImpulse(BtOgre::Convert::toBullet(*static_cast<Ogre::Vector3*>(msg)));
 		break;
+	case MSG_RIGIDBODY_COLLISION_FLAG_SET:
+		m_rigidbody->setCollisionFlags(m_rigidbody->getCollisionFlags() | *static_cast<int*>(msg));
+		break;
+	case MSG_RIGIDBODY_COLLISION_FLAG_REMOVE:
+		m_rigidbody->setCollisionFlags(m_rigidbody->getCollisionFlags() &~ *static_cast<int*>(msg));
+		break;
 	default:
 		break;
 	}
@@ -96,6 +102,7 @@ void RigidbodyComponent::Shut(){
 	m_messenger->Unregister(MSG_RIGIDBODY_GRAVITY_SET, this);
 	m_messenger->Unregister(MSG_RIGIDBODY_POSITION_SET, this);
 	m_messenger->Unregister(MSG_RIGIDBODY_APPLY_IMPULSE, this);
+	m_messenger->Unregister(MSG_RIGIDBODY_COLLISION_FLAG_REMOVE, this);
 }
 
 void RigidbodyComponent::SetMessenger(ComponentMessenger* messenger){
@@ -106,6 +113,8 @@ void RigidbodyComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_RIGIDBODY_GRAVITY_SET, this);
 	m_messenger->Register(MSG_RIGIDBODY_POSITION_SET, this);
 	m_messenger->Register(MSG_RIGIDBODY_APPLY_IMPULSE, this);
+	m_messenger->Register(MSG_RIGIDBODY_COLLISION_FLAG_SET, this);
+	m_messenger->Register(MSG_RIGIDBODY_COLLISION_FLAG_REMOVE, this);
 }
 
 void CharacterController::Notify(int type, void* msg){
@@ -146,8 +155,11 @@ void CharacterController::Notify(int type, void* msg){
 		m_direction = *static_cast<Ogre::Vector3*>(msg);
 		m_direction *= 10.0f;
 		break;
-	case MSG_CHARACTER_CONTROLLER_IS_ON_GROUND:
+	case MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_SET:
 		m_on_ground = *static_cast<bool*>(msg);
+		break;
+	case MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_GET:
+		*static_cast<bool*>(msg) = m_on_ground;
 		break;
 	default:
 		break;
@@ -165,7 +177,8 @@ void CharacterController::Shut(){
 		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_SET, this);
 		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_GET, this);
 		m_messenger->Unregister(MSG_CHARACTER_CONROLLER_JUMP, this);
-		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND, this);
+		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_SET, this);
+		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_GET, this);
 	}
 	m_physics_engine->RemoveObjectSimulationStep(this);
 }
@@ -176,7 +189,8 @@ void CharacterController::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_SET, this);
 	m_messenger->Register(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_GET, this);
 	m_messenger->Register(MSG_CHARACTER_CONROLLER_JUMP, this);
-	m_messenger->Register(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND, this);
+	m_messenger->Register(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_SET, this);
+	m_messenger->Register(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_GET, this);
 }
 
 void CharacterController::Init(const Ogre::Vector3& position, Ogre::Entity* entity, float step_height, PhysicsEngine* physics_engine){
@@ -405,7 +419,7 @@ void Generic6DofConstraintComponent::Init(PhysicsEngine* physics_engine, btRigid
 	transform_b.setIdentity();
 	transform_b.setOrigin(pivot_b);
 	m_constraint = new btGeneric6DofConstraint(*body_a, *body_b, transform_a, transform_b, linear_reference);
-	m_physics_engine->GetDynamicWorld()->addConstraint(m_constraint);
+	m_physics_engine->GetDynamicWorld()->addConstraint(m_constraint, false);
 }
 
 void RaycastComponent::Init(PhysicsEngine* physics_engine, btCollisionObject* obj, const Ogre::String& body_id){

@@ -24,6 +24,9 @@ public:
 	SoundData2D m_leaf_sfx;
 
 protected:
+	void CreateBlueBubble(const Ogre::Vector3& pos, const BubbleDef& bubble_def);
+	void CreatePinkBubble(const Ogre::Vector3& pos, const BubbleDef& bubble_def);
+
 	void Normal(float dt);
 	void OnBubble(float dt);
 	void InsideBubble(float dt);

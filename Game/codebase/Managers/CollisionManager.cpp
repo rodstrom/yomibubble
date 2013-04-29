@@ -41,6 +41,7 @@ void CollisionManager::Init(){
 	m_collision[MakeIntPair(GAME_OBJECT_PINK_BUBBLE, GAME_OBJECT_BLUE_BUBBLE)] = &CollisionManager::PinkBubbleBlueBubble;
 	m_collision[MakeIntPair(GAME_OBJECT_BLUE_BUBBLE, GAME_OBJECT_PINK_BUBBLE)] = &CollisionManager::BlueBubblePinkBubble;
 	m_collision[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_TRIGGER_TEST)] = &CollisionManager::PlayerTrigger;
+	m_collision[MakeIntPair(GAME_OBJECT_LEAF, GAME_OBJECT_PLAYER)] = &CollisionManager::LeafPlayer;
 
 	m_raycast_map[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_BLUE_BUBBLE)] = &CollisionManager::PlayerBlueBubble;
 	m_raycast_map[MakeIntPair(GAME_OBJECT_BLUE_BUBBLE, GAME_OBJECT_PLAYER)] = &CollisionManager::BlueBubblePlayer;
@@ -48,7 +49,7 @@ void CollisionManager::Init(){
 	m_raycast_map[MakeIntPair(GAME_OBJECT_PINK_BUBBLE, GAME_OBJECT_PLAYER)] = &CollisionManager::PinkBubblePlayer;
 	m_raycast_map[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_PLANE)] = &CollisionManager::PlayerPlane;
 	m_raycast_map[MakeIntPair(GAME_OBJECT_PLANE, GAME_OBJECT_PLAYER)] = &CollisionManager::PlanePlayer;
-	m_collision[MakeIntPair(GAME_OBJECT_LEAF, GAME_OBJECT_PLAYER)] = &CollisionManager::LeafPlayer;
+	m_raycast_map[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_TERRAIN)] = &CollisionManager::PlayerTerrain;
 }
 
 void CollisionManager::ProcessCollision(const btCollisionObject* ob_a, const btCollisionObject* ob_b){
@@ -111,10 +112,18 @@ void CollisionManager::PlayerBlueBubble(GameObject* player, GameObject* blue_bub
 				Ogre::Vector3 impulse(0.0f, cc->GetRigidbody()->getLinearVelocity().y() * -2.2f, 0.0f);
 				player->GetComponentMessenger()->Notify(MSG_RIGIDBODY_APPLY_IMPULSE, &impulse);
 			}
-			else if (y_vel < -10.0f){
-				std::cout << "Inside Bubble\n";
+			else if (y_vel < -10.0f){  // go inside bubble
+				int player_state = PLAYER_STATE_INSIDE_BUBBLE;
+				Ogre::Vector3 gravity(0,0,0);
+				bool can_land = false;
+				int coll = btCollisionObject::CF_NO_CONTACT_RESPONSE;
+				player->GetComponentMessenger()->Notify(MSG_RIGIDBODY_COLLISION_FLAG_SET, &coll);
+				player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_SET_BUBBLE, &blue_bubble);
+				player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_SET_STATE, &player_state);
+				player->GetComponentMessenger()->Notify(MSG_CHARACTER_CONTROLLER_GRAVITY_SET, &gravity);
+				player->GetComponentMessenger()->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &gravity);
 			}
-			else {   //Stand on bubble if lower than 2.0
+			else {   //Stand on bubble if lower than 4.0
 				int player_state = PLAYER_STATE_ON_BUBBLE;
 				Ogre::Vector3 gravity(0,0,0);
 				player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_SET_BUBBLE, &blue_bubble);
@@ -128,10 +137,14 @@ void CollisionManager::PlayerBlueBubble(GameObject* player, GameObject* blue_bub
 
 void CollisionManager::PlayerPlane(GameObject* player, GameObject* plane){
 	bool on_ground = true;
-	int player_state = PLAYER_STATE_NORMAL;
-	player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_SET_STATE, &player_state);
-	player->GetComponentMessenger()->Notify(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND, &on_ground);
-	CharacterController* cc = static_cast<CharacterController*>(player->GetComponent(COMPONENT_CHARACTER_CONTROLLER));
+	int current_state = PLAYER_STATE_INSIDE_BUBBLE;
+	player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_STATE_GET, &current_state);
+	if (current_state != PLAYER_STATE_INSIDE_BUBBLE){
+		int player_state = PLAYER_STATE_NORMAL;
+		player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_SET_STATE, &player_state);
+		player->GetComponentMessenger()->Notify(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_SET, &on_ground);
+		CharacterController* cc = static_cast<CharacterController*>(player->GetComponent(COMPONENT_CHARACTER_CONTROLLER));
+	}
 }
 
 void CollisionManager::LeafPlayer(GameObject* leaf, GameObject* player){
@@ -142,4 +155,16 @@ void CollisionManager::LeafPlayer(GameObject* leaf, GameObject* player){
 
 void CollisionManager::PlayerTrigger(GameObject* player, GameObject* trigger){
 	std::cout << "trigger collisioin\n";
+}
+
+void CollisionManager::PlayerTerrain(GameObject* player, GameObject* terrain){
+	bool on_ground = true;
+	int current_state = PLAYER_STATE_INSIDE_BUBBLE;
+	player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_STATE_GET, &current_state);
+	if (current_state != PLAYER_STATE_INSIDE_BUBBLE){
+		int player_state = PLAYER_STATE_NORMAL;
+		player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_SET_STATE, &player_state);
+		player->GetComponentMessenger()->Notify(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_SET, &on_ground);
+		CharacterController* cc = static_cast<CharacterController*>(player->GetComponent(COMPONENT_CHARACTER_CONTROLLER));
+	}
 }

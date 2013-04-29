@@ -12,10 +12,10 @@ PlayState::~PlayState(void){}
 
 void PlayState::Enter(){
 	m_scene_manager = Ogre::Root::getSingleton().createSceneManager("OctreeSceneManager");
-	m_scene_manager->setDisplaySceneNodes(true);
+	//m_scene_manager->setDisplaySceneNodes(true);
 	m_physics_engine = new PhysicsEngine;
 	m_physics_engine->Init();
-	m_physics_engine->SetDebugDraw(m_scene_manager);
+	//m_physics_engine->SetDebugDraw(m_scene_manager);
 	m_camera = m_scene_manager->createCamera("MainCamera");
 	//m_camera->setPosition(Ogre::Vector3(500,500,500));
 	//m_camera->lookAt(Ogre::Vector3(0,0,0));
@@ -95,13 +95,14 @@ void PlayState::Enter(){
 	//m_physics_engine->CreateTerrainCollision(mArtifexLoader->mTerrain);
 	//m_scene_manager->setSkyDome(true, "Examples/CloudySky");
 	
-	TriggerDef trigger_def;
+	/*TriggerDef trigger_def;
 	trigger_def.body_type = STATIC_BODY;
 	trigger_def.collider_type = COLLIDER_BOX;
 	trigger_def.x = 2.0f;
 	trigger_def.y = 2.0f;
 	trigger_def.z = 2.0f;
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_TRIGGER_TEST, Ogre::Vector3(x + 2.0f, y - 10.0f ,z + 2.0f), &trigger_def);
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_TRIGGER_TEST, Ogre::Vector3(x + 2.0f, y - 10.0f ,z + 2.0f), &trigger_def);*/
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_TERRAIN, Ogre::Vector3(0,0,0), NULL);
 }
 
 
