@@ -71,31 +71,47 @@ void InputSystem::Shut(){
 }
 
 void InputSystem::Capture(){
+	bool mouse_change = false;
 	if (m_mouse){
 		m_mouse->capture();
 		OIS::MouseState mouse_state = m_mouse->getMouseState();
 		m_game->InjectMouseState(mouse_state);
 		m_game->InjectMousePosition(mouse_state.X.abs, mouse_state.Y.abs);
 		m_game->InjectRelativeCameraAxis(mouse_state.X.rel, mouse_state.Y.rel, mouse_state.Z.rel);
+		if (mouse_state.X.rel + mouse_state.Y.rel + mouse_state.Z.rel != 0) mouse_change = true;
 	}
+	bool changeXmove = false;
+	bool changeZmove = false;
 	if (m_keyboard){
 		m_keyboard->capture();
 		if (m_keyboard->isKeyDown(OIS::KC_W)){
-			m_game->InjectRelativeMovementZ(-1.0f);
+			m_game->InjectRelativeMovementZ(-0.002f);
+			changeZmove = true;
 		}
 		else if (m_keyboard->isKeyDown(OIS::KC_S)){
-			m_game->InjectRelativeMovementZ(1.0f);
+			m_game->InjectRelativeMovementZ(0.002f);
+			changeZmove = true;
 		}
 		if (m_keyboard->isKeyDown(OIS::KC_A)){
-			m_game->InjectRelativeMovementX(-1.0f);
+			m_game->InjectRelativeMovementX(-0.002f);
+			changeXmove = true;
 		}
 		else if (m_keyboard->isKeyDown(OIS::KC_D)){
-			m_game->InjectRelativeMovementX(1.0f);
+			m_game->InjectRelativeMovementX(0.002f);
+			changeXmove = true;
 		}
 	}
 	if (m_joysticks.size() > 0){
 		for (auto it = m_joysticks.begin(); it != m_joysticks.end(); it++){
 			(*it)->capture();
+			
+			if((*it)->getJoyStickState().mAxes[0].abs < 16384 && (*it)->getJoyStickState().mAxes[0].abs > -16384 && !changeZmove) m_game->InjectRelativeMovementZ(0.0f);
+			if((*it)->getJoyStickState().mAxes[1].abs < 16384 && (*it)->getJoyStickState().mAxes[1].abs > -16384 && !changeXmove) m_game->InjectRelativeMovementX(0.0f);
+			if(((*it)->getJoyStickState().mAxes[2].abs < 16384 && (*it)->getJoyStickState().mAxes[2].abs > -16384) 
+				&& ((*it)->getJoyStickState().mAxes[3].abs < 16384 && (*it)->getJoyStickState().mAxes[3].abs > -16384)
+				&& (!mouse_change))
+				m_game->InjectRelativeCameraAxis(0.0f, 0.0f, 0.0f);
+
 		}
 	}
 }
@@ -213,6 +229,12 @@ bool InputSystem::mouseReleased(const OIS::MouseEvent& e, OIS::MouseButtonID id)
 	case 0: //OIS::MouseButtonID::MB_Left:
 		m_game->InjectReleasedButton(BTN_LEFT_MOUSE);
 		break;
+	case 6: 
+		m_game->InjectPressedButton(BTN_BACK);
+		break;
+	case 7: 
+		m_game->InjectPressedButton(BTN_START);
+		break;
 	default:
 		break;
 	}
@@ -220,36 +242,69 @@ bool InputSystem::mouseReleased(const OIS::MouseEvent& e, OIS::MouseButtonID id)
 }
 
 bool InputSystem::povMoved(const OIS::JoyStickEvent& e, int pov){
-	for (auto it = m_joystick_listeners.begin(); it != m_joystick_listeners.end(); it++){
-		if (!(*it)->povMoved(e, pov)) { break; }
-	}
+	
 	return true;
 }
 
 bool InputSystem::axisMoved(const OIS::JoyStickEvent& e, int axis){
-	for (auto it = m_joystick_listeners.begin(); it != m_joystick_listeners.end(); it++){
-		if (!(*it)->axisMoved(e, axis)) { break; }
+	if(e.state.mAxes[0].abs > 16384 || e.state.mAxes[0].abs < -16384) {
+		float movement = e.state.mAxes[0].abs * 0.00000005f;
+		m_game->InjectRelativeMovementZ(movement);
 	}
+	else {
+		m_game->InjectRelativeMovementZ(0.0f);
+	}
+
+	if(e.state.mAxes[1].abs > 16384 || e.state.mAxes[1].abs < -16384) {
+		float movement = e.state.mAxes[1].abs * 0.00000005f;
+		m_game->InjectRelativeMovementX(movement);
+	}
+	else {
+		m_game->InjectRelativeMovementX(0.0f);
+	}
+	
+	float camX = 0.0f; 
+	float camY = 0.0f;
+	if(e.state.mAxes[2].abs > 16384 || e.state.mAxes[2].abs < -16384) {
+		camY = e.state.mAxes[2].abs * 0.005f;
+	}
+	if(e.state.mAxes[3].abs > 16384 || e.state.mAxes[3].abs < -16384) {
+		camX = e.state.mAxes[3].abs * 0.005f;
+	}
+	m_game->InjectRelativeCameraAxis(camX, camY, 0.0f);
+
 	return true;
 }
 
 bool InputSystem::sliderMoved(const OIS::JoyStickEvent& e, int sliderID){
-	for (auto it = m_joystick_listeners.begin(); it != m_joystick_listeners.end(); it++){
-		if (!(*it)->sliderMoved(e, sliderID)) { break; }
-	}
+	
 	return true;
 }
 
 bool InputSystem::buttonPressed(const OIS::JoyStickEvent& e, int button){
-	for (auto it = m_joystick_listeners.begin(); it != m_joystick_listeners.end(); it++){
-		if (!(*it)->buttonPressed(e, button)) { break; }
+	switch (button){
+	case 1: //OIS::MouseButtonID::MB_Right: //or GamePad B
+		m_game->InjectPressedButton(BTN_RIGHT_MOUSE);
+		break;
+	case 0: //OIS::MouseButtonID::MB_Left: //or GamePad A
+		m_game->InjectPressedButton(BTN_LEFT_MOUSE);
+		break;
+	default:
+		break;
 	}
 	return true;
 }
 
 bool InputSystem::buttonReleased(const OIS::JoyStickEvent& e, int button){
-	for (auto it = m_joystick_listeners.begin(); it != m_joystick_listeners.end(); it++){
-		if (!(*it)->buttonReleased(e, button)) { break; }
+	switch (button){
+	case 1: //OIS::MouseButtonID::MB_Right: //or GamePad B
+		m_game->InjectReleasedButton(BTN_RIGHT_MOUSE);
+		break;
+	case 0: //OIS::MouseButtonID::MB_Left: //or GamePad A
+		m_game->InjectReleasedButton(BTN_LEFT_MOUSE);
+		break;
+	default:
+		break;
 	}
 	return true;
 }

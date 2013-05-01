@@ -29,6 +29,8 @@ void GameObjectManager::Init(PhysicsEngine* physics_engine, Ogre::SceneManager* 
 	m_create_fptr[GAME_OBJECT_OVERLAY]	   =	&GameObjectManager::Create2DOverlay;
 	m_create_fptr[GAME_OBJECT_GUI]		   =	&GameObjectManager::CreateGUI;
 	m_create_fptr[GAME_OBJECT_LEAF]		   =	&GameObjectManager::CreateLeaf;
+	m_create_fptr[GAME_OBJECT_TRIGGER_TEST]=	&GameObjectManager::CreateTestTrigger;
+	m_create_fptr[GAME_OBJECT_TERRAIN]	   =	&GameObjectManager::CreateTerrain;
 }
 
 void GameObjectManager::Update(float dt){
@@ -114,7 +116,7 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	CharacterController* contr = new CharacterController;
 	go->AddComponent(contr);
 	go->AddUpdateable(contr);
-	go->AddLateUpdate(contr);
+	//go->AddLateUpdate(contr);
 	FollowCameraComponent* fcc = new FollowCameraComponent;
 	go->AddComponent(fcc);
 	go->AddUpdateable(fcc);
@@ -136,21 +138,31 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	go->AddComponent(raycast);
 	CountableResourceGUI* gui = new CountableResourceGUI;
 	go->AddComponent(gui);
+	TriggerComponent* tc = new TriggerComponent;
+	go->AddComponent(tc);
 
-	Ogre::Vector3 scale(0.007);
+	//Ogre::Vector3 scale(0.007);
 
 	node_comp->Init(position, m_scene_manager);
-	node_comp->GetSceneNode()->setScale(scale);
+	//node_comp->GetSceneNode()->setScale(scale);
 	node_comp->SetId("player_node");
 	
+	//acomp->Init("Yomi.mesh", m_scene_manager, node_comp->GetId());
 	acomp->Init("Yomi.mesh", m_scene_manager, node_comp->GetId());
 	
+	acomp->GetEntity()->setMaterialName("_YomiFBXASC039sFBXASC032staffMaterial__191");
 	//acomp->Init("yomi.mesh", m_scene_manager);
 	//Ogre::Vector3 scale(0.008f);
 	//node_comp->GetSceneNode()->setScale(scale);
 	//acomp->Init("yomi.mesh", m_scene_manager);
 	
+	TriggerDef tdef;
+	tdef.body_type = STATIC_BODY;
+	tdef.collider_type = COLLIDER_SPHERE;
+	tdef.radius = 0.1f;
 
+	tc->Init(position, m_physics_engine, &tdef);
+	tc->SetId("btrig");
 	contr->Init(position, acomp->GetEntity(), def.step_height, m_physics_engine);
 	contr->SetTurnSpeed(def.turn_speed);
 	contr->SetVelocity(def.velocity);
@@ -177,14 +189,18 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	fcc->GetCamera()->setNearClipDistance(0.1f);
 	csnc->Init(Ogre::Vector3(0.0f, 0.0f, 1.0f), "CreateBubble", node_comp->GetSceneNode());
 	m_sound_manager->GetYomiNode(node_comp->GetSceneNode()->getName());
-	raycast->Init(m_physics_engine, contr->GetRigidbody());
-	raycast->SetLength(Ogre::Vector3(0.0f,-0.8f,0.0f));
+	raycast->Init(m_physics_engine, contr->GetRigidbody(), "body");
+	raycast->SetLength(Ogre::Vector3(0.0f,-1.0f,0.0f));
 	raycast->SetAttached(true);
+
+	//DEBUGGING GRAVITY
+	//contr->GetRigidbody()->setGravity(btVector3(0,0,0));
 
 	return go;
 }
 
 GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, void* data){
+	BubbleDef& def = *static_cast<BubbleDef*>(data);
 	GameObject* go = new GameObject(GAME_OBJECT_BLUE_BUBBLE);
 	NodeComponent* node_comp = new NodeComponent;
 	go->AddComponent(node_comp);
@@ -195,25 +211,29 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 	BubbleController* bc = new BubbleController;
 	go->AddComponent(bc);
 	go->AddUpdateable(bc);
-	Point2PointConstraintComponent* p2p = new Point2PointConstraintComponent;
+	Point2PointConstraintComponent* cons = new Point2PointConstraintComponent;
+	go->AddComponent(cons);
 
-	bc->Init(m_physics_engine, 5.0f, 10.0f);
+	//Point2PointConstraintComponent* cons = new Point2PointConstraintComponent;
+	//go->AddComponent(cons);
+	bc->Init(m_physics_engine, 50.0f, 100.0f);
 	node_comp->Init(position, m_scene_manager);
 	mrc->Init("sphere.mesh", m_scene_manager);
-	Ogre::Vector3 scale(0.002f);
+	Ogre::Vector3 scale(def.start_scale);
 	node_comp->GetSceneNode()->setScale(scale);
 	mrc->GetEntity()->setMaterialName("Examples/BlueBubble");
 	rc->Init(position,  mrc->GetEntity(), m_physics_engine, 1.0f, COLLIDER_SPHERE, DYNAMIC_BODY);
 	rc->GetRigidbody()->setGravity(btVector3(0.0f, 0.0f, 0.0f));
-	rc->GetRigidbody()->setRestitution(1.0f);
-	rc->GetRigidbody()->setFriction(0.5);
+	rc->GetRigidbody()->setRestitution(def.restitution);
+	rc->GetRigidbody()->setFriction(def.friction);
 	rc->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
-	p2p->Init(m_physics_engine, rc->GetRigidbody(), btVector3(0.0f,0.0f,0.0f), btVector3(0.0f,0.0f,0.0f));
-
+	rc->GetRigidbody()->setActivationState(DISABLE_DEACTIVATION);
+	cons->Init(m_physics_engine,rc->GetRigidbody(), def.connection_body, btVector3(0,0,0), btVector3(0,0,0));
 	return go;
 }
 
 GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, void* data){
+	BubbleDef& def = *static_cast<BubbleDef*>(data);
 	GameObject* go = new GameObject(GAME_OBJECT_BLUE_BUBBLE);
 	NodeComponent* node_comp = new NodeComponent;
 	go->AddComponent(node_comp);
@@ -224,19 +244,23 @@ GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, v
 	BubbleController* bc = new BubbleController;
 	go->AddComponent(bc);
 	go->AddUpdateable(bc);
+	Point2PointConstraintComponent* cons = new Point2PointConstraintComponent;
+	go->AddComponent(cons);
 
-	bc->Init(m_physics_engine, 5.0f, 10.0f);
+	bc->Init(m_physics_engine, 10.0f, 50.0f);
 	node_comp->Init(position, m_scene_manager);
 	mrc->Init("sphere.mesh", m_scene_manager);
-	Ogre::Vector3 scale(0.002f);
+	Ogre::Vector3 scale(def.start_scale);
 	node_comp->GetSceneNode()->setScale(scale);
 	mrc->GetEntity()->setMaterialName("Examples/PinkBubble");
 	rc->Init(position,  mrc->GetEntity(), m_physics_engine, 1.0f, COLLIDER_SPHERE, DYNAMIC_BODY);
 	rc->GetRigidbody()->setGravity(btVector3(0.0f, 0.0f, 0.0f));
 	rc->GetRigidbody()->setLinearFactor(btVector3(1,0,1));
-	rc->GetRigidbody()->setRestitution(1.0f);
-	rc->GetRigidbody()->setFriction(0.5);
+	rc->GetRigidbody()->setRestitution(def.restitution);
+	rc->GetRigidbody()->setFriction(def.friction);
 	rc->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
+	rc->GetRigidbody()->setActivationState(DISABLE_DEACTIVATION);
+	cons->Init(m_physics_engine,rc->GetRigidbody(), def.connection_body, btVector3(0,0,0), btVector3(0,0,0));
 	return go;
 }
 
@@ -258,6 +282,7 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 
 	node_comp->Init(position, m_scene_manager);
 	acomp->Init("Yomi_2Yomi.mesh", m_scene_manager);
+	acomp->GetEntity()->setMaterialName("SolidColor/Green");
 	m_sound_manager->GetTottNode(node_comp->GetSceneNode()->getName());
 	way_point->Init(node_comp->GetSceneNode(), 0.001f);
 	way_point->AddWayPoint(Ogre::Vector3(15.0f, -10.0f, 21.0f));
@@ -267,6 +292,10 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 	contr->SetVelocity(def.velocity);
 	contr->GetRigidbody()->setRestitution(def.restitution);
 	contr->GetRigidbody()->setFriction(def.friction);
+	
+	//DEBUGGING GRAVITY
+	contr->GetRigidbody()->setGravity(btVector3(0,0,0));
+
 	return go;
 }
 
@@ -336,12 +365,32 @@ GameObject* GameObjectManager::CreateLeaf(const Ogre::Vector3& position, void* d
 	go->AddComponent(rb);
 
 	node_comp->Init(position, m_scene_manager);
-	mrc->Init("cube.mesh", m_scene_manager);
-	Ogre::Vector3 scale(0.002f);
-	node_comp->GetSceneNode()->setScale(scale);
+	mrc->Init("Collectable_Leaf.mesh", m_scene_manager);
+	//Ogre::Vector3 scale(0.002f);
+	//node_comp->GetSceneNode()->setScale(scale);
 	rb->Init(position, mrc->GetEntity(), m_physics_engine, 1, COLLIDER_BOX, STATIC_BODY);
 	particle->Init(m_scene_manager, "Smoke", particleDef.particle_name);
+	mrc->GetEntity()->setMaterialName("Examples/Leaf");
 	node_comp->GetSceneNode()->setPosition(Ogre::Vector3(position));
 	particle->CreateParticle(node_comp->GetSceneNode(), node_comp->GetSceneNode()->getPosition(), Ogre::Vector3(0,-3,0));
+	return go;
+}
+
+GameObject* GameObjectManager::CreateTestTrigger(const Ogre::Vector3& position, void* data){
+	TriggerDef& def = *static_cast<TriggerDef*>(data);
+	GameObject* go = new GameObject(GAME_OBJECT_TRIGGER_TEST);
+	TriggerComponent* tc = new TriggerComponent;
+	go->AddComponent(tc);
+
+	tc->Init(position, m_physics_engine, &def);
+	return go;
+}
+
+GameObject* GameObjectManager::CreateTerrain(const Ogre::Vector3& position, void* data){
+	GameObject* go = new GameObject(GAME_OBJECT_TERRAIN);
+	TerrainComponent* tc = new TerrainComponent;
+	go->AddComponent(tc);
+
+	tc->Init(m_scene_manager, m_physics_engine, "try");
 	return go;
 }

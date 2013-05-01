@@ -37,19 +37,18 @@ protected:
 
 };
 
-class CharacterController : public RigidbodyComponent, public IComponentUpdateable, public IComponentLateUpdate, public IComponentSimulationStep{
+class CharacterController : public RigidbodyComponent, public IComponentUpdateable, public IComponentSimulationStep{
 public:
 	CharacterController(void) : m_velocity(0.0), m_turn_speed(0.0f), 
 		m_has_follow_cam(false), m_is_jumping(false), m_on_ground(true), m_start_y_pos(0.0f),
 		m_max_jump_height(0.0f), m_direction(btVector3(0,0,0)), m_deacc(0.0f), m_max_velocity(0.0f), m_acc_x(0.0f), m_acc_z(0.0f)
-	{ m_type = COMPONENT_CHARACTER_CONTROLLER; }
+	{ m_type = COMPONENT_CHARACTER_CONTROLLER; m_update = true; }
 	virtual ~CharacterController(void){}
 	virtual void Notify(int type, void* msg);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
 	virtual void Init(const Ogre::Vector3& position, Ogre::Entity* entity, float step_height, PhysicsEngine* physics_engine);
 	virtual void Update(float dt);
-	virtual void LateUpdate(float dt);
 	virtual void SimulationStep(btScalar time_step);
 	void SetVelocity(float velocity) { m_velocity = velocity; }
 	void SetTurnSpeed(float turn_speed) { m_turn_speed = turn_speed; }
@@ -90,7 +89,7 @@ public:
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
 	virtual void Init(PhysicsEngine* physics_engine, btRigidBody* body_a, btRigidBody* body_b, const btVector3& pivot_a, const btVector3& pivot_b);
-	virtual void Init(PhysicsEngine* physics_engine, btRigidBody* body, const btVector3& pivot, const btVector3& world_point);
+	virtual void Init(PhysicsEngine* physics_engine, btRigidBody* body_a, const btVector3& pivot_a);
 	btPoint2PointConstraint* GetConstraint() const { return m_constraint; }
 
 private:
@@ -138,7 +137,7 @@ public:
 	virtual void Notify(int type, void* msg);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
-	virtual void Init(PhysicsEngine* physics_engine, btCollisionObject* obj);
+	virtual void Init(PhysicsEngine* physics_engine, btCollisionObject* obj, const Ogre::String& body_id = Ogre::StringUtil::BLANK);
 	void SetLength(const Ogre::Vector3& length);
 	bool IsAttached() const { return m_attached; }
 	void SetAttached(bool value) { m_attached = value; }

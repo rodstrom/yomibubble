@@ -5,7 +5,7 @@
 
 class CameraComponent : public Component, public IComponentObserver, public IComponentUpdateable{
 public:
-	CameraComponent(void) : m_scene_manager(NULL), m_camera(NULL), m_viewport(NULL), m_camera_id(Ogre::StringUtil::BLANK) { m_type = COMPONENT_CAMERA; }
+	CameraComponent(void) : m_scene_manager(NULL), m_camera(NULL), m_viewport(NULL), m_camera_id(Ogre::StringUtil::BLANK) { m_type = COMPONENT_CAMERA; m_update = true; }
 	virtual ~CameraComponent(void){}
 	virtual void Notify(int type, void* msg);
 	virtual void Shut();

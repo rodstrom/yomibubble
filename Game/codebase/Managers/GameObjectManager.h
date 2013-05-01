@@ -2,6 +2,7 @@
 #define _N_GAME_OBJECT_MANAGER_H_
 
 #include "..\Components\GameObjectPrereq.h"
+#include <string>
 
 class GameObject;
 class InputManager;
@@ -18,6 +19,7 @@ public:
 	void RemoveGameObject(GameObject* gameobject);
 	GameObject* CreateGameObject(int type, const Ogre::Vector3& position, void* data);
 	void Shut();
+	//GameObject* GetGameObject(std::string id);
 
 	Ogre::SceneManager* GetSceneManager() const { return m_scene_manager; }
 	InputManager* GetInputManager() const { return m_input_manager; }
@@ -34,6 +36,8 @@ private:
 	GameObject* CreatePlane(const Ogre::Vector3& position, void* data);
 	GameObject* CreateLeaf(const Ogre::Vector3& position, void* data);
 	GameObject* CreateGUI(const Ogre::Vector3& position, void* data);
+	GameObject* CreateTestTrigger(const Ogre::Vector3& position, void* data);
+	GameObject* CreateTerrain(const Ogre::Vector3& position, void* data);
 
 	typedef GameObject* (GameObjectManager::*CreateObjectFptr)(const Ogre::Vector3&, void* data);
 	

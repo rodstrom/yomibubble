@@ -13,6 +13,7 @@ public:
 
 	void ProcessCollision(const btCollisionObject* ob_a, const btCollisionObject* ob_b);
 	void ProcessRaycast(const btCollisionObject* ob_a, const btCollisionObject* ob_b);
+	void UpdateColliisonChache();
 	
 private:
 	CollisionManager(void);
@@ -36,9 +37,14 @@ private:
 	void PlayerPlane(GameObject* player, GameObject* plane);
 	void PlanePlayer(GameObject* plane, GameObject* player) { PlayerPlane(player, plane); }
 	void LeafPlayer(GameObject* leaf, GameObject* player);
+	void PlayerTrigger(GameObject* player, GameObject* trigger);
 
+	void PlayerTerrain(GameObject* player, GameObject* terrain);
+
+	
 	typedef void (CollisionManager::*DoubleDispatch)(GameObject*, GameObject*);
 	typedef std::map<std::pair<int, int>, DoubleDispatch> HitMap;
+	typedef std::list<std::pair<void*,void*>> BeginEndChache;
 	HitMap m_collision;
 	HitMap m_raycast_map;
 };

@@ -10,19 +10,20 @@ enum EGameObject{
 	GAME_OBJECT_GUI,
 	GAME_OBJECT_PLANE,
 	GAME_OBJECT_LEAF,
+	GAME_OBJECT_TRIGGER_TEST,
+	GAME_OBJECT_TERRAIN,
 	GAME_OBJECT_SIZE
 };
 
 struct TriggerDef{
-	TriggerDef(void) : body_type(0), x(0.0f), y(0.0f), radius(0.0f), type(0), mass(0.0f), origin(Ogre::Vector3::ZERO){}
+	TriggerDef(void) : body_type(0), x(0.0f), y(0.0f), radius(0.0f), collider_type(0), mass(0.0f){}
 	int body_type;
-	int type;
+	int collider_type;
 	float x;
 	float y;
 	float z;
 	float radius;
 	float mass;
-	Ogre::Vector3 origin;
 };
 
 

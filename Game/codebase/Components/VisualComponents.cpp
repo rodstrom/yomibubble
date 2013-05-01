@@ -3,6 +3,10 @@
 #include "ComponentMessenger.h"
 #include "..\Managers\InputManager.h"
 #include "..\InputPrereq.h"
+#include "..\PhysicsEngine.h"
+#include "GameObject.h"
+#include "..\Managers\GameObjectManager.h"
+#include "..\Managers\SoundManager.h"
 
 void NodeComponent::Init(const Ogre::Vector3& pos, Ogre::SceneManager* scene_manager){
 	m_scene_manager = scene_manager;
@@ -59,8 +63,6 @@ void NodeComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_NODE_ATTACH_ENTITY, this);
 }
 
-
-
 void MeshRenderComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager){
 	m_scene_manager = scene_manager;
 	m_entity = m_scene_manager->createEntity(filename);
@@ -92,12 +94,14 @@ void AnimationComponent::SetMessenger(ComponentMessenger* messenger){
 	MeshRenderComponent::SetMessenger(messenger);
 	m_messenger->Register(MSG_ANIMATION_PLAY, this);
 	m_messenger->Register(MSG_ANIMATION_PAUSE, this);
+	m_messenger->Register(MSG_ANIMATION_BLEND, this);
 }
 
 void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager){
 	MeshRenderComponent::Init(filename, scene_manager);
-	/*
+	
 	m_animation_blender = new AnimationBlender(GetEntity());
+	/*
 	m_animation_blender->init("Idle");
 	m_animation_blender->init("Run");
 	m_animation_blender->init("Walk");
@@ -115,6 +119,7 @@ void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* 
 	m_animation_blender->init("Walk");
 	m_animation_blender->init("Jump");
 	*/
+	
 }
 
 void AnimationComponent::AddAnimationStates(unsigned int value){
@@ -132,6 +137,7 @@ void AnimationComponent::Update(float dt){
 			}
 		}
 	}
+	//m_animation_blender->addTime(dt);
 }
 
 void AnimationComponent::Notify(int type, void* msg){
@@ -159,7 +165,8 @@ void AnimationComponent::Notify(int type, void* msg){
 				if (m_animation_states[0] != NULL){
 					m_animation_states[0]->setEnabled(true);
 					m_animation_states[0]->setLoop(true);
-				//	m_animation_blender->blend("Run", AnimationBlender::BlendWhileAnimating, 0.2, false );
+					//m_animation_blender->init("Walk");
+					//m_animation_blender->blend("Idle", AnimationBlender::BlendWhileAnimating, 0.2, true);
 				}
 			}
 		}
@@ -195,6 +202,7 @@ void AnimationComponent::Shut(){
 	m_animation_states.clear();
 	m_messenger->Unregister(MSG_ANIMATION_PLAY, this);
 	m_messenger->Unregister(MSG_ANIMATION_PAUSE, this);
+	m_messenger->Unregister(MSG_ANIMATION_BLEND, this);
 	MeshRenderComponent::Shut();
 }
 
@@ -443,7 +451,7 @@ void CountableResourceGUI::Init(const Ogre::String& material_name_inactive, cons
 	m_material_name_inactive = material_name_inactive;
 
 	Ogre::OverlayManager& overlayManager = Ogre::OverlayManager::getSingleton();
-    Ogre::Overlay* overlay = overlayManager.create( "OverlayName" );
+	Ogre::Overlay* overlay = overlayManager.create( "OverlayName" );
 
 	Ogre::Vector2 temppos(0.0f, 0.0f);
 
@@ -480,3 +488,82 @@ void CountableResourceGUI::Init(const Ogre::String& material_name_inactive, cons
 
     overlay->show();
 };
+
+void TerrainComponent::Notify(int type, void* message){
+
+}
+
+void TerrainComponent::Shut(){
+	if (m_artifex_loader){
+		m_artifex_loader->unloadZone();
+		delete m_artifex_loader;
+		m_artifex_loader = NULL;
+	}
+	if (m_terrain_body){
+		m_physics_engine->GetDynamicWorld()->removeRigidBody(m_terrain_body);
+		delete m_terrain_body;
+		m_terrain_body;
+	}
+	if (m_terrain_shape){
+		delete m_terrain_shape;
+		m_terrain_shape = NULL;
+	}
+	if (m_terrain_motion_state){
+		delete m_terrain_motion_state;
+		m_terrain_motion_state = NULL;
+	}
+}
+
+void TerrainComponent::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
+}
+
+void TerrainComponent::Init(Ogre::SceneManager* scene_manager, PhysicsEngine* physics_engine, const Ogre::String& filename){
+	m_scene_manager = scene_manager;
+	m_physics_engine = physics_engine;
+	m_artifex_loader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_scene_manager->getCamera("MainCamera"), m_owner->GetGameObjectManager(), m_owner->GetGameObjectManager()->GetSoundManager(), "../../resources/terrain/");
+	
+	m_artifex_loader->loadZone(filename);
+	Ogre::Terrain* terrain = m_artifex_loader->mTerrain;
+	size_t w = terrain->getSize();
+	float* terrain_height_data = terrain->getHeightData();
+	float world_size = terrain->getWorldSize();
+	Ogre::Vector3 pos = terrain->getPosition();
+	float max_height = terrain->getMaxHeight();
+	float min_height = terrain->getMinHeight();
+
+	float* data_converter = new float[terrain->getSize() * terrain->getSize()];
+	for (int i = 0; i < terrain->getSize(); i++){
+		memcpy(
+			data_converter + terrain->getSize() * i,
+			terrain_height_data + terrain->getSize() * (terrain->getSize()-i-1),
+			sizeof(float)*(terrain->getSize())
+			);
+	}
+
+	m_terrain_shape = new btHeightfieldTerrainShape(terrain->getSize(), terrain->getSize(), data_converter, 1, terrain->getMinHeight(), terrain->getMaxHeight(), 1, PHY_FLOAT, true);
+	
+	//delete[] data_converter;
+	float units_between_vertices = terrain->getWorldSize() / (w - 1);
+	btVector3 local_scaling(units_between_vertices, 1, units_between_vertices);
+	m_terrain_shape->setLocalScaling(local_scaling);
+	m_terrain_shape->setUseDiamondSubdivision(true);
+
+	m_terrain_motion_state = new btDefaultMotionState;
+	m_terrain_body = new btRigidBody(0, m_terrain_motion_state, m_terrain_shape);
+	m_terrain_body->getWorldTransform().setOrigin(
+		btVector3(
+		pos.x,
+		pos.y + (terrain->getMaxHeight() - terrain->getMinHeight()) / 2,
+		pos.z
+		)
+		);
+
+	m_terrain_body->getWorldTransform().setRotation(
+		btQuaternion(Ogre::Quaternion::IDENTITY.x, Ogre::Quaternion::IDENTITY.y, Ogre::Quaternion::IDENTITY.z, Ogre::Quaternion::IDENTITY.w)
+		);
+
+	m_terrain_body->setCollisionFlags(m_terrain_body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
+	m_physics_engine->GetDynamicWorld()->addRigidBody(m_terrain_body);
+	m_terrain_body->setUserPointer(m_owner);
+}

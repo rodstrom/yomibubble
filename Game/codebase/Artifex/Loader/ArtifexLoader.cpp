@@ -19,7 +19,7 @@ THE SOFTWARE.
 using namespace std;
 using namespace Ogre;
 
-ArtifexLoader::ArtifexLoader(Root *root, SceneManager *scenemgr, SceneNode *camnode, Camera *camera, string zonepath)
+ArtifexLoader::ArtifexLoader(Root *root, SceneManager *scenemgr, SceneNode *camnode, Camera *camera, GameObjectManager *game_object_manager, SoundManager *sound_manager, string zonepath)
 {
 	mZonePath = zonepath;
 
@@ -33,7 +33,7 @@ ArtifexLoader::ArtifexLoader(Root *root, SceneManager *scenemgr, SceneNode *camn
 	
 	ResourceGroupManager::getSingleton().createResourceGroup(ETM_GROUP);
 
-	mDBManager = new DBManager(this);	
+	mDBManager = new DBManager(this, game_object_manager, sound_manager);	
 	
 	mHeightMapBinarayFileName = "artifex_terrain.bin";		
 	mHeightMapImageFileName = "ETterrain.png";
@@ -114,6 +114,8 @@ bool ArtifexLoader::loadZone(string zonename, bool use_cfg_settings, bool fog, b
 		if (mLoadGrass==1) createGrass();
 	}
 
+#ifndef NO_TERRAIN_DEBUG
+
 #ifdef TSM_TERRAIN
 	initTSM();
 #elif defined(ETM_TERRAIN)
@@ -125,6 +127,8 @@ bool ArtifexLoader::loadZone(string zonename, bool use_cfg_settings, bool fog, b
 
 #ifndef OT_TERRAIN
     loadTerrain();
+#endif
+
 #endif
 
 	string dbpath = mZonePath;

@@ -2,7 +2,9 @@
 #define _N_VISUAL_COMPONENTS_H_
 
 #include "ComponentsPrereq.h"
-#include "../AnimationBlender.h"
+#include "..\AnimationBlender.h"
+#include "..\Artifex\Loader\ArtifexLoader.h"
+#include "BulletCollision\CollisionShapes\btHeightfieldTerrainShape.h"
 #include <functional>
 
 class NodeComponent : public Component, public IComponentObserver{
@@ -25,7 +27,7 @@ protected:
 
 class MeshRenderComponent : public Component, public IComponentObserver {
 public:
-	MeshRenderComponent(void) : m_entity(NULL), m_scene_manager(NULL){ m_type = COMPONENT_RENDERER; }
+	MeshRenderComponent(void) : m_entity(NULL), m_scene_manager(NULL){ m_type = COMPONENT_MESH_RENDER; }
 	virtual ~MeshRenderComponent(void){}
 	virtual void Notify(int type, void* message);
 	virtual void Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager);
@@ -43,7 +45,7 @@ protected:
 
 class ChildSceneNodeComponent : public Component, public IComponentObserver{
 public:
-	ChildSceneNodeComponent(void){}
+	ChildSceneNodeComponent(void){ m_type = COMPONENT_CHILD_NODE; }
 	virtual ~ChildSceneNodeComponent(void){}
 	virtual void Notify(int type, void* msg);
 	virtual void Init(const Ogre::Vector3& position, const Ogre::String& id, Ogre::SceneNode* parent);
@@ -59,7 +61,7 @@ protected:
 
 class AnimationComponent : public MeshRenderComponent, public IComponentUpdateable{
 public:
-	AnimationComponent(void){ m_type = COMPONENT_ANIMATION; }
+	AnimationComponent(void){ m_type = COMPONENT_ANIMATION; m_update = true; }
 	virtual ~AnimationComponent(void){}
 	virtual void Update(float dt);
 	virtual void Notify(int type, void* message);
@@ -99,7 +101,7 @@ public:
 		OCS_COLLISION
 	};
 
-	OverlayCollisionCallbackComponent(void){}
+	OverlayCollisionCallbackComponent(void){ m_update = true; }
 	virtual ~OverlayCollisionCallbackComponent(void){}
 	virtual void Notify(int type, void* message);
 	virtual void Update(float dt);
@@ -115,7 +117,7 @@ protected:
 
 class Overlay2DAnimatedComponent : public IComponentUpdateable, public Overlay2DComponent{
 public:
-	Overlay2DAnimatedComponent(void){}
+	Overlay2DAnimatedComponent(void){ m_update = true; }
 	virtual ~Overlay2DAnimatedComponent(void){}
 	virtual void Notify(int type, void*message);
 	virtual void Update(float dt);
@@ -179,6 +181,27 @@ protected:
 	Ogre::SceneNode*			m_nodes;
 	Ogre::SceneManager*			m_scene_manager;
 	Ogre::ParticleSystem*		m_particle_system;
+};
+
+class PhysicsEngine;
+class TerrainComponent : public Component, public IComponentObserver{
+public:
+	TerrainComponent(void) : m_scene_manager(NULL), m_physics_engine(NULL), m_artifex_loader(NULL), m_terrain_shape(NULL), 
+		m_terrain_body(NULL), m_terrain_motion_state(NULL){}
+	virtual ~TerrainComponent(void){}
+
+	virtual void Notify(int type, void* message);
+	virtual void Shut();
+	virtual void SetMessenger(ComponentMessenger* messenger);
+	void Init(Ogre::SceneManager* scene_manager, PhysicsEngine* physics_engine, const Ogre::String& filename);
+
+protected:
+	Ogre::SceneManager*				m_scene_manager;
+	PhysicsEngine*					m_physics_engine;
+	ArtifexLoader*					m_artifex_loader;
+	btHeightfieldTerrainShape*		m_terrain_shape;
+	btRigidBody*					m_terrain_body;
+	btDefaultMotionState*			m_terrain_motion_state;
 };
 
 #endif // _N_VISUAL_COMPONENTS_H_
