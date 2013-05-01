@@ -61,7 +61,7 @@ protected:
 
 class AnimationComponent : public MeshRenderComponent, public IComponentUpdateable{
 public:
-	AnimationComponent(void){ m_type = COMPONENT_ANIMATION; m_update = true; }
+	AnimationComponent(void){  }
 	virtual ~AnimationComponent(void){}
 	virtual void Update(float dt);
 	virtual void Notify(int type, void* message);

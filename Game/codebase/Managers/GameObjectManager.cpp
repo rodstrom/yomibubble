@@ -147,7 +147,7 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	//node_comp->GetSceneNode()->setScale(scale);
 	node_comp->SetId("player_node");
 	
-	//acomp->Init("Yomi.mesh", m_scene_manager, node_comp->GetId());
+	//acomp->Init("Yomi_2Yomi.mesh", m_scene_manager, node_comp->GetId());
 	acomp->Init("Yomi.mesh", m_scene_manager, node_comp->GetId());
 	
 	acomp->GetEntity()->setMaterialName("_YomiFBXASC039sFBXASC032staffMaterial__191");

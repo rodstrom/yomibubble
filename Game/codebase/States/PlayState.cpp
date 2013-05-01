@@ -51,11 +51,11 @@ void PlayState::Enter(){
 	
 	//m_cam_node->attachObject(m_camera);
 	//Ogre::SceneNode* node = m_scene_manager->getSceneNode("camNode");
-	//mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_camera, m_game_object_manager, m_sound_manager, "../../resources/terrain/");
+	mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_camera, m_game_object_manager, m_sound_manager, "../../resources/terrain/");
 #ifdef _DEBUG
-	//mArtifexLoader->loadZone("try", false, false, false, false, true, false, true, true, true, true);
+	mArtifexLoader->loadZone("try", false, false, false, false, true, false, true, true, true, true);
 #else
-	//mArtifexLoader->loadZone("try", true, true, true, false, true, false, true, true, true, true);
+	mArtifexLoader->loadZone("try", true, true, true, false, true, false, true, true, true, true);
 #endif
 	//PlaneDef plane_def("plane", "Examples/BeachStones");
 	//m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(x,y - 2.0f,z), &plane_def);
@@ -102,17 +102,8 @@ void PlayState::Enter(){
 
 	m_physics_engine->ShowDebugDraw(true);
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y+1.0f,z+3.0f), &tott_def);
-	//m_physics_engine->CreateTerrainCollision(mArtifexLoader->mTerrain);
+	m_physics_engine->CreateTerrainCollision(mArtifexLoader->mTerrain);
 	//m_scene_manager->setSkyDome(true, "Examples/CloudySky");
-	
-	/*TriggerDef trigger_def;
-	trigger_def.body_type = STATIC_BODY;
-	trigger_def.collider_type = COLLIDER_BOX;
-	trigger_def.x = 2.0f;
-	trigger_def.y = 2.0f;
-	trigger_def.z = 2.0f;
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_TRIGGER_TEST, Ogre::Vector3(x + 2.0f, y - 10.0f ,z + 2.0f), &trigger_def);*/
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_TERRAIN, Ogre::Vector3(0,0,0), NULL);
 }
 
 
