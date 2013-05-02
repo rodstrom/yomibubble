@@ -38,12 +38,12 @@ enum EComponentMsg{
 	MSG_ANIMATION_PLAY,
 	MSG_ANIMATION_PAUSE,
 	MSG_ANIMATION_BLEND,
-	MSG_CHARACTER_CONROLLER_VELOCITY_SET,
-	MSG_CHARACTER_CONROLLER_TURN_SPEED_SET,
+	MSG_CHARACTER_CONTROLLER_VELOCITY_SET,
+	MSG_CHARACTER_CONTROLLER_TURN_SPEED_SET,
 	MSG_CHARACTER_CONTROLLER_SET_DIRECTION,
 	MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_SET,
 	MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_GET,
-	MSG_CHARACTER_CONROLLER_JUMP,
+	MSG_CHARACTER_CONTROLLER_JUMP,
 	MSG_CHARACTER_CONTROLLER_GRAVITY_SET,
 	MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_SET,
 	MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_GET,
@@ -217,6 +217,24 @@ struct BubbleDef{
 
 struct PlayerInputDef{
 
+};
+
+struct CharacterControllerDef{
+	CharacterControllerDef(void) : step_height(0.0f), turn_speed(0.0f), velocity(0.0f), max_jump_height(0.0f), friction(0.0f), mass(0.0f),
+		restitution(0.0f), jump_power(0.0f), max_speed(0.0f), deceleration(0.0f), air_deceleration(0.0f), radius(0.0f), height(0.0f) {}
+	float step_height;
+	float turn_speed;
+	float velocity;
+	float max_jump_height;
+	float jump_power;
+	float friction;
+	float restitution;
+	float max_speed;
+	float deceleration;
+	float air_deceleration;
+	float radius;
+	float height;
+	float mass;
 };
 
 struct DynamicCharacterControllerDef{

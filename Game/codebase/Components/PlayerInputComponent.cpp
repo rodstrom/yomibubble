@@ -149,11 +149,11 @@ void PlayerInputComponent::Normal(float dt){
 
 	if (m_input_manager->IsButtonPressed(BTN_START)){
 		bool jumping = true;
-		m_messenger->Notify(MSG_CHARACTER_CONROLLER_JUMP, &jumping);
+		m_messenger->Notify(MSG_CHARACTER_CONTROLLER_JUMP, &jumping);
 	}
 	else if (m_input_manager->IsButtonReleased(BTN_START)){
 		bool jumping = false;
-		m_messenger->Notify(MSG_CHARACTER_CONROLLER_JUMP, &jumping);
+		m_messenger->Notify(MSG_CHARACTER_CONTROLLER_JUMP, &jumping);
 	}
 
 
@@ -185,7 +185,7 @@ void PlayerInputComponent::OnBubble(float dt){
 		m_player_state = PLAYER_STATE_NORMAL;
 		bool jump = true;
 		m_messenger->Notify(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_SET, &jump);
-		m_messenger->Notify(MSG_CHARACTER_CONROLLER_JUMP, &jump);
+		m_messenger->Notify(MSG_CHARACTER_CONTROLLER_JUMP, &jump);
 		return;
 	}
 
@@ -234,7 +234,7 @@ void PlayerInputComponent::InsideBubble(float dt){
 		bool jump = true;
 		m_messenger->Notify(MSG_RIGIDBODY_COLLISION_FLAG_REMOVE, &coll, "body");
 		m_messenger->Notify(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_SET, &jump);
-		m_messenger->Notify(MSG_CHARACTER_CONROLLER_JUMP, &jump);
+		m_messenger->Notify(MSG_CHARACTER_CONTROLLER_JUMP, &jump);
 		return;
 	}
 

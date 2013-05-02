@@ -41,14 +41,14 @@ protected:
 class CharacterController : public RigidbodyComponent, public IComponentUpdateable, public IComponentSimulationStep{
 public:
 	CharacterController(void) : m_velocity(0.0), m_turn_speed(0.0f), 
-		m_has_follow_cam(false), m_is_jumping(false), m_on_ground(true), m_start_y_pos(0.0f),
-		m_max_jump_height(0.0f), m_direction(btVector3(0,0,0)), m_deacc(0.0f), m_max_speed(0.0f), m_acc_x(0.0f), m_acc_z(0.0f)
+		m_has_follow_cam(false), m_is_jumping(false), m_on_ground(true), m_start_y_pos(0.0f), m_y_bottom_offset(0.0f),
+		m_max_jump_height(0.0f), m_direction(btVector3(0,0,0)), m_deceleration(0.0f), m_max_speed(0.0f), m_step_height(0.0f)
 	{ m_type = COMPONENT_CHARACTER_CONTROLLER; m_update = true; }
 	virtual ~CharacterController(void){}
 	virtual void Notify(int type, void* msg);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
-	virtual void Init(const Ogre::Vector3& position, Ogre::Entity* entity, float step_height, PhysicsEngine* physics_engine);
+	virtual void Init(const Ogre::Vector3& position, PhysicsEngine* physics_engine, const CharacterControllerDef& def);
 	virtual void Update(float dt);
 	virtual void SimulationStep(btScalar time_step);
 	void SetVelocity(float velocity) { m_velocity = velocity; }
@@ -57,24 +57,24 @@ public:
 	void SetMaxJumpHeight(float value) { m_max_jump_height = value; }
 	void SetJumpPower(float value) { m_jump_pwr = value; }
 	void SetMaxSpeed(float value) { m_max_speed = value; }
-	void SetDeacceleration(float value) { m_deacc = value; }
-	void SetRaycastLength(float value) { m_ray_length = value; }
+	void SetDeacceleration(float value) { m_deceleration = value; }
 
 protected:
-	void ApplyAcceleration(Ogre::Vector3& dir, float dt);
+	void QueryRaycast();
+	void Deceleration(float dt);
 
 	Ogre::Vector3	m_direction;
 
 	float		m_max_speed;
 	float		m_velocity;
-	float		m_deacc;
+	float		m_deceleration;
+	float		m_air_deceleration;
 	float		m_turn_speed;
 	float		m_max_jump_height;
 	float		m_jump_pwr;
 	float		m_start_y_pos;
-	float		m_acc_x;
-	float		m_acc_z;
-	float		m_ray_length;
+	float		m_step_height;
+	float		m_y_bottom_offset;
 	bool		m_has_follow_cam;
 	bool		m_is_jumping;
 	bool		m_on_ground;

@@ -91,7 +91,7 @@ void GameObjectManager::Shut(){
 }
 
 GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void* data){
-	CharControllerDef& def = *static_cast<CharControllerDef*>(data);
+	CharacterControllerDef& def = *static_cast<CharacterControllerDef*>(data);
 	//DynamicCharacterControllerDef& def = *static_cast<DynamicCharacterControllerDef*>(data);
 	GameObject* go = new GameObject(GAME_OBJECT_PLAYER);
 	NodeComponent* node_comp = new NodeComponent;
@@ -140,26 +140,26 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 
 	tc->Init(position, m_physics_engine, &tdef);
 	tc->SetId("btrig");
-	contr->Init(position, acomp->GetEntity(), def.step_height, m_physics_engine);
-	contr->SetTurnSpeed(def.turn_speed);
-	contr->SetVelocity(def.velocity);
-	contr->SetJumpPower(def.jump_power);
+	contr->Init(position, m_physics_engine, def);
+	//contr->SetTurnSpeed(def.turn_speed);
+	//contr->SetVelocity(def.velocity);
+	//contr->SetJumpPower(def.jump_power);
 	contr->HasFollowCam(true);
-	contr->SetMaxSpeed(def.max_velocity);
-	contr->SetDeacceleration(def.deacceleration);
-	contr->SetMaxJumpHeight(def.max_jump_height);
+	//contr->SetMaxSpeed(def.max_speed);
+	//contr->SetDeacceleration(def.deceleration);
+	//contr->SetMaxJumpHeight(def.max_jump_height);
 	contr->SetId("body");
-	contr->GetRigidbody()->setFriction(def.friction);
-	contr->GetRigidbody()->setRestitution(def.restitution);
-	contr->SetRaycastLength(5.0f);
+	//contr->GetRigidbody()->setFriction(def.friction);
+	//contr->GetRigidbody()->setRestitution(def.restitution);
+	//contr->SetRaycastLength(5.0f);
 	contr->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
 	//dcc->Init(position, m_physics_engine, def);
 	//dcc->GetRigidbody()->getWorldTransform().setOrigin(BtOgre::Convert::toBullet(position));
 	//dcc->GetGhostObject()->getWorldTransform().setOrigin(BtOgre::Convert::toBullet(position));
 	pccomp->Init(m_input_manager, m_sound_manager);
-	pccomp->SetMaxVelocity(def.max_velocity);
+	pccomp->SetMaxVelocity(def.max_speed);
 	pccomp->SetVelocity(1.0f);
-	pccomp->SetDeacceleration(def.deacceleration);
+	pccomp->SetDeacceleration(def.deceleration);
 	sound2D->Init(m_sound_manager);
 	sound3D->Init(m_sound_manager);
 	music2D->Init(m_sound_manager);
@@ -244,7 +244,7 @@ GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, v
 
 
 GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* data){
-	CharControllerDef& def = *static_cast<CharControllerDef*>(data);
+	CharacterControllerDef& def = *static_cast<CharacterControllerDef*>(data);
 	GameObject* go = new GameObject(GAME_OBJECT_TOTT);
 	NodeComponent* node_comp = new NodeComponent;
 	go->AddComponent(node_comp);
@@ -265,7 +265,7 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 	way_point->Init(node_comp->GetSceneNode(), 0.001f);
 	way_point->AddWayPoint(Ogre::Vector3(15.0f, -10.0f, 21.0f));
 	
-	contr->Init(position, acomp->GetEntity(), def.step_height, m_physics_engine);
+	contr->Init(position, m_physics_engine, def);
 	contr->SetTurnSpeed(def.turn_speed);
 	contr->SetVelocity(def.velocity);
 	contr->GetRigidbody()->setRestitution(def.restitution);

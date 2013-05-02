@@ -69,16 +69,19 @@ void PlayState::Enter(){
 	trigger_def.z = 0.5f;
 	trigger_def.origin = Ogre::Vector3(0,-1,0);
 	trigger_def.mass = 0.0f;*/
-	CharControllerDef player_def;
-	player_def.friction = 1.0f;
+	CharacterControllerDef player_def;
+	player_def.friction = 0.0f;
 	player_def.velocity = 5.0f;
-	player_def.max_velocity = 5.0f;
-	player_def.deacceleration = 10.0f;
+	player_def.max_speed = 5.0f;
+	player_def.deceleration = 7.0f;
 	player_def.jump_power = 300.0f;
 	player_def.restitution = 0.0f;
-	player_def.step_height = 0.35f;
+	player_def.step_height = 0.15f;
 	player_def.turn_speed = 1000.0f;
-	player_def.max_jump_height = 10.0f;
+	player_def.max_jump_height = 3.0f;
+	player_def.radius = 0.4f;
+	player_def.height = 0.1f;
+	player_def.mass = 1.0f;
 	/*DynamicCharacterControllerDef player_def;
 	player_def.deceleration = 1.0f;
 	player_def.height = 1.0f;
@@ -90,7 +93,7 @@ void PlayState::Enter(){
 	player_def.step_height = 0.35f;*/
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(x,y+1.0f,z), &player_def);
 	
-	CharControllerDef tott_def;
+	CharacterControllerDef tott_def;
 	tott_def.friction = 1.0f;
 	tott_def.velocity = 500.0f;
 	tott_def.jump_power = 200.0f;
@@ -112,7 +115,7 @@ void PlayState::Enter(){
 	trigger_def.z = 2.0f;
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_TRIGGER_TEST, Ogre::Vector3(x + 2.0f, y - 10.0f ,z + 2.0f), &trigger_def);*/
 	Ogre::String terrain = "try";
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_TERRAIN, Ogre::Vector3(0,0,0), &terrain);
+	//m_game_object_manager->CreateGameObject(GAME_OBJECT_TERRAIN, Ogre::Vector3(0,0,0), &terrain);
 }
 
 
