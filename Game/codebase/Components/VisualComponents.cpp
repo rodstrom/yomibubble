@@ -397,11 +397,11 @@ void ParticleComponent::CreateParticle(Ogre::SceneNode* p_scene_node, const Ogre
 }
 
 void ParticleComponent::Notify(int type, void* message){
-	switch (type)
+	/*switch (type)
 	{
 	default:
 		break;
-	}
+	}*/
 }
 
 void ParticleComponent::SetMessenger(ComponentMessenger* messenger){
@@ -432,7 +432,7 @@ void CountableResourceGUI::Notify(int type, void* message){
 
 void CountableResourceGUI::Shut(){
 	m_messenger->Unregister(MSG_LEAF_PICKUP, this);
-	for (int i = 0; i < m_elements.size(); i++)
+	for (unsigned int i = 0; i < m_elements.size(); i++)
 	{
 		//delete m_elements.end();
 		m_elements[i]=NULL;
@@ -468,8 +468,8 @@ void CountableResourceGUI::Init(const Ogre::String& material_name_inactive, cons
 		if (counter == 6)
 		{
 			counter = 0;
-			temppos.x = 15.0;
-			temppos.y += 0.2;
+			temppos.x = 15.0f;
+			temppos.y += 0.2f;
 
 			if (total_number - i < 6)
 			{ temppos.x = 0.0 + (((6-(total_number-i))/2) * 0.15); }
@@ -480,11 +480,11 @@ void CountableResourceGUI::Init(const Ogre::String& material_name_inactive, cons
 
 		m_elements.push_back(static_cast<Ogre::OverlayContainer*>( overlayManager.createOverlayElement( "Panel", panel_name ) ));
 		m_elements[i]->setPosition( temppos.x, temppos.y );
-		m_elements[i]->setDimensions( 0.15, 0.15 );
+		m_elements[i]->setDimensions( 0.15f, 0.15f );
 		m_elements[i]->setMaterialName(m_material_name_inactive);
 		overlay->add2D(m_elements[i]);
 		counter++;
-		temppos.x += 0.15;
+		temppos.x += 0.15f;
 	};
 
     overlay->show();
@@ -513,6 +513,10 @@ void TerrainComponent::Shut(){
 		delete m_terrain_motion_state;
 		m_terrain_motion_state = NULL;
 	}
+	if (m_data_converter){
+		delete[] m_data_converter;
+		m_data_converter = NULL;
+	}
 }
 
 void TerrainComponent::SetMessenger(ComponentMessenger* messenger){
@@ -522,8 +526,7 @@ void TerrainComponent::SetMessenger(ComponentMessenger* messenger){
 void TerrainComponent::Init(Ogre::SceneManager* scene_manager, PhysicsEngine* physics_engine, const Ogre::String& filename){
 	m_scene_manager = scene_manager;
 	m_physics_engine = physics_engine;
-
-	m_artifex_loader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_scene_manager->getCamera("MainCamera"), "../../resources/terrain/");
+	m_artifex_loader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_scene_manager->getCamera("MainCamera"), physics_engine, "../../resources/terrain/");
 
 //mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_camera, m_game_object_manager, m_sound_manager, "../../resources/terrain/");
 
@@ -548,6 +551,7 @@ void TerrainComponent::Init(Ogre::SceneManager* scene_manager, PhysicsEngine* ph
 
 	m_terrain_shape = new btHeightfieldTerrainShape(terrain->getSize(), terrain->getSize(), data_converter, 1, terrain->getMinHeight(), terrain->getMaxHeight(), 1, PHY_FLOAT, true);
 	
+	// TODO: Fix this memory leak, The terrain needs this data so delete when unloading.
 	//delete[] data_converter;
 	float units_between_vertices = terrain->getWorldSize() / (w - 1);
 	btVector3 local_scaling(units_between_vertices, 1, units_between_vertices);
@@ -570,5 +574,7 @@ void TerrainComponent::Init(Ogre::SceneManager* scene_manager, PhysicsEngine* ph
 
 	m_terrain_body->setCollisionFlags(m_terrain_body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
 	m_physics_engine->GetDynamicWorld()->addRigidBody(m_terrain_body);
-	m_terrain_body->setUserPointer(m_owner);
+	m_collision_def.flag |= COLLISION_FLAG_GAME_OBJECT;
+	m_collision_def.data = m_owner;
+	m_terrain_body->setUserPointer(&m_collision_def);
 }

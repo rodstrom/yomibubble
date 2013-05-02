@@ -6,6 +6,9 @@
 #include "GameObject.h"
 #include "..\Managers\GameObjectManager.h"
 #include "..\PhysicsEngine.h"
+#include "VisualComponents.h"
+
+#include <iostream>
 
 void PlayerInputComponent::Update(float dt){
 	(this->*m_states[m_player_state])(dt);
@@ -64,6 +67,8 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 	m_acc_x = 0.001f;
 	m_acc_z = 0.001f;
 	m_max_velocity = 0.00000002f;
+
+	
 }
 
 void PlayerInputComponent::SetMessenger(ComponentMessenger* messenger){
@@ -91,6 +96,9 @@ void PlayerInputComponent::Normal(float dt){
 		m_anim_msg.id="Run";
 		m_anim_msg.blend = false;
 		m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
+		
+
+		//std::cout << "Yomi pos: " << dynamic_cast<NodeComponent*>(m_owner->GetComponent(COMPONENT_NODE))->GetSceneNode()->getPosition() << std::endl;
 		
 	}
 	else
@@ -121,6 +129,7 @@ void PlayerInputComponent::Normal(float dt){
 			m_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &body, "btrig");
 			if (node && body){
 				Ogre::Vector3 pos = node->_getDerivedPosition();
+				//pos.y += 4;
 				BubbleDef bubble_def;
 				bubble_def.connection_body = body;
 				bubble_def.start_scale = 0.002f;
@@ -134,6 +143,7 @@ void PlayerInputComponent::Normal(float dt){
 					m_current_bubble = m_owner->GetGameObjectManager()->CreateGameObject(GAME_OBJECT_PINK_BUBBLE, pos, &bubble_def);
 					m_bubble_type = BUBBLE_TYPE_PINK;
 				}
+				
 				m_messenger->Notify(MSG_RIGIDBODY_POSITION_SET, &pos, "btrig");
 				m_is_creating_bubble = true;
 			}

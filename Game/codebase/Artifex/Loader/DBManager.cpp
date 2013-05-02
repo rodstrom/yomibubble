@@ -1,16 +1,19 @@
+
 #include "stdafx.h"
 #include "DBManager.h"
+#include "..\..\PhysicsEngine.h"
+#include "..\..\Components\GameObjectPrereq.h"
 
-DBManager::DBManager(ArtifexLoader *artifexloader) {
-
-mArtifexLoader = artifexloader;	
+DBManager::DBManager(ArtifexLoader *artifexloader, PhysicsEngine* physicsengine) {
+mPhysicsEngine = physicsengine;
+mArtifexLoader = artifexloader;
 mDB = new CppSQLite3DB();
 saving = false;
 
 };
 
 DBManager::~DBManager() {
-
+Shut();
 };
 int DBManager::Open(const std::string path) {
 mDB->open(path.c_str());
@@ -103,8 +106,32 @@ SceneNode *mNode = NULL;
 try {
 mNode = mArtifexLoader->mSceneMgr->getRootSceneNode()->createChildSceneNode(entName+"Node",Ogre::Vector3(spawn.x,spawn.y,spawn.z),Quaternion ((Degree(spawn.ry)), Vector3::UNIT_Y));
 mNode->attachObject(newModel);
-mNode->setScale(spawn.sx,spawn.sy,spawn.sz);	
-mNode->setOrientation(Quaternion ((Degree(spawn.rx)), Vector3::UNIT_X)*Quaternion ((Degree(spawn.ry)), Vector3::UNIT_Y)*Quaternion ((Degree(spawn.rz)), Vector3::UNIT_Z));
+mNode->setScale(spawn.sx,spawn.sy,spawn.sz);
+Ogre::Quaternion quat = Ogre::Quaternion ((Degree(spawn.rx)), Vector3::UNIT_X)*Quaternion ((Degree(spawn.ry)), Vector3::UNIT_Y)*Quaternion ((Degree(spawn.rz)), Vector3::UNIT_Z);
+mNode->setOrientation(quat);
+//mNode->setOrientation(Quaternion ((Degree(spawn.rx)), Vector3::UNIT_X)*Quaternion ((Degree(spawn.ry)), Vector3::UNIT_Y)*Quaternion ((Degree(spawn.rz)), Vector3::UNIT_Z));
+
+// Create collision shape and set position
+BtOgre::StaticMeshToShapeConverter converter(newModel);
+btCollisionShape* shape = converter.createTrimesh();
+m_shapes.push_back(shape);
+btMotionState* motion_state = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)));
+m_motion_states.push_back(motion_state);
+btRigidBody* body = new btRigidBody(0, motion_state, shape, btVector3(0,0,0));
+m_bodies.push_back(body);
+
+btTransform transform;
+transform.setIdentity();
+transform.setOrigin(btVector3(spawn.x, spawn.y, spawn.z));
+transform.setRotation(BtOgre::Convert::toBullet(quat));
+body->setWorldTransform(transform);
+CollisionDef* collision_def = new CollisionDef;
+collision_def->data = NULL;
+collision_def->flag |= COLLISION_FLAG_STATIC;
+body->setUserPointer(collision_def);
+m_collision_defs.push_back(collision_def);
+mPhysicsEngine->GetDynamicWorld()->addRigidBody(body);
+
 } catch (Exception &e) {
 cout << "\n|= ArtifexTerra3D =| Zoneloader v1.0 RC1 OT beta SQLite: spawnloader error - problems creating " << spawn.name.c_str() << ":" << e.what() << "\n";
 };
@@ -152,7 +179,7 @@ EmptyTrash();
 
 tmpSpawns = &mArtifexLoader->mObjectFile;
 
-for (int b=0;b<tmpSpawns->size();b++) {	
+for (unsigned int b=0;b<tmpSpawns->size();b++) {	
 WriteSpawn (tmpSpawns->at(b),spawntype);	
 }
 
@@ -272,3 +299,17 @@ int DBManager::Close(void){
 mDB->close();
 return 0;
 };
+
+void DBManager::Shut(){
+for (unsigned int i = 0; i < m_motion_states.size(); i++){ // will always have the same size as the other lists
+mPhysicsEngine->GetDynamicWorld()->removeRigidBody(m_bodies[i]);
+delete m_motion_states[i];
+delete m_shapes[i];
+delete m_bodies[i];
+delete m_collision_defs[i];
+}
+m_motion_states.clear();
+m_shapes.clear();
+m_bodies.clear();
+m_collision_defs.clear();
+}

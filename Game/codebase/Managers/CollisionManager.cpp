@@ -53,21 +53,30 @@ void CollisionManager::Init(){
 }
 
 void CollisionManager::ProcessCollision(const btCollisionObject* ob_a, const btCollisionObject* ob_b){
-	GameObject* go_a = static_cast<GameObject*>(ob_a->getUserPointer());
-	GameObject* go_b = static_cast<GameObject*>(ob_b->getUserPointer());
-
-	HitMap::iterator it = m_collision.find(MakeIntPair(go_a->GetType(), go_b->GetType()));
-	if (it != m_collision.end()){
-		(this->*it->second)(go_a, go_b);
+	CollisionDef* cd_a = static_cast<CollisionDef*>(ob_a->getUserPointer());
+	CollisionDef* cd_b = static_cast<CollisionDef*>(ob_b->getUserPointer());
+	if (((cd_a->flag & COLLISION_FLAG_GAME_OBJECT) == COLLISION_FLAG_GAME_OBJECT) &&
+		((cd_b->flag & COLLISION_FLAG_GAME_OBJECT) == COLLISION_FLAG_GAME_OBJECT)){
+			GameObject* go_a = static_cast<GameObject*>(cd_a->data);
+			GameObject* go_b = static_cast<GameObject*>(cd_b->data);
+			HitMap::iterator it = m_collision.find(MakeIntPair(go_a->GetType(), go_b->GetType()));
+		if (it != m_collision.end()){
+			(this->*it->second)(go_a, go_b);
+		}
 	}
 }
 
 void CollisionManager::ProcessRaycast(const btCollisionObject* ob_a, const btCollisionObject* ob_b){
-	GameObject* go_a = static_cast<GameObject*>(ob_a->getUserPointer());
-	GameObject* go_b = static_cast<GameObject*>(ob_b->getUserPointer());
-	HitMap::iterator it = m_raycast_map.find(MakeIntPair(go_a->GetType(), go_b->GetType()));
-	if (it != m_raycast_map.end()){
-		(this->*it->second)(go_a, go_b);
+	CollisionDef* cd_a = static_cast<CollisionDef*>(ob_a->getUserPointer());
+	CollisionDef* cd_b = static_cast<CollisionDef*>(ob_b->getUserPointer());
+	if (((cd_a->flag & COLLISION_FLAG_GAME_OBJECT) == COLLISION_FLAG_GAME_OBJECT) &&
+		((cd_b->flag & COLLISION_FLAG_GAME_OBJECT) == COLLISION_FLAG_GAME_OBJECT)){
+			GameObject* go_a = static_cast<GameObject*>(cd_a->data);
+			GameObject* go_b = static_cast<GameObject*>(cd_b->data);
+			HitMap::iterator it = m_raycast_map.find(MakeIntPair(go_a->GetType(), go_b->GetType()));
+		if (it != m_raycast_map.end()){
+			(this->*it->second)(go_a, go_b);
+		}
 	}
 }
 
@@ -87,10 +96,10 @@ void CollisionManager::BlueBubbleBlueBubble(GameObject* blue_bubble_a, GameObjec
 		RigidbodyComponent* rc_b = static_cast<RigidbodyComponent*>(blue_bubble_b->GetComponent(COMPONENT_RIGIDBODY));
 		HingeConstraintComponent* constraint = new HingeConstraintComponent;
 		if (!comp_a){
-			blue_bubble_a->AddComponent(constraint);
+			blue_bubble_a->AddComponentToFront(constraint);
 		}
 		else{
-			blue_bubble_b->AddComponent(constraint);
+			blue_bubble_b->AddComponentToFront(constraint);
 		}
 		btVector3 pivot_a = rc_b->GetRigidbody()->getWorldTransform().getOrigin() - rc_a->GetRigidbody()->getWorldTransform().getOrigin();
 		btVector3 pivot_b = rc_a->GetRigidbody()->getWorldTransform().getOrigin() - rc_b->GetRigidbody()->getWorldTransform().getOrigin();

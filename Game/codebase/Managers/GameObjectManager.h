@@ -15,7 +15,6 @@ public:
 	~GameObjectManager(void);
 	void Init(PhysicsEngine* physics_engine, Ogre::SceneManager* scene_manager, InputManager* input_manager, Ogre::Viewport* viewport, SoundManager* sound_manager);
 	void Update(float dt);
-	void LateUpdate(float dt);		// Update performed after physics simulation.	
 	void RemoveGameObject(GameObject* gameobject);
 	GameObject* CreateGameObject(int type, const Ogre::Vector3& position, void* data);
 	void Shut();

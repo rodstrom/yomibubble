@@ -76,9 +76,10 @@ using namespace std;
 using namespace Ogre;
 using namespace Artifex;
 
+class PhysicsEngine;
 class ArtifexLoader {
 public:
-ArtifexLoader(Root *root, SceneManager *scenemgr, SceneNode *camnode, Camera *camera, string zonepath="");
+ArtifexLoader(Root *root, SceneManager *scenemgr, SceneNode *camnode, Camera *camera, PhysicsEngine* physics_engine, string zonepath="");
 ~ArtifexLoader();
 
 Root *mRoot;

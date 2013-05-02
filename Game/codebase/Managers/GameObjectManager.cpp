@@ -44,17 +44,6 @@ void GameObjectManager::Update(float dt){
 	}
 }
 
-void GameObjectManager::LateUpdate(float dt){
-	if (!m_late_update_objects.empty()){
-		std::list<GameObject*>::iterator it;
-		GameObject* go = NULL;
-		for (it = m_late_update_objects.begin(); it != m_late_update_objects.end(); it++){
-			go = *it;
-			go->LateUpdate(dt);
-		}
-	}
-}
-
 void GameObjectManager::RemoveGameObject(GameObject* gameobject){
 	if (gameobject->DoUpdate()){
 		m_updateable_game_objects.remove(gameobject);
@@ -68,9 +57,6 @@ void GameObjectManager::RemoveGameObject(GameObject* gameobject){
 void GameObjectManager::AddGameObject(GameObject* gameobject){
 	if (gameobject->DoUpdate()){
 		m_updateable_game_objects.push_back(gameobject);
-	}
-	if (gameobject->DoLateUpdate()){
-		m_late_update_objects.push_back(gameobject);
 	}
 	m_game_objects.push_back(gameobject);
 }
@@ -106,6 +92,7 @@ void GameObjectManager::Shut(){
 
 GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void* data){
 	CharControllerDef& def = *static_cast<CharControllerDef*>(data);
+	//DynamicCharacterControllerDef& def = *static_cast<DynamicCharacterControllerDef*>(data);
 	GameObject* go = new GameObject(GAME_OBJECT_PLAYER);
 	NodeComponent* node_comp = new NodeComponent;
 	go->AddComponent(node_comp);
@@ -116,7 +103,9 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	CharacterController* contr = new CharacterController;
 	go->AddComponent(contr);
 	go->AddUpdateable(contr);
-	//go->AddLateUpdate(contr);
+	/*DynamicCharacterController* dcc = new DynamicCharacterController;
+	go->AddComponent(dcc);
+	go->AddUpdateable(dcc);*/
 	FollowCameraComponent* fcc = new FollowCameraComponent;
 	go->AddComponent(fcc);
 	go->AddUpdateable(fcc);
@@ -163,7 +152,7 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 
 	tc->Init(position, m_physics_engine, &tdef);
 	tc->SetId("btrig");
-	contr->Init(position, acomp->GetEntity(), def.step_height, m_physics_engine);
+	contr->Init(position, acomp->GetEntity(), def.step_height, m_physics_engine, true);
 	contr->SetTurnSpeed(def.turn_speed);
 	contr->SetVelocity(def.velocity);
 	contr->SetJumpPower(def.jump_power);
@@ -176,15 +165,18 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	contr->GetRigidbody()->setRestitution(def.restitution);
 	contr->SetRaycastLength(5.0f);
 	contr->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
+	//dcc->Init(position, m_physics_engine, def);
+	//dcc->GetRigidbody()->getWorldTransform().setOrigin(BtOgre::Convert::toBullet(position));
+	//dcc->GetGhostObject()->getWorldTransform().setOrigin(BtOgre::Convert::toBullet(position));
 	pccomp->Init(m_input_manager, m_sound_manager);
 	pccomp->SetMaxVelocity(def.max_velocity);
-	pccomp->SetVelocity(def.velocity);
+	pccomp->SetVelocity(1.0f);
 	pccomp->SetDeacceleration(def.deacceleration);
 	sound2D->Init(m_sound_manager);
 	sound3D->Init(m_sound_manager);
 	music2D->Init(m_sound_manager);
 	music3D->Init(m_sound_manager);
-	gui->Init("Examples/Empty", "Examples/Filled", 10);
+	gui->Init("Examples/Empty", "Examples/Filled", 4);
 	fcc->Init(m_scene_manager, m_viewport, true);
 	fcc->GetCamera()->setNearClipDistance(0.1f);
 	csnc->Init(Ogre::Vector3(0.0f, 0.0f, 1.0f), "CreateBubble", node_comp->GetSceneNode());
@@ -217,7 +209,7 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 
 	//Point2PointConstraintComponent* cons = new Point2PointConstraintComponent;
 	//go->AddComponent(cons);
-	bc->Init(m_physics_engine, 50.0f, 100.0f);
+	bc->Init(m_physics_engine, 10.0f, 20.0f);
 	node_comp->Init(position, m_scene_manager);
 	mrc->Init("sphere.mesh", m_scene_manager);
 	Ogre::Vector3 scale(def.start_scale);
@@ -288,7 +280,7 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 	way_point->Init(node_comp->GetSceneNode(), 0.001f);
 	way_point->AddWayPoint(Ogre::Vector3(15.0f, -10.0f, 21.0f));
 	
-	contr->Init(position, acomp->GetEntity(), def.step_height, m_physics_engine);
+	contr->Init(position, acomp->GetEntity(), def.step_height, m_physics_engine, true);
 	contr->SetTurnSpeed(def.turn_speed);
 	contr->SetVelocity(def.velocity);
 	contr->GetRigidbody()->setRestitution(def.restitution);
@@ -392,6 +384,6 @@ GameObject* GameObjectManager::CreateTerrain(const Ogre::Vector3& position, void
 	TerrainComponent* tc = new TerrainComponent;
 	go->AddComponent(tc);
 
-	tc->Init(m_scene_manager, m_physics_engine, "try");
+	tc->Init(m_scene_manager, m_physics_engine, *static_cast<Ogre::String*>(data));
 	return go;
 }

@@ -46,14 +46,6 @@ void GameObject::Update(float dt){
 	}
 }
 
-void GameObject::LateUpdate(float dt){
-	if (!m_late_updates.empty()){
-		for (unsigned int i = 0; i < m_late_updates.size(); i++){
-			m_late_updates[i]->LateUpdate(dt);
-		}
-	}
-}
-
 Component* GameObject::GetComponent(int type){
 	if (!m_components.empty()){
 		for (unsigned int i = 0; i < m_components.size(); i++){
@@ -74,20 +66,20 @@ void GameObject::AddComponent(Component* component){
 	component->SetMessenger(m_messenger);
 }
 
+void GameObject::AddComponentToFront(Component* component){
+	m_components.push_front(component);
+	component->SetOwner(this);
+	component->SetMessenger(m_messenger);
+}
+
 void GameObject::AddUpdateable(IComponentUpdateable* updateable){
 	m_updateables.push_back(updateable);
 }
 
-void GameObject::AddLateUpdate(IComponentLateUpdate* late_update){
-	m_late_updates.push_back(late_update);
-}
 
 void GameObject::Shut(){
 	if (m_updateables.empty()){
 		m_updateables.clear();
-	}
-	if (!m_late_updates.empty()){
-		m_late_updates.clear();
 	}
 	if (!m_components.empty()){
 		for (unsigned int i = 0; i < m_components.size(); i++){
@@ -110,13 +102,6 @@ bool GameObject::DoUpdate(){
 	return false;
 }
 
-bool GameObject::DoLateUpdate(){
-	if (!m_late_updates.empty()){
-		return true;
-	}
-	return false;
-}
-
 void GameObject::GetComponents(int type, std::vector<Component*>& list){
 	for (unsigned int i = 0; i < m_components.size(); i++){
 		if (m_components[i]->GetComponentType() == type){
@@ -129,12 +114,6 @@ void GameObject::RemoveComponent(Component* component){
 	for (unsigned int i = 0; i < m_updateables.size(); i++){
 		if ((void*)component == (void*)m_updateables[i]){
 			m_updateables.erase(m_updateables.begin() + i);
-			break;
-		}
-	}
-	for (unsigned int i = 0; i < m_late_updates.size(); i++){
-		if ((void*)component == (void*)m_late_updates[i]){
-			m_late_updates.erase(m_late_updates.begin() + i);
 			break;
 		}
 	}

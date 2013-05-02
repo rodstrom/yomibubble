@@ -58,4 +58,14 @@ struct PlaneDef{
 	float restitution;
 };
 
+struct CollisionDef {
+	short flag;
+	void* data;
+};
+
+enum ECollisionTypes{
+	COLLISION_FLAG_STATIC = 0x0001,
+	COLLISION_FLAG_GAME_OBJECT = 0x0002
+};
+
 #endif // _N_GAME_OBJECT_PREREQ_H_

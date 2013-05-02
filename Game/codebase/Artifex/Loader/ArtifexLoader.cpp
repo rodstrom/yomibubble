@@ -19,7 +19,7 @@ THE SOFTWARE.
 using namespace std;
 using namespace Ogre;
 
-ArtifexLoader::ArtifexLoader(Root *root, SceneManager *scenemgr, SceneNode *camnode, Camera *camera, string zonepath)
+ArtifexLoader::ArtifexLoader(Root *root, SceneManager *scenemgr, SceneNode *camnode, Camera *camera, PhysicsEngine* physics_engine, string zonepath)
 {
 mZonePath = zonepath;
 
@@ -33,7 +33,7 @@ mZoneLoaded = false;
 
 ResourceGroupManager::getSingleton().createResourceGroup(ETM_GROUP);
 
-mDBManager = new DBManager(this);	
+mDBManager = new DBManager(this, physics_engine);	
 
 mHeightMapBinarayFileName = "artifex_terrain.bin";	
 mHeightMapImageFileName = "ETterrain.png";
@@ -218,7 +218,6 @@ try {
 mSplatMgr->~SplattingManager();
 } catch (Exception &e) {};
 #endif
-
 try {
 mWaterNode->detachAllObjects();
 mSceneMgr->destroySceneNode("WaterNode");
