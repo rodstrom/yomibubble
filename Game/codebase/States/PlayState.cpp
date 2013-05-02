@@ -42,7 +42,7 @@ void PlayState::Enter(){
 	Ogre::MeshManager::getSingleton().createPlane("plane", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane, 50, 50, 20, 20, true, 1, 5, 5, Ogre::Vector3::UNIT_Z);
 
 	float x = 180.0f;
-	float y = 790.0f;
+	float y = 90.0f;
 	float z = 230.0f;
 
 	ParticleDef particleDef;
@@ -51,12 +51,12 @@ void PlayState::Enter(){
 	
 	//m_cam_node->attachObject(m_camera);
 	//Ogre::SceneNode* node = m_scene_manager->getSceneNode("camNode");
-	mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_camera, m_game_object_manager, m_sound_manager, "../../resources/terrain/");
+	/*mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_camera, "../../resources/terrain/");
 #ifdef _DEBUG
 	mArtifexLoader->loadZone("try", false, false, false, false, true, false, true, true, true, true);
 #else
 	mArtifexLoader->loadZone("try", true, true, true, false, true, false, true, true, true, true);
-#endif
+#endif*/
 	//PlaneDef plane_def("plane", "Examples/BeachStones");
 	//m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(x,y - 2.0f,z), &plane_def);
 
@@ -102,8 +102,9 @@ void PlayState::Enter(){
 
 	m_physics_engine->ShowDebugDraw(true);
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y+1.0f,z+3.0f), &tott_def);
-	m_physics_engine->CreateTerrainCollision(mArtifexLoader->mTerrain);
+	//m_physics_engine->CreateTerrainCollision(mArtifexLoader->mTerrain);
 	//m_scene_manager->setSkyDome(true, "Examples/CloudySky");
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_TERRAIN, Ogre::Vector3::ZERO, NULL);
 }
 
 

@@ -387,6 +387,7 @@ void OverlayCallbackComponent::Shut(){
 void ParticleComponent::Init(Ogre::SceneManager* p_scene_manager, const Ogre::String& p_particle_name, const Ogre::String& p_particle_file_name){
 	m_scene_manager = p_scene_manager;
 	m_particle_system = m_scene_manager->createParticleSystem(p_particle_name, p_particle_file_name);
+	m_particle_system->setDefaultHeight(0.1f);
 }
 
 void ParticleComponent::CreateParticle(Ogre::SceneNode* p_scene_node, const Ogre::Vector3& p_position, const Ogre::Vector3& p_offset_position){
@@ -521,8 +522,12 @@ void TerrainComponent::SetMessenger(ComponentMessenger* messenger){
 void TerrainComponent::Init(Ogre::SceneManager* scene_manager, PhysicsEngine* physics_engine, const Ogre::String& filename){
 	m_scene_manager = scene_manager;
 	m_physics_engine = physics_engine;
-	m_artifex_loader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_scene_manager->getCamera("MainCamera"), m_owner->GetGameObjectManager(), m_owner->GetGameObjectManager()->GetSoundManager(), "../../resources/terrain/");
-	
+
+	m_artifex_loader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_scene_manager->getCamera("MainCamera"), "../../resources/terrain/");
+
+//mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_camera, m_game_object_manager, m_sound_manager, "../../resources/terrain/");
+
+
 	m_artifex_loader->loadZone(filename);
 	Ogre::Terrain* terrain = m_artifex_loader->mTerrain;
 	size_t w = terrain->getSize();

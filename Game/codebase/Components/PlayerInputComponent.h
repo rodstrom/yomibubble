@@ -51,6 +51,11 @@ protected:
 	float m_max_scale;
 	float m_current_scale;
 	SoundData2D m_walk_sound;
+	SoundData2D m_jump_sound;
+	SoundData2D m_bounce_sound;
+	SoundData2D m_bubble_burst_sound;
+	SoundData2D m_bubble_blow_sound;
+
 	SoundData2D m_test_sfx;
 	
 	SoundData2D m_def_music;

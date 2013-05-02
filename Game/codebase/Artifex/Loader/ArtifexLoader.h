@@ -38,8 +38,7 @@ THE SOFTWARE.
 // #define TSM_TERRAIN
 
 // uncomment this if you want to use Ogre's::Terrain component (Ogre 1.7 and higher)
-
-//#define ETM_TERRAIN
+//#define OT_TERRAIN
 #define OT_TERRAIN
 
 // includes needed to work with the Enhanced Terrain Manager
@@ -73,215 +72,211 @@ class DBManager;
 
 #define ETM_GROUP "ETM" // the resourcegroup for the zone
 
-// included for DBManager
-#include "..\..\Managers\GameObjectManager.h"
-#include "..\..\Managers\SoundManager.h"
-
 using namespace std;
 using namespace Ogre;
 using namespace Artifex;
 
 class ArtifexLoader {
 public:
-	ArtifexLoader(Root *root, SceneManager *scenemgr, SceneNode *camnode, Camera *camera, GameObjectManager *game_object_manager, SoundManager *sound_manager, string zonepath="");
-	~ArtifexLoader();
+ArtifexLoader(Root *root, SceneManager *scenemgr, SceneNode *camnode, Camera *camera, string zonepath="");
+~ArtifexLoader();
 
-	Root *mRoot;
-	SceneManager *mSceneMgr;
+Root *mRoot;
+SceneManager *mSceneMgr;
 
-	bool isZoneLoaded();
-	bool mZoneLoaded;
+bool isZoneLoaded();
+bool mZoneLoaded;
 
-	float getHeightAt(const float &x, const float &z);
+float getHeightAt(const float &x, const float &z);
 
 #ifdef ETM_TERRAIN
-	// ETM
-//	ET::TerrainManager* mTerrainMgr;
-//    ET::TerrainInfo* mTerrainInfo;
-//    ET::SplattingManager* mSplatMgr;
-	/*
-	void loadTerrain();
-	void loadBinaryTerrain();
-	void loadImgTerrain();
-	void initETM();
-	void updateLightmap();
-	*/
-	
+// ETM
+// ET::TerrainManager* mTerrainMgr;
+// ET::TerrainInfo* mTerrainInfo;
+// ET::SplattingManager* mSplatMgr;
+/*
+void loadTerrain();
+void loadBinaryTerrain();
+void loadImgTerrain();
+void initETM();
+void updateLightmap();
+*/
+
 #elif defined(TSM_TERRAIN)
-	// TSM
-	Image mCoverage[3];
-	TexturePtr mCoverageTex[3];
-	
-	void initTSM();
-	void loadTerrain();
+// TSM
+Image mCoverage[3];
+TexturePtr mCoverageTex[3];
+
+void initTSM();
+void loadTerrain();
 
 #elif defined(OT_TERRAIN)
-	// Ogre::Terrain
-	Ogre::TerrainGlobalOptions* mTerrainGlobals;
-	Ogre::TerrainGroup* mTerrainGroup;
-	Ogre::TerrainMaterialGeneratorPtr mMTerrMatGen;
-	Ogre::Terrain* mTerrain;
-	
-	// init 
-	void initOgreTerrain();
-	void configureTerrainDefaults(Ogre::Light* light);
-	
-	// terrain loaders
-	void loadTerrain();
-	void loadBinaryTerrain();
-	void loadImgTerrain();	
-	
-	// blendmap stuff
-	void loadOrCreateBlendMaps(bool saveBlendMaps=false);
-	void saveConvertedBlendMap(int blendMapNumber, Ogre::TerrainLayerBlendMap *blendMap);
-	
-	// colourmap loader
-	void loadGlobalColourMap();
-	
+// Ogre::Terrain
+Ogre::TerrainGlobalOptions* mTerrainGlobals;
+Ogre::TerrainGroup* mTerrainGroup;
+Ogre::TerrainMaterialGeneratorPtr mMTerrMatGen;
+Ogre::Terrain* mTerrain;
+
+// init
+void initOgreTerrain();
+void configureTerrainDefaults(Ogre::Light* light);
+
+// terrain loaders
+void loadTerrain();
+void loadBinaryTerrain();
+void loadImgTerrain();	
+
+// blendmap stuff
+void loadOrCreateBlendMaps(bool saveBlendMaps=false);
+void saveConvertedBlendMap(int blendMapNumber, Ogre::TerrainLayerBlendMap *blendMap);
+
+// colourmap loader
+void loadGlobalColourMap();
+
 #endif
 
-	// SQLite
-	DBManager *mDBManager;
+// SQLite
+DBManager *mDBManager;
 
-	string mZoneVersion;
-	string mLoadObjectsFrom;
+string mZoneVersion;
+string mLoadObjectsFrom;
 
-	//grass
-	string mGrassCoverMap;
-	string mGrassCoverChannel;
-	string mGrassColourMap;
-	string mGrassMaterial;
-	bool mGrassAnimate;
-	float mGrassDensity;
-	float mGrassRange;
-	
+//grass
+string mGrassCoverMap;
+string mGrassCoverChannel;
+string mGrassColourMap;
+string mGrassMaterial;
+bool mGrassAnimate;
+float mGrassDensity;
+float mGrassRange;
+
 #ifdef PG_GRASSLOADER
-	ArtifexLoaderPGGrass *mArtifexLoaderPGGrass;
-#endif 	
+ArtifexLoaderPGGrass *mArtifexLoaderPGGrass;
+#endif
 
-	// fog
-	float mFogR;
-	float mFogG;
-	float mFogB;
-	float mFogDensity;
-	float mFogStart;
-	float mFogEnd;
-	bool mFogVisible;
+// fog
+float mFogR;
+float mFogG;
+float mFogB;
+float mFogDensity;
+float mFogStart;
+float mFogEnd;
+bool mFogVisible;
 
-	// skye
-	string mSkyBoxName;
-	float mSkyRadius;
+// skye
+string mSkyBoxName;
+float mSkyRadius;
 
-	// camera
-	SceneNode *mCamNode;
-	Camera *mCamera;
-	float mFarClipDistance;
-	float mCamX;
-	float mCamY;
-	float mCamZ;
+// camera
+SceneNode *mCamNode;
+Camera *mCamera;
+float mFarClipDistance;
+float mCamX;
+float mCamY;
+float mCamZ;
 
-	//light
-	Light *mLight;
-	float mLightPosX;
-	float mLightPosY;
-	float mLightPosZ;
-	float mAmbientR;
-	float mAmbientG;
-	float mAmbientB;
+//light
+Light *mLight;
+float mLightPosX;
+float mLightPosY;
+float mLightPosZ;
+float mAmbientR;
+float mAmbientG;
+float mAmbientB;
 
-	// water
-	int mWaterVisible;
-	float mWaterXPos;
-	float mWaterYPos;
-	float mWaterZPos;
-	float mWaterWidth;
-	float mWaterLength;
-	string mWaterMaterial;
-	SceneNode* mWaterNode;
-	Entity *mWaterEntity;
+// water
+int mWaterVisible;
+float mWaterXPos;
+float mWaterYPos;
+float mWaterZPos;
+float mWaterWidth;
+float mWaterLength;
+string mWaterMaterial;
+SceneNode* mWaterNode;
+Entity *mWaterEntity;
 
-	// terrain
-	bool mTerrainLoD;
+// terrain
+bool mTerrainLoD;
 
-	float mTerrainPixelError;
-	float mTerrainLoDMorphingFactor;
+float mTerrainPixelError;
+float mTerrainLoDMorphingFactor;
 
-	int mTerrainMaxLoD;
+int mTerrainMaxLoD;
 
-	int mTerrainTileSize;
-	int mTerrainVertexCount;
+int mTerrainTileSize;
+int mTerrainVertexCount;
 
-	bool mTerrainVertexNormals;
-	bool mTerrainVertexTangents;
+bool mTerrainVertexNormals;
+bool mTerrainVertexTangents;
 
-	// *** terrainDimensions
-	float mTerrX, mTerrZ, mTerrY;
+// *** terrainDimensions
+float mTerrX, mTerrZ, mTerrY;
 
-	float mSplattScaleX;
-	float mSplattScaleZ;
-	int mTextureCount;
-	
-	// *** ColourMap
-	Image* mOverlay;
-	TexturePtr mOverlayTex;
+float mSplattScaleX;
+float mSplattScaleZ;
+int mTextureCount;
 
-	Image* mSplatting[9];
-	string mTexturePath[9];
-	TexturePtr mSplattingTex[9];
-	string mETBlendMapFileName[3];
-	
-	Image* mHeightMapImage;
-	string mHeightMapImageFileName;
-	string mHeightMapBinarayFileName;
-	
-	bool mLoadTerrainBinary;
-	
+// *** ColourMap
+Image* mOverlay;
+TexturePtr mOverlayTex;
 
-	int mTextureSize;
-	int mCoverMapSize;
+Image* mSplatting[9];
+string mTexturePath[9];
+TexturePtr mSplattingTex[9];
+string mETBlendMapFileName[3];
 
-	void setupTextures();
+Image* mHeightMapImage;
+string mHeightMapImageFileName;
+string mHeightMapBinarayFileName;
 
-	void loadTerrainSettings();
+bool mLoadTerrainBinary;
 
-	void createColourLayer();
 
-	void loadCameraSettings();
+int mTextureSize;
+int mCoverMapSize;
 
-	void loadWaterSettings();
-	void createWater();
+void setupTextures();
 
-	void loadSkyeSettings();
-	void createSkye();
+void loadTerrainSettings();
 
-	void loadFogSettings();
-	void createFog();
+void createColourLayer();
 
-	void loadGrassSettings();
-	void createGrass();
+void loadCameraSettings();
 
-	void loadLightSettings();
-	void createLight();
+void loadWaterSettings();
+void createWater();
 
-	string mZonePath;
-	string mZoneName;
+void loadSkyeSettings();
+void createSkye();
 
-	bool mLightmap;
-	float mLightmapShadow;
+void loadFogSettings();
+void createFog();
 
-	bool mLoadGrass;
+void loadGrassSettings();
+void createGrass();
 
-	std::vector <Spawn2> mObjectFile;
-	std::vector <Spawn2> mObjectTrashCan;
+void loadLightSettings();
+void createLight();
 
-	float getMeshYAdjust(Ogre::String meshfile);
+string mZonePath;
+string mZoneName;
 
-	void spawnLoader(String which);
-	void staticsLoader(String which, float renderDistance);
+bool mLightmap;
+float mLightmapShadow;
 
-	bool loadZone(std::string zonename, bool use_cfg_settings=true, bool fog=true, bool water=true, bool skye=true, bool light=true, bool grass=true, bool statics=true, bool groundcover=true, bool movables=true, bool mobiles=true);
-	void unloadZone();
+bool mLoadGrass;
 
-	void loadZoneCFG();
+std::vector <Spawn2> mObjectFile;
+std::vector <Spawn2> mObjectTrashCan;
+
+float getMeshYAdjust(Ogre::String meshfile);
+
+void spawnLoader(String which);
+void staticsLoader(String which, float renderDistance);
+
+bool loadZone(std::string zonename, bool use_cfg_settings=true, bool fog=true, bool water=true, bool skye=true, bool light=true, bool grass=true, bool statics=true, bool groundcover=true, bool movables=true, bool mobiles=true);
+void unloadZone();
+
+void loadZoneCFG();
 };
 #endif

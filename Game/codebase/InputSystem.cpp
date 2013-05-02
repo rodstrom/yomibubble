@@ -2,6 +2,8 @@
 #include "InputSystem.h"
 #include "Game.h"
 
+#include <iostream>
+
 InputSystem::InputSystem(Game* game, Ogre::RenderWindow* render_window) : 
 m_game(game),
 m_render_window(render_window),
@@ -111,7 +113,6 @@ void InputSystem::Capture(){
 				&& ((*it)->getJoyStickState().mAxes[3].abs < 16384 && (*it)->getJoyStickState().mAxes[3].abs > -16384)
 				&& (!mouse_change))
 				m_game->InjectRelativeCameraAxis(0.0f, 0.0f, 0.0f);
-
 		}
 	}
 }
@@ -273,6 +274,21 @@ bool InputSystem::axisMoved(const OIS::JoyStickEvent& e, int axis){
 	}
 	m_game->InjectRelativeCameraAxis(camX, camY, 0.0f);
 
+	//std::cout << e.state.mAxes[4].abs << std::endl;
+
+	if (e.state.mAxes[4].abs > 0){
+		m_game->InjectPressedButton(BTN_LEFT_MOUSE);
+		m_game->InjectReleasedButton(BTN_RIGHT_MOUSE);
+	}
+	else if (e.state.mAxes[4].abs < 0){
+		m_game->InjectPressedButton(BTN_RIGHT_MOUSE);
+		m_game->InjectReleasedButton(BTN_LEFT_MOUSE);
+	}
+	else{
+		m_game->InjectReleasedButton(BTN_LEFT_MOUSE);
+		m_game->InjectReleasedButton(BTN_RIGHT_MOUSE);
+	}
+
 	return true;
 }
 
@@ -283,11 +299,47 @@ bool InputSystem::sliderMoved(const OIS::JoyStickEvent& e, int sliderID){
 
 bool InputSystem::buttonPressed(const OIS::JoyStickEvent& e, int button){
 	switch (button){
-	case 1: //OIS::MouseButtonID::MB_Right: //or GamePad B
+	case 13:
 		m_game->InjectPressedButton(BTN_RIGHT_MOUSE);
 		break;
-	case 0: //OIS::MouseButtonID::MB_Left: //or GamePad A
+	case 12:
+		m_game->InjectPressedButton(BTN_RIGHT_MOUSE);
+		break;
+	case 11:
+		m_game->InjectPressedButton(BTN_RIGHT_MOUSE);
+		break;
+	case 10:
+		m_game->InjectPressedButton(BTN_RIGHT_MOUSE);
+		break;
+	case 9:
+		m_game->InjectPressedButton(BTN_RIGHT_MOUSE);
+		break;
+	case 8: //?
+
+		break;
+	case 7: //Start Button
+		
+		break;
+	case 6: //Back Button
+		
+		break;
+	case 5: //Right Button
+		
+		break;
+	case 4: //Left Button
+		
+		break;
+	case 3: //Y button
+		
+		break;
+	case 2: //X button
+		
+		break;
+	case 1: //OIS::MouseButtonID::MB_Right: //or GamePad B
 		m_game->InjectPressedButton(BTN_LEFT_MOUSE);
+		break;
+	case 0: //OIS::MouseButtonID::MB_Left: //or GamePad A
+		m_game->InjectPressedButton(BTN_START);
 		break;
 	default:
 		break;
@@ -297,11 +349,47 @@ bool InputSystem::buttonPressed(const OIS::JoyStickEvent& e, int button){
 
 bool InputSystem::buttonReleased(const OIS::JoyStickEvent& e, int button){
 	switch (button){
-	case 1: //OIS::MouseButtonID::MB_Right: //or GamePad B
+	case 13:
 		m_game->InjectReleasedButton(BTN_RIGHT_MOUSE);
 		break;
-	case 0: //OIS::MouseButtonID::MB_Left: //or GamePad A
+	case 12:
+		m_game->InjectReleasedButton(BTN_RIGHT_MOUSE);
+		break;
+	case 11:
+		m_game->InjectReleasedButton(BTN_RIGHT_MOUSE);
+		break;
+	case 10:
+		m_game->InjectReleasedButton(BTN_RIGHT_MOUSE);
+		break;
+	case 9:
+		m_game->InjectReleasedButton(BTN_RIGHT_MOUSE);
+		break;
+	case 8: //?
+		
+		break;
+	case 7: //Start Button
+		
+		break;
+	case 6: //Back Button
+		
+		break;
+	case 5: //Right Button
+		
+		break;
+	case 4: //Left Button
+		
+		break;
+	case 3: //Y button
+		
+		break;
+	case 2: //X button
+		
+		break;
+	case 1: //OIS::MouseButtonID::MB_Right: //or GamePad B
 		m_game->InjectReleasedButton(BTN_LEFT_MOUSE);
+		break;
+	case 0: //OIS::MouseButtonID::MB_Left: //or GamePad A
+		m_game->InjectReleasedButton(BTN_START);
 		break;
 	default:
 		break;

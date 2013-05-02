@@ -206,13 +206,14 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 	go->AddComponent(node_comp);
 	MeshRenderComponent* mrc = new MeshRenderComponent;
 	go->AddComponent(mrc);
+	Point2PointConstraintComponent* cons = new Point2PointConstraintComponent;
+	go->AddComponent(cons);
 	RigidbodyComponent* rc = new RigidbodyComponent;
 	go->AddComponent(rc);
 	BubbleController* bc = new BubbleController;
 	go->AddComponent(bc);
 	go->AddUpdateable(bc);
-	Point2PointConstraintComponent* cons = new Point2PointConstraintComponent;
-	go->AddComponent(cons);
+
 
 	//Point2PointConstraintComponent* cons = new Point2PointConstraintComponent;
 	//go->AddComponent(cons);
@@ -239,13 +240,13 @@ GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, v
 	go->AddComponent(node_comp);
 	MeshRenderComponent* mrc = new MeshRenderComponent;
 	go->AddComponent(mrc);
+	Point2PointConstraintComponent* cons = new Point2PointConstraintComponent;
+	go->AddComponent(cons);
 	RigidbodyComponent* rc = new RigidbodyComponent;
 	go->AddComponent(rc);
 	BubbleController* bc = new BubbleController;
 	go->AddComponent(bc);
 	go->AddUpdateable(bc);
-	Point2PointConstraintComponent* cons = new Point2PointConstraintComponent;
-	go->AddComponent(cons);
 
 	bc->Init(m_physics_engine, 10.0f, 50.0f);
 	node_comp->Init(position, m_scene_manager);
@@ -369,7 +370,7 @@ GameObject* GameObjectManager::CreateLeaf(const Ogre::Vector3& position, void* d
 	//Ogre::Vector3 scale(0.002f);
 	//node_comp->GetSceneNode()->setScale(scale);
 	rb->Init(position, mrc->GetEntity(), m_physics_engine, 1, COLLIDER_BOX, STATIC_BODY);
-	particle->Init(m_scene_manager, "Smoke", particleDef.particle_name);
+	particle->Init(m_scene_manager, "ring_flare2", particleDef.particle_name);
 	mrc->GetEntity()->setMaterialName("Examples/Leaf");
 	node_comp->GetSceneNode()->setPosition(Ogre::Vector3(position));
 	particle->CreateParticle(node_comp->GetSceneNode(), node_comp->GetSceneNode()->getPosition(), Ogre::Vector3(0,-3,0));

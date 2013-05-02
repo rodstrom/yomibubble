@@ -21,43 +21,30 @@ class ArtifexLoader;
 
 #include "CppSQLite3.h"
 
-#include "..\..\Managers\GameObjectManager.h"
-#include "..\..\Managers\SoundManager.h"
-
-#include <string>
-#include <vector>
-
 class DBManager {
 public:
-	DBManager(ArtifexLoader *artifexloader, GameObjectManager *game_object_manager, SoundManager *sound_manager);
-	~DBManager();
+DBManager(ArtifexLoader *artifexloader);
+~DBManager();
 
-	ArtifexLoader *mArtifexLoader;
-	CppSQLite3DB *mDB;
+ArtifexLoader *mArtifexLoader;
+CppSQLite3DB *mDB;
 
-	int Open(const string path);
-	int Close(void);
+int Open(const string path);
+int Close(void);
 
-	bool ExecSQL (std::string query);
-	bool EmptyTable(std::string tablename);
-	bool WriteSpawn(Spawn2 spawn, std::string spawntype="default");
-	bool DeleteSpawn(const Spawn2& spawn , bool clear_attributes=true);
-	bool ClearAttributes(const Spawn2& spawn);
-	bool WriteAttributes(Spawn2& spawn);
-	bool EmptyTrash();
-	int DBManager::getObjectProperties(Spawn2 &spawn);
-	Vector3 DBManager::getWaypoint(string waypoint_id);
+bool ExecSQL (std::string query);
+bool EmptyTable(std::string tablename);
+bool WriteSpawn(Spawn2 spawn, std::string spawntype="default");
+bool DeleteSpawn(const Spawn2& spawn , bool clear_attributes=true);
+bool ClearAttributes(const Spawn2& spawn);
+bool WriteAttributes(Spawn2& spawn);
+bool EmptyTrash();
+int DBManager::getObjectProperties(Spawn2 &spawn);
 
-	std::vector<std::string> &DBManager::split(const std::string &s, char delim, std::vector<std::string> &elems);
-	std::vector<std::string> DBManager::split(const std::string &s, char delim);
+int Save();
+int Load();
 
-	int Save();
-	int Load();
-
-	bool saving;
-
-	GameObjectManager *m_game_object_manager;
-	SoundManager *m_sound_manager;
+bool saving;
 
 };
 #endif

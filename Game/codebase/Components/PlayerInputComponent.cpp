@@ -46,13 +46,24 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 	m_3D_music_data = sound_manager->Create3DData("Main_Theme", "", false, false, false, 1.0f, 1.0f);
 	m_leaf_sfx = sound_manager->Create2DData("Take_Leaf", false, false, false, false, 1.0f, 1.0f);
 
+	m_jump_sound = sound_manager->Create2DData("Jump", false, false, false, false, 1.0f, 1.0f);
+	m_bounce_sound = sound_manager->Create2DData("Bounce", false, false, false, false, 1.0f, 1.0f);
+	m_bubble_burst_sound = sound_manager->Create2DData("Bubble_Burst", false, false, false, false, 1.0f, 1.0f);
+	m_bubble_blow_sound = sound_manager->Create2DData("Blow_Bubble", false, false, false, false, 1.0f, 1.0f);
+
 	m_states[PLAYER_STATE_NORMAL] =			&PlayerInputComponent::Normal;
 	m_states[PLAYER_STATE_ON_BUBBLE] =		&PlayerInputComponent::OnBubble;
 	m_states[PLAYER_STATE_INSIDE_BUBBLE] =	&PlayerInputComponent::InsideBubble;
 	m_states[PLAYER_STATE_BOUNCING] =		&PlayerInputComponent::Bouncing;
 
-	m_min_bubble_size = 0.5f;
-	m_max_bubble_size = 1.5f;
+	m_min_bubble_size = 0.005f;
+	m_max_bubble_size = 0.007f;
+
+	m_velocity = 0.0000001f;
+	m_deacc = 0.002f;
+	m_acc_x = 0.001f;
+	m_acc_z = 0.001f;
+	m_max_velocity = 0.00000002f;
 }
 
 void PlayerInputComponent::SetMessenger(ComponentMessenger* messenger){
@@ -101,8 +112,10 @@ void PlayerInputComponent::Normal(float dt){
 	}
 
 	if (!m_is_creating_bubble){
+		m_messenger->Notify(MSG_SFX2D_STOP, &m_bubble_blow_sound);
+
 		Ogre::SceneNode* node = NULL;
-		if (m_input_manager->IsButtonPressed(BTN_LEFT_MOUSE) || m_input_manager->IsButtonPressed(BTN_RIGHT_MOUSE)){
+		if (m_input_manager->IsButtonPressed(BTN_LEFT_MOUSE) || m_input_manager->IsButtonPressed(BTN_RIGHT_MOUSE)){// && m_current_bubble != NULL){
 			m_messenger->Notify(MSG_CHILD_NODE_GET_NODE, &node);
 			btRigidBody* body = NULL;
 			m_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &body, "btrig");
@@ -127,10 +140,40 @@ void PlayerInputComponent::Normal(float dt){
 		}
 	}
 	else{
+		m_messenger->Notify(MSG_SFX2D_PLAY, &m_bubble_blow_sound);
+
 		const float SCALE = 0.001f * dt;
-		Ogre::Vector3 scale_inc(SCALE);
-		m_current_scale += SCALE;
-		if (m_bubble_type == BUBBLE_TYPE_BLUE && m_input_manager->IsButtonReleased(BTN_LEFT_MOUSE)){
+		Ogre::Vector3 scale_inc;//(SCALE);
+		if (m_current_scale < m_min_bubble_size){
+			m_current_scale += SCALE * 2;
+			scale_inc = Ogre::Vector3((SCALE * 2));
+		}
+		else if (m_current_scale >= m_min_bubble_size
+			&& m_current_scale < m_max_bubble_size){
+			m_current_scale += SCALE;
+			scale_inc = Ogre::Vector3(SCALE);
+		}
+		
+		//m_current_scale += SCALE;
+		
+		if (m_current_scale > m_max_bubble_size){
+			if (m_current_bubble != NULL)
+			{
+				m_owner->GetGameObjectManager()->RemoveGameObject(m_current_bubble);
+				m_current_bubble = NULL;
+				//insert pop sound here
+				m_current_scale = 0.0f;
+				m_is_creating_bubble = false;
+			}
+		}
+		
+		if (m_bubble_type == BUBBLE_TYPE_BLUE && m_input_manager->IsButtonReleased(BTN_LEFT_MOUSE) && m_current_bubble != NULL){
+			if (m_current_scale < m_min_bubble_size){
+				m_current_scale = m_min_bubble_size;
+				Ogre::Vector3 scale_incr(m_current_scale);
+				m_current_bubble->GetComponentMessenger()->Notify(MSG_INCREASE_SCALE_BY_VALUE, &scale_incr);
+			}
+			
 			Ogre::Vector3 gravity(0,-9.8f,0);
 			m_current_bubble->RemoveComponent(COMPONENT_POINT2POINT_CONSTRAINT);
 			m_current_bubble->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GRAVITY_SET, &gravity);
@@ -138,30 +181,41 @@ void PlayerInputComponent::Normal(float dt){
 			m_is_creating_bubble = false;
 			m_current_bubble = NULL;
 		}
-		else if (m_bubble_type == BUBBLE_TYPE_PINK && m_input_manager->IsButtonReleased(BTN_RIGHT_MOUSE)){
+		else if (m_bubble_type == BUBBLE_TYPE_PINK && m_input_manager->IsButtonReleased(BTN_RIGHT_MOUSE) && m_current_bubble != NULL){
+			if (m_current_scale < m_min_bubble_size){
+				m_current_scale = m_min_bubble_size;
+				Ogre::Vector3 scale_incr(m_current_scale);
+				m_current_bubble->GetComponentMessenger()->Notify(MSG_INCREASE_SCALE_BY_VALUE, &scale_incr);
+			}
+			
 			m_current_scale = 0.0f;
 			m_is_creating_bubble = false;
 			m_current_bubble->RemoveComponent(COMPONENT_POINT2POINT_CONSTRAINT);
 			m_current_bubble = NULL;
 		}
 
-		if (m_input_manager->IsButtonDown(BTN_LEFT_MOUSE) || m_input_manager->IsButtonDown(BTN_RIGHT_MOUSE)){
+		if (m_input_manager->IsButtonDown(BTN_LEFT_MOUSE) && m_current_bubble != NULL || m_input_manager->IsButtonDown(BTN_RIGHT_MOUSE) && m_current_bubble != NULL){
 			Ogre::SceneNode* player_node = NULL;
 			Ogre::SceneNode* child_node = NULL;
 			Ogre::SceneNode* bubble_node = NULL;
 			m_messenger->Notify(MSG_NODE_GET_NODE, &player_node);
 			m_messenger->Notify(MSG_CHILD_NODE_GET_NODE, &child_node);
 			m_current_bubble->GetComponentMessenger()->Notify(MSG_NODE_GET_NODE, &bubble_node);
-			if (child_node && bubble_node && player_node){
-				Ogre::Vector3 pos = child_node->_getDerivedPosition();
-				Ogre::Vector3 dir = pos - player_node->getPosition();
-				dir.normalise();
-				float scale_size = (bubble_node->getScale().length() * 50.0f);
-				pos += (dir*scale_size);
-				m_messenger->Notify(MSG_RIGIDBODY_POSITION_SET, &pos, "btrig");		// btrig is the ID for the TriggerCompoent
-				m_current_bubble->GetComponentMessenger()->Notify(MSG_INCREASE_SCALE_BY_VALUE, &scale_inc);
+			if (m_current_bubble != NULL)
+			{
+				if (child_node && bubble_node && player_node){
+					Ogre::Vector3 pos = child_node->_getDerivedPosition();
+					Ogre::Vector3 dir = pos - player_node->getPosition();
+					dir.normalise();
+					float scale_size = (bubble_node->getScale().length() * 50.0f);
+					pos += (dir*scale_size);
+					m_messenger->Notify(MSG_RIGIDBODY_POSITION_SET, &pos, "btrig");		// btrig is the ID for the TriggerCompoent
+					m_current_bubble->GetComponentMessenger()->Notify(MSG_INCREASE_SCALE_BY_VALUE, &scale_inc);
+				}
 			}
 		}
+
+
 	}
 
 	if (m_input_manager->IsButtonPressed(BTN_START)){
@@ -200,6 +254,7 @@ void PlayerInputComponent::OnBubble(float dt){
 	if (m_input_manager->IsButtonPressed(BTN_START)){
 		m_player_state = PLAYER_STATE_NORMAL;
 		bool jump = true;
+		m_messenger->Notify(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_SET, &jump);
 		m_messenger->Notify(MSG_CHARACTER_CONTROLLER_JUMP, &jump);
 		return;
 	}
@@ -282,6 +337,7 @@ void PlayerInputComponent::Bouncing(float dt){
 	Ogre::Vector3 acc = Ogre::Vector3::ZERO;
 	Acceleration(dir, acc, dt);
 	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &acc);
+	//m_messenger->Notify(MSG_SFX2D_PLAY, &m_bounce_sound);
 }
 
 void PlayerInputComponent::Acceleration(Ogre::Vector3& dir, Ogre::Vector3& acc, float dt){

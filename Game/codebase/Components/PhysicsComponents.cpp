@@ -177,7 +177,6 @@ void CharacterController::Shut(){
 		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_SET, this);
 		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_GET, this);
 		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_JUMP, this);
-		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_VELOCITY_SET, this);
 		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_SET, this);
 		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_GET, this);
 	}
@@ -190,7 +189,6 @@ void CharacterController::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_SET, this);
 	m_messenger->Register(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_GET, this);
 	m_messenger->Register(MSG_CHARACTER_CONTROLLER_JUMP, this);
-	m_messenger->Register(MSG_CHARACTER_CONTROLLER_VELOCITY_SET, this);
 	m_messenger->Register(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_SET, this);
 	m_messenger->Register(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_GET, this);
 }
@@ -216,6 +214,13 @@ void CharacterController::Init(const Ogre::Vector3& position, Ogre::Entity* enti
 	m_rigidbody->setAngularFactor(0);
 	m_physics_engine->GetDynamicWorld()->addRigidBody(m_rigidbody);
 	m_physics_engine->AddObjectSimulationStep(this);
+
+	m_max_velocity = 0.00005f;
+	m_velocity = 0.1f;
+	m_deacc = 0.1f;
+	m_turn_speed = 0.1f;
+	m_max_jump_height = 0.3f;
+	m_jump_pwr = 0.5f;
 }
 
 void CharacterController::SimulationStep(btScalar time_step){
@@ -471,7 +476,11 @@ void HingeConstraintComponent::Notify(int type, void* msg){
 }
 
 void HingeConstraintComponent::Shut(){
-
+	if (m_constraint){
+		m_physics_engine->GetDynamicWorld()->removeConstraint(m_constraint);
+		delete m_constraint;
+		m_constraint = NULL;
+	}
 }
 
 void HingeConstraintComponent::SetMessenger(ComponentMessenger* messenger){
