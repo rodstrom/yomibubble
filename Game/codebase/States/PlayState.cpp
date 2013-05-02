@@ -12,7 +12,7 @@ PlayState::~PlayState(void){}
 
 void PlayState::Enter(){
 	m_scene_manager = Ogre::Root::getSingleton().createSceneManager("OctreeSceneManager");
-	m_scene_manager->setDisplaySceneNodes(true);
+	//m_scene_manager->setDisplaySceneNodes(true);
 	m_physics_engine = new PhysicsEngine;
 	m_physics_engine->Init();
 	//m_physics_engine->SetDebugDraw(m_scene_manager);
@@ -72,7 +72,7 @@ void PlayState::Enter(){
 	CharControllerDef player_def;
 	player_def.friction = 1.0f;
 	player_def.velocity = 5.0f;
-	player_def.max_velocity = 1.0f;
+	player_def.max_velocity = 5.0f;
 	player_def.deacceleration = 10.0f;
 	player_def.jump_power = 300.0f;
 	player_def.restitution = 0.0f;

@@ -123,6 +123,23 @@ void RigidbodyComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_RIGIDBODY_COLLISION_FLAG_REMOVE, this);
 }
 
+class IgnoreBodyCast : public btCollisionWorld::ClosestRayResultCallback{
+public:
+	IgnoreBodyCast(btRigidBody* body) :
+		btCollisionWorld::ClosestRayResultCallback(btVector3(0,0,0), btVector3(0,0,0)),
+		m_body(body){}
+
+	btScalar AddSingleResult(btCollisionWorld::LocalRayResult& ray_result, bool normal_in_world_space){
+		if (ray_result.m_collisionObject == m_body){
+			return 1.0f;
+		}
+		return ClosestRayResultCallback::addSingleResult(ray_result, normal_in_world_space);
+	}
+
+private:
+	btRigidBody* m_body;
+};
+
 void CharacterController::Notify(int type, void* msg){
 	RigidbodyComponent::Notify(type, msg);
 	switch (type){
@@ -173,7 +190,73 @@ void CharacterController::Notify(int type, void* msg){
 }
 
 void CharacterController::Update(float dt){
-	// remove?
+	btVector3 vel = m_rigidbody->getLinearVelocity();
+	float speed = m_velocity * dt;
+	float jump_strength = 0.0f;
+	m_is_moving = false;
+	if (m_direction.x != 0.0f || m_direction.z != 0.0f){
+		m_is_moving = true;
+	}
+	
+	if (m_on_ground){
+		if (m_has_follow_cam){
+		Ogre::SceneNode* node = NULL;
+		m_messenger->Notify(MSG_NODE_GET_NODE, &node);
+			if (node){
+				Ogre::Vector3 goal_dir = m_direction;
+				m_messenger->Notify(MSG_FOLLOW_CAMERA_GET_ORIENTATION, &goal_dir);
+				if (!m_is_jumping){
+					Ogre::Quaternion goal = node->getOrientation().zAxis().getRotationTo(goal_dir);
+					Ogre::Real yaw_to_goal = goal.getYaw().valueDegrees();
+					Ogre::Real yaw_at_speed = yaw_to_goal / Ogre::Math::Abs(yaw_to_goal) * dt * m_turn_speed;
+
+					if (yaw_to_goal < 0) yaw_to_goal = std::min<Ogre::Real>(0, std::max<Ogre::Real>(yaw_to_goal, yaw_at_speed));
+					else if (yaw_to_goal > 0) yaw_to_goal = std::max<Ogre::Real>(0, std::min<Ogre::Real>(yaw_to_goal, yaw_at_speed));
+					node->yaw(Ogre::Degree(yaw_to_goal));
+				}
+				m_rigidbody->applyCentralImpulse(btVector3(goal_dir.x * speed, 0.0f, goal_dir.z * speed));
+			}
+		}
+		else{
+			Ogre::SceneNode* node = NULL;
+			m_messenger->Notify(MSG_NODE_GET_NODE, &node);
+			if (node){
+				m_direction.y = 0.0f;
+				m_direction.normalise();
+				Ogre::Quaternion goal = node->getOrientation().zAxis().getRotationTo(m_direction);
+				Ogre::Real yaw_to_goal = goal.getYaw().valueDegrees();
+				Ogre::Real yaw_at_speed = yaw_to_goal / Ogre::Math::Abs(yaw_to_goal) * dt * m_turn_speed;
+
+				if (yaw_to_goal < 0) yaw_to_goal = std::min<Ogre::Real>(0, std::max<Ogre::Real>(yaw_to_goal, yaw_at_speed));
+				else if (yaw_to_goal > 0) yaw_to_goal = std::max<Ogre::Real>(0, std::min<Ogre::Real>(yaw_to_goal, yaw_at_speed));
+				node->yaw(Ogre::Degree(yaw_to_goal));
+				m_rigidbody->applyCentralImpulse(btVector3(m_direction.x * speed, 0.0f, m_direction.z * speed));
+			}
+		}
+	}
+	else{
+		if (!m_has_follow_cam){
+			m_rigidbody->applyCentralImpulse(btVector3(m_direction.x * speed, 0.0f, m_direction.z * speed));
+		}
+		else {
+			Ogre::SceneNode* node = NULL;
+			m_messenger->Notify(MSG_NODE_GET_NODE, &node);
+			if (node){
+				Ogre::Vector3 goal_dir = m_direction;
+				m_messenger->Notify(MSG_FOLLOW_CAMERA_GET_ORIENTATION, &goal_dir);
+				m_rigidbody->applyCentralImpulse(btVector3(goal_dir.x * speed, 0.0f, goal_dir.z * speed));
+			}
+		}
+	}
+	if (m_is_jumping){
+		float y_pos = m_rigidbody->getWorldTransform().getOrigin().y();
+		if ((y_pos - m_start_y_pos) >= m_max_jump_height){
+			m_is_jumping = false;
+		}
+		float jump_strength = m_jump_pwr * dt;
+		vel = m_rigidbody->getLinearVelocity();
+		m_rigidbody->setLinearVelocity(btVector3(vel.x(), jump_strength, vel.z()));
+	}
 }
 
 void CharacterController::Shut(){
@@ -225,84 +308,11 @@ void CharacterController::Init(const Ogre::Vector3& position, Ogre::Entity* enti
 }
 
 void CharacterController::SimulationStep(btScalar time_step){
-	float dt = (float)time_step;
-	btVector3 vel = m_rigidbody->getLinearVelocity();
-	float jump_strength = 0.0f;
-	if (m_direction.x != 0.0f || m_direction.z != 0.0f){
-		m_is_moving = true;
-	}
-	else{
-		m_is_moving = false;
-	}
-	
-	if (m_on_ground){
-		//Ogre::Vector3 dir = m_direction;
-		if (m_has_follow_cam){
-		Ogre::SceneNode* node = NULL;
-		Ogre::SceneNode* camera_node = NULL;
-		m_messenger->Notify(MSG_NODE_GET_NODE, &node);
-		m_messenger->Notify(MSG_CAMERA_GET_CAMERA_NODE, &camera_node);
-			if (node && camera_node){
-				Ogre::Vector3 goal_dir = Ogre::Vector3::ZERO;
-				goal_dir += m_direction.z * camera_node->getOrientation().zAxis();
-				goal_dir += m_direction.x * camera_node->getOrientation().xAxis();
-				goal_dir.y = 0.0f;
-				//goal_dir.normalise();
-				if (!m_is_jumping){
-					Ogre::Quaternion goal = node->getOrientation().zAxis().getRotationTo(goal_dir);
-					Ogre::Real yaw_to_goal = goal.getYaw().valueDegrees();
-					Ogre::Real yaw_at_speed = yaw_to_goal / Ogre::Math::Abs(yaw_to_goal) * dt * m_turn_speed;
-
-					if (yaw_to_goal < 0) yaw_to_goal = std::min<Ogre::Real>(0, std::max<Ogre::Real>(yaw_to_goal, yaw_at_speed));
-					else if (yaw_to_goal > 0) yaw_to_goal = std::max<Ogre::Real>(0, std::min<Ogre::Real>(yaw_to_goal, yaw_at_speed));
-					node->yaw(Ogre::Degree(yaw_to_goal));
-				}
-				m_rigidbody->setLinearVelocity(btVector3(goal_dir.x, vel.y(), goal_dir.z));
-			}
-		}
-		else{
-			Ogre::SceneNode* node = NULL;
-			m_messenger->Notify(MSG_NODE_GET_NODE, &node);
-			if (node){
-				m_direction.y = 0.0f;
-				m_direction.normalise();
-				Ogre::Quaternion goal = node->getOrientation().zAxis().getRotationTo(m_direction);
-				Ogre::Real yaw_to_goal = goal.getYaw().valueDegrees();
-				Ogre::Real yaw_at_speed = yaw_to_goal / Ogre::Math::Abs(yaw_to_goal) * dt * m_turn_speed;
-
-				if (yaw_to_goal < 0) yaw_to_goal = std::min<Ogre::Real>(0, std::max<Ogre::Real>(yaw_to_goal, yaw_at_speed));
-				else if (yaw_to_goal > 0) yaw_to_goal = std::max<Ogre::Real>(0, std::min<Ogre::Real>(yaw_to_goal, yaw_at_speed));
-				node->yaw(Ogre::Degree(yaw_to_goal));
-				m_rigidbody->setLinearVelocity(btVector3(m_direction.x, vel.y(), m_direction.z));
-			}
-		}
-	}
-	else{
-		if (!m_has_follow_cam){
-			m_rigidbody->setLinearVelocity(btVector3(m_direction.x, vel.y(), m_direction.z));
-		}
-		else {
-			Ogre::SceneNode* node = NULL;
-			Ogre::SceneNode* camera_node = NULL;
-			m_messenger->Notify(MSG_NODE_GET_NODE, &node);
-			m_messenger->Notify(MSG_CAMERA_GET_CAMERA_NODE, &camera_node);
-			if (node && camera_node){
-				Ogre::Vector3 goal_dir = Ogre::Vector3::ZERO;
-				goal_dir += m_direction.z * camera_node->getOrientation().zAxis();
-				goal_dir += m_direction.x * camera_node->getOrientation().xAxis();
-				goal_dir.y = 0.0f;
-				m_rigidbody->setLinearVelocity(btVector3(goal_dir.x, vel.y(), goal_dir.z));
-			}
-		}
-	}
-	if (m_is_jumping){
-		float y_pos = m_rigidbody->getWorldTransform().getOrigin().y();
-		if ((y_pos - m_start_y_pos) >= m_max_jump_height){
-			m_is_jumping = false;
-		}
-		float jump_strength = m_jump_pwr * dt;
-		vel = m_rigidbody->getLinearVelocity();
-		m_rigidbody->setLinearVelocity(btVector3(vel.x(), jump_strength, vel.z()));
+	Ogre::Vector2 velXZ(m_rigidbody->getLinearVelocity().x(), m_rigidbody->getLinearVelocity().z());
+	btScalar speedXZ = velXZ.length();
+	if (speedXZ > m_max_speed){
+		velXZ = velXZ / speedXZ * m_max_speed;
+		m_rigidbody->setLinearVelocity(btVector3(velXZ.x, m_rigidbody->getLinearVelocity().y(), velXZ.y));
 	}
 }
 

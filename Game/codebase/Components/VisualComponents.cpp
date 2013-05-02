@@ -529,6 +529,8 @@ void TerrainComponent::Init(Ogre::SceneManager* scene_manager, PhysicsEngine* ph
 		);
 
 	m_terrain_body->setCollisionFlags(m_terrain_body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
+	m_terrain_body->setFriction(1.0f);
+	m_terrain_body->setRestitution(0.2f);
 	m_physics_engine->GetDynamicWorld()->addRigidBody(m_terrain_body);
 	m_collision_def.flag |= COLLISION_FLAG_GAME_OBJECT;
 	m_collision_def.data = m_owner;

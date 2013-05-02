@@ -145,7 +145,7 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	contr->SetVelocity(def.velocity);
 	contr->SetJumpPower(def.jump_power);
 	contr->HasFollowCam(true);
-	contr->SetMaxVelocity(def.max_velocity);
+	contr->SetMaxSpeed(def.max_velocity);
 	contr->SetDeacceleration(def.deacceleration);
 	contr->SetMaxJumpHeight(def.max_jump_height);
 	contr->SetId("body");

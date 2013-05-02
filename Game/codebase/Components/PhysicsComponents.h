@@ -42,7 +42,7 @@ class CharacterController : public RigidbodyComponent, public IComponentUpdateab
 public:
 	CharacterController(void) : m_velocity(0.0), m_turn_speed(0.0f), 
 		m_has_follow_cam(false), m_is_jumping(false), m_on_ground(true), m_start_y_pos(0.0f),
-		m_max_jump_height(0.0f), m_direction(btVector3(0,0,0)), m_deacc(0.0f), m_max_velocity(0.0f), m_acc_x(0.0f), m_acc_z(0.0f)
+		m_max_jump_height(0.0f), m_direction(btVector3(0,0,0)), m_deacc(0.0f), m_max_speed(0.0f), m_acc_x(0.0f), m_acc_z(0.0f)
 	{ m_type = COMPONENT_CHARACTER_CONTROLLER; m_update = true; }
 	virtual ~CharacterController(void){}
 	virtual void Notify(int type, void* msg);
@@ -56,7 +56,7 @@ public:
 	void HasFollowCam(bool value) { m_has_follow_cam = value; }
 	void SetMaxJumpHeight(float value) { m_max_jump_height = value; }
 	void SetJumpPower(float value) { m_jump_pwr = value; }
-	void SetMaxVelocity(float value) { m_max_velocity = value; }
+	void SetMaxSpeed(float value) { m_max_speed = value; }
 	void SetDeacceleration(float value) { m_deacc = value; }
 	void SetRaycastLength(float value) { m_ray_length = value; }
 
@@ -65,7 +65,7 @@ protected:
 
 	Ogre::Vector3	m_direction;
 
-	float		m_max_velocity;
+	float		m_max_speed;
 	float		m_velocity;
 	float		m_deacc;
 	float		m_turn_speed;
