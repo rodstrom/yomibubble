@@ -44,11 +44,11 @@ void PlayState::Enter(){
 	float x = 180.0f;
 	float y = 90.0f;
 	float z = 230.0f;
-
+	/*
 	ParticleDef particleDef;
 	particleDef.particle_name = "Particle/Smoke";
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(x+5,y-10,z), &particleDef);	
-	
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(178+5,72,240), &particleDef);	
+	*/
 	//m_cam_node->attachObject(m_camera);
 	//Ogre::SceneNode* node = m_scene_manager->getSceneNode("camNode");
 	/*mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_camera, "../../resources/terrain/");
@@ -62,13 +62,14 @@ void PlayState::Enter(){
 
 	//mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, m_camera, m_scene_manager->getSceneNode(""), m_game_object_manager, m_sound_manager, "../../resources/terrain/");
 	//mArtifexLoader->loadZone("try");
-
+	/*
 	PlaneDef plane_def;
 	plane_def.material_name = "Examples/BeachStones";
 	plane_def.plane_name = "plane";
 	plane_def.friction = 1.0f;
 	plane_def.restitution = 0.8f;
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(x,y - 2.0f,z), &plane_def);
+	*/
 	//0.35f, 1000.0f, 500.0f, 10.0f, 
 	/*TriggerDef trigger_def;
 	trigger_def.body_type = DYNAMIC_BODY;
@@ -101,7 +102,7 @@ void PlayState::Enter(){
 	trigger_def.y = 2.0f;
 	trigger_def.z = 2.0f;
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_TRIGGER_TEST, Ogre::Vector3(x + 2.0f, y - 10.0f ,z + 2.0f), &trigger_def);*/
-	Ogre::String terrain = "Dayarea";
+	Ogre::String terrain = "NightArea";
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_TERRAIN, Ogre::Vector3(0,0,0), &terrain);
 
 	CharControllerDef player_def;
@@ -132,7 +133,18 @@ void PlayState::Enter(){
 		player_pos = Ogre::Vector3(230, 72, 298);
 	}
 	else if (terrain == "Dayarea"){
-		player_pos = Ogre::Vector3(178, 72, 232);
+		player_pos = Ogre::Vector3(170, 75, 173);
+		/*
+		ParticleDef particleDef;
+		particleDef.particle_name = "Particle/Smoke";
+		m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(170,72,288), &particleDef);	
+		m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(179,72,240), &particleDef);	
+		m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(178+5,72,240), &particleDef);	
+		m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(178+5,72,240), &particleDef);	
+		m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(178+5,72,240), &particleDef);	
+		m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(178+5,72,240), &particleDef);	
+		m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(178+5,72,240), &particleDef);	
+		*/
 	}
 	else if (terrain == "try"){
 		player_pos = Ogre::Vector3(230, 72, 298);

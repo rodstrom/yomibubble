@@ -59,8 +59,8 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 	m_states[PLAYER_STATE_INSIDE_BUBBLE] =	&PlayerInputComponent::InsideBubble;
 	m_states[PLAYER_STATE_BOUNCING] =		&PlayerInputComponent::Bouncing;
 
-	m_min_bubble_size = 0.005f;
-	m_max_bubble_size = 0.007f;
+	m_min_bubble_size = 0.805f;
+	m_max_bubble_size = 1.907f;
 
 	m_velocity = 0.0000001f;
 	m_deacc = 0.002f;
@@ -98,7 +98,7 @@ void PlayerInputComponent::Normal(float dt){
 		m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
 		
 
-		//std::cout << "Yomi pos: " << dynamic_cast<NodeComponent*>(m_owner->GetComponent(COMPONENT_NODE))->GetSceneNode()->getPosition() << std::endl;
+		std::cout << "Yomi pos: " << dynamic_cast<NodeComponent*>(m_owner->GetComponent(COMPONENT_NODE))->GetSceneNode()->getPosition() << std::endl;
 		
 	}
 	else
@@ -152,7 +152,7 @@ void PlayerInputComponent::Normal(float dt){
 	else{
 		m_messenger->Notify(MSG_SFX2D_PLAY, &m_bubble_blow_sound);
 
-		const float SCALE = 0.001f * dt;
+		const float SCALE = 0.91f * dt;
 		Ogre::Vector3 scale_inc;//(SCALE);
 		if (m_current_scale < m_min_bubble_size){
 			m_current_scale += SCALE * 2;
@@ -217,15 +217,13 @@ void PlayerInputComponent::Normal(float dt){
 					Ogre::Vector3 pos = child_node->_getDerivedPosition();
 					Ogre::Vector3 dir = pos - player_node->getPosition();
 					dir.normalise();
-					float scale_size = (bubble_node->getScale().length() * 50.0f);
+					float scale_size = (bubble_node->getScale().length() * 0.5f);
 					pos += (dir*scale_size);
 					m_messenger->Notify(MSG_RIGIDBODY_POSITION_SET, &pos, "btrig");		// btrig is the ID for the TriggerCompoent
 					m_current_bubble->GetComponentMessenger()->Notify(MSG_INCREASE_SCALE_BY_VALUE, &scale_inc);
 				}
 			}
 		}
-
-
 	}
 
 	if (m_input_manager->IsButtonPressed(BTN_START)){

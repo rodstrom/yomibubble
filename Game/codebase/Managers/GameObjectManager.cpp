@@ -206,15 +206,16 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 	go->AddComponent(bc);
 	go->AddUpdateable(bc);
 
-
+	
 	//Point2PointConstraintComponent* cons = new Point2PointConstraintComponent;
 	//go->AddComponent(cons);
-	bc->Init(m_physics_engine, 10.0f, 20.0f);
+	bc->Init(m_physics_engine, 0.1f, 0.2f);
 	node_comp->Init(position, m_scene_manager);
-	mrc->Init("sphere.mesh", m_scene_manager);
-	Ogre::Vector3 scale(def.start_scale);
+	mrc->Init("BlueBubble.mesh", m_scene_manager);
+	//Ogre::Vector3 scale(def.start_scale);
+	Ogre::Vector3 scale(0.1f);
 	node_comp->GetSceneNode()->setScale(scale);
-	mrc->GetEntity()->setMaterialName("Examples/BlueBubble");
+	mrc->GetEntity()->setMaterialName("BlueBubble");
 	rc->Init(position,  mrc->GetEntity(), m_physics_engine, 1.0f, COLLIDER_SPHERE, DYNAMIC_BODY);
 	rc->GetRigidbody()->setGravity(btVector3(0.0f, 0.0f, 0.0f));
 	rc->GetRigidbody()->setRestitution(def.restitution);
@@ -242,10 +243,10 @@ GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, v
 
 	bc->Init(m_physics_engine, 10.0f, 50.0f);
 	node_comp->Init(position, m_scene_manager);
-	mrc->Init("sphere.mesh", m_scene_manager);
+	mrc->Init("PinkBubble.mesh", m_scene_manager);
 	Ogre::Vector3 scale(def.start_scale);
 	node_comp->GetSceneNode()->setScale(scale);
-	mrc->GetEntity()->setMaterialName("Examples/PinkBubble");
+	mrc->GetEntity()->setMaterialName("PinkBubble");
 	rc->Init(position,  mrc->GetEntity(), m_physics_engine, 1.0f, COLLIDER_SPHERE, DYNAMIC_BODY);
 	rc->GetRigidbody()->setGravity(btVector3(0.0f, 0.0f, 0.0f));
 	rc->GetRigidbody()->setLinearFactor(btVector3(1,0,1));
