@@ -218,4 +218,15 @@ struct PlayerInputDef{
 
 };
 
+struct DynamicCharacterControllerDef{
+	float step_height;
+	float radius;
+	float height;
+	float jump_impulse;
+	float deceleration;
+	float max_speed;
+	float jump_recharge_time;
+	float mass;
+};
+
 #endif // _N_COMPONENTS_PREREQ_H_

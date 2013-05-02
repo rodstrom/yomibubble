@@ -18,14 +18,16 @@ THE SOFTWARE.
 
 #include "ArtifexLoader.h"
 class ArtifexLoader;
+class PhysicsEngine;
 
 #include "CppSQLite3.h"
 
 class DBManager {
 public:
-	DBManager(ArtifexLoader *artifexloader);
+	DBManager(ArtifexLoader *artifexloader, PhysicsEngine* physicsengine);
 	~DBManager();
 
+	PhysicsEngine* mPhysicsEngine;
 	ArtifexLoader *mArtifexLoader;
 	CppSQLite3DB *mDB;
 
@@ -46,5 +48,11 @@ public:
 
 	bool saving;
 
+protected:
+	void Shut();
+	std::vector<btRigidBody*> m_bodies;
+	std::vector<btMotionState*> m_motion_states;
+	std::vector<btCollisionShape*> m_shapes;
+	std::vector<struct CollisionDef*> m_collision_defs;
 };
 #endif

@@ -1,6 +1,7 @@
 #ifndef _N_VISUAL_COMPONENTS_H_
 #define _N_VISUAL_COMPONENTS_H_
 
+#include "GameObjectPrereq.h"
 #include "ComponentsPrereq.h"
 #include "..\AnimationBlender.h"
 #include "..\Artifex\Loader\ArtifexLoader.h"
@@ -185,7 +186,7 @@ class PhysicsEngine;
 class TerrainComponent : public Component, public IComponentObserver{
 public:
 	TerrainComponent(void) : m_scene_manager(NULL), m_physics_engine(NULL), m_artifex_loader(NULL), m_terrain_shape(NULL), 
-		m_terrain_body(NULL), m_terrain_motion_state(NULL){}
+		m_terrain_body(NULL), m_terrain_motion_state(NULL), m_data_converter(NULL){}
 	virtual ~TerrainComponent(void){}
 
 	virtual void Notify(int type, void* message);
@@ -194,12 +195,14 @@ public:
 	void Init(Ogre::SceneManager* scene_manager, PhysicsEngine* physics_engine, const Ogre::String& filename);
 
 protected:
+	float*							m_data_converter;
 	Ogre::SceneManager*				m_scene_manager;
 	PhysicsEngine*					m_physics_engine;
 	ArtifexLoader*					m_artifex_loader;
 	btHeightfieldTerrainShape*		m_terrain_shape;
 	btRigidBody*					m_terrain_body;
 	btDefaultMotionState*			m_terrain_motion_state;
+	CollisionDef					m_collision_def;
 };
 
 #endif // _N_VISUAL_COMPONENTS_H_

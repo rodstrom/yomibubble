@@ -44,17 +44,6 @@ void GameObjectManager::Update(float dt){
 	}
 }
 
-void GameObjectManager::LateUpdate(float dt){
-	if (!m_late_update_objects.empty()){
-		std::list<GameObject*>::iterator it;
-		GameObject* go = NULL;
-		for (it = m_late_update_objects.begin(); it != m_late_update_objects.end(); it++){
-			go = *it;
-			go->LateUpdate(dt);
-		}
-	}
-}
-
 void GameObjectManager::RemoveGameObject(GameObject* gameobject){
 	if (gameobject->DoUpdate()){
 		m_updateable_game_objects.remove(gameobject);
@@ -68,9 +57,6 @@ void GameObjectManager::RemoveGameObject(GameObject* gameobject){
 void GameObjectManager::AddGameObject(GameObject* gameobject){
 	if (gameobject->DoUpdate()){
 		m_updateable_game_objects.push_back(gameobject);
-	}
-	if (gameobject->DoLateUpdate()){
-		m_late_update_objects.push_back(gameobject);
 	}
 	m_game_objects.push_back(gameobject);
 }
@@ -106,6 +92,7 @@ void GameObjectManager::Shut(){
 
 GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void* data){
 	CharControllerDef& def = *static_cast<CharControllerDef*>(data);
+	//DynamicCharacterControllerDef& def = *static_cast<DynamicCharacterControllerDef*>(data);
 	GameObject* go = new GameObject(GAME_OBJECT_PLAYER);
 	NodeComponent* node_comp = new NodeComponent;
 	go->AddComponent(node_comp);
@@ -116,7 +103,9 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	CharacterController* contr = new CharacterController;
 	go->AddComponent(contr);
 	go->AddUpdateable(contr);
-	//go->AddLateUpdate(contr);
+	/*DynamicCharacterController* dcc = new DynamicCharacterController;
+	go->AddComponent(dcc);
+	go->AddUpdateable(dcc);*/
 	FollowCameraComponent* fcc = new FollowCameraComponent;
 	go->AddComponent(fcc);
 	go->AddUpdateable(fcc);
@@ -164,9 +153,12 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	contr->GetRigidbody()->setRestitution(def.restitution);
 	contr->SetRaycastLength(5.0f);
 	contr->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
+	//dcc->Init(position, m_physics_engine, def);
+	//dcc->GetRigidbody()->getWorldTransform().setOrigin(BtOgre::Convert::toBullet(position));
+	//dcc->GetGhostObject()->getWorldTransform().setOrigin(BtOgre::Convert::toBullet(position));
 	pccomp->Init(m_input_manager, m_sound_manager);
 	pccomp->SetMaxVelocity(def.max_velocity);
-	pccomp->SetVelocity(def.velocity);
+	pccomp->SetVelocity(1.0f);
 	pccomp->SetDeacceleration(def.deacceleration);
 	sound2D->Init(m_sound_manager);
 	sound3D->Init(m_sound_manager);
@@ -372,6 +364,6 @@ GameObject* GameObjectManager::CreateTerrain(const Ogre::Vector3& position, void
 	TerrainComponent* tc = new TerrainComponent;
 	go->AddComponent(tc);
 
-	tc->Init(m_scene_manager, m_physics_engine, "try");
+	tc->Init(m_scene_manager, m_physics_engine, *static_cast<Ogre::String*>(data));
 	return go;
 }

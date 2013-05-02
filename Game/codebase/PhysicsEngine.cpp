@@ -97,7 +97,7 @@ void PhysicsEngine::Step(float dt){
 	if (m_debug_drawer){
 		m_debug_drawer->step();
 	}
-	RaycastQuery();
+	//RaycastQuery();
 }
 
 void PhysicsEngine::CreateTerrainCollision(Ogre::Terrain* terrain){
@@ -161,7 +161,7 @@ void PhysicsEngine::RaycastQuery(){
 			}
 			btCollisionWorld::AllHitsRayResultCallback re(from,to);
 			m_dynamic_world->rayTest(from, to, re);
-			for (unsigned int i = 0; i < re.m_collisionObjects.size(); i++){
+			for (int i = 0; i < re.m_collisionObjects.size(); i++){
 				CollisionManager::GetSingletonPtr()->ProcessRaycast(def.collision_object, re.m_collisionObjects[i]);
 			}
 		}

@@ -12,14 +12,14 @@ PlayState::~PlayState(void){}
 
 void PlayState::Enter(){
 	m_scene_manager = Ogre::Root::getSingleton().createSceneManager("OctreeSceneManager");
-	//m_scene_manager->setDisplaySceneNodes(true);
+	m_scene_manager->setDisplaySceneNodes(true);
 	m_physics_engine = new PhysicsEngine;
 	m_physics_engine->Init();
 	//m_physics_engine->SetDebugDraw(m_scene_manager);
 	m_camera = m_scene_manager->createCamera("MainCamera");
 	//m_camera->setPosition(Ogre::Vector3(500,500,500));
 	//m_camera->lookAt(Ogre::Vector3(0,0,0));
-	m_camera->setNearClipDistance(0.1);
+	m_camera->setNearClipDistance(0.1f);
 	m_viewport = m_render_window->addViewport(m_camera);
 	m_viewport->setBackgroundColour(Ogre::ColourValue(0.0,0.0,1.0));
 	m_camera->setAspectRatio(Ogre::Real(m_viewport->getActualWidth()) / Ogre::Real(m_viewport->getActualHeight()));
@@ -79,6 +79,15 @@ void PlayState::Enter(){
 	player_def.step_height = 0.35f;
 	player_def.turn_speed = 1000.0f;
 	player_def.max_jump_height = 10.0f;
+	/*DynamicCharacterControllerDef player_def;
+	player_def.deceleration = 1.0f;
+	player_def.height = 1.0f;
+	player_def.jump_impulse = 10.0f;
+	player_def.jump_recharge_time = 2.0f;
+	player_def.mass = 1.0f;
+	player_def.max_speed = 2.0f;
+	player_def.radius = 0.5f;
+	player_def.step_height = 0.35f;*/
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(x,y+1.0f,z), &player_def);
 	
 	CharControllerDef tott_def;
@@ -86,12 +95,12 @@ void PlayState::Enter(){
 	tott_def.velocity = 500.0f;
 	tott_def.jump_power = 200.0f;
 	tott_def.restitution = 0.0f;
-	tott_def.step_height = 0.35f;
+	tott_def.step_height = 2.35f;
 	tott_def.turn_speed = 1000.0f;
 	tott_def.max_jump_height = 10.0f;
 
-	m_physics_engine->ShowDebugDraw(true);
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y+1.0f,z+3.0f), &tott_def);
+	//m_physics_engine->ShowDebugDraw(true);
+	//m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y+1.0f,z+3.0f), &tott_def);
 	//m_physics_engine->CreateTerrainCollision(mArtifexLoader->mTerrain);
 	//m_scene_manager->setSkyDome(true, "Examples/CloudySky");
 	
@@ -102,7 +111,8 @@ void PlayState::Enter(){
 	trigger_def.y = 2.0f;
 	trigger_def.z = 2.0f;
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_TRIGGER_TEST, Ogre::Vector3(x + 2.0f, y - 10.0f ,z + 2.0f), &trigger_def);*/
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_TERRAIN, Ogre::Vector3(0,0,0), NULL);
+	Ogre::String terrain = "try";
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_TERRAIN, Ogre::Vector3(0,0,0), &terrain);
 }
 
 
@@ -129,7 +139,6 @@ bool PlayState::Update(float dt){
 	m_sound_manager->Update(m_camera, m_scene_manager, dt);
 	m_game_object_manager->Update(dt);
 	m_physics_engine->Step(dt);
-	m_game_object_manager->LateUpdate(dt);
 	if (m_input_manager->IsButtonPressed(BTN_BACK)){
 		return false;
 	}
