@@ -127,8 +127,10 @@ int DBManager::Load() {
 					body->setWorldTransform(transform);
 					CollisionDef* collision_def = new CollisionDef;
 					collision_def->data = NULL;
-					collision_def->flag |= COLLISION_FLAG_STATIC;
+					collision_def->flag = COLLISION_FLAG_STATIC;
 					body->setUserPointer(collision_def);
+					body->setRestitution(1.0f);
+					body->setFriction(1.0f);
 					m_collision_defs.push_back(collision_def);
 					mPhysicsEngine->GetDynamicWorld()->addRigidBody(body);
 

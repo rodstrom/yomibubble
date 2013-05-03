@@ -92,7 +92,6 @@ void GameObjectManager::Shut(){
 
 GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void* data){
 	CharacterControllerDef& def = *static_cast<CharacterControllerDef*>(data);
-	//DynamicCharacterControllerDef& def = *static_cast<DynamicCharacterControllerDef*>(data);
 	GameObject* go = new GameObject(GAME_OBJECT_PLAYER);
 	NodeComponent* node_comp = new NodeComponent;
 	go->AddComponent(node_comp);
@@ -103,9 +102,6 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	CharacterController* contr = new CharacterController;
 	go->AddComponent(contr);
 	go->AddUpdateable(contr);
-	/*DynamicCharacterController* dcc = new DynamicCharacterController;
-	go->AddComponent(dcc);
-	go->AddUpdateable(dcc);*/
 	FollowCameraComponent* fcc = new FollowCameraComponent;
 	go->AddComponent(fcc);
 	go->AddUpdateable(fcc);
@@ -122,12 +118,12 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	go->AddComponent(music2D);
 	Music3DComponent* music3D = new Music3DComponent;
 	go->AddComponent(music3D);
-	RaycastComponent* raycast = new RaycastComponent;
-	go->AddComponent(raycast);
 	CountableResourceGUI* gui = new CountableResourceGUI;
 	go->AddComponent(gui);
 	TriggerComponent* tc = new TriggerComponent;
 	go->AddComponent(tc);
+	PlayerRaycastCollisionComponent* prcc = new PlayerRaycastCollisionComponent;
+	go->AddComponent(prcc);
 
 	node_comp->Init(position, m_scene_manager);
 	node_comp->SetId("player_node");
@@ -141,21 +137,9 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	tc->Init(position, m_physics_engine, &tdef);
 	tc->SetId("btrig");
 	contr->Init(position, m_physics_engine, def);
-	//contr->SetTurnSpeed(def.turn_speed);
-	//contr->SetVelocity(def.velocity);
-	//contr->SetJumpPower(def.jump_power);
 	contr->HasFollowCam(true);
-	//contr->SetMaxSpeed(def.max_speed);
-	//contr->SetDeacceleration(def.deceleration);
-	//contr->SetMaxJumpHeight(def.max_jump_height);
 	contr->SetId("body");
-	//contr->GetRigidbody()->setFriction(def.friction);
-	//contr->GetRigidbody()->setRestitution(def.restitution);
-	//contr->SetRaycastLength(5.0f);
 	contr->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
-	//dcc->Init(position, m_physics_engine, def);
-	//dcc->GetRigidbody()->getWorldTransform().setOrigin(BtOgre::Convert::toBullet(position));
-	//dcc->GetGhostObject()->getWorldTransform().setOrigin(BtOgre::Convert::toBullet(position));
 	pccomp->Init(m_input_manager, m_sound_manager);
 	pccomp->SetMaxVelocity(def.max_speed);
 	pccomp->SetVelocity(1.0f);
@@ -169,9 +153,7 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	fcc->GetCamera()->setNearClipDistance(0.1f);
 	csnc->Init(Ogre::Vector3(0.0f, 0.0f, 1.0f), "CreateBubble", node_comp->GetSceneNode());
 	m_sound_manager->GetYomiNode(node_comp->GetSceneNode()->getName());
-	raycast->Init(m_physics_engine, contr->GetRigidbody(), "body");
-	raycast->SetLength(Ogre::Vector3(0.0f,-1.0f,0.0f));
-	raycast->SetAttached(true);
+	prcc->Init(m_physics_engine);
 
 	return go;
 }
@@ -191,8 +173,6 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 	Point2PointConstraintComponent* cons = new Point2PointConstraintComponent;
 	go->AddComponent(cons);
 
-	//Point2PointConstraintComponent* cons = new Point2PointConstraintComponent;
-	//go->AddComponent(cons);
 	bc->Init(m_physics_engine, 50.0f, 100.0f);
 	node_comp->Init(position, m_scene_manager);
 	mrc->Init("sphere.mesh", m_scene_manager);
@@ -204,6 +184,8 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 	rc->GetRigidbody()->setRestitution(def.restitution);
 	rc->GetRigidbody()->setFriction(def.friction);
 	rc->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
+	rc->GetRigidbody()->setGravity(btVector3(0.0f, 0.0f, 0.0f));
+	rc->GetRigidbody()->setRollingFriction(0.9f);
 	rc->GetRigidbody()->setActivationState(DISABLE_DEACTIVATION);
 	cons->Init(m_physics_engine,rc->GetRigidbody(), def.connection_body, btVector3(0,0,0), btVector3(0,0,0));
 	return go;
@@ -232,7 +214,7 @@ GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, v
 	mrc->GetEntity()->setMaterialName("Examples/PinkBubble");
 	rc->Init(position,  mrc->GetEntity(), m_physics_engine, 1.0f, COLLIDER_SPHERE, DYNAMIC_BODY);
 	rc->GetRigidbody()->setGravity(btVector3(0.0f, 0.0f, 0.0f));
-	rc->GetRigidbody()->setLinearFactor(btVector3(1,0,1));
+	//rc->GetRigidbody()->setLinearFactor(btVector3(1,0,1));
 	rc->GetRigidbody()->setRestitution(def.restitution);
 	rc->GetRigidbody()->setFriction(def.friction);
 	rc->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
@@ -290,6 +272,7 @@ GameObject* GameObjectManager::CreatePlane(const Ogre::Vector3& position, void* 
 	rc->Init(position, mrc->GetEntity(), m_physics_engine, 0.0f, COLLIDER_TRIANGLE_MESH_SHAPE, STATIC_BODY);
 	rc->GetRigidbody()->setRestitution(plane_def.restitution);
 	rc->GetRigidbody()->setFriction(plane_def.friction);
+	rc->GetCollisionDef().flag = COLLISION_FLAG_STATIC;
 	//mrc->GetSceneNode()->setPosition(BtOgre::Convert::toOgre(rc->GetRigidbody()->getWorldTransform().getOrigin()));
 
 	return go;

@@ -15,6 +15,7 @@ public:
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
 	btRigidBody* GetRigidbody() { return m_rigidbody; }
+	CollisionDef& GetCollisionDef() { return m_collision_def; }
 
 protected:
 	btRigidBody*			m_rigidbody;
@@ -150,58 +151,32 @@ protected:
 	PhysicsEngine* m_physics_engine;
 };
 
-class DynamicCharacterController : public Component, public IComponentObserver, public IComponentUpdateable {
+class RaycastCollisionComponent : public Component, public IComponentObserver{
 public:
-	DynamicCharacterController(void) : m_on_ground(false), m_hitting_wall(false), m_bottom_y_offset(0.0f), m_bottom_rounded_region_y_offset(0.0f),
-		m_step_height(0.0f), m_jump_recharge_time(0.0f), m_jump_recharge_timer(0.0f), m_deceleration(0.0f), m_max_speed(0.0f), m_jump_impulse(0.0f),
-		m_manual_velocity(Ogre::Vector3::ZERO), m_collision_shape(NULL), m_motion_state(NULL), m_body(NULL), m_ghost_object(NULL), 
-		m_previous_position(Ogre::Vector3::ZERO){}
-	virtual ~DynamicCharacterController(void){}
+	RaycastCollisionComponent(void) : m_physics_engine(NULL){}
+	virtual ~RaycastCollisionComponent(void){}
 
-	virtual void Notify(int type, void* msg);
-	virtual void Shut();
-	virtual void SetMessenger(ComponentMessenger* messenger);
-	virtual void Init(const Ogre::Vector3& pos, PhysicsEngine* physics_engine, const DynamicCharacterControllerDef& def);
-	void Update(float dt);
-	void Jump();
-
-	void Move(const Ogre::Vector3& direction);
-	void Move(const Ogre::Vector2& direction);
-
-	bool IsOnGround() const;
-
-	btRigidBody* GetRigidbody() const { return m_body; }
-	btPairCachingGhostObject* GetGhostObject() const { return m_ghost_object; }
+	virtual void Notify(int type, void* msg){}
+	virtual void Shut(){}
+	virtual void SetMessenger(ComponentMessenger* messenger){}
+	virtual void Init(PhysicsEngine* physics_engin);
 
 protected:
-	btCollisionShape*			m_collision_shape;
-	btMotionState*				m_motion_state;
-	btRigidBody*				m_body;
-	btPairCachingGhostObject*	m_ghost_object;
-	CollisionDef				m_collision_def;
-	PhysicsEngine*				m_physics_engine;
+	PhysicsEngine* m_physics_engine;
+};
 
-	btTransform m_motion_transform;
+class PlayerRaycastCollisionComponent : public RaycastCollisionComponent {
+public:
+	PlayerRaycastCollisionComponent(void){}
+	virtual ~PlayerRaycastCollisionComponent(void){}
 
-	Ogre::Vector3 m_manual_velocity;
-	Ogre::Vector3 m_previous_position;
-	std::vector<Ogre::Vector3> m_surface_hit_normals;
+	virtual void Shut();
+	virtual void Notify(int type, void* msg);
+	virtual void SetMessenger(ComponentMessenger* messenger);
 
-	bool m_on_ground;
-	bool m_hitting_wall;
-	float m_bottom_y_offset;
-	float m_bottom_rounded_region_y_offset;
-	float m_step_height;
-	float m_jump_recharge_time;
-	float m_jump_recharge_timer;
-	float m_deceleration;
-	float m_max_speed;
-	float m_jump_impulse;
-
-	void ParseGhostContacts();
-	void UpdatePosition(float dt);
-	void UpdateVelocity(float dt);
-	Ogre::Vector3 Project(const Ogre::Vector3& lhs, const Ogre::Vector3& rhs) const;
+protected:
+	void PlayerBubble(GameObject*);
+	void PlayerLandscape();
 };
 
 #endif // _N_PHYSICS_COMPONENTS_H_

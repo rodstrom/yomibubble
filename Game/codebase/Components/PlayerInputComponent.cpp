@@ -114,7 +114,7 @@ void PlayerInputComponent::Normal(float dt){
 		Ogre::Vector3 scale_inc(SCALE);
 		m_current_scale += SCALE;
 		if (m_bubble_type == BUBBLE_TYPE_BLUE && m_input_manager->IsButtonReleased(BTN_LEFT_MOUSE)){
-			Ogre::Vector3 gravity(0,-9.8f,0);
+			Ogre::Vector3 gravity(0,-5.8f,0);
 			m_current_bubble->RemoveComponent(COMPONENT_POINT2POINT_CONSTRAINT);
 			m_current_bubble->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GRAVITY_SET, &gravity);
 			m_current_scale = 0.0f;

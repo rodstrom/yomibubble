@@ -70,7 +70,7 @@ void PlayState::Enter(){
 	trigger_def.origin = Ogre::Vector3(0,-1,0);
 	trigger_def.mass = 0.0f;*/
 	CharacterControllerDef player_def;
-	player_def.friction = 0.0f;
+	player_def.friction = 1.1f;
 	player_def.velocity = 5.0f;
 	player_def.max_speed = 5.0f;
 	player_def.deceleration = 7.0f;
@@ -115,7 +115,7 @@ void PlayState::Enter(){
 	trigger_def.z = 2.0f;
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_TRIGGER_TEST, Ogre::Vector3(x + 2.0f, y - 10.0f ,z + 2.0f), &trigger_def);*/
 	Ogre::String terrain = "try";
-	//m_game_object_manager->CreateGameObject(GAME_OBJECT_TERRAIN, Ogre::Vector3(0,0,0), &terrain);
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_TERRAIN, Ogre::Vector3(0,0,0), &terrain);
 }
 
 

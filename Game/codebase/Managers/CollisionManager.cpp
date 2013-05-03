@@ -55,8 +55,8 @@ void CollisionManager::Init(){
 void CollisionManager::ProcessCollision(const btCollisionObject* ob_a, const btCollisionObject* ob_b){
 	CollisionDef* cd_a = static_cast<CollisionDef*>(ob_a->getUserPointer());
 	CollisionDef* cd_b = static_cast<CollisionDef*>(ob_b->getUserPointer());
-	if (((cd_a->flag & COLLISION_FLAG_GAME_OBJECT) == COLLISION_FLAG_GAME_OBJECT) &&
-		((cd_b->flag & COLLISION_FLAG_GAME_OBJECT) == COLLISION_FLAG_GAME_OBJECT)){
+	if ((cd_a->flag == COLLISION_FLAG_GAME_OBJECT) &&
+		(cd_b->flag == COLLISION_FLAG_GAME_OBJECT)){
 			GameObject* go_a = static_cast<GameObject*>(cd_a->data);
 			GameObject* go_b = static_cast<GameObject*>(cd_b->data);
 			HitMap::iterator it = m_collision.find(MakeIntPair(go_a->GetType(), go_b->GetType()));
@@ -67,7 +67,7 @@ void CollisionManager::ProcessCollision(const btCollisionObject* ob_a, const btC
 }
 
 void CollisionManager::ProcessRaycast(const btCollisionObject* ob_a, const btCollisionObject* ob_b){
-	CollisionDef* cd_a = static_cast<CollisionDef*>(ob_a->getUserPointer());
+	/*CollisionDef* cd_a = static_cast<CollisionDef*>(ob_a->getUserPointer());
 	CollisionDef* cd_b = static_cast<CollisionDef*>(ob_b->getUserPointer());
 	if (((cd_a->flag & COLLISION_FLAG_GAME_OBJECT) == COLLISION_FLAG_GAME_OBJECT) &&
 		((cd_b->flag & COLLISION_FLAG_GAME_OBJECT) == COLLISION_FLAG_GAME_OBJECT)){
@@ -77,7 +77,7 @@ void CollisionManager::ProcessRaycast(const btCollisionObject* ob_a, const btCol
 		if (it != m_raycast_map.end()){
 			(this->*it->second)(go_a, go_b);
 		}
-	}
+	}*/
 }
 
 inline std::pair<int,int> CollisionManager::MakeIntPair(int a, int b){
@@ -109,7 +109,7 @@ void CollisionManager::BlueBubbleBlueBubble(GameObject* blue_bubble_a, GameObjec
 }
 
 void CollisionManager::PlayerBlueBubble(GameObject* player, GameObject* blue_bubble){
-	PlayerInputComponent* pic = static_cast<PlayerInputComponent*>(player->GetComponent(COMPONENT_PLAYER_INPUT));
+	/*PlayerInputComponent* pic = static_cast<PlayerInputComponent*>(player->GetComponent(COMPONENT_PLAYER_INPUT));
 	if (pic->GetPlayerState() == PLAYER_STATE_NORMAL || pic->GetPlayerState() == PLAYER_STATE_BOUNCING){
 		CharacterController* cc = static_cast<CharacterController*>(player->GetComponent(COMPONENT_CHARACTER_CONTROLLER));
 		float y_vel = cc->GetRigidbody()->getLinearVelocity().y();
@@ -141,7 +141,7 @@ void CollisionManager::PlayerBlueBubble(GameObject* player, GameObject* blue_bub
 				player->GetComponentMessenger()->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &gravity);
 			}
 		}
-	}
+	}*/
 }
 
 void CollisionManager::PlayerPlane(GameObject* player, GameObject* plane){
