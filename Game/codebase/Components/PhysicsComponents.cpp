@@ -126,6 +126,46 @@ void RigidbodyComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_RIGIDBODY_COLLISION_FLAG_REMOVE, this);
 }
 
+class IgnoreBodyCast : public btCollisionWorld::ClosestRayResultCallback{
+public:
+IgnoreBodyCast(btRigidBody* body) :
+btCollisionWorld::ClosestRayResultCallback(btVector3(0,0,0), btVector3(0,0,0)),
+m_body(body){}
+
+btScalar AddSingleResult(btCollisionWorld::LocalRayResult& ray_result, bool normal_in_world_space){
+if (ray_result.m_collisionObject == m_body){
+return 1.0f;
+}
+return ClosestRayResultCallback::addSingleResult(ray_result, normal_in_world_space);
+}
+
+private:
+btRigidBody* m_body;
+};
+
+void CharacterController::QueryRaycast(){
+IgnoreBodyCast ray_callback_bottom(m_rigidbody);
+m_physics_engine->GetDynamicWorld()->rayTest(m_rigidbody->getWorldTransform().getOrigin(), m_rigidbody->getWorldTransform().getOrigin() - btVector3(0,(0.5 + 0.15),0), ray_callback_bottom);
+if (ray_callback_bottom.hasHit()){
+float previous_y = m_rigidbody->getWorldTransform().getOrigin().y();
+m_rigidbody->getWorldTransform().getOrigin().setY(previous_y + (0.5 + 0.15) * (1.0f - ray_callback_bottom.m_closestHitFraction));
+btVector3 vel(m_rigidbody->getLinearVelocity());
+vel.setY(0.0f);
+m_rigidbody->setLinearVelocity(vel);
+m_on_ground = true;
+}
+/*IgnoreBodyAndGhostCast ray_callback_bottom(m_body, m_ghost_object);
+m_physics_engine->GetDynamicWorld()->rayTest(m_body->getWorldTransform().getOrigin(), m_body->getWorldTransform().getOrigin() - btVector3(0.0f, m_bottom_y_offset + m_step_height, 0.0f), ray_callback_bottom);
+if (ray_callback_bottom.hasHit()){
+float previous_y = m_body->getWorldTransform().getOrigin().y();
+m_body->getWorldTransform().getOrigin().setY(previous_y + (m_bottom_y_offset + m_step_height) * (1.0f - ray_callback_bottom.m_closestHitFraction));
+btVector3 vel(m_body->getLinearVelocity());
+vel.setY(0.0f);
+m_body->setLinearVelocity(vel);
+m_on_ground = true;
+}*/
+}
+
 void CharacterController::Notify(int type, void* msg){
 	RigidbodyComponent::Notify(type, msg);
 	switch (type){
@@ -176,7 +216,9 @@ void CharacterController::Notify(int type, void* msg){
 }
 
 void CharacterController::Update(float dt){
-	// remove?
+	//	m_on_ground = false;
+//QueryRaycast();
+
 }
 
 void CharacterController::Shut(){
@@ -521,4 +563,38 @@ public:
 private:
 	btRigidBody* m_body;
 	btPairCachingGhostObject* m_ghost_object;
+};
+
+void BobbingComponent::Shut(){
+};
+
+void BobbingComponent::SetMessenger(ComponentMessenger* messenger){
+};
+
+void BobbingComponent::Init(Ogre::SceneNode* node){
+	m_node = node;
+
+	m_current_time = 0.0f;
+	m_bob_timer = 2.0f;
+
+	m_up = true;
+};
+
+void BobbingComponent::Update(float dt){
+	m_current_time += dt;
+
+	if (m_current_time >= m_bob_timer){
+		m_current_time = 0.0f;
+		if (m_up) { m_up = false; }
+		else { m_up = true; }
+	}
+	else{
+		if (m_up){
+			m_node->setPosition(m_node->getPosition().x, m_node->getPosition().y + 0.01, m_node->getPosition().z);
+		}
+		else{
+			m_node->setPosition(m_node->getPosition().x, m_node->getPosition().y - 0.01, m_node->getPosition().z);
+		}
+	}
+
 };

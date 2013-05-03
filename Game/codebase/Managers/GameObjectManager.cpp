@@ -176,7 +176,7 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	sound3D->Init(m_sound_manager);
 	music2D->Init(m_sound_manager);
 	music3D->Init(m_sound_manager);
-	gui->Init("Examples/Empty", "Examples/Filled", 4);
+	gui->Init("Examples/Empty", "Examples/Filled", 6);
 	fcc->Init(m_scene_manager, m_viewport, true);
 	fcc->GetCamera()->setNearClipDistance(0.1f);
 	csnc->Init(Ogre::Vector3(0.0f, 0.0f, 1.0f), "CreateBubble", node_comp->GetSceneNode());
@@ -349,24 +349,28 @@ GameObject* GameObjectManager::CreateGUI(const Ogre::Vector3& position, void* da
 GameObject* GameObjectManager::CreateLeaf(const Ogre::Vector3& position, void* data){
 	ParticleDef& particleDef = *static_cast<ParticleDef*>(data);
 	GameObject* go = new GameObject(GAME_OBJECT_LEAF);
-	ParticleComponent* particle = new ParticleComponent;
-	go->AddComponent(particle);
+	//ParticleComponent* particle = new ParticleComponent;
+	//go->AddComponent(particle);
 	NodeComponent* node_comp = new NodeComponent;
 	go->AddComponent(node_comp);
 	MeshRenderComponent* mrc = new MeshRenderComponent;
 	go->AddComponent(mrc);
 	RigidbodyComponent* rb = new RigidbodyComponent;
 	go->AddComponent(rb);
+	BobbingComponent* bc = new BobbingComponent;
+	go->AddComponent(bc);
+	go->AddUpdateable(bc);
 
 	node_comp->Init(position, m_scene_manager);
 	mrc->Init("Collectable_Leaf.mesh", m_scene_manager);
+	bc->Init(node_comp->GetSceneNode());
 	//Ogre::Vector3 scale(0.002f);
 	//node_comp->GetSceneNode()->setScale(scale);
 	rb->Init(position, mrc->GetEntity(), m_physics_engine, 1, COLLIDER_BOX, STATIC_BODY);
-	particle->Init(m_scene_manager, "ring_flare2", particleDef.particle_name);
+	//particle->Init(m_scene_manager, "ring_flare2", particleDef.particle_name);
 	mrc->GetEntity()->setMaterialName("Examples/Leaf");
 	node_comp->GetSceneNode()->setPosition(Ogre::Vector3(position));
-	particle->CreateParticle(node_comp->GetSceneNode(), node_comp->GetSceneNode()->getPosition(), Ogre::Vector3(0,-3,0));
+	//particle->CreateParticle(node_comp->GetSceneNode(), node_comp->GetSceneNode()->getPosition(), Ogre::Vector3(0,-3,0));
 	return go;
 }
 

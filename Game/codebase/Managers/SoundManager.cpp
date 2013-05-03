@@ -30,6 +30,7 @@ void SoundManager::LoadAudio(){
 	m_sound_manager->createSound("Bubble_Burst", "SFX/Yomi/Bubble_Burst.wav", false, false, true);
 	m_sound_manager->createSound("Jump", "SFX/Yomi/Jump.wav", false, false, true);
 	m_sound_manager->createSound("Bounce", "SFX/Yomi/Bounce.wav", false, false, true);
+	ChangeVolume("Bounce", 0.5f);
 
 	m_sound_manager->createSound("Dun_Dun", "SFX/Tott/Bristlestick_Zoom_mono.wav", false, false, true);
 	m_sound_manager->getSound("Dun_Dun")->setMinVolume(0.0f);

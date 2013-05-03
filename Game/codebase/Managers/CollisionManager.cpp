@@ -120,6 +120,7 @@ void CollisionManager::PlayerBlueBubble(GameObject* player, GameObject* blue_bub
 				player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_SET_STATE, &player_state);
 				Ogre::Vector3 impulse(0.0f, cc->GetRigidbody()->getLinearVelocity().y() * -2.2f, 0.0f);
 				player->GetComponentMessenger()->Notify(MSG_RIGIDBODY_APPLY_IMPULSE, &impulse);
+				player->GetComponentMessenger()->Notify(MSG_SFX2D_PLAY,  &static_cast<PlayerInputComponent*>(player->GetComponent(COMPONENT_PLAYER_INPUT))->m_bounce_sound);
 			}
 			else if (y_vel < -10.0f){  // go inside bubble
 				int player_state = PLAYER_STATE_INSIDE_BUBBLE;
@@ -167,6 +168,7 @@ void CollisionManager::PlayerTrigger(GameObject* player, GameObject* trigger){
 }
 
 void CollisionManager::PlayerTerrain(GameObject* player, GameObject* terrain){
+	
 	bool on_ground = true;
 	int current_state = PLAYER_STATE_INSIDE_BUBBLE;
 	player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_STATE_GET, &current_state);
@@ -176,4 +178,5 @@ void CollisionManager::PlayerTerrain(GameObject* player, GameObject* terrain){
 		player->GetComponentMessenger()->Notify(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_SET, &on_ground);
 		CharacterController* cc = static_cast<CharacterController*>(player->GetComponent(COMPONENT_CHARACTER_CONTROLLER));
 	}
+	
 }
