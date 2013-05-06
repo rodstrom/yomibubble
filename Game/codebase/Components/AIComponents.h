@@ -14,8 +14,9 @@ public:
 	virtual void Init(Ogre::SceneNode *m_node, float walk_speed);
 	virtual void SetMessenger(ComponentMessenger* messenger);
 	virtual void Update(float dt);
-
+	
 	void AddWayPoint(Ogre::Vector3 way_point);
+	void AddWayPoint(Ogre::SceneNode* scene_node);
 
 private:
 	WayPoint* m_way_point;

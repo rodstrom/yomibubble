@@ -179,4 +179,23 @@ protected:
 	void PlayerLandscape();
 };
 
+class BobbingComponent : public Component, public IComponentUpdateable{
+public:
+	BobbingComponent(void){}
+	virtual ~BobbingComponent(void){}
+
+	virtual void Shut();
+	virtual void SetMessenger(ComponentMessenger* messenger);
+	virtual void Init(Ogre::SceneNode* node);
+	virtual void Update(float dt);
+
+private:
+	Ogre::SceneNode* m_node;
+
+	float m_current_time;
+	float m_bob_timer;
+
+	bool m_up;
+};
+
 #endif // _N_PHYSICS_COMPONENTS_H_

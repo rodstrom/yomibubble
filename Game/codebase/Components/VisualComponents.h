@@ -72,9 +72,11 @@ public:
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
 
+	AnimationBlender* m_animation_blender;
+
 protected:
 	std::vector<Ogre::AnimationState*>	m_animation_states;
-	AnimationBlender*					m_animation_blender;
+	
 };
 
 class Overlay2DComponent : public Component, public IComponentObserver {

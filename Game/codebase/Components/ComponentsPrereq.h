@@ -166,8 +166,10 @@ struct RigidBodyDef{
 };
 
 struct AnimationMsg{
-	int index;
+	bool blend;
 	Ogre::String id;
+	Ogre::String bottom_anim;
+	Ogre::String top_anim;
 };
 
 struct CharControllerJumpDef{

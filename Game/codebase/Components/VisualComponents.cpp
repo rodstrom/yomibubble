@@ -4,6 +4,9 @@
 #include "..\Managers\InputManager.h"
 #include "..\InputPrereq.h"
 #include "..\PhysicsEngine.h"
+#include "GameObject.h"
+#include "..\Managers\GameObjectManager.h"
+#include "..\Managers\SoundManager.h"
 
 void NodeComponent::Init(const Ogre::Vector3& pos, Ogre::SceneManager* scene_manager){
 	m_scene_manager = scene_manager;
@@ -96,12 +99,27 @@ void AnimationComponent::SetMessenger(ComponentMessenger* messenger){
 
 void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager){
 	MeshRenderComponent::Init(filename, scene_manager);
-	//m_animation_blender = new AnimationBlender(GetEntity());
-	//m_animation_blender->init("RunBase");
+	
+	m_animation_blender = new AnimationBlender(GetEntity());
+	/*
+	m_animation_blender->init("Idle");
+	m_animation_blender->init("Run");
+	m_animation_blender->init("Walk");
+	m_animation_blender->init("Jump");
+	*/
 }
 
 void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager, const Ogre::String& node_id){
 	MeshRenderComponent::Init(filename, scene_manager, node_id);
+	
+	m_animation_blender = new AnimationBlender(GetEntity());
+	/*
+	m_animation_blender->init("Idle");
+	m_animation_blender->init("Run");
+	m_animation_blender->init("Walk");
+	m_animation_blender->init("Jump");
+	*/
+	
 }
 
 void AnimationComponent::AddAnimationStates(unsigned int value){
@@ -119,33 +137,54 @@ void AnimationComponent::Update(float dt){
 			}
 		}
 	}
+	//m_animation_blender->addTime(dt);
 }
 
 void AnimationComponent::Notify(int type, void* msg){
 	MeshRenderComponent::Notify(type, msg);
+	AnimationMsg* anim_msg = static_cast<AnimationMsg*>(msg);
+
 	switch (type){
 	case MSG_ANIMATION_PLAY:
 		{
-			int index = static_cast<AnimationMsg*>(msg)->index;
-			m_animation_states[index] = m_entity->getAnimationState(static_cast<AnimationMsg*>(msg)->id);
-			if (m_animation_states[index] != NULL){
-				m_animation_states[index]->setEnabled(true);
-				m_animation_states[index]->setLoop(true);
+			if (anim_msg->blend){
+				m_animation_states[0] = m_entity->getAnimationState(anim_msg->bottom_anim);
+				if (m_animation_states[0] != NULL){
+					m_animation_states[0]->setEnabled(true);
+					m_animation_states[0]->setLoop(true);
+				}
+
+				m_animation_states[1] = m_entity->getAnimationState(anim_msg->top_anim);
+				if (m_animation_states[1] != NULL){
+					m_animation_states[1]->setEnabled(true);
+					m_animation_states[1]->setLoop(true);
+				}
+			}
+			else{
+				m_animation_states[0] = m_entity->getAnimationState(anim_msg->id);
+				if (m_animation_states[0] != NULL){
+					m_animation_states[0]->setEnabled(true);
+					m_animation_states[0]->setLoop(true);
+					//m_animation_blender->init("Walk");
+					//m_animation_blender->blend("Idle", AnimationBlender::BlendWhileAnimating, 0.2, true);
+				}
 			}
 		}
 		break;
 	case MSG_ANIMATION_PAUSE:
 		{
-			int index = static_cast<AnimationMsg*>(msg)->index;
-			if (m_animation_states[index] != NULL){
-				m_animation_states[index]->setEnabled(false);
-				m_animation_states[index]->setLoop(false);
+			if (m_animation_states[0] != NULL){
+					m_animation_states[0]->setEnabled(false);
+					m_animation_states[0]->setLoop(false);
+				}
+
+			if (anim_msg->blend){
+				if (m_animation_states[1] != NULL){
+					m_animation_states[1]->setEnabled(false);
+					m_animation_states[1]->setLoop(false);
+				}
 			}
 		}
-		break;
-	case MSG_ANIMATION_BLEND:
-		//m_animation_blender->blend("RunBase", AnimationBlender::BlendWhileAnimating, 0.2, true);
-		//m_animation_blender->blend("IdleTop", AnimationBlender::BlendWhileAnimating, 0.2, true);
 		break;
 	default:
 		break;
@@ -348,6 +387,7 @@ void OverlayCallbackComponent::Shut(){
 void ParticleComponent::Init(Ogre::SceneManager* p_scene_manager, const Ogre::String& p_particle_name, const Ogre::String& p_particle_file_name){
 	m_scene_manager = p_scene_manager;
 	m_particle_system = m_scene_manager->createParticleSystem(p_particle_name, p_particle_file_name);
+	m_particle_system->setDefaultHeight(0.1f);
 }
 
 void ParticleComponent::CreateParticle(Ogre::SceneNode* p_scene_node, const Ogre::Vector3& p_position, const Ogre::Vector3& p_offset_position){
@@ -412,7 +452,7 @@ void CountableResourceGUI::Init(const Ogre::String& material_name_inactive, cons
 	m_material_name_inactive = material_name_inactive;
 
 	Ogre::OverlayManager& overlayManager = Ogre::OverlayManager::getSingleton();
-    Ogre::Overlay* overlay = overlayManager.create( "OverlayName" );
+	Ogre::Overlay* overlay = overlayManager.create( "OverlayName" );
 
 	Ogre::Vector2 temppos(0.0f, 0.0f);
 
@@ -487,6 +527,10 @@ void TerrainComponent::Init(Ogre::SceneManager* scene_manager, PhysicsEngine* ph
 	m_scene_manager = scene_manager;
 	m_physics_engine = physics_engine;
 	m_artifex_loader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_scene_manager->getCamera("MainCamera"), physics_engine, "../../resources/terrain/");
+
+//mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_camera, m_game_object_manager, m_sound_manager, "../../resources/terrain/");
+
+
 	m_artifex_loader->loadZone(filename);
 	Ogre::Terrain* terrain = m_artifex_loader->mTerrain;
 	size_t w = terrain->getSize();
@@ -507,8 +551,6 @@ void TerrainComponent::Init(Ogre::SceneManager* scene_manager, PhysicsEngine* ph
 
 	m_terrain_shape = new btHeightfieldTerrainShape(terrain->getSize(), terrain->getSize(), data_converter, 1, terrain->getMinHeight(), terrain->getMaxHeight(), 1, PHY_FLOAT, true);
 	
-	// TODO: Fix this memory leak, The terrain needs this data so delete when unloading.
-	//delete[] data_converter;
 	float units_between_vertices = terrain->getWorldSize() / (w - 1);
 	btVector3 local_scaling(units_between_vertices, 1, units_between_vertices);
 	m_terrain_shape->setLocalScaling(local_scaling);
@@ -529,8 +571,8 @@ void TerrainComponent::Init(Ogre::SceneManager* scene_manager, PhysicsEngine* ph
 		);
 
 	m_terrain_body->setCollisionFlags(m_terrain_body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
+	m_terrain_body->setRestitution(0.5f);
 	m_terrain_body->setFriction(1.0f);
-	m_terrain_body->setRestitution(0.2f);
 	m_physics_engine->GetDynamicWorld()->addRigidBody(m_terrain_body);
 	m_collision_def.flag = COLLISION_FLAG_STATIC;
 	m_collision_def.data = m_owner;

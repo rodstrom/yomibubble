@@ -1,6 +1,7 @@
 #ifndef ANIMATION_BLENDER_H
 #define ANIMATION_BLENDER_H
 
+#include "OgreEntity.h"
 using namespace Ogre;
 
 class AnimationBlender

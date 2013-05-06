@@ -23,7 +23,7 @@ PhysicsEngine::PhysicsEngine(void) :
 PhysicsEngine::~PhysicsEngine(void){}
 
 bool PhysicsEngine::Init(){
-	m_broadphase = new btAxisSweep3(btVector3(-10000, -10000, -10000), btVector3(10000,10000,10000),1024);
+	m_broadphase = new btDbvtBroadphase;
 	m_ghost_pair_callback = new btGhostPairCallback;
 	m_broadphase->getOverlappingPairCache()->setInternalGhostPairCallback(m_ghost_pair_callback);
 	m_collision_configuration = new btDefaultCollisionConfiguration;
@@ -94,6 +94,7 @@ void PhysicsEngine::Step(float dt){
 	}
 	
 	m_dynamic_world->stepSimulation(dt, max_steps);
+	
 	if (m_debug_drawer){
 		m_debug_drawer->step();
 	}

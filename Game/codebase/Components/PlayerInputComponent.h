@@ -22,6 +22,11 @@ public:
 	void SetDeacceleration(float value) { m_deacc = value; }
 
 	SoundData2D m_leaf_sfx;
+	AnimationMsg m_anim_msg;
+	SoundData2D m_bounce_sound;
+
+	float m_min_bubble_size;
+	float m_max_bubble_size;
 
 protected:
 	void CreateBlueBubble(const Ogre::Vector3& pos, const BubbleDef& bubble_def);
@@ -47,6 +52,11 @@ protected:
 	float m_max_scale;
 	float m_current_scale;
 	SoundData2D m_walk_sound;
+	SoundData2D m_jump_sound;
+	
+	SoundData2D m_bubble_burst_sound;
+	SoundData2D m_bubble_blow_sound;
+
 	SoundData2D m_test_sfx;
 	
 	SoundData2D m_def_music;

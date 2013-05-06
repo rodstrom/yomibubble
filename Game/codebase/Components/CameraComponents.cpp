@@ -50,7 +50,7 @@ void CameraComponent::Update(float dt){
 }
 
 void CameraComponent::ActivateCamera(){
-	m_viewport->setCamera(m_camera);
+	//m_viewport->setCamera(m_camera);
 }
 
 void FollowCameraComponent::Notify(int type, void* msg){

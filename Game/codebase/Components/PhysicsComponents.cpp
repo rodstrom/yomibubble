@@ -71,7 +71,6 @@ void RigidbodyComponent::Init(const Ogre::Vector3& position, Ogre::Entity* entit
 		btScalar mass = (btScalar)p_mass;
 		btVector3 inertia;
 		m_shape->calculateLocalInertia(mass, inertia);
-		
 		m_motion_state = new BtOgre::RigidBodyState(m_messenger);
 		m_rigidbody = new btRigidBody(mass, m_motion_state, m_shape, inertia);
 	}
@@ -628,3 +627,38 @@ void PlayerRaycastCollisionComponent::PlayerLandscape(){
 		m_messenger->Notify(MSG_PLAYER_INPUT_SET_STATE, &player_state);
 	}
 }
+
+void BobbingComponent::Shut(){
+
+};
+
+void BobbingComponent::SetMessenger(ComponentMessenger* messenger){
+
+};
+
+void BobbingComponent::Init(Ogre::SceneNode* node){
+	m_node = node;
+
+	m_current_time = 0.0f;
+	m_bob_timer = 2.0f;
+
+	m_up = true;
+};
+
+void BobbingComponent::Update(float dt){
+	m_current_time += dt;
+
+	if (m_current_time >= m_bob_timer){
+		m_current_time = 0.0f;
+	if (m_up) { m_up = false; }
+	else { m_up = true; }
+	}
+	else{
+	if (m_up){
+		m_node->setPosition(m_node->getPosition().x, m_node->getPosition().y + 0.01, m_node->getPosition().z);
+	}
+	else{
+			m_node->setPosition(m_node->getPosition().x, m_node->getPosition().y - 0.01, m_node->getPosition().z);
+		}
+	}
+};
