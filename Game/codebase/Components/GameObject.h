@@ -54,6 +54,7 @@ private:
 	Component* CreateChildNode(const Ogre::Vector3& pos, void* data);
 	Component* CreateNodeComponent(const Ogre::Vector3& pos, void* data);
 	Component* CreateTriggerComponent(const Ogre::Vector3& pos, void* data);
+	Component* CreateSyncedTriggerComponent(const Ogre::Vector3& pos, void* data);
 	Component* CreateRaycastComponent(const Ogre::Vector3& pos, void* data);
 };
 

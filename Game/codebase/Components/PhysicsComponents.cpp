@@ -45,10 +45,10 @@ void RigidbodyComponent::Notify(int type, void* msg){
 	}
 }
 
-void RigidbodyComponent::Init(const Ogre::Vector3& position, Ogre::Entity* entity, PhysicsEngine* physics_engine, float p_mass, int collider_type, int body_type){
+void RigidbodyComponent::Init(const Ogre::Vector3& position, Ogre::Entity* entity, PhysicsEngine* physics_engine, const RigidBodyDef& def){
 	m_physics_engine = physics_engine;
 	BtOgre::StaticMeshToShapeConverter converter(entity);
-	switch (collider_type){
+	switch (def.collider_type){
 	case COLLIDER_BOX:
 		m_shape = converter.createBox();
 		break;
@@ -67,14 +67,14 @@ void RigidbodyComponent::Init(const Ogre::Vector3& position, Ogre::Entity* entit
 	default:
 		break;
 	}
-	if (body_type == DYNAMIC_BODY){
-		btScalar mass = (btScalar)p_mass;
+	if (def.body_type == DYNAMIC_BODY){
+		btScalar mass = (btScalar)def.mass;
 		btVector3 inertia;
 		m_shape->calculateLocalInertia(mass, inertia);
 		m_motion_state = new BtOgre::RigidBodyState(m_messenger);
 		m_rigidbody = new btRigidBody(mass, m_motion_state, m_shape, inertia);
 	}
-	else if (body_type == STATIC_BODY){
+	else if (def.body_type == STATIC_BODY){
 		m_motion_state = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)));
 		m_rigidbody = new btRigidBody(0, m_motion_state, m_shape, btVector3(0,0,0));
 	}
@@ -83,7 +83,10 @@ void RigidbodyComponent::Init(const Ogre::Vector3& position, Ogre::Entity* entit
 	m_rigidbody->setUserPointer(&m_collision_def);
 	m_rigidbody->getWorldTransform().setOrigin(BtOgre::Convert::toBullet(position));
 	m_rigidbody->setCollisionFlags(m_rigidbody->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
-	m_physics_engine->GetDynamicWorld()->addRigidBody(m_rigidbody);
+	m_rigidbody->setRestitution(def.restitution);
+	m_rigidbody->setFriction(def.friction);
+	m_rigidbody->setRollingFriction(def.rolling_friction);
+	m_physics_engine->GetDynamicWorld()->addRigidBody(m_rigidbody, def.collision_filter.filter, def.collision_filter.mask);
 }
 
 void RigidbodyComponent::Shut(){
@@ -141,7 +144,7 @@ private:
 
 void CharacterController::QueryRaycast(){
 	IgnoreBodyCast ray_callback_bottom(m_rigidbody);
-	m_physics_engine->GetDynamicWorld()->rayTest(m_rigidbody->getWorldTransform().getOrigin(), m_rigidbody->getWorldTransform().getOrigin() - btVector3(0,m_y_bottom_offset + m_step_height,0), ray_callback_bottom);
+	m_physics_engine->GetDynamicWorld()->rayTest((m_rigidbody->getWorldTransform().getOrigin() + m_offset), (m_rigidbody->getWorldTransform().getOrigin() + m_offset) - btVector3(0,m_y_bottom_offset + m_step_height,0), ray_callback_bottom);
 	if (ray_callback_bottom.hasHit()){
 		CollisionDef& def = *static_cast<CollisionDef*>(ray_callback_bottom.m_collisionObject->getUserPointer());
 		if (def.flag == COLLISION_FLAG_STATIC){
@@ -151,11 +154,6 @@ void CharacterController::QueryRaycast(){
 			GameObject* go = static_cast<GameObject*>(def.data);
 			m_messenger->Notify(MSG_RAYCAST_COLLISION_GAME_OBJECT, &go);
 		}
-		/*float previous_y = m_rigidbody->getWorldTransform().getOrigin().y();
-		m_rigidbody->getWorldTransform().getOrigin().setY(previous_y + (m_y_bottom_offset + m_step_height) * (1.0f - ray_callback_bottom.m_closestHitFraction));
-		btVector3 vel(m_rigidbody->getLinearVelocity());
-		vel.setY(0.0f);
-		m_rigidbody->setLinearVelocity(vel);*/
 		m_on_ground = true;
 	}
 }
@@ -181,7 +179,7 @@ void CharacterController::Notify(int type, void* msg){
 			if (jump){
 				if (m_on_ground){
 					m_is_jumping = true;
-					m_start_y_pos = m_rigidbody->getWorldTransform().getOrigin().y();
+					m_jump_timer = 0.0f;
 				}
 			}
 			else{
@@ -215,7 +213,6 @@ void CharacterController::Notify(int type, void* msg){
 }
 
 void CharacterController::Update(float dt){
-	Deceleration(dt);
 	m_on_ground = false;
 	QueryRaycast();
 	btVector3 vel = m_rigidbody->getLinearVelocity();
@@ -275,9 +272,10 @@ void CharacterController::Update(float dt){
 		}
 	}
 	if (m_is_jumping){
-		float y_pos = m_rigidbody->getWorldTransform().getOrigin().y();
-		if ((y_pos - m_start_y_pos) >= m_max_jump_height){
+		m_jump_timer += dt;
+		if (m_jump_timer >= m_max_jump_height){
 			m_is_jumping = false;
+			m_jump_timer = 0.0f;
 		}
 		float jump_strength = m_jump_pwr * dt;
 		vel = m_rigidbody->getLinearVelocity();
@@ -286,7 +284,12 @@ void CharacterController::Update(float dt){
 }
 
 void CharacterController::Shut(){
-	RigidbodyComponent::Shut();
+	m_compound_shape->removeChildShape(m_shape);
+	m_physics_engine->GetDynamicWorld()->removeRigidBody(m_rigidbody);
+	delete m_shape;
+	delete m_compound_shape;
+	delete m_motion_state;
+	delete m_rigidbody;
 	if (m_messenger){
 		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, this);
 		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_SET, this);
@@ -320,6 +323,12 @@ void CharacterController::Init(const Ogre::Vector3& position, PhysicsEngine* phy
 	m_deceleration = def.deceleration;
 	m_air_deceleration = def.air_deceleration;
 	m_turn_speed = def.turn_speed;
+	m_offset = BtOgre::Convert::toBullet(def.offset);
+	m_compound_shape = new btCompoundShape;
+	btTransform offset;
+	offset.setIdentity();
+	offset.setOrigin(BtOgre::Convert::toBullet(def.offset));
+	m_compound_shape->addChildShape(offset, m_shape);
 
 	btTransform start_transform;
 	start_transform.setIdentity();
@@ -329,7 +338,7 @@ void CharacterController::Init(const Ogre::Vector3& position, PhysicsEngine* phy
 	m_shape->calculateLocalInertia(def.mass, inertia);
 	m_motion_state = new BtOgre::RigidBodyState(m_messenger);
 	static_cast<BtOgre::RigidBodyState*>(m_motion_state)->UpdateOrientation(false);
-	m_rigidbody = new btRigidBody(def.mass, m_motion_state, m_shape, inertia);
+	m_rigidbody = new btRigidBody(def.mass, m_motion_state, m_compound_shape, inertia);
 	m_collision_def.flag = COLLISION_FLAG_GAME_OBJECT;
 	m_collision_def.data = m_owner;
 	m_rigidbody->setUserPointer(&m_collision_def);
@@ -339,24 +348,16 @@ void CharacterController::Init(const Ogre::Vector3& position, PhysicsEngine* phy
 	m_rigidbody->setAngularFactor(0);
 	m_rigidbody->setRestitution(def.restitution);
 	m_rigidbody->setFriction(def.friction);
-	m_physics_engine->GetDynamicWorld()->addRigidBody(m_rigidbody);
+	m_physics_engine->GetDynamicWorld()->addRigidBody(m_rigidbody, def.collision_filter.filter, def.collision_filter.mask);
 	m_physics_engine->AddObjectSimulationStep(this);
 }
 
-void CharacterController::Deceleration(float dt){
-
-}
-
 void CharacterController::SimulationStep(btScalar time_step){
-	
 	Ogre::Vector2 velXZ(m_rigidbody->getLinearVelocity().x(), m_rigidbody->getLinearVelocity().z());
 	btScalar speedXZ = velXZ.length();
 	if (speedXZ > m_max_speed){
 		velXZ = velXZ / speedXZ * m_max_speed;
 		m_rigidbody->setLinearVelocity(btVector3(velXZ.x, m_rigidbody->getLinearVelocity().y(), velXZ.y));
-	}
-	else if (m_direction == Ogre::Vector3::ZERO){
-		//Deceleration((float)time_step);
 	}
 }
 
@@ -438,10 +439,12 @@ void TriggerComponent::Init(const Ogre::Vector3& pos, PhysicsEngine* physics_eng
 		m_motion_state = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)));
 		m_rigidbody = new btRigidBody(0, m_motion_state, m_shape, btVector3(0,0,0));
 	}
-	m_rigidbody->setUserPointer(m_owner);
+	m_collision_def.flag = COLLISION_FLAG_GAME_OBJECT;
+	m_collision_def.data = m_owner;
+	m_rigidbody->setUserPointer(&m_collision_def);
 	m_rigidbody->getWorldTransform().setOrigin(BtOgre::Convert::toBullet(pos));
 	m_rigidbody->setCollisionFlags(m_rigidbody->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK | btCollisionObject::CF_NO_CONTACT_RESPONSE);
-	m_physics_engine->GetDynamicWorld()->addRigidBody(m_rigidbody);
+	m_physics_engine->GetDynamicWorld()->addRigidBody(m_rigidbody, def->collision_filter.filter, def->collision_filter.mask);
 }
 
 void TriggerComponent::Notify(int type, void* msg){
@@ -662,3 +665,18 @@ void BobbingComponent::Update(float dt){
 		}
 	}
 };
+
+void SyncedTriggerComponent::Init(const Ogre::Vector3& pos, PhysicsEngine* physics_engine, struct TriggerDef* def){
+	TriggerComponent::Init(pos, physics_engine, def);
+	m_offset = def->offset;
+}
+
+void SyncedTriggerComponent::Update(float dt){
+	Ogre::SceneNode* node = NULL;
+	m_messenger->Notify(MSG_NODE_GET_NODE, &node);
+	if (node){
+		Ogre::Vector3 pos = node->_getDerivedPosition();
+		pos += m_offset;
+		m_rigidbody->getWorldTransform().setOrigin(BtOgre::Convert::toBullet(pos));
+	}
+}

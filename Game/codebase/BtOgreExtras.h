@@ -275,6 +275,11 @@ public:
 
 }
 
+struct TriMeshDef {
+	btTriangleMesh* trimesh;
+	btBvhTriangleMeshShape* trimesh_shape;
+};
+
 #endif
 
 

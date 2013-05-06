@@ -7,7 +7,7 @@
 #include "..\Managers\GameObjectManager.h"
 #include "..\PhysicsEngine.h"
 #include "VisualComponents.h"
-
+#include "..\PhysicsPrereq.h"
 #include <iostream>
 
 void PlayerInputComponent::Update(float dt){
@@ -183,7 +183,7 @@ void PlayerInputComponent::Normal(float dt){
 				Ogre::Vector3 scale_incr(m_current_scale);
 				m_current_bubble->GetComponentMessenger()->Notify(MSG_INCREASE_SCALE_BY_VALUE, &scale_incr);
 			}
-			
+			this->CreateTriggerForBubble();
 			Ogre::Vector3 gravity(0,-5.8f,0);
 			m_current_bubble->RemoveComponent(COMPONENT_POINT2POINT_CONSTRAINT);
 			m_current_bubble->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GRAVITY_SET, &gravity);
@@ -197,7 +197,7 @@ void PlayerInputComponent::Normal(float dt){
 				Ogre::Vector3 scale_incr(m_current_scale);
 				m_current_bubble->GetComponentMessenger()->Notify(MSG_INCREASE_SCALE_BY_VALUE, &scale_incr);
 			}
-			
+			this->CreateTriggerForBubble();
 			m_current_scale = 0.0f;
 			m_is_creating_bubble = false;
 			m_current_bubble->RemoveComponent(COMPONENT_POINT2POINT_CONSTRAINT);
@@ -271,15 +271,10 @@ void PlayerInputComponent::OnBubble(float dt){
 	bool follow_cam = false;
 	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_GET, &follow_cam);
 	if (follow_cam){
-		Ogre::SceneNode* cam_node = NULL;
-		m_messenger->Notify(MSG_CAMERA_GET_CAMERA_NODE, &cam_node);
-		if (cam_node && bubble_node){
-			Ogre::Vector3 goal_dir = Ogre::Vector3::ZERO;
-			goal_dir += dir.z * cam_node->getOrientation().zAxis();
-			goal_dir += dir.x * cam_node->getOrientation().xAxis();
-			goal_dir.y = 0.0f;
-			goal_dir.normalise();
-			m_current_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_APPLY_IMPULSE, &goal_dir);
+		if (bubble_node){
+			m_messenger->Notify(MSG_FOLLOW_CAMERA_GET_ORIENTATION, &dir);
+			dir.normalise();
+			m_current_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_APPLY_IMPULSE, &dir);
 		}
 	}
 	else{
@@ -320,16 +315,10 @@ void PlayerInputComponent::InsideBubble(float dt){
 	bool follow_cam = false;
 	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_GET, &follow_cam);
 	if (follow_cam){
-		Ogre::SceneNode* cam_node = NULL;
-		m_messenger->Notify(MSG_CAMERA_GET_CAMERA_NODE, &cam_node);
-		if (cam_node && bubble_node){
-			Ogre::Vector3 goal_dir = Ogre::Vector3::ZERO;
-			goal_dir += dir.z * cam_node->getOrientation().zAxis();
-			goal_dir += dir.x * cam_node->getOrientation().xAxis();
-			goal_dir.y = 0.0f;
-			goal_dir.normalise();
-			std::cout << "X: " << goal_dir.x << " Y: " << goal_dir.y << " Z: " << goal_dir.z << std::endl;
-			m_current_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_APPLY_IMPULSE, &goal_dir);
+		if (bubble_node){
+			m_messenger->Notify(MSG_FOLLOW_CAMERA_GET_ORIENTATION, &dir);
+			dir.normalise();
+			m_current_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_APPLY_IMPULSE, &dir);
 		}
 	}
 	else{
@@ -342,56 +331,28 @@ void PlayerInputComponent::Bouncing(float dt){
 	dir.x = m_input_manager->GetMovementAxis().x;
 	dir.z = m_input_manager->GetMovementAxis().z;
 
-	Ogre::Vector3 acc = Ogre::Vector3::ZERO;
-	Acceleration(dir, acc, dt);
-	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &acc);
+	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &dir);
 	//m_messenger->Notify(MSG_SFX2D_PLAY, &m_bounce_sound);
 }
 
-void PlayerInputComponent::Acceleration(Ogre::Vector3& dir, Ogre::Vector3& acc, float dt){
-	bool is_jumping = false;
-	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_GET, &is_jumping);
-	
-	float deacc = m_deacc;
-	if (is_jumping){
-		deacc = m_deacc;
+void PlayerInputComponent::CreateTriggerForBubble(){
+	Ogre::SceneNode* node = NULL;
+	m_messenger->Notify(MSG_NODE_GET_NODE, &node);
+	if (node){
+		TriggerDef trdef;
+		trdef.body_type = STATIC_BODY;
+		trdef.collider_type = COLLIDER_BOX;
+		trdef.mass = 1.0f;
+		float size = m_current_scale * 0.5f;
+		trdef.x = size;
+		trdef.z = size;
+		trdef.y = 0.01f;
+		trdef.offset.y = size;
+		trdef.collision_filter.filter = COL_BUBBLE_TRIG;
+		trdef.collision_filter.mask = COL_PLAYER;
+		Ogre::Vector3 pos = node->_getDerivedPosition();
+		m_current_bubble->CreateComponent(COMPONENT_SYNCED_TRIGGER, pos, &trdef);
 	}
-
-	if (dir.x != 0.0f){
-		if (dir.x < 0.0f){
-			m_acc_x = std::max(m_acc_x - (m_velocity*dt), -m_max_velocity);
-		}
-		else if (dir.x > 0.0f){
-			m_acc_x = std::min(m_acc_x + (m_velocity*dt), m_max_velocity);
-		}
-	}
-	else{
-		if (m_acc_x < 0.0f){
-			m_acc_x = std::min(m_acc_x + (m_deacc*dt), 0.0f);
-		}
-		else if (m_acc_x > 0.0f){
-			m_acc_x = std::max(m_acc_x - (m_deacc*dt), 0.0f);
-		}
-	}
-
-	if (dir.z != 0.0f){
-		if (dir.z < 0.0f){
-			m_acc_z = std::max(m_acc_z - (m_velocity*dt), -m_max_velocity);
-		}
-		else if (dir.z > 0.0f){
-			m_acc_z = std::min(m_acc_z + (m_velocity*dt), m_max_velocity);
-		}
-	}
-	else {
-		if (m_acc_z < 0.0f){
-			m_acc_z = std::min(m_acc_z + (m_deacc*dt), 0.0f);
-		}
-		else if (m_acc_z > 0.0f){
-			m_acc_z = std::max(m_acc_z - (m_deacc*dt), 0.0f);
-		}
-	}
-	acc.x += m_acc_x;
-	acc.z += m_acc_z;
 }
 
 void BubbleController::Notify(int type, void* msg){
@@ -432,7 +393,6 @@ void BubbleController::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_BUBBLE_CONTROLLER_CAN_ATTACH_SET, this);
 }
 
-
 void BubbleController::ApplyImpulse(const btVector3& dir){
 	btRigidBody* body = NULL;
 	m_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &body);
@@ -443,10 +403,6 @@ void BubbleController::ApplyImpulse(const btVector3& dir){
 
 void BubbleController::Update(float dt){
 	if (m_apply_impulse){
-	btRigidBody* body = NULL;
-	m_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &body);
-	if (body){
-	}
 		m_messenger->Notify(MSG_RIGIDBODY_APPLY_IMPULSE, &m_impulse);
 	}
 }

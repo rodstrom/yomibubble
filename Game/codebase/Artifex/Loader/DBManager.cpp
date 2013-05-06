@@ -3,6 +3,7 @@
 #include "DBManager.h"
 #include "..\..\PhysicsEngine.h"
 #include "..\..\Components\GameObjectPrereq.h"
+#include "..\..\PhysicsPrereq.h"
 
 DBManager::DBManager(ArtifexLoader *artifexloader, PhysicsEngine* physicsengine) {
 	mPhysicsEngine = physicsengine;
@@ -132,7 +133,8 @@ int DBManager::Load() {
 					body->setRestitution(1.0f);
 					body->setFriction(1.0f);
 					m_collision_defs.push_back(collision_def);
-					mPhysicsEngine->GetDynamicWorld()->addRigidBody(body);
+					int mask = COL_TOTT | COL_BUBBLE | COL_PLAYER;
+					mPhysicsEngine->GetDynamicWorld()->addRigidBody(body, COL_WORLD_STATIC, mask);
 
 				} catch (Exception &e) {
 					cout << "\n|= ArtifexTerra3D =| Zoneloader v1.0 RC1 OT beta SQLite: spawnloader error - problems creating " << spawn.name.c_str() << ":" << e.what() << "\n";
