@@ -6,6 +6,7 @@
 #include "..\Components\PhysicsComponents.h"
 #include "..\Components\CameraComponents.h"
 #include "..\Components\AIComponents.h"
+#include "..\Components\TimerComponent.h"
 #include "InputManager.h"
 #include "..\Components\AudioComponents.h"
 #include "..\Components\PlayerInputComponent.h"
@@ -26,10 +27,12 @@ void GameObjectManager::Init(PhysicsEngine* physics_engine, Ogre::SceneManager* 
 	m_create_fptr[GAME_OBJECT_PINK_BUBBLE] =	&GameObjectManager::CreatePinkBubble;
 	m_create_fptr[GAME_OBJECT_TOTT]        =	&GameObjectManager::CreateTott;
 	m_create_fptr[GAME_OBJECT_PLANE]       =	&GameObjectManager::CreatePlane;
-	m_create_fptr[GAME_OBJECT_OVERLAY]	   =	&GameObjectManager::CreateButton;
+	m_create_fptr[GAME_OBJECT_BUTTON]	   =	&GameObjectManager::CreateButton;
+	m_create_fptr[GAME_OBJECT_OVERLAY]	   =	&GameObjectManager::Create2DOverlay;
 	m_create_fptr[GAME_OBJECT_GUI]		   =	&GameObjectManager::CreateGUI;
 	m_create_fptr[GAME_OBJECT_LEAF]		   =	&GameObjectManager::CreateLeaf;
 	m_create_fptr[GAME_OBJECT_TRIGGER_TEST]=	&GameObjectManager::CreateTestTrigger;
+	m_create_fptr[GAME_OBJECT_COMPANION]   =	&GameObjectManager::CreateCompanion;
 }
 
 void GameObjectManager::Update(float dt){
@@ -315,6 +318,21 @@ GameObject* GameObjectManager::CreateButton(const Ogre::Vector3& position, void*
 	return go;
 }
 
+GameObject* GameObjectManager::Create2DOverlay(const Ogre::Vector3& position, void* data) {
+ OverlayDef& overlayDef = *static_cast<OverlayDef*>(data);
+ GameObject* go = new GameObject;
+ Overlay2DComponent* overlayComp = new Overlay2DComponent;
+ go->AddComponent(overlayComp);
+ OverlayCollisionCallbackComponent* coll_comp = new OverlayCollisionCallbackComponent;
+ go->AddComponent(coll_comp);
+ go->AddUpdateable(coll_comp);
+
+ coll_comp->Init(m_input_manager, m_viewport);
+ overlayComp->Init(overlayDef.overlay_name, overlayDef.cont_name);
+
+ return go;
+}
+
 GameObject* GameObjectManager::CreateGUI(const Ogre::Vector3& position, void* data){
 	GuiDef& guiDef = *static_cast<GuiDef*>(data);
 	GameObject* go = new GameObject;
@@ -344,7 +362,7 @@ GameObject* GameObjectManager::CreateLeaf(const Ogre::Vector3& position, void* d
 	Ogre::Vector3 scale(0.002f);
 	node_comp->GetSceneNode()->setScale(scale);
 	rb->Init(position, mrc->GetEntity(), m_physics_engine, 1, COLLIDER_BOX, STATIC_BODY);
-	particle->Init(m_scene_manager, "Smoke", particleDef.particle_name);
+	particle->Init(m_scene_manager, particleDef.test, particleDef.particle_name);
 	node_comp->GetSceneNode()->setPosition(Ogre::Vector3(position));
 	particle->CreateParticle(node_comp->GetSceneNode(), node_comp->GetSceneNode()->getPosition(), Ogre::Vector3(0,-3,0));
 	return go;
@@ -357,5 +375,18 @@ GameObject* GameObjectManager::CreateTestTrigger(const Ogre::Vector3& position, 
 	go->AddComponent(tc);
 
 	tc->Init(position, m_physics_engine, &def);
+	return go;
+}
+
+GameObject* GameObjectManager::CreateCompanion(const Ogre::Vector3& position, void* data){
+	ButtonDef& buttonDef = *static_cast<ButtonDef*>(data);
+	GameObject* go = new GameObject(GAME_OBJECT_COMPANION);
+	TimerComponent* timer = new TimerComponent;
+	go->AddComponent(timer);
+	go->AddUpdateable(timer);
+
+	TriggerComponent* tc = new TriggerComponent;
+	go->AddComponent(tc);
+	
 	return go;
 }

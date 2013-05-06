@@ -7,7 +7,7 @@
 //#include "..\Components\SkyXPrereq.h"
 #include <sstream>
 
-PlayState::PlayState(void) : m_physics_engine(NULL), m_game_object_manager(NULL){}
+PlayState::PlayState(void) : m_physics_engine(NULL), m_game_object_manager(NULL), m_pause(false){}
 PlayState::~PlayState(void){}
 
 void PlayState::Enter(){
@@ -32,7 +32,13 @@ void PlayState::Enter(){
 	
 	/*ParticleDef particleDef;
 	particleDef.particle_name = "Particle/Smoke";
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(180,78,225), &particleDef);	*/
+	particleDef.test = "Test";
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(180,78,225), &particleDef);
+
+	ParticleDef particleDef2;
+	particleDef2.particle_name = "Particle/Smoke";
+	particleDef2.test = "Test2";
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(300,78,225), &particleDef2);*/
 	
 	Ogre::Light* light = m_scene_manager->createLight("light1");
 	light->setType(Ogre::Light::LT_DIRECTIONAL);
@@ -120,15 +126,46 @@ bool PlayState::Update(float dt){
 	m_game_object_manager->Update(dt);
 	m_physics_engine->Step(dt);
 	m_game_object_manager->LateUpdate(dt);
-	if (m_input_manager->IsButtonPressed(BTN_BACK)){
-		return false;
-	}
+	
 	if (m_input_manager->IsButtonDown(BTN_ARROW_UP)){
 		m_physics_engine->ShowDebugDraw(true);
 	}
 	else{
 		m_physics_engine->ShowDebugDraw(false);
 	}
-	
-	return true;
+		
+
+ if (m_input_manager->IsButtonPressed(BTN_BACK)){
+			return false;
+		}
+
+ if(m_pause){
+	 CreatePauseScreen();
+	 }
+
+		return true;
+}
+
+
+void PlayState::CreatePauseScreen(){
+	//std::cout << "Pause" << std::endl;
+	OverlayDef pause_def;
+	pause_def.overlay_name = "pauseOverlay";
+	pause_def.cont_name = "PausePanel";
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_OVERLAY, Ogre::Vector3(0.0f,0.0f,0.0f), &pause_def);
+
+	ButtonDef menu_button_resume;
+	menu_button_resume.overlay_name = "pauseButtonOverlay";
+	menu_button_resume.cont_name = "resume";
+	menu_button_resume.mat_start_hover = "Examples/Green";
+	menu_button_resume.mat_start = "Examples/Red";
+	menu_button_resume.mat_exit_hover = "Examples/MenuExitButtonHoover";
+	menu_button_resume.mat_exit = "Examples/MenuExitButton";
+	menu_button_resume.func = [this] { Test(); };
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_BUTTON, Ogre::Vector3(0,0,0), &menu_button_resume);
+
+}
+
+void PlayState::Test(){
+	std::cout << "Testing" << std::endl;
 }

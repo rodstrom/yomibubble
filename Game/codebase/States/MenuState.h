@@ -13,7 +13,10 @@ public:
 	bool Update(float dt);
 	void Enter();
 	void Exit();
-	void Test();
+	void ChangeStateToPlayState();
+	void ChangeStateToOptions();
+	void ChangeStateToCredits();
+	void ChangeStateToExit();
 
 	//DECLARE_STATE_CLASS(MenuState);
 
@@ -21,6 +24,7 @@ private:
 	GameObjectManager*			m_game_object_manager;
 	PhysicsEngine*				m_physics_engine;
 	SoundManager*				m_sound_manager;
+	bool						m_quit;
 
 };
 
