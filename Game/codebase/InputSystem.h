@@ -48,6 +48,7 @@ private:
 
 	float m_last_z;
 	float m_last_x;
+	float m_delta_zoom;
 
 	OIS::Mouse*			m_mouse;
 	OIS::Keyboard*		m_keyboard;

@@ -2,6 +2,7 @@
 #define _N_PLAYER_CONTROLLER_H_
 
 #include "ComponentsPrereq.h"
+#include "GameObjectPrereq.h"
 #include "..\Managers\SoundManager.h"
 
 class InputManager;
@@ -68,6 +69,8 @@ protected:
 	float m_acc_x;
 	float m_acc_z;
 	float m_max_velocity;
+
+	CameraDataDef m_camera_data_def;
 };
 
 class PhysicsEngine;

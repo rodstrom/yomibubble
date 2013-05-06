@@ -47,7 +47,7 @@ private:
 	bool			m_buttons[BTN_SIZE];
 	bool			m_last_buttons[BTN_SIZE];
 	OIS::MouseState m_mouse_state;
-	MousePosition m_mouse_position;
+	MousePosition	m_mouse_position;
 	MovementAxis	m_movement_axis;
 	CameraAxis		m_camera_axis;
 };

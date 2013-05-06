@@ -367,9 +367,9 @@ GameObject* GameObjectManager::CreateLeaf(const Ogre::Vector3& position, void* d
 	//Ogre::Vector3 scale(0.002f);
 	//node_comp->GetSceneNode()->setScale(scale);
 	rb->Init(position, mrc->GetEntity(), m_physics_engine, 1, COLLIDER_BOX, STATIC_BODY);
-	//particle->Init(m_scene_manager, "ring_flare2", particleDef.particle_name);
 	mrc->GetEntity()->setMaterialName("Examples/Leaf");
 	node_comp->GetSceneNode()->setPosition(Ogre::Vector3(position));
+	//particle->Init(m_scene_manager, "bajs", particleDef.particle_name);
 	//particle->CreateParticle(node_comp->GetSceneNode(), node_comp->GetSceneNode()->getPosition(), Ogre::Vector3(0,-3,0));
 	return go;
 }

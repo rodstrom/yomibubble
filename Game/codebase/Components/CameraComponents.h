@@ -39,6 +39,9 @@ protected:
 	Ogre::SceneNode*	m_camera_goal;
 	Ogre::SceneNode*	m_camera_node;
 	Ogre::Real			m_pivot_pitch;
+	Ogre::Vector3		m_default_position;
+	Ogre::Vector3		m_player_direction;
+	bool				m_getting_input;
 };
 
 #endif //_N_CAMERA_COMPONENTS_H_

@@ -6,6 +6,7 @@
 #include "..\Managers\GameObjectManager.h"
 //#include "..\Components\SkyXPrereq.h"
 #include <sstream>
+#include "..\Managers\VariableManager.h"
 
 PlayState::PlayState(void) : m_physics_engine(NULL), m_game_object_manager(NULL){}
 PlayState::~PlayState(void){}
@@ -30,11 +31,14 @@ void PlayState::Enter(){
 	m_sound_manager->LoadAudio();
 	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager);
 	
-	
-	
+	m_variable_manager = new VariableManager();
+	m_variable_manager->Init();
+	m_variable_manager->LoadVariables();
+	/*
 	Ogre::Light* light = m_scene_manager->createLight("light1");
 	light->setType(Ogre::Light::LT_DIRECTIONAL);
 	light->setDirection(Ogre::Vector3(1,-1,0));
+	*/
 	//m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
 	
 	// Create plane mesh
@@ -107,14 +111,14 @@ void PlayState::Enter(){
 
 	CharControllerDef player_def;
 	player_def.friction = 1.0f;
-	player_def.velocity = 5.0f;
-	player_def.max_velocity = 1.0f;
-	player_def.deacceleration = 10.0f;
-	player_def.jump_power = 300.0f;
+	player_def.velocity = m_variable_manager->GetValue("Player_Speed");
+	player_def.max_velocity = m_variable_manager->GetValue("Player_Max_Speed");
+	player_def.deacceleration = m_variable_manager->GetValue("Player_Deceleration");
+	player_def.jump_power = m_variable_manager->GetValue("Player_Jump_Power");
 	player_def.restitution = 0.0f;
 	player_def.step_height = 0.35f;
 	player_def.turn_speed = 1000.0f;
-	player_def.max_jump_height = 1.7f;
+	player_def.max_jump_height = m_variable_manager->GetValue("Player_Max_Jump_Height");
 	/*DynamicCharacterControllerDef player_def;
 	player_def.deceleration = 1.0f;
 	player_def.height = 1.0f;
@@ -138,15 +142,12 @@ void PlayState::Enter(){
 		ParticleDef particleDef;
 		particleDef.particle_name = "Particle/Smoke";
 		m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(168,75,175), &particleDef);
-		
 		m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(179,84,191), &particleDef);	
 		m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(178,79,229), &particleDef);	
 		m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(236,90,234), &particleDef);	
 		m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(157,77,213), &particleDef);	
 		m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(149,79,202), &particleDef);	
 		m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(131,89,203), &particleDef);	
-		
-		
 	}
 	else if (terrain == "try"){
 		player_pos = Ogre::Vector3(230, 72, 298);

@@ -26,6 +26,9 @@ struct TriggerDef{
 	float mass;
 };
 
+struct CameraDataDef{
+	Ogre::Vector3 player_direction;
+};
 
 struct CharControllerDef{
 	CharControllerDef(void) : step_height(0.0f), turn_speed(0.0f), velocity(0.0f), max_jump_height(0.0f), friction(0.0f), 

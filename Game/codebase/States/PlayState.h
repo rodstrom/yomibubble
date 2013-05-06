@@ -8,6 +8,7 @@
 
 class GameObjectManager;
 class PhysicsEngine;
+class VariableManager;
 class PlayState : public State
 {
 public:
@@ -45,6 +46,7 @@ private:
 
 	Ogre::SceneNode* m_cam_node;
 	ArtifexLoader* mArtifexLoader;
+	VariableManager* m_variable_manager;
 };
 
 #endif // _PLAY_STATE_H_
