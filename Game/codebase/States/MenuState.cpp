@@ -24,25 +24,43 @@ void MenuState::Enter(){
 	m_game_object_manager = new GameObjectManager;
 	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager);
 
-	/*ButtonDef buttonDef;
-	buttonDef.overlay_name = "testOverlay";
-	buttonDef.cont_name = "MyOverlayElements/TestPanel";
-	buttonDef.mat_start_hover = "Examples/Green";
-	buttonDef.mat_start = "Examples/Red";
-	buttonDef.mat_exit_hover = "Examples/MenuExitButtonHoover";
-	buttonDef.mat_exit = "Examples/MenuExitButton";
+	OverlayDef menuBackground;
+	menuBackground.overlay_name = "MenuBackground";
+	menuBackground.cont_name = "Menu/Background";
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_OVERLAY, Ogre::Vector3(0,0,0), &menuBackground);
+
+	menuBackground.overlay_name = "MenuBackgroundBubbles";
+	menuBackground.cont_name = "Menu/BackgroundBubbles";
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_OVERLAY, Ogre::Vector3(0,0,0), &menuBackground);
+
+	ButtonDef buttonDef;
+	buttonDef.overlay_name = "MenuStart";
+	buttonDef.cont_name = "Menu/Start";
+	buttonDef.mat_start_hover = "Menu/StartHover";
+	buttonDef.mat_start = "Menu/Start";
 	buttonDef.func = [this] { ChangeStateToPlayState(); };
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_BUTTON, Ogre::Vector3(0,0,0), &buttonDef);
-
-	ButtonDef exitButtonDef;
-	exitButtonDef.overlay_name = "testOverlay2";
-	exitButtonDef.cont_name = "MyOverlayElements/TestPanel2";
-	exitButtonDef.mat_start_hover = "Examples/Green";
-	exitButtonDef.mat_start = "Examples/Red";
-	exitButtonDef.mat_exit_hover = "Examples/MenuExitButtonHoover";
-	exitButtonDef.mat_exit = "Examples/MenuExitButton";
-	exitButtonDef.func = [this] { ChangeStateToExit(); };
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_BUTTON, Ogre::Vector3(0,0,0), &exitButtonDef);*/
+	
+	buttonDef.overlay_name = "MenuOptions";
+	buttonDef.cont_name = "Menu/Options";
+	buttonDef.mat_start_hover = "Menu/OptionsHover";
+	buttonDef.mat_start = "Menu/Options";
+	buttonDef.func = [this] { ChangeStateToPlayState(); };
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_BUTTON, Ogre::Vector3(0,0,0), &buttonDef);
+	
+	buttonDef.overlay_name = "MenuCredits";
+	buttonDef.cont_name = "Menu/Credits";
+	buttonDef.mat_start_hover = "Menu/CreditsHover";
+	buttonDef.mat_start = "Menu/Credits";
+	buttonDef.func = [this] { ChangeStateToPlayState(); };
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_BUTTON, Ogre::Vector3(0,0,0), &buttonDef);
+	
+	buttonDef.overlay_name = "MenuQuit";
+	buttonDef.cont_name = "Menu/Quit";
+	buttonDef.mat_start_hover = "Menu/QuitHover";
+	buttonDef.mat_start = "Menu/Quit";
+	buttonDef.func = [this] { ChangeStateToExit(); };
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_BUTTON, Ogre::Vector3(0,0,0), &buttonDef);
 
 	//m_scene_manager->setSkyDome(true, "Examples/CloudySky");
 }
