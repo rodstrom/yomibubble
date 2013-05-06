@@ -50,7 +50,7 @@ void CameraComponent::Update(float dt){
 }
 
 void CameraComponent::ActivateCamera(){
-	m_viewport->setCamera(m_camera);
+	//m_viewport->setCamera(m_camera);
 }
 
 void FollowCameraComponent::Notify(int type, void* msg){
@@ -59,6 +59,15 @@ void FollowCameraComponent::Notify(int type, void* msg){
 	case MSG_CAMERA_GET_CAMERA_NODE:
 		*static_cast<Ogre::SceneNode**>(msg) = m_camera_node;
 		break;
+	case MSG_FOLLOW_CAMERA_GET_ORIENTATION:
+		{
+			Ogre::Vector3 goal = Ogre::Vector3::ZERO;
+			Ogre::Vector3 dir = *static_cast<Ogre::Vector3*>(msg);
+			goal += dir.z * m_camera_node->getOrientation().zAxis();
+			goal += dir.x * m_camera_node->getOrientation().xAxis();
+			goal.y = 0.0f;
+			*static_cast<Ogre::Vector3*>(msg) = goal;
+		}
 	default:
 		break;
 	}
@@ -67,11 +76,13 @@ void FollowCameraComponent::Notify(int type, void* msg){
 void FollowCameraComponent::Shut(){
 	CameraComponent::Shut();
 	m_messenger->Unregister(MSG_CAMERA_GET_CAMERA_NODE, this);
+	m_messenger->Unregister(MSG_FOLLOW_CAMERA_GET_ORIENTATION, this);
 }
 
 void FollowCameraComponent::SetMessenger(ComponentMessenger* messenger){
 	CameraComponent::SetMessenger(messenger);
 	m_messenger->Register(MSG_CAMERA_GET_CAMERA_NODE, this);
+	m_messenger->Register(MSG_FOLLOW_CAMERA_GET_ORIENTATION, this);
 }
 
 void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewport* viewport, bool activate, const Ogre::String& camera_id){

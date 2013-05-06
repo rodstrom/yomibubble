@@ -13,6 +13,8 @@ enum EGameObject{
 	GAME_OBJECT_TRIGGER_TEST,
 	GAME_OBJECT_BUTTON,
 	GAME_OBJECT_COMPANION,
+	GAME_OBJECT_TERRAIN,
+	GAME_OBJECT_GATE,
 	GAME_OBJECT_SIZE
 };
 
@@ -25,21 +27,6 @@ struct TriggerDef{
 	float z;
 	float radius;
 	float mass;
-};
-
-
-struct CharControllerDef{
-	CharControllerDef(void) : step_height(0.0f), turn_speed(0.0f), velocity(0.0f), max_jump_height(0.0f), friction(0.0f), 
-		restitution(0.0f), jump_power(0.0f), max_velocity(0.0f), deacceleration(0.0f) {}
-	float step_height;
-	float turn_speed;
-	float velocity;
-	float max_jump_height;
-	float jump_power;
-	float friction;
-	float restitution;
-	float max_velocity;
-	float deacceleration;
 };
 
 struct RigidbodyDef{
@@ -57,6 +44,16 @@ struct PlaneDef{
 	Ogre::String material_name;
 	float friction;
 	float restitution;
+};
+
+struct CollisionDef {
+	short flag;
+	void* data;
+};
+
+enum ECollisionTypes{
+	COLLISION_FLAG_STATIC = 0,
+	COLLISION_FLAG_GAME_OBJECT
 };
 
 #endif // _N_GAME_OBJECT_PREREQ_H_

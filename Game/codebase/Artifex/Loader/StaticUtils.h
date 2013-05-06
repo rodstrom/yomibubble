@@ -94,7 +94,7 @@ static void flipFArray(float* arr, size_t x, size_t y,FlipOptions options=REVERS
 			break;
 		*/ 
 		case FLIPX: {
-				for (int v=0;v<y;v++) {
+				for (unsigned int v=0;v<y;v++) {
 					for (int u=0;u<(int)x/2;u++) {
 						f=*(arr+v*y+u);
 						*(arr+v*y+u) = *(arr+v*y+x-u-1);

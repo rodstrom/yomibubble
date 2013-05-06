@@ -33,17 +33,21 @@ enum EComponentMsg{
 	MSG_RIGIDBODY_GRAVITY_SET,
 	MSG_RIGIDBODY_POSITION_SET,
 	MSG_RIGIDBODY_APPLY_IMPULSE,
+	MSG_RIGIDBODY_COLLISION_FLAG_SET,
+	MSG_RIGIDBODY_COLLISION_FLAG_REMOVE,
 	MSG_ANIMATION_PLAY,
 	MSG_ANIMATION_PAUSE,
 	MSG_ANIMATION_BLEND,
-	MSG_CHARACTER_CONROLLER_VELOCITY_SET,
-	MSG_CHARACTER_CONROLLER_TURN_SPEED_SET,
+	MSG_CHARACTER_CONTROLLER_VELOCITY_SET,
+	MSG_CHARACTER_CONTROLLER_TURN_SPEED_SET,
 	MSG_CHARACTER_CONTROLLER_SET_DIRECTION,
 	MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_SET,
 	MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_GET,
-	MSG_CHARACTER_CONROLLER_JUMP,
+	MSG_CHARACTER_CONTROLLER_JUMP,
 	MSG_CHARACTER_CONTROLLER_GRAVITY_SET,
-	MSG_CHARACTER_CONTROLLER_IS_ON_GROUND,
+	MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_SET,
+	MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_GET,
+	MSG_FOLLOW_CAMERA_GET_ORIENTATION,
 	MSG_CAMERA_GET_CAMERA_NODE,
 	MSG_CAMERA_GET_CAMERA,
 	MSG_CAMERA_SET_ACTIVE,
@@ -70,6 +74,7 @@ enum EComponentMsg{
 	MSG_LEAF_PICKUP,
 	MSG_PLAYER_INPUT_SET_BUBBLE,
 	MSG_PLAYER_INPUT_SET_STATE,
+	MSG_PLAYER_INPUT_STATE_GET,
 	MSG_BUBBLE_CONTROLLER_APPLY_IMPULSE,
 	MSG_BUBBLE_CONTROLLER_CAN_ATTACH_SET,
 	MSG_BUBBLE_CONTROLLER_CAN_ATTACH_GET,
@@ -77,6 +82,8 @@ enum EComponentMsg{
 	MSG_P2P_GET_CONSTRAINT_SET_PIVOTA,
 	MSG_P2P_GET_CONSTRAINT_SET_PIVOTB,
 	MSG_START_TIMER,
+	MSG_RAYCAST_COLLISION_GAME_OBJECT,
+	MSG_RAYCAST_COLLISION_STATIC_ENVIRONMENT,
 	MSG_SIZE
 };
 
@@ -162,8 +169,10 @@ struct RigidBodyDef{
 };
 
 struct AnimationMsg{
-	int index;
+	bool blend;
 	Ogre::String id;
+	Ogre::String bottom_anim;
+	Ogre::String top_anim;
 };
 
 struct CharControllerJumpDef{
@@ -215,6 +224,46 @@ struct RaycastDef{
 	btVector3 origin;
 	btVector3 length;
 	Ogre::String body_id;
+};
+
+struct BubbleDef{
+	btRigidBody* connection_body;		// the static trigger body the joint will connect to while blowing.
+	float start_scale;
+	float restitution;
+	float friction;
+};
+
+struct PlayerInputDef{
+
+};
+
+struct CharacterControllerDef{
+	CharacterControllerDef(void) : step_height(0.0f), turn_speed(0.0f), velocity(0.0f), max_jump_height(0.0f), friction(0.0f), mass(0.0f),
+		restitution(0.0f), jump_power(0.0f), max_speed(0.0f), deceleration(0.0f), air_deceleration(0.0f), radius(0.0f), height(0.0f) {}
+	float step_height;
+	float turn_speed;
+	float velocity;
+	float max_jump_height;
+	float jump_power;
+	float friction;
+	float restitution;
+	float max_speed;
+	float deceleration;
+	float air_deceleration;
+	float radius;
+	float height;
+	float mass;
+};
+
+struct DynamicCharacterControllerDef{
+	float step_height;
+	float radius;
+	float height;
+	float jump_impulse;
+	float deceleration;
+	float max_speed;
+	float jump_recharge_time;
+	float mass;
 };
 
 #endif // _N_COMPONENTS_PREREQ_H_

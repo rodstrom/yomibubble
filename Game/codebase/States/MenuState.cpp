@@ -66,7 +66,7 @@ bool MenuState::Update(float dt){
 	//m_sound_manager->Update(m_camera, m_scene_manager, dt);
 	m_game_object_manager->Update(dt);
 	m_physics_engine->Step(dt);
-	m_game_object_manager->LateUpdate(dt);
+	//m_game_object_manager->LateUpdate(dt);
 	if (m_input_manager->IsButtonPressed(BTN_BACK))
 		return false;
 

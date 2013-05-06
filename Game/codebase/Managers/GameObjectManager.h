@@ -2,6 +2,7 @@
 #define _N_GAME_OBJECT_MANAGER_H_
 
 #include "..\Components\GameObjectPrereq.h"
+#include <string>
 
 class GameObject;
 class InputManager;
@@ -14,10 +15,10 @@ public:
 	~GameObjectManager(void);
 	void Init(PhysicsEngine* physics_engine, Ogre::SceneManager* scene_manager, InputManager* input_manager, Ogre::Viewport* viewport, SoundManager* sound_manager);
 	void Update(float dt);
-	void LateUpdate(float dt);		// Update performed after physics simulation.	
 	void RemoveGameObject(GameObject* gameobject);
 	GameObject* CreateGameObject(int type, const Ogre::Vector3& position, void* data);
 	void Shut();
+	//GameObject* GetGameObject(std::string id);
 
 	Ogre::SceneManager* GetSceneManager() const { return m_scene_manager; }
 	InputManager* GetInputManager() const { return m_input_manager; }
@@ -37,6 +38,8 @@ private:
 	GameObject* CreateGUI(const Ogre::Vector3& position, void* data);
 	GameObject* CreateTestTrigger(const Ogre::Vector3& position, void* data);
 	GameObject* CreateCompanion(const Ogre::Vector3& position, void* data);
+	GameObject* CreateTerrain(const Ogre::Vector3& position, void* data);
+	GameObject* CreateGate(const Ogre::Vector3& position, void* data);
 
 	typedef GameObject* (GameObjectManager::*CreateObjectFptr)(const Ogre::Vector3&, void* data);
 	

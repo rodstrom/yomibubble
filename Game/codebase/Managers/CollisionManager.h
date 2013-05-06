@@ -39,6 +39,8 @@ private:
 	void LeafPlayer(GameObject* leaf, GameObject* player);
 	void PlayerTrigger(GameObject* player, GameObject* trigger);
 
+	void PlayerTerrain(GameObject* player, GameObject* terrain);
+
 	
 	typedef void (CollisionManager::*DoubleDispatch)(GameObject*, GameObject*);
 	typedef std::map<std::pair<int, int>, DoubleDispatch> HitMap;
