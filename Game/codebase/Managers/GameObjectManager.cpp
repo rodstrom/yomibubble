@@ -371,7 +371,7 @@ GameObject* GameObjectManager::CreateTerrain(const Ogre::Vector3& position, void
 	TerrainComponent* tc = new TerrainComponent;
 	go->AddComponent(tc);
 
-	tc->Init(m_scene_manager, m_physics_engine, *static_cast<Ogre::String*>(data));
+	tc->Init(m_scene_manager, m_physics_engine, this, m_sound_manager, *static_cast<Ogre::String*>(data));
 	return go;
 }
 

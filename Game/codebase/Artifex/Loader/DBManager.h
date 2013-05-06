@@ -18,16 +18,21 @@ THE SOFTWARE.
 
 #include "ArtifexLoader.h"
 class ArtifexLoader;
-class PhysicsEngine;
 
 #include "CppSQLite3.h"
 
+#include "..\..\Managers\GameObjectManager.h"
+#include "..\..\Managers\SoundManager.h"
+#include "..\..\PhysicsEngine.h"
+
+#include <string>
+#include <vector>
+
 class DBManager {
 public:
-	DBManager(ArtifexLoader *artifexloader, PhysicsEngine* physicsengine);
+	DBManager(ArtifexLoader *artifexloader, PhysicsEngine *physics_engine, GameObjectManager *game_object_manager, SoundManager *sound_manager);
 	~DBManager();
 
-	PhysicsEngine* mPhysicsEngine;
 	ArtifexLoader *mArtifexLoader;
 	CppSQLite3DB *mDB;
 
@@ -42,17 +47,25 @@ public:
 	bool WriteAttributes(Spawn2& spawn);
 	bool EmptyTrash();
 	int DBManager::getObjectProperties(Spawn2 &spawn);
+	Vector3 DBManager::getWaypoint(string waypoint_id);
+
+	std::vector<std::string> &DBManager::split(const std::string &s, char delim, std::vector<std::string> &elems);
+	std::vector<std::string> DBManager::split(const std::string &s, char delim);
 
 	int Save();
 	int Load();
 
 	bool saving;
 
-protected:
+	GameObjectManager *m_game_object_manager;
+	SoundManager *m_sound_manager;	
+	PhysicsEngine *m_physics_engine;
+
 	void Shut();
 	std::vector<btRigidBody*> m_bodies;
 	std::vector<btMotionState*> m_motion_states;
 	std::vector<btCollisionShape*> m_shapes;
 	std::vector<struct CollisionDef*> m_collision_defs;
+
 };
 #endif

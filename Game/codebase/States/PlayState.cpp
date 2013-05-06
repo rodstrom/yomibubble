@@ -139,18 +139,6 @@ void PlayState::Enter(){
 	else if (terrain == "Dayarea"){
 		player_pos = Ogre::Vector3(170, 75, 173);
 		
-		ParticleDef particleDef;
-		particleDef.particle_name = "Particle/Smoke";
-		m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(168,75,175), &particleDef);
-		
-		m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(179,84,191), &particleDef);	
-		m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(178,79,229), &particleDef);	
-		m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(236,90,234), &particleDef);	
-		m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(157,77,213), &particleDef);	
-		m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(149,79,202), &particleDef);	
-		m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(131,89,203), &particleDef);	
-		
-		
 	}
 	else if (terrain == "try"){
 		player_pos = Ogre::Vector3(230, 72, 298);

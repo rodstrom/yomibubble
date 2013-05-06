@@ -523,10 +523,10 @@ void TerrainComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger = messenger;
 }
 
-void TerrainComponent::Init(Ogre::SceneManager* scene_manager, PhysicsEngine* physics_engine, const Ogre::String& filename){
+void TerrainComponent::Init(Ogre::SceneManager* scene_manager, PhysicsEngine* physics_engine, GameObjectManager* game_object_manager, SoundManager* sound_manager, const Ogre::String& filename){
 	m_scene_manager = scene_manager;
 	m_physics_engine = physics_engine;
-	m_artifex_loader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_scene_manager->getCamera("MainCamera"), physics_engine, "../../resources/terrain/");
+	m_artifex_loader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_scene_manager->getCamera("MainCamera"), physics_engine, game_object_manager, sound_manager, "../../resources/terrain/");
 
 //mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_camera, m_game_object_manager, m_sound_manager, "../../resources/terrain/");
 
