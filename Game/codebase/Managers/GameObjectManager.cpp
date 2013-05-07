@@ -384,14 +384,31 @@ GameObject* GameObjectManager::CreateTestTrigger(const Ogre::Vector3& position, 
 
 GameObject* GameObjectManager::CreateCompanion(const Ogre::Vector3& position, void* data){
 	ButtonDef& buttonDef = *static_cast<ButtonDef*>(data);
+	CharacterControllerDef& def = *static_cast<CharacterControllerDef*>(data);
 	GameObject* go = new GameObject(GAME_OBJECT_COMPANION);
 	TimerComponent* timer = new TimerComponent;
 	go->AddComponent(timer);
 	go->AddUpdateable(timer);
+	NodeComponent* node_comp = new NodeComponent;
+	go->AddComponent(node_comp);
+	MeshRenderComponent* mrc = new MeshRenderComponent;
+	go->AddComponent(mrc);
+	AnimationComponent* acomp = new AnimationComponent;
+	acomp->AddAnimationStates(1);
+	go->AddComponent(acomp);
+	go->AddUpdateable(acomp);
+	CharacterController* contr = new CharacterController;
+	go->AddComponent(contr);
+	go->AddUpdateable(contr);
+	WayPointComponent* way_point = new WayPointComponent;
+	go->AddComponent(way_point);
+	go->AddUpdateable(way_point);
 
-	TriggerComponent* tc = new TriggerComponent;
-	go->AddComponent(tc);
-	
+	node_comp->Init(position, m_scene_manager);
+	mrc->Init("yomi.mesh", m_scene_manager);
+	Ogre::Vector3 scale(0.0002f);
+	node_comp->GetSceneNode()->setScale(scale);
+	acomp->GetEntity()->setMaterialName("_YomiFBXASC039sFBXASC032staffMaterial__191");	
 	return go;
 }
 
