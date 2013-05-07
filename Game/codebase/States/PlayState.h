@@ -5,6 +5,7 @@
 #include "..\PhysicsEngine.h"
 #include "..\Artifex\Loader\ArtifexLoader.h"
 #include "..\Functor.h"
+#include <functional>
 
 class LevelManager;
 class GameObjectManager;
@@ -18,11 +19,17 @@ public:
 	bool Update(float dt);
 	void Enter();
 	void Exit();
+	bool Pause() { return m_pause; }
+	void CreatePauseScreen();
+	void Resume();
+	void Quit();
 
 private:
 	PhysicsEngine*				m_physics_engine;
 	GameObjectManager*			m_game_object_manager;
 	LevelManager*				m_level_manager;
+	bool m_pause;
+	bool m_running;
 };
 
 #endif // _PLAY_STATE_H_

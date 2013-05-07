@@ -238,6 +238,7 @@ void PlayerInputComponent::Normal(float dt){
 	Ogre::Vector3 acc = Ogre::Vector3::ZERO;
 	//Acceleration(dir, acc, dt);
 	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &dir);
+	m_messenger->Notify(MSG_START_TIMER, NULL);
 }
 
 void PlayerInputComponent::OnBubble(float dt){

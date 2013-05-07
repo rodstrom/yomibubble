@@ -77,9 +77,12 @@ using namespace Ogre;
 using namespace Artifex;
 
 class PhysicsEngine;
+class GameObjectManager;
+class SoundManager;
+
 class ArtifexLoader {
 public:
-ArtifexLoader(Root *root, SceneManager *scenemgr, SceneNode *camnode, Camera *camera, PhysicsEngine* physics_engine, string zonepath="");
+ArtifexLoader(Root *root, SceneManager *scenemgr, SceneNode *camnode, Camera *camera, PhysicsEngine* physics_engine, GameObjectManager* game_object_manager, SoundManager* sound_manager, string zonepath="");
 ~ArtifexLoader();
 
 Root *mRoot;

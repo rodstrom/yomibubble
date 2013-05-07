@@ -66,6 +66,8 @@ enum EComponentMsg{
 	MSG_MUSIC3D_STOP,
 	MSG_INCREASE_SCALE_BY_VALUE,
 	MSG_SET_OBJECT_POSITION,
+	MSG_OVERLAY_SHOW,
+	MSG_OVERLAY_HIDE,
 	MSG_OVERLAY_HOVER_ENTER,
 	MSG_OVERLAY_HOVER_EXIT,
 	MSG_OVERLAY_CALLBACK,
@@ -80,6 +82,7 @@ enum EComponentMsg{
 	MSG_P2P_GET_CONSTRAINT,
 	MSG_P2P_GET_CONSTRAINT_SET_PIVOTA,
 	MSG_P2P_GET_CONSTRAINT_SET_PIVOTB,
+	MSG_START_TIMER,
 	MSG_RAYCAST_COLLISION_GAME_OBJECT,
 	MSG_RAYCAST_COLLISION_STATIC_ENVIRONMENT,
 	MSG_SIZE
@@ -172,12 +175,22 @@ struct AddForceMsg{
 };
 
 struct ButtonDef{
-	Ogre::String mat_hover;
+	Ogre::String mat_start_hover;
+	Ogre::String mat_start;
+	Ogre::String mat_exit_hover;
 	Ogre::String mat_exit;
+	Ogre::String mat_options_hover;
+	Ogre::String mat_options;
+	Ogre::String mat_credits_hover;
+	Ogre::String mat_credits;
 	Ogre::String cont_name;
 	Ogre::String overlay_name;
-	Ogre::String mat_start_button;
 	std::function<void()> func;
+};
+
+struct OverlayDef{
+	Ogre::String cont_name;
+	Ogre::String overlay_name;
 };
 
 struct GuiDef{
@@ -190,6 +203,7 @@ struct GuiDef{
 
 struct ParticleDef{
 	Ogre::String particle_name;
+	Ogre::String test;
 };
 
 struct RaycastDef{

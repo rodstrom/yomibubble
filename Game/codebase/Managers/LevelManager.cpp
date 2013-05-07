@@ -3,8 +3,8 @@
 #include "GameObjectManager.h"
 #include "..\MessageSystem.h"
 
-LevelManager::LevelManager(GameObjectManager* game_object_manager, MessageSystem* message_system) : 
-	m_game_object_manager(game_object_manager), m_message_system(message_system), m_current_level(0){
+LevelManager::LevelManager(GameObjectManager* game_object_manager, Ogre::SceneManager* scene_manager,  MessageSystem* message_system) : 
+	m_game_object_manager(game_object_manager), m_scene_manager(scene_manager), m_message_system(message_system), m_current_level(0){
 		m_message_system->Register<LevelManager>(EEventType::EVT_CHANGE_LEVEL, this, &LevelManager::ChangeLevel);
 }
 LevelManager::~LevelManager(void){}
@@ -30,17 +30,17 @@ void LevelManager::LoadLevel(const Ogre::String& level_id){
 }
 
 void LevelManager::FixZFighting(){
-	if(MaterialManager::getSingleton().getByName("Ogre/TextureShadowCaster").isNull())
+	if(Ogre::MaterialManager::getSingleton().getByName("Ogre/TextureShadowCaster").isNull())
 		// Render a frame to get the shadow materials created
 			Ogre::Root::getSingleton().renderOneFrame();
 
 	   // Get all shadow materials
-		std::vector<MaterialPtr> tmpMaterials;
-	   TexturePtr tmpTexturePtr = m_scene_manager->getShadowTexture(0);
-	   String tmpMaterialName = tmpTexturePtr->getName() + "Mat" + m_scene_manager->getName();
-	   tmpMaterials.push_back(MaterialManager::getSingleton().getByName(tmpMaterialName));
-	   tmpMaterials.push_back(MaterialManager::getSingleton().getByName("Ogre/TextureShadowCaster"));
-	   tmpMaterials.push_back(MaterialManager::getSingleton().getByName("Ogre/TextureShadowReceiver"));
+		std::vector<Ogre::MaterialPtr> tmpMaterials;
+	   Ogre::TexturePtr tmpTexturePtr = m_scene_manager->getShadowTexture(0);
+	   Ogre::String tmpMaterialName = tmpTexturePtr->getName() + "Mat" + m_scene_manager->getName();
+	   tmpMaterials.push_back(Ogre::MaterialManager::getSingleton().getByName(tmpMaterialName));
+	   tmpMaterials.push_back(Ogre::MaterialManager::getSingleton().getByName("Ogre/TextureShadowCaster"));
+	   tmpMaterials.push_back(Ogre::MaterialManager::getSingleton().getByName("Ogre/TextureShadowReceiver"));
 
 	   // Loop through the list of shadow materials
 	   unsigned int i = 0;

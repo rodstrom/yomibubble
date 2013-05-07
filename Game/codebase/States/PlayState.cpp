@@ -8,7 +8,7 @@
 #include "..\Managers\LevelManager.h"
 #include <sstream>
 
-PlayState::PlayState(void) : m_physics_engine(NULL), m_game_object_manager(NULL){}
+PlayState::PlayState(void) : m_physics_engine(NULL), m_game_object_manager(NULL), m_pause(false), m_running(true){}
 PlayState::~PlayState(void){}
 
 void PlayState::Enter(){
@@ -34,7 +34,18 @@ void PlayState::Enter(){
 	m_sound_manager->LoadAudio();
 	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager, m_message_system);
 	
-	m_level_manager = new LevelManager(m_game_object_manager, m_message_system);
+	m_level_manager = new LevelManager(m_game_object_manager, m_scene_manager, m_message_system);
+	/*ParticleDef particleDef;
+	particleDef.particle_name = "Particle/Smoke";
+	particleDef.test = "Test";
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(180,78,225), &particleDef);
+
+	ParticleDef particleDef2;
+	particleDef2.particle_name = "Particle/Smoke";
+	particleDef2.test = "Test2";
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(300,78,225), &particleDef2);*/
+	
+	
 
 	// Create plane mesh
 	Ogre::Plane plane(Ogre::Vector3::UNIT_Y, -10);
@@ -61,14 +72,9 @@ void PlayState::Enter(){
 
 	//mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, m_camera, m_scene_manager->getSceneNode(""), m_game_object_manager, m_sound_manager, "../../resources/terrain/");
 	//mArtifexLoader->loadZone("try");
-	/*
-	PlaneDef plane_def;
-	plane_def.material_name = "Examples/BeachStones";
-	plane_def.plane_name = "plane";
-	plane_def.friction = 1.0f;
-	plane_def.restitution = 0.8f;
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(x,y - 2.0f,z), &plane_def);
-	*/
+	
+	
+	
 	//0.35f, 1000.0f, 500.0f, 10.0f, 
 	/*TriggerDef trigger_def;
 	trigger_def.body_type = DYNAMIC_BODY;
@@ -91,7 +97,7 @@ void PlayState::Enter(){
 
 	//m_physics_engine->ShowDebugDraw(true);
 	//m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y+1.0f,z+3.0f), &tott_def);
-	//m_physics_engine->CreateTerrainCollision(mArtifexLoader->mTerrain);
+	//	m_physics_engine->CreateTerrainCollision(mArtifexLoader->mTerrain);
 	//m_scene_manager->setSkyDome(true, "Examples/CloudySky");
 	
 	/*TriggerDef trigger_def;
@@ -228,23 +234,77 @@ void PlayState::Exit(){
 	m_physics_engine->Shut();
 	delete m_physics_engine;
 	m_physics_engine = NULL;
+	delete m_sound_manager;
+	m_sound_manager = NULL;
+	m_render_window->removeAllViewports();
 	Ogre::Root::getSingleton().destroySceneManager(m_scene_manager);
 	m_scene_manager = NULL;
 }
 
 bool PlayState::Update(float dt){
-	m_sound_manager->Update(m_camera, m_scene_manager, dt);
+
 	m_game_object_manager->Update(dt);
-	m_physics_engine->Step(dt);
-	if (m_input_manager->IsButtonPressed(BTN_BACK)){
-		return false;
-	}
-	if (m_input_manager->IsButtonDown(BTN_ARROW_UP)){
-		m_physics_engine->ShowDebugDraw(true);
-	}
-	else{
-		m_physics_engine->ShowDebugDraw(false);
-	}
+
+	//if(m_pause){
+	//	//CreatePauseScreen();
+	//	PushState(FindByName("PauseState"));
+	//}
+	//else {
+		m_sound_manager->Update(m_camera, m_scene_manager, dt);
+		m_physics_engine->Step(dt);
 	
-	return true;
+		if (m_input_manager->IsButtonDown(BTN_ARROW_UP)){
+			m_physics_engine->ShowDebugDraw(true);
+		}
+		else{
+			m_physics_engine->ShowDebugDraw(false);
+		}
+		
+		if (m_input_manager->IsButtonPressed(BTN_BACK)){
+			m_pause = true;
+			PushState(FindByName("PauseState"));
+			m_input_manager->InjectReleasedButton(BTN_BACK);	//bugfix
+			//return false;
+		}
+		else {
+			m_pause = false;
+		}
+	//}
+	return m_running;
+}
+
+
+void PlayState::CreatePauseScreen(){
+	OverlayDef menuBackground;
+	menuBackground.overlay_name = "Menu";
+	menuBackground.cont_name = "Menu/Background";
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_OVERLAY, Ogre::Vector3(0,0,0), &menuBackground);
+
+	menuBackground.overlay_name = "Menu";
+	menuBackground.cont_name = "Menu/BackgroundBubbles";
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_OVERLAY, Ogre::Vector3(0,0,0), &menuBackground);
+
+	ButtonDef buttonDef;
+	buttonDef.overlay_name = "Menu";
+	buttonDef.cont_name = "Menu/Start";
+	buttonDef.mat_start_hover = "Menu/StartHover";
+	buttonDef.mat_start = "Menu/Start";
+	buttonDef.func = [this] { Resume(); };
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_BUTTON, Ogre::Vector3(0,0,0), &buttonDef);
+	
+	buttonDef.overlay_name = "Menu";
+	buttonDef.cont_name = "Menu/Options";
+	buttonDef.mat_start_hover = "Menu/OptionsHover";
+	buttonDef.mat_start = "Menu/Options";
+	buttonDef.func = [this] { Quit(); };
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_BUTTON, Ogre::Vector3(0,0,0), &buttonDef);
+
+}
+
+void PlayState::Resume(){
+	m_pause = false;
+}
+
+void PlayState::Quit(){
+	m_running = false;
 }

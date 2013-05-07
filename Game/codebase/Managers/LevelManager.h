@@ -3,11 +3,12 @@
 
 #include "LevelPrereq.h"
 
+struct IEvent;
 class MessageSystem;
 class GameObjectManager;
 class LevelManager {
 public:
-	LevelManager(GameObjectManager* game_object_manager, MessageSystem* message_system);
+	LevelManager(GameObjectManager* game_object_manager, Ogre::SceneManager* scene_manager, MessageSystem* message_system);
 	~LevelManager(void);
 	void AddLevel(const LevelDef& level_def) { m_levels.push_back(level_def); }
 	void ChangeLevel(IEvent*);
@@ -19,6 +20,7 @@ protected:
 	std::vector<LevelDef> m_levels;
 	GameObjectManager* m_game_object_manager;
 	MessageSystem*	m_message_system;
+	Ogre::SceneManager* m_scene_manager;
 };
 
 #endif // _LEVEL_MANAGER_H_

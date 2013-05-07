@@ -6,6 +6,7 @@
 #include "..\Components\PhysicsComponents.h"
 #include "..\Components\CameraComponents.h"
 #include "..\Components\AIComponents.h"
+#include "..\Components\TimerComponent.h"
 #include "InputManager.h"
 #include "..\Components\AudioComponents.h"
 #include "..\Components\PlayerInputComponent.h"
@@ -29,10 +30,12 @@ void GameObjectManager::Init(PhysicsEngine* physics_engine, Ogre::SceneManager* 
 	m_create_fptr[GAME_OBJECT_PINK_BUBBLE] =	&GameObjectManager::CreatePinkBubble;
 	m_create_fptr[GAME_OBJECT_TOTT]        =	&GameObjectManager::CreateTott;
 	m_create_fptr[GAME_OBJECT_PLANE]       =	&GameObjectManager::CreatePlane;
+	m_create_fptr[GAME_OBJECT_BUTTON]	   =	&GameObjectManager::CreateButton;
 	m_create_fptr[GAME_OBJECT_OVERLAY]	   =	&GameObjectManager::Create2DOverlay;
 	m_create_fptr[GAME_OBJECT_GUI]		   =	&GameObjectManager::CreateGUI;
 	m_create_fptr[GAME_OBJECT_LEAF]		   =	&GameObjectManager::CreateLeaf;
 	m_create_fptr[GAME_OBJECT_TRIGGER_TEST]=	&GameObjectManager::CreateTestTrigger;
+	m_create_fptr[GAME_OBJECT_COMPANION]   =	&GameObjectManager::CreateCompanion;
 	m_create_fptr[GAME_OBJECT_TERRAIN]	   =	&GameObjectManager::CreateTerrain;
 	m_create_fptr[GAME_OBJECT_GATE]		   =	&GameObjectManager::CreateGate;
 }
@@ -327,24 +330,36 @@ GameObject* GameObjectManager::CreatePlane(const Ogre::Vector3& position, void* 
 	rc->GetCollisionDef().flag = COLLISION_FLAG_STATIC;
 	return go;
 }
-GameObject* GameObjectManager::Create2DOverlay(const Ogre::Vector3& position, void* data) {
+GameObject* GameObjectManager::CreateButton(const Ogre::Vector3& position, void* data) {
 	ButtonDef& buttonDef = *static_cast<ButtonDef*>(data);
 	GameObject* go = new GameObject;
-	//Overlay2DComponent* overlayComp = new Overlay2DComponent;
-	//go->AddComponent(overlayComp);
-	OverlayCollisionCallbackComponent* overlayCallBack = new OverlayCollisionCallbackComponent;
-	go->AddComponent(overlayCallBack);
-	go->AddUpdateable(overlayCallBack);
+	OverlayCollisionCallbackComponent* collisionCallBack = new OverlayCollisionCallbackComponent;
+	go->AddComponent(collisionCallBack);
+	go->AddUpdateable(collisionCallBack);
 	Overlay2DAnimatedComponent* overlay2DAnim = new Overlay2DAnimatedComponent;
 	go->AddComponent(overlay2DAnim);
 	OverlayCallbackComponent* overlaycallback = new OverlayCallbackComponent;
 	go->AddComponent(overlaycallback);
-	//overlayComp->Init(buttonDef.overlay_name, buttonDef.cont_name);
 	overlaycallback->Init(buttonDef.func);
-	overlayCallBack->Init(m_input_manager, m_viewport);
-	overlay2DAnim->Init(buttonDef.overlay_name, buttonDef.mat_hover, buttonDef.mat_exit, buttonDef.cont_name);
+	collisionCallBack->Init(m_input_manager, m_viewport);
+	overlay2DAnim->Init(buttonDef.overlay_name, buttonDef.mat_start_hover, buttonDef.mat_start, buttonDef.cont_name);
 
 	return go;
+}
+
+GameObject* GameObjectManager::Create2DOverlay(const Ogre::Vector3& position, void* data) {
+ OverlayDef& overlayDef = *static_cast<OverlayDef*>(data);
+ GameObject* go = new GameObject;
+ Overlay2DComponent* overlayComp = new Overlay2DComponent;
+ go->AddComponent(overlayComp);
+ OverlayCollisionCallbackComponent* coll_comp = new OverlayCollisionCallbackComponent;
+ go->AddComponent(coll_comp);
+ go->AddUpdateable(coll_comp);
+
+ coll_comp->Init(m_input_manager, m_viewport);
+ overlayComp->Init(overlayDef.overlay_name, overlayDef.cont_name);
+
+ return go;
 }
 
 GameObject* GameObjectManager::CreateGUI(const Ogre::Vector3& position, void* data){
@@ -388,6 +403,7 @@ GameObject* GameObjectManager::CreateLeaf(const Ogre::Vector3& position, void* d
 	 trdef.collision_filter.mask = COL_PLAYER;
 
 	 rb->Init(position, m_physics_engine, trdef);
+	//particle->Init(m_scene_manager, particleDef.test, particleDef.particle_name);
 	//particle->Init(m_scene_manager, "ring_flare2", particleDef.particle_name);
 	mrc->GetEntity()->setMaterialName("Examples/Leaf");
 	node_comp->GetSceneNode()->setPosition(Ogre::Vector3(position));
@@ -405,12 +421,25 @@ GameObject* GameObjectManager::CreateTestTrigger(const Ogre::Vector3& position, 
 	return go;
 }
 
+GameObject* GameObjectManager::CreateCompanion(const Ogre::Vector3& position, void* data){
+	ButtonDef& buttonDef = *static_cast<ButtonDef*>(data);
+	GameObject* go = new GameObject(GAME_OBJECT_COMPANION);
+	TimerComponent* timer = new TimerComponent;
+	go->AddComponent(timer);
+	go->AddUpdateable(timer);
+
+	TriggerComponent* tc = new TriggerComponent;
+	go->AddComponent(tc);
+	
+	return go;
+}
+
 GameObject* GameObjectManager::CreateTerrain(const Ogre::Vector3& position, void* data){
 	GameObject* go = new GameObject(GAME_OBJECT_TERRAIN);
 	TerrainComponent* tc = new TerrainComponent;
 	go->AddComponent(tc);
 
-	tc->Init(m_scene_manager, m_physics_engine, *static_cast<Ogre::String*>(data));
+	tc->Init(m_scene_manager, m_physics_engine, this, m_sound_manager, *static_cast<Ogre::String*>(data));
 	return go;
 }
 

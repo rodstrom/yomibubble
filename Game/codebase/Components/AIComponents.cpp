@@ -32,6 +32,10 @@ void WayPointComponent::Update(float dt){
 	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_VELOCITY_SET, &speed3);
 };
 
+void WayPointComponent::SetLoopable(Ogre::String loop){
+	m_way_point->setLoopable(loop);
+};
+
 void WayPointComponent::AddWayPoint(Ogre::Vector3 way_point){
 	m_way_point->AddWayPoint(way_point);
 };

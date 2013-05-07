@@ -10,8 +10,8 @@ SoundManager::SoundManager(Ogre::SceneManager* scene_manager, Ogre::Camera* came
 
 	m_sound_manager->init();
 
-	m_ear_node = scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(0,0,0), Ogre::Quaternion::IDENTITY);
-	m_ear_node->attachObject(m_sound_manager->getListener());
+	//m_ear_node = scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(0,0,0), Ogre::Quaternion::IDENTITY);
+//	m_ear_node->attachObject(m_sound_manager->getListener());
 	m_scene_manager = scene_manager;
 	m_sound_manager->setDistanceModel(AL_LINEAR_DISTANCE_CLAMPED);
 }
@@ -133,8 +133,8 @@ void SoundManager::ChangePitch(Ogre::String name, float new_pitch){ //Around 0.0
 void SoundManager::Update(Ogre::Camera* camera, Ogre::SceneManager* scene_manager, float dt){
 	m_sound_manager->update(dt);
 
-	m_ear_node->setPosition(scene_manager->getSceneNode(m_yomi_node_name)->getPosition());
-	m_ear_node->setOrientation(scene_manager->getSceneNode(m_yomi_node_name)->getOrientation());
+	//m_ear_node->setPosition(scene_manager->getSceneNode(m_yomi_node_name)->getPosition());
+	//m_ear_node->setOrientation(scene_manager->getSceneNode(m_yomi_node_name)->getOrientation());
 
 	//std::cout << "Ear node pos : " << m_ear_node->getPosition() << std::endl;
 	processSoundDeletesPending();

@@ -26,10 +26,14 @@ public:
 
 	Ogre::SceneNode* m_follow_node;
 
+	void setLoopable(Ogre::String loop);
 	float getSpeed();
 private:
 	bool withinDistance(float meters);
 	bool m_follow_node_moving;
+	bool m_loop_waypoints;
+	int m_current_waypoint;
+
 	Ogre::Vector3 m_old_destination;
 };
 
