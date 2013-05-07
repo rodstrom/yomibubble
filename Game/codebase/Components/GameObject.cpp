@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "GameObject.h"
 #include "ComponentMessenger.h"
+#include "PhysicsComponents.h"
+#include "..\Managers\GameObjectManager.h"
+#include "..\PhysicsEngine.h"
 
 int GameObject::m_object_counter = 0;
 
@@ -8,11 +11,13 @@ GameObject::GameObject(void){
 	m_messenger = new ComponentMessenger;
 	m_object_counter++;
 	m_type = m_object_counter;
+	Init();
 }
 
 GameObject::GameObject(int type) : m_type(type){
 	m_messenger = new ComponentMessenger;
 	m_object_counter++;
+	Init();
 }
 
 GameObject::~GameObject(void){}
@@ -30,11 +35,11 @@ void GameObject::Init(){
 	m_component_creator[COMPONENT_CHILD_NODE] = &GameObject::CreateChildNode;
 	m_component_creator[COMPONENT_TRIGGER] = &GameObject::CreateTriggerComponent;
 	m_component_creator[COMPONENT_RAYCAST] = &GameObject::CreateRaycastComponent;
+	m_component_creator[COMPONENT_SYNCED_TRIGGER] = &GameObject::CreateSyncedTriggerComponent;
 }
 
 Component* GameObject::CreateComponent(int type, const Ogre::Vector3& pos, void* data){
 	Component* component = (this->*m_component_creator[type])(pos, data);
-	AddComponent(component);
 	return component;
 }
 
@@ -59,9 +64,6 @@ Component* GameObject::GetComponent(int type){
 
 void GameObject::AddComponent(Component* component){
 	m_components.push_back(component);
-	/*if (component->DoUpdate()){
-		m_updateables.push_back(reinterpret_cast<IComponentUpdateable*>(component));
-	}*/
 	component->SetOwner(this);
 	component->SetMessenger(m_messenger);
 }
@@ -210,4 +212,13 @@ Component* GameObject::CreateTriggerComponent(const Ogre::Vector3& pos, void* da
 
 Component* GameObject::CreateRaycastComponent(const Ogre::Vector3& pos, void* data){
 	return NULL;
+}
+
+Component* GameObject::CreateSyncedTriggerComponent(const Ogre::Vector3& pos, void* data){
+	TriggerDef& def = *static_cast<TriggerDef*>(data);
+	SyncedTriggerComponent* stc = new SyncedTriggerComponent;
+	AddComponent(stc);
+	AddUpdateable(stc);
+	stc->Init(pos, GetGameObjectManager()->GetPhysicsEngine(), &def);
+	return stc;
 }

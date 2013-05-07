@@ -2,6 +2,7 @@
 #define _N_CAMERA_COMPONENTS_H_
 
 #include "ComponentsPrereq.h"
+#include "PhysicsComponents.h"
 
 class CameraComponent : public Component, public IComponentObserver, public IComponentUpdateable{
 public:
@@ -32,6 +33,7 @@ public:
 	virtual void SetMessenger(ComponentMessenger* messenger);
 	virtual void Init(Ogre::SceneManager* scene_manager, Ogre::Viewport* viewport, bool activate = false, const Ogre::String& camera_id = Ogre::StringUtil::BLANK);
 	virtual void Update(float dt);
+	void SetTrigger(TriggerComponent* trigger) { m_trigger = trigger; }
 
 protected:
 	void UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real delta_pitch, Ogre::Real delta_zoom);
@@ -42,6 +44,9 @@ protected:
 	Ogre::Vector3		m_default_position;
 	Ogre::Vector3		m_player_direction;
 	bool				m_getting_input;
+	float				m_default_distance;
+	float				m_default_pitch;
+	TriggerComponent*	m_trigger;
 };
 
 #endif //_N_CAMERA_COMPONENTS_H_

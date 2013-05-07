@@ -53,7 +53,7 @@ void CameraComponent::Update(float dt){
 }
 
 void CameraComponent::ActivateCamera(){
-	m_viewport->setCamera(m_camera);
+	//m_viewport->setCamera(m_camera);
 }
 
 void FollowCameraComponent::Notify(int type, void* msg){
@@ -68,6 +68,15 @@ void FollowCameraComponent::Notify(int type, void* msg){
 		def = *static_cast<CameraDataDef*>(msg);
 		m_player_direction = def.player_direction;
 		break;
+	case MSG_FOLLOW_CAMERA_GET_ORIENTATION:
+		{
+			Ogre::Vector3 goal = Ogre::Vector3::ZERO;
+			Ogre::Vector3 dir = *static_cast<Ogre::Vector3*>(msg);
+			goal += dir.z * m_camera_node->getOrientation().zAxis();
+			goal += dir.x * m_camera_node->getOrientation().xAxis();
+			goal.y = 0.0f;
+			*static_cast<Ogre::Vector3*>(msg) = goal;	
+		}
 	default:
 		break;
 	}
@@ -77,12 +86,14 @@ void FollowCameraComponent::Shut(){
 	CameraComponent::Shut();
 	m_messenger->Unregister(MSG_CAMERA_GET_CAMERA_NODE, this);
 	m_messenger->Unregister(MSG_DEFAULT_CAMERA_POS, this);
+	m_messenger->Unregister(MSG_FOLLOW_CAMERA_GET_ORIENTATION, this);
 }
 
 void FollowCameraComponent::SetMessenger(ComponentMessenger* messenger){
 	CameraComponent::SetMessenger(messenger);
 	m_messenger->Register(MSG_CAMERA_GET_CAMERA_NODE, this);
 	m_messenger->Register(MSG_DEFAULT_CAMERA_POS, this);
+	m_messenger->Register(MSG_FOLLOW_CAMERA_GET_ORIENTATION, this);
 }
 
 void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewport* viewport, bool activate, const Ogre::String& camera_id){
@@ -97,6 +108,10 @@ void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewpo
 	m_camera_node->attachObject(m_camera);
 	m_getting_input = false;
 	m_player_direction = Ogre::Vector3::ZERO;
+	m_camera_goal->setPosition(0,0,12);
+	m_default_distance = 12.0;
+	m_default_pitch = -25.7;
+	m_camera_pivot->pitch(Ogre::Degree(m_default_pitch), Ogre::Node::TS_LOCAL);
 }
 
 void FollowCameraComponent::Update(float dt){
@@ -105,8 +120,6 @@ void FollowCameraComponent::Update(float dt){
 	if (input){
 		CameraAxis axis = input->GetCameraAxis();
 		UpdateCameraGoal(-0.1f * axis.x, -0.1f * axis.y, -0.0005f * axis.z);
-		//OIS::MouseState ms = input->GetMouseState();
-		//UpdateCameraGoal(-0.1f * ms.X.rel, -0.1f * ms.Y.rel, -0.0005f * ms.Z.rel);
 	}
 	Ogre::SceneNode* node = NULL;
 	m_messenger->Notify(MSG_NODE_GET_NODE, &node);
@@ -118,6 +131,14 @@ void FollowCameraComponent::Update(float dt){
 		//m_default_position = Ogre::Vector3(node->getPosition().x + 0.002, node->getPosition().y + 0.002, node->getPosition().z + 0.002);
 		//m_camera_goal->setPosition(m_default_position);
 	}
+
+	//m_trigger->GetCollisionDef
+
+	//std::cout << "kiss " << m_camera->getDerivedPosition().x << std::endl;
+	m_camera->getDerivedRight(); //x-led
+	m_camera->getDerivedUp(); //y-led
+
+	//std::cout << "bajs" << m_camera->getBoundingBox().getCorner(Ogre::AxisAlignedBox::CornerEnum::NEAR_LEFT_TOP).x << std::endl;
 }
 
 void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real delta_pitch, Ogre::Real delta_zoom){
@@ -131,10 +152,9 @@ void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real de
 	}
 
 	if (!m_getting_input){
-		m_camera_goal->setPosition(0,0,12);
-		m_pivot_pitch = -35.7;
-		//if (m_player_direction.z != 0.0f)
-		m_camera_pivot->yaw(Ogre::Degree(m_player_direction.x * -1000), Ogre::Node::TS_WORLD);
+		m_camera_goal->setPosition(0, 0, m_default_distance);
+		m_pivot_pitch = m_default_pitch;
+		m_camera_pivot->yaw(Ogre::Degree(m_player_direction.x * -0.00015), Ogre::Node::TS_WORLD);
 	}
 	
 	if (m_getting_input){
@@ -145,16 +165,19 @@ void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real de
 		&& m_getting_input){
 			m_camera_pivot->pitch(Ogre::Degree(delta_pitch), Ogre::Node::TS_LOCAL);
 			m_pivot_pitch += delta_pitch;
+			m_default_pitch = m_pivot_pitch;
 	}
-	Ogre::Real dist = m_camera_goal->_getDerivedPosition().distance(m_camera_pivot->_getDerivedPosition());
-	Ogre::Real dist_change = delta_zoom * dist;
+	if (m_getting_input){
+		Ogre::Real dist = m_camera_goal->_getDerivedPosition().distance(m_camera_pivot->_getDerivedPosition());
+		Ogre::Real dist_change = delta_zoom * dist;
+		m_default_distance += (delta_zoom * dist);
 
-	if (!(dist + dist_change < 2 && dist_change < 0) &&
+		if (!(dist + dist_change < 2 && dist_change < 0) &&
 		!(dist + dist_change > 25 && dist_change > 0)){
 			m_camera_goal->translate(0,0, dist_change, Ogre::Node::TS_LOCAL);
+		}
 	}
 
 	//std::cout << "Pitch degrees: " << m_pivot_pitch << std::endl;
-
 	//std::cout << "Camera goal: " << m_camera_goal->getPosition() << std::endl; //0,0,12
 }

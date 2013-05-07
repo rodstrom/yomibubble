@@ -24,35 +24,35 @@ class PhysicsEngine;
 
 class DBManager {
 public:
-DBManager(ArtifexLoader *artifexloader, PhysicsEngine* physicsengine);
-~DBManager();
+	DBManager(ArtifexLoader *artifexloader, PhysicsEngine* physicsengine);
+	~DBManager();
 
-PhysicsEngine* mPhysicsEngine;
-ArtifexLoader *mArtifexLoader;
-CppSQLite3DB *mDB;
+	PhysicsEngine* mPhysicsEngine;
+	ArtifexLoader *mArtifexLoader;
+	CppSQLite3DB *mDB;
 
-int Open(const string path);
-int Close(void);
+	int Open(const string path);
+	int Close(void);
 
-bool ExecSQL (std::string query);
-bool EmptyTable(std::string tablename);
-bool WriteSpawn(Spawn2 spawn, std::string spawntype="default");
-bool DeleteSpawn(const Spawn2& spawn , bool clear_attributes=true);
-bool ClearAttributes(const Spawn2& spawn);
-bool WriteAttributes(Spawn2& spawn);
-bool EmptyTrash();
-int DBManager::getObjectProperties(Spawn2 &spawn);
+	bool ExecSQL (std::string query);
+	bool EmptyTable(std::string tablename);
+	bool WriteSpawn(Spawn2 spawn, std::string spawntype="default");
+	bool DeleteSpawn(const Spawn2& spawn , bool clear_attributes=true);
+	bool ClearAttributes(const Spawn2& spawn);
+	bool WriteAttributes(Spawn2& spawn);
+	bool EmptyTrash();
+	int DBManager::getObjectProperties(Spawn2 &spawn);
 
-int Save();
-int Load();
+	int Save();
+	int Load();
 
-bool saving;
+	bool saving;
 
 protected:
-void Shut();
-std::vector<btRigidBody*> m_bodies;
-std::vector<btMotionState*> m_motion_states;
-std::vector<btCollisionShape*> m_shapes;
-std::vector<struct CollisionDef*> m_collision_defs;
+	void Shut();
+	std::vector<btRigidBody*> m_bodies;
+	std::vector<btMotionState*> m_motion_states;
+	std::vector<btCollisionShape*> m_shapes;
+	std::vector<struct CollisionDef*> m_collision_defs;
 };
 #endif

@@ -7,6 +7,8 @@
 #include "..\Components\PhysicsComponents.h"
 #include "..\Components\PlayerInputComponent.h"
 #include <memory>
+#include "..\Components\CameraComponents.h"
+#include "OgreAxisAlignedBox.h"
 
 CollisionManager* CollisionManager::m_instance = NULL;
 
@@ -42,6 +44,7 @@ void CollisionManager::Init(){
 	m_collision[MakeIntPair(GAME_OBJECT_BLUE_BUBBLE, GAME_OBJECT_PINK_BUBBLE)] = &CollisionManager::BlueBubblePinkBubble;
 	m_collision[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_TRIGGER_TEST)] = &CollisionManager::PlayerTrigger;
 	m_collision[MakeIntPair(GAME_OBJECT_LEAF, GAME_OBJECT_PLAYER)] = &CollisionManager::LeafPlayer;
+	m_collision[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_LEAF)] = &CollisionManager::PlayerLeaf;
 
 	m_raycast_map[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_BLUE_BUBBLE)] = &CollisionManager::PlayerBlueBubble;
 	m_raycast_map[MakeIntPair(GAME_OBJECT_BLUE_BUBBLE, GAME_OBJECT_PLAYER)] = &CollisionManager::BlueBubblePlayer;
@@ -50,13 +53,14 @@ void CollisionManager::Init(){
 	m_raycast_map[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_PLANE)] = &CollisionManager::PlayerPlane;
 	m_raycast_map[MakeIntPair(GAME_OBJECT_PLANE, GAME_OBJECT_PLAYER)] = &CollisionManager::PlanePlayer;
 	m_raycast_map[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_TERRAIN)] = &CollisionManager::PlayerTerrain;
+	m_raycast_map[MakeIntPair(GAME_OBJECT_TERRAIN, GAME_OBJECT_PLAYER)] = &CollisionManager::TerrainPlayer;
 }
 
 void CollisionManager::ProcessCollision(const btCollisionObject* ob_a, const btCollisionObject* ob_b){
 	CollisionDef* cd_a = static_cast<CollisionDef*>(ob_a->getUserPointer());
 	CollisionDef* cd_b = static_cast<CollisionDef*>(ob_b->getUserPointer());
-	if (((cd_a->flag & COLLISION_FLAG_GAME_OBJECT) == COLLISION_FLAG_GAME_OBJECT) &&
-		((cd_b->flag & COLLISION_FLAG_GAME_OBJECT) == COLLISION_FLAG_GAME_OBJECT)){
+	if ((cd_a->flag == COLLISION_FLAG_GAME_OBJECT) &&
+		(cd_b->flag == COLLISION_FLAG_GAME_OBJECT)){
 			GameObject* go_a = static_cast<GameObject*>(cd_a->data);
 			GameObject* go_b = static_cast<GameObject*>(cd_b->data);
 			HitMap::iterator it = m_collision.find(MakeIntPair(go_a->GetType(), go_b->GetType()));
@@ -67,7 +71,7 @@ void CollisionManager::ProcessCollision(const btCollisionObject* ob_a, const btC
 }
 
 void CollisionManager::ProcessRaycast(const btCollisionObject* ob_a, const btCollisionObject* ob_b){
-	CollisionDef* cd_a = static_cast<CollisionDef*>(ob_a->getUserPointer());
+	/*CollisionDef* cd_a = static_cast<CollisionDef*>(ob_a->getUserPointer());
 	CollisionDef* cd_b = static_cast<CollisionDef*>(ob_b->getUserPointer());
 	if (((cd_a->flag & COLLISION_FLAG_GAME_OBJECT) == COLLISION_FLAG_GAME_OBJECT) &&
 		((cd_b->flag & COLLISION_FLAG_GAME_OBJECT) == COLLISION_FLAG_GAME_OBJECT)){
@@ -77,7 +81,7 @@ void CollisionManager::ProcessRaycast(const btCollisionObject* ob_a, const btCol
 		if (it != m_raycast_map.end()){
 			(this->*it->second)(go_a, go_b);
 		}
-	}
+	}*/
 }
 
 inline std::pair<int,int> CollisionManager::MakeIntPair(int a, int b){
@@ -109,6 +113,7 @@ void CollisionManager::BlueBubbleBlueBubble(GameObject* blue_bubble_a, GameObjec
 }
 
 void CollisionManager::PlayerBlueBubble(GameObject* player, GameObject* blue_bubble){
+	/*
 	PlayerInputComponent* pic = static_cast<PlayerInputComponent*>(player->GetComponent(COMPONENT_PLAYER_INPUT));
 	if (pic->GetPlayerState() == PLAYER_STATE_NORMAL || pic->GetPlayerState() == PLAYER_STATE_BOUNCING){
 		CharacterController* cc = static_cast<CharacterController*>(player->GetComponent(COMPONENT_CHARACTER_CONTROLLER));
@@ -143,6 +148,7 @@ void CollisionManager::PlayerBlueBubble(GameObject* player, GameObject* blue_bub
 			}
 		}
 	}
+	*/
 }
 
 void CollisionManager::PlayerPlane(GameObject* player, GameObject* plane){
@@ -178,5 +184,4 @@ void CollisionManager::PlayerTerrain(GameObject* player, GameObject* terrain){
 		player->GetComponentMessenger()->Notify(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_SET, &on_ground);
 		CharacterController* cc = static_cast<CharacterController*>(player->GetComponent(COMPONENT_CHARACTER_CONTROLLER));
 	}
-	
 }

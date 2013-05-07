@@ -30,6 +30,7 @@ public:
 	float m_max_bubble_size;
 
 protected:
+	void CreateTriggerForBubble();
 	void CreateBlueBubble(const Ogre::Vector3& pos, const BubbleDef& bubble_def);
 	void CreatePinkBubble(const Ogre::Vector3& pos, const BubbleDef& bubble_def);
 

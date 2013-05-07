@@ -37,6 +37,7 @@ private:
 	GameObject* CreateGUI(const Ogre::Vector3& position, void* data);
 	GameObject* CreateTestTrigger(const Ogre::Vector3& position, void* data);
 	GameObject* CreateTerrain(const Ogre::Vector3& position, void* data);
+	GameObject* CreateGate(const Ogre::Vector3& position, void* data);
 
 	typedef GameObject* (GameObjectManager::*CreateObjectFptr)(const Ogre::Vector3&, void* data);
 	

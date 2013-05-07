@@ -37,9 +37,11 @@ private:
 	void PlayerPlane(GameObject* player, GameObject* plane);
 	void PlanePlayer(GameObject* plane, GameObject* player) { PlayerPlane(player, plane); }
 	void LeafPlayer(GameObject* leaf, GameObject* player);
+	void PlayerLeaf(GameObject* player, GameObject* leaf) { LeafPlayer(leaf, player); }
 	void PlayerTrigger(GameObject* player, GameObject* trigger);
 
 	void PlayerTerrain(GameObject* player, GameObject* terrain);
+	void TerrainPlayer(GameObject* terrain, GameObject* player){ PlayerTerrain(player, terrain); }
 
 	
 	typedef void (CollisionManager::*DoubleDispatch)(GameObject*, GameObject*);

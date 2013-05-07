@@ -36,15 +36,12 @@ class RigidBodyState : public btMotionState
 		bool m_update_orientation;
 		bool m_update_position;
 
-		bool m_hack_pivot;
-
     public:
         RigidBodyState(ComponentMessenger* messenger, const btTransform &transform, const btTransform &offset = btTransform::getIdentity())
             : mTransform(transform),
               mCenterOfMassOffset(offset),
 			  m_messenger(messenger),
 			  m_update_orientation(true),
-			  m_hack_pivot(false),
 			  m_update_position(true){}
 
         RigidBodyState(ComponentMessenger* messenger) :
@@ -64,7 +61,6 @@ class RigidBodyState : public btMotionState
 			if (m_messenger == NULL)
 			{ return; }
 
-			m_hack_pivot = true;
 			setWorldTransform(in);
            
 		}
@@ -79,11 +75,6 @@ class RigidBodyState : public btMotionState
             btQuaternion rot = transform.getRotation();
             btVector3 pos = transform.getOrigin();
 			Ogre::Vector3 vec3 = BtOgre::Convert::toOgre(pos);
-			if (m_hack_pivot)
-			{ 
-				//vec3.y -= 0.8; 
-			}
-			m_hack_pivot = false;
 			Ogre::Quaternion quat = BtOgre::Convert::toOgre(rot);
 			Ogre::SceneNode* node = NULL;
 			m_messenger->Notify(MSG_NODE_GET_NODE, &node);

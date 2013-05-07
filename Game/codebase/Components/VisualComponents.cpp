@@ -7,6 +7,7 @@
 #include "GameObject.h"
 #include "..\Managers\GameObjectManager.h"
 #include "..\Managers\SoundManager.h"
+#include "..\PhysicsPrereq.h"
 
 void NodeComponent::Init(const Ogre::Vector3& pos, Ogre::SceneManager* scene_manager){
 	m_scene_manager = scene_manager;
@@ -37,7 +38,7 @@ void NodeComponent::Notify(int type, void* msg){
 			}
 		}
 		break;
-	default: 
+	default:
 		break;
 	}
 }
@@ -551,8 +552,6 @@ void TerrainComponent::Init(Ogre::SceneManager* scene_manager, PhysicsEngine* ph
 
 	m_terrain_shape = new btHeightfieldTerrainShape(terrain->getSize(), terrain->getSize(), data_converter, 1, terrain->getMinHeight(), terrain->getMaxHeight(), 1, PHY_FLOAT, true);
 	
-	// TODO: Fix this memory leak, The terrain needs this data so delete when unloading.
-	//delete[] data_converter;
 	float units_between_vertices = terrain->getWorldSize() / (w - 1);
 	btVector3 local_scaling(units_between_vertices, 1, units_between_vertices);
 	m_terrain_shape->setLocalScaling(local_scaling);
@@ -573,8 +572,13 @@ void TerrainComponent::Init(Ogre::SceneManager* scene_manager, PhysicsEngine* ph
 		);
 
 	m_terrain_body->setCollisionFlags(m_terrain_body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
-	m_physics_engine->GetDynamicWorld()->addRigidBody(m_terrain_body);
-	m_collision_def.flag |= COLLISION_FLAG_GAME_OBJECT;
+	m_terrain_body->setRestitution(0.5f);
+	m_terrain_body->setRollingFriction(1.0f);
+	m_terrain_body->setFriction(1.0f);
+	int filter = COL_WORLD_STATIC;
+	int mask = COL_PLAYER | COL_TOTT | COL_BUBBLE;
+	m_physics_engine->GetDynamicWorld()->addRigidBody(m_terrain_body, filter, mask);
+	m_collision_def.flag = COLLISION_FLAG_STATIC;
 	m_collision_def.data = m_owner;
 	m_terrain_body->setUserPointer(&m_collision_def);
 }

@@ -94,19 +94,20 @@ void InputSystem::Capture(){
 	if (m_keyboard){
 		m_keyboard->capture();
 		if (m_keyboard->isKeyDown(OIS::KC_W)){
-			m_game->InjectRelativeMovementZ(-0.002f);
+			//m_game->InjectRelativeMovementZ(-0.002f);
+			m_game->InjectRelativeMovementZ(-1.0f);
 			changeZmove = true;
 		}
 		else if (m_keyboard->isKeyDown(OIS::KC_S)){
-			m_game->InjectRelativeMovementZ(0.002f);
+			m_game->InjectRelativeMovementZ(1.0f);
 			changeZmove = true;
 		}
 		if (m_keyboard->isKeyDown(OIS::KC_A)){
-			m_game->InjectRelativeMovementX(-0.002f);
+			m_game->InjectRelativeMovementX(-1.0f);
 			changeXmove = true;
 		}
 		else if (m_keyboard->isKeyDown(OIS::KC_D)){
-			m_game->InjectRelativeMovementX(0.002f);
+			m_game->InjectRelativeMovementX(1.0f);
 			changeXmove = true;
 		}
 	}
@@ -256,7 +257,7 @@ bool InputSystem::povMoved(const OIS::JoyStickEvent& e, int pov){
 
 bool InputSystem::axisMoved(const OIS::JoyStickEvent& e, int axis){
 	if(e.state.mAxes[0].abs > 16384 || e.state.mAxes[0].abs < -16384) {
-		float movement = e.state.mAxes[0].abs * 0.00000005f;
+		float movement = e.state.mAxes[0].abs * 0.50000005f;
 		m_game->InjectRelativeMovementZ(movement);
 	}
 	else {
@@ -264,7 +265,7 @@ bool InputSystem::axisMoved(const OIS::JoyStickEvent& e, int axis){
 	}
 
 	if(e.state.mAxes[1].abs > 16384 || e.state.mAxes[1].abs < -16384) {
-		float movement = e.state.mAxes[1].abs * 0.00000005f;
+		float movement = e.state.mAxes[1].abs * 0.50000005f;
 		m_game->InjectRelativeMovementX(movement);
 	}
 	else {
@@ -331,11 +332,13 @@ bool InputSystem::buttonPressed(const OIS::JoyStickEvent& e, int button){
 		
 		break;
 	case 5: //Right Button
-		m_delta_zoom += 20.0;
+		m_delta_zoom += 20.00005;
+		//m_game->InjectRelativeCameraAxisZ(m_delta_zoom);
 		//m_game->InjectRelativeCameraAxisZ(1000.0);
 		break;
 	case 4: //Left Button
-		m_delta_zoom -= 20.0;
+		m_delta_zoom -= 20.00005;
+		//m_game->InjectRelativeCameraAxisZ(m_delta_zoom);
 		//m_game->InjectRelativeCameraAxisZ(-1000.0);
 		break;
 	case 3: //Y button

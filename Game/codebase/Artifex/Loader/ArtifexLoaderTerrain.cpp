@@ -376,11 +376,11 @@ void ArtifexLoader::configureTerrainDefaults(Ogre::Light* light)
     defaultimp.layerList.resize(mTextureCount+1);
 	
 	// double the first layer to fix the blendmap order
-    defaultimp.layerList[0].worldSize = mSplattScaleX/2;
+    defaultimp.layerList[0].worldSize = mSplattScaleX* 0.01f;
     defaultimp.layerList[0].textureNames.push_back("Splatting0"); 
     
     for (int i=0;i<mTextureCount;i++) {
-		defaultimp.layerList[i+1].worldSize = mSplattScaleX/2;
+		defaultimp.layerList[i+1].worldSize = mSplattScaleX*0.01f;
 		defaultimp.layerList[i+1].textureNames.push_back("Splatting"+StringConverter::toString(i)); 		
 	}    
 };

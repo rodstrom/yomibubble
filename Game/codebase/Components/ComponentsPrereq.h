@@ -20,6 +20,7 @@ enum EComponentType{
 	COMPONENT_NODE,
 	COMPONENT_CHILD_NODE,
 	COMPONENT_TRIGGER,
+	COMPONENT_SYNCED_TRIGGER,
 	COMPONENT_RAYCAST,
 	COMPONENT_SIZE
 };
@@ -47,6 +48,7 @@ enum EComponentMsg{
 	MSG_CHARACTER_CONTROLLER_GRAVITY_SET,
 	MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_SET,
 	MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_GET,
+	MSG_FOLLOW_CAMERA_GET_ORIENTATION,
 	MSG_CAMERA_GET_CAMERA_NODE,
 	MSG_CAMERA_GET_CAMERA,
 	MSG_CAMERA_SET_ACTIVE,
@@ -79,6 +81,8 @@ enum EComponentMsg{
 	MSG_P2P_GET_CONSTRAINT,
 	MSG_P2P_GET_CONSTRAINT_SET_PIVOTA,
 	MSG_P2P_GET_CONSTRAINT_SET_PIVOTB,
+	MSG_RAYCAST_COLLISION_GAME_OBJECT,
+	MSG_RAYCAST_COLLISION_STATIC_ENVIRONMENT,
 	MSG_SIZE
 };
 
@@ -156,25 +160,11 @@ public:
 	virtual void SimulationStep(btScalar time_step) = 0;
 };
 
-struct RigidBodyDef{
-	int collider_type;
-	float mass;
-	float restitution;
-	float friction;
-};
-
 struct AnimationMsg{
 	bool blend;
 	Ogre::String id;
 	Ogre::String bottom_anim;
 	Ogre::String top_anim;
-};
-
-struct CharControllerJumpDef{
-	CharControllerJumpDef(void) : jump(false), _override(false){}
-	CharControllerJumpDef(bool p_jump, bool p_override) : jump(p_jump), _override(p_override){}
-	bool jump;
-	bool _override;
 };
 
 struct AddForceMsg{
@@ -215,21 +205,6 @@ struct BubbleDef{
 	float start_scale;
 	float restitution;
 	float friction;
-};
-
-struct PlayerInputDef{
-
-};
-
-struct DynamicCharacterControllerDef{
-	float step_height;
-	float radius;
-	float height;
-	float jump_impulse;
-	float deceleration;
-	float max_speed;
-	float jump_recharge_time;
-	float mass;
 };
 
 #endif // _N_COMPONENTS_PREREQ_H_
