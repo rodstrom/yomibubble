@@ -20,8 +20,10 @@ public:
 	bool Update(float dt);
 	void Enter();
 	void Exit();
+	bool Pause() { return m_pause; }
 	void CreatePauseScreen();
-	void Test();
+	void Resume();
+	void Quit();
 
 private:
 	/*Ogre::Entity*				m_penguin;
@@ -45,6 +47,7 @@ private:
 	ArtifexLoader*				mArtifexLoader;
 	bool						m_pause;
 	std::function<void()>	    func;
+	bool						m_running;
 };
 
 #endif // _PLAY_STATE_H_

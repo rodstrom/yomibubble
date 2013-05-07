@@ -25,37 +25,37 @@ void MenuState::Enter(){
 	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager);
 
 	OverlayDef menuBackground;
-	menuBackground.overlay_name = "MenuBackground";
+	menuBackground.overlay_name = "Menu";
 	menuBackground.cont_name = "Menu/Background";
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_OVERLAY, Ogre::Vector3(0,0,0), &menuBackground);
 
-	menuBackground.overlay_name = "MenuBackgroundBubbles";
+	menuBackground.overlay_name = "Menu";
 	menuBackground.cont_name = "Menu/BackgroundBubbles";
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_OVERLAY, Ogre::Vector3(0,0,0), &menuBackground);
 
 	ButtonDef buttonDef;
-	buttonDef.overlay_name = "MenuStart";
+	buttonDef.overlay_name = "Menu";
 	buttonDef.cont_name = "Menu/Start";
 	buttonDef.mat_start_hover = "Menu/StartHover";
 	buttonDef.mat_start = "Menu/Start";
 	buttonDef.func = [this] { ChangeStateToPlayState(); };
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_BUTTON, Ogre::Vector3(0,0,0), &buttonDef);
 	
-	buttonDef.overlay_name = "MenuOptions";
+	buttonDef.overlay_name = "Menu";
 	buttonDef.cont_name = "Menu/Options";
 	buttonDef.mat_start_hover = "Menu/OptionsHover";
 	buttonDef.mat_start = "Menu/Options";
 	buttonDef.func = [this] { ChangeStateToPlayState(); };
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_BUTTON, Ogre::Vector3(0,0,0), &buttonDef);
 	
-	buttonDef.overlay_name = "MenuCredits";
+	buttonDef.overlay_name = "Menu";
 	buttonDef.cont_name = "Menu/Credits";
 	buttonDef.mat_start_hover = "Menu/CreditsHover";
 	buttonDef.mat_start = "Menu/Credits";
 	buttonDef.func = [this] { ChangeStateToPlayState(); };
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_BUTTON, Ogre::Vector3(0,0,0), &buttonDef);
 	
-	buttonDef.overlay_name = "MenuQuit";
+	buttonDef.overlay_name = "Menu";
 	buttonDef.cont_name = "Menu/Quit";
 	buttonDef.mat_start_hover = "Menu/QuitHover";
 	buttonDef.mat_start = "Menu/Quit";
@@ -88,10 +88,7 @@ bool MenuState::Update(float dt){
 	if (m_input_manager->IsButtonPressed(BTN_BACK))
 		return false;
 
-	if(m_quit)
-		return false;
-
-	return true;
+	return !m_quit;
 }
 
 void MenuState::ChangeStateToPlayState()

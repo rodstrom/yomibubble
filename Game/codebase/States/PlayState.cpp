@@ -7,7 +7,7 @@
 //#include "..\Components\SkyXPrereq.h"
 #include <sstream>
 
-PlayState::PlayState(void) : m_physics_engine(NULL), m_game_object_manager(NULL), m_pause(false){}
+PlayState::PlayState(void) : m_physics_engine(NULL), m_game_object_manager(NULL), m_pause(false), m_running(true){}
 PlayState::~PlayState(void){}
 
 void PlayState::Enter(){
@@ -185,54 +185,77 @@ void PlayState::Exit(){
 	m_physics_engine->Shut();
 	delete m_physics_engine;
 	m_physics_engine = NULL;
+	delete m_sound_manager;
+	m_sound_manager = NULL;
+	m_render_window->removeAllViewports();
 	Ogre::Root::getSingleton().destroySceneManager(m_scene_manager);
 	m_scene_manager = NULL;
 }
 
 bool PlayState::Update(float dt){
-	m_sound_manager->Update(m_camera, m_scene_manager, dt);
+
 	m_game_object_manager->Update(dt);
-	m_physics_engine->Step(dt);
+
+	//if(m_pause){
+	//	//CreatePauseScreen();
+	//	PushState(FindByName("PauseState"));
+	//}
+	//else {
+		m_sound_manager->Update(m_camera, m_scene_manager, dt);
+		m_physics_engine->Step(dt);
 	
-	if (m_input_manager->IsButtonDown(BTN_ARROW_UP)){
-		m_physics_engine->ShowDebugDraw(true);
-	}
-	else{
-		m_physics_engine->ShowDebugDraw(false);
-	}
-		
-
- if (m_input_manager->IsButtonPressed(BTN_BACK)){
-			return false;
+		if (m_input_manager->IsButtonDown(BTN_ARROW_UP)){
+			m_physics_engine->ShowDebugDraw(true);
 		}
-
- if(m_pause){
-	 CreatePauseScreen();
-	 }
-
-		return true;
+		else{
+			m_physics_engine->ShowDebugDraw(false);
+		}
+		
+		if (m_input_manager->IsButtonPressed(BTN_BACK)){
+			m_pause = true;
+			PushState(FindByName("PauseState"));
+			m_input_manager->InjectReleasedButton(BTN_BACK);	//bugfix
+			//return false;
+		}
+		else {
+			m_pause = false;
+		}
+	//}
+	return m_running;
 }
 
 
 void PlayState::CreatePauseScreen(){
-	//std::cout << "Pause" << std::endl;
-	OverlayDef pause_def;
-	pause_def.overlay_name = "pauseOverlay";
-	pause_def.cont_name = "PausePanel";
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_OVERLAY, Ogre::Vector3(0.0f,0.0f,0.0f), &pause_def);
+	OverlayDef menuBackground;
+	menuBackground.overlay_name = "Menu";
+	menuBackground.cont_name = "Menu/Background";
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_OVERLAY, Ogre::Vector3(0,0,0), &menuBackground);
 
-	ButtonDef menu_button_resume;
-	menu_button_resume.overlay_name = "pauseButtonOverlay";
-	menu_button_resume.cont_name = "resume";
-	menu_button_resume.mat_start_hover = "Examples/Green";
-	menu_button_resume.mat_start = "Examples/Red";
-	menu_button_resume.mat_exit_hover = "Examples/MenuExitButtonHoover";
-	menu_button_resume.mat_exit = "Examples/MenuExitButton";
-	menu_button_resume.func = [this] { Test(); };
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_BUTTON, Ogre::Vector3(0,0,0), &menu_button_resume);
+	menuBackground.overlay_name = "Menu";
+	menuBackground.cont_name = "Menu/BackgroundBubbles";
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_OVERLAY, Ogre::Vector3(0,0,0), &menuBackground);
+
+	ButtonDef buttonDef;
+	buttonDef.overlay_name = "Menu";
+	buttonDef.cont_name = "Menu/Start";
+	buttonDef.mat_start_hover = "Menu/StartHover";
+	buttonDef.mat_start = "Menu/Start";
+	buttonDef.func = [this] { Resume(); };
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_BUTTON, Ogre::Vector3(0,0,0), &buttonDef);
+	
+	buttonDef.overlay_name = "Menu";
+	buttonDef.cont_name = "Menu/Options";
+	buttonDef.mat_start_hover = "Menu/OptionsHover";
+	buttonDef.mat_start = "Menu/Options";
+	buttonDef.func = [this] { Quit(); };
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_BUTTON, Ogre::Vector3(0,0,0), &buttonDef);
 
 }
 
-void PlayState::Test(){
-	std::cout << "Testing" << std::endl;
+void PlayState::Resume(){
+	m_pause = false;
+}
+
+void PlayState::Quit(){
+	m_running = false;
 }
