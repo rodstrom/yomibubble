@@ -5,7 +5,7 @@
 #include "..\Managers\SoundManager.h"
 #include "..\Managers\GameObjectManager.h"
 
-MenuState::MenuState(void) : m_quit(false) {} 
+MenuState::MenuState(void) : m_quit(false), m_current_selected_button(0) {} 
 MenuState::~MenuState(void){}
 
 void MenuState::Enter(){
@@ -87,6 +87,38 @@ bool MenuState::Update(float dt){
 	//m_game_object_manager->LateUpdate(dt);
 	if (m_input_manager->IsButtonPressed(BTN_BACK))
 		return false;
+
+	if (m_input_manager->IsButtonPressed(BTN_ARROW_DOWN)) 
+		m_current_selected_button++;
+	if (m_input_manager->IsButtonPressed(BTN_ARROW_UP)) 
+		m_current_selected_button--;
+	
+	if (m_current_selected_button < 0) 
+		m_current_selected_button = 3;
+	if (m_current_selected_button > 3) 
+		m_current_selected_button = 0;
+
+	/*unsigned int w, h, d;
+	int x, y;
+	m_render_window->getMetrics(w,h,d,x,y);	*/
+
+	switch(m_current_selected_button){
+	case 0:	//hover start button
+		//m_input_manager->InjectMousePosition(x+80, y+h*0.25f);
+		//SetCursorPos(x+80, y+h*0.25f);
+		break;
+	case 1:	//hover options button
+		//SetCursorPos(x+80, y+h*0.4f);
+		break;
+	case 2:	//hover credits button
+		//SetCursorPos(x+80, y+h*0.55f);
+		break;
+	case 3:	//hover quit button
+		//SetCursorPos(x+80, y+h*0.7f);
+		break;
+	default: 
+		m_current_selected_button = 0;
+	}
 
 	return !m_quit;
 }

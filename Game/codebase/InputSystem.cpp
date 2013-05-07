@@ -252,9 +252,17 @@ bool InputSystem::axisMoved(const OIS::JoyStickEvent& e, int axis){
 	if(e.state.mAxes[0].abs > 16384 || e.state.mAxes[0].abs < -16384) {
 		float movement = e.state.mAxes[0].abs * 0.00000005f;
 		m_game->InjectRelativeMovementZ(movement);
+		if(e.state.mAxes[0].abs < 0) {
+			m_game->InjectPressedButton(BTN_ARROW_UP);
+		}
+		else {			
+			m_game->InjectPressedButton(BTN_ARROW_DOWN);
+		}
 	}
 	else {
 		m_game->InjectRelativeMovementZ(0.0f);
+		m_game->InjectReleasedButton(BTN_ARROW_UP);
+		m_game->InjectReleasedButton(BTN_ARROW_DOWN);
 	}
 
 	if(e.state.mAxes[1].abs > 16384 || e.state.mAxes[1].abs < -16384) {

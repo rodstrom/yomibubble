@@ -78,13 +78,11 @@ bool PauseState::Update(float dt){
 	return !m_quit;
 }
 
-void PauseState::ResumeGame()
-{
+void PauseState::ResumeGame(){
 	PopState();
 }
 
 void PauseState::ToMainMenu(){
-	//need to flush all states first
-	PopState();
+	PopState();		//need to flush all states first
 	ChangeState(FindByName("MenuState"));
 }
