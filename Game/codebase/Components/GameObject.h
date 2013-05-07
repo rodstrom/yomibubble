@@ -23,9 +23,9 @@ public:
 	ComponentMessenger* GetComponentMessenger() const { return m_messenger; }
 	void RemoveComponent(Component* component);
 	void RemoveComponent(int type, bool all = false);
-	int GetType() { return m_type; }
+	int GetType() { return m_type; }	// Returns the type of game object (eg: Player, Tott, Leaf etc)
 	void SetGameObjectManager(GameObjectManager* game_object_manager) { m_game_object_manager = game_object_manager; }
-	Component* CreateComponent(int type, const Ogre::Vector3& pos, void* data);
+	Component* CreateComponent(int type, const Ogre::Vector3& pos, void* data);		// Creates and adds a component of specified type
 
 private:
 	void Init();

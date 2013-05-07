@@ -30,7 +30,7 @@ public:
 	TriggerComponent(void){ m_type = COMPONENT_TRIGGER; }
 	virtual ~TriggerComponent(void){}
 
-	virtual void Init(const Ogre::Vector3& pos, PhysicsEngine* physics_engine, struct TriggerDef* def);
+	virtual void Init(const Ogre::Vector3& pos, PhysicsEngine* physics_engine, const TriggerDef& def);
 	virtual void Notify(int type, void* message);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);

@@ -5,6 +5,7 @@
 #include "..\Managers\SoundManager.h"
 #include "..\Managers\GameObjectManager.h"
 #include "..\PhysicsPrereq.h"
+#include "..\Managers\LevelManager.h"
 #include <sstream>
 
 PlayState::PlayState(void) : m_physics_engine(NULL), m_game_object_manager(NULL){}
@@ -12,16 +13,16 @@ PlayState::~PlayState(void){}
 
 void PlayState::Enter(){
 	m_scene_manager = Ogre::Root::getSingleton().createSceneManager("OctreeSceneManager");
-	//m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_MODULATIVE);
+
 	//m_scene_manager->setAmbientLight(Ogre::ColourValue(0.2f,0.2f,0.2f,1.0f));
 	//m_scene_manager->setDisplaySceneNodes(true);
 	m_physics_engine = new PhysicsEngine;
 	m_physics_engine->Init();
-	//m_physics_engine->SetDebugDraw(m_scene_manager);
+	m_physics_engine->SetDebugDraw(m_scene_manager);
 	m_camera = m_scene_manager->createCamera("MainCamera");
 	//m_camera->setPosition(Ogre::Vector3(500,500,500));
 	//m_camera->lookAt(Ogre::Vector3(0,0,0));
-	m_camera->setNearClipDistance(0.01f);
+	//m_camera->setNearClipDistance(5.0f);
 	m_camera->setFarClipDistance(5000.0f);
 	m_viewport = m_render_window->addViewport(m_camera);
 	//m_viewport->setBackgroundColour(Ogre::ColourValue(0.0,0.0,1.0));
@@ -31,8 +32,10 @@ void PlayState::Enter(){
 	m_game_object_manager = new GameObjectManager;
 	m_sound_manager = new SoundManager(m_scene_manager, m_camera);
 	m_sound_manager->LoadAudio();
-	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager);
+	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager, m_message_system);
 	
+	m_level_manager = new LevelManager(m_game_object_manager, m_message_system);
+
 	// Create plane mesh
 	Ogre::Plane plane(Ogre::Vector3::UNIT_Y, -10);
 	Ogre::MeshManager::getSingleton().createPlane("plane", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane, 50, 50, 20, 20, true, 1, 5, 5, Ogre::Vector3::UNIT_Z);
@@ -99,7 +102,7 @@ void PlayState::Enter(){
 	trigger_def.z = 2.0f;
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_TRIGGER_TEST, Ogre::Vector3(x + 2.0f, y - 10.0f ,z + 2.0f), &trigger_def);*/
 	Ogre::String terrain = "Dayarea";
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_TERRAIN, Ogre::Vector3(0,0,0), &terrain);
+	//m_game_object_manager->CreateGameObject(GAME_OBJECT_TERRAIN, Ogre::Vector3(0,0,0), &terrain);
 
 	CharacterControllerDef player_def;
 	player_def.friction = 1.0f;
@@ -156,13 +159,13 @@ void PlayState::Enter(){
 
 	/*Ogre::Light* light = m_scene_manager->createLight("light1");
 	light->setType(Ogre::Light::LT_POINT);
-	light->setPosition(player_pos);
+	light->setPosition(player_pos + Ogre::Vector3(0.0,2.0f,0.0f));
 	light->setSpecularColour(Ogre::ColourValue::Blue);
 	light->setDiffuseColour(Ogre::ColourValue::White);
-	light->setAttenuation(75.0f, 0.0f, 0.1f, 0.012f);
-	light->setPowerScale(0.01f);*/
+	light->setAttenuation(75.0f, 1.0f, 1.1f, 0.012f);
+	light->setCastShadows(true);*/
 
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(player_pos.x,player_pos.y+1.0f,player_pos.z), &player_def);
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(player_pos.x,player_pos.y+8.5f,player_pos.z), &player_def);
 	//m_game_object_manager->CreateGameObject(GAME_OBJECT_GATE, player_pos, NULL);
 	PlaneDef plane_def;
 	plane_def.material_name = "Examples/BeachStones";
@@ -171,7 +174,42 @@ void PlayState::Enter(){
 	plane_def.restitution = 0.8f;
 	plane_def.collision_filter.filter = COL_WORLD_STATIC;
 	plane_def.collision_filter.mask = COL_BUBBLE | COL_PLAYER | COL_TOTT;
-	//m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(player_pos.x,player_pos.y - 2.0f,player_pos.z), &plane_def);
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(player_pos.x,player_pos.y + 8.0f,player_pos.z), &plane_def);
+	m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
+	m_scene_manager->setShadowUseInfiniteFarPlane(false);
+	m_scene_manager->setShadowTextureSelfShadow(true);
+	m_scene_manager->setShadowTextureCount(1);
+	m_scene_manager->setShadowTextureSize(2048);
+	m_scene_manager->setShadowColour(Ogre::ColourValue(0.6f,0.6f,0.6f,1.0f));
+	m_scene_manager->setShadowFarDistance(30.0f);
+	m_camera->setNearClipDistance(1.0f);
+	//m_scene_manager->showBoundingBoxes(true);
+	
+if(MaterialManager::getSingleton().getByName("Ogre/TextureShadowCaster").isNull())
+    // Render a frame to get the shadow materials created
+		Ogre::Root::getSingleton().renderOneFrame();
+
+   // Get all shadow materials
+	std::vector<MaterialPtr> tmpMaterials;
+   TexturePtr tmpTexturePtr = m_scene_manager->getShadowTexture(0);
+   String tmpMaterialName = tmpTexturePtr->getName() + "Mat" + m_scene_manager->getName();
+   tmpMaterials.push_back(MaterialManager::getSingleton().getByName(tmpMaterialName));
+   tmpMaterials.push_back(MaterialManager::getSingleton().getByName("Ogre/TextureShadowCaster"));
+   tmpMaterials.push_back(MaterialManager::getSingleton().getByName("Ogre/TextureShadowReceiver"));
+
+   // Loop through the list of shadow materials
+   unsigned int i = 0;
+   for( ; i < tmpMaterials.size(); i++ )
+   {
+    // Check if the current shadow material exists
+    if( !tmpMaterials[i].isNull() )
+     // Set the depth bias of the shadow material
+     tmpMaterials[i]->getTechnique(0)->getPass(0)->setDepthBias(5.0f);
+   }
+
+   // Clear the temporary list of shadow materials
+   tmpMaterials.clear();
+
 }
 
 
