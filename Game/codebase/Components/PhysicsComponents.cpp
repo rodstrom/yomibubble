@@ -21,7 +21,10 @@ void RigidbodyComponent::Notify(int type, void* msg){
 		}
 		break;
 	case MSG_SET_OBJECT_POSITION:
-			m_rigidbody->getWorldTransform().setOrigin(BtOgre::Convert::toBullet(*static_cast<Ogre::Vector3*>(msg)));
+		m_rigidbody->getWorldTransform().setOrigin(BtOgre::Convert::toBullet(*static_cast<Ogre::Vector3*>(msg)));
+		break;
+	case MSG_SET_OBJECT_ORIENTATION:
+		m_rigidbody->getWorldTransform().setRotation(BtOgre::Convert::toBullet(*static_cast<Ogre::Quaternion*>(msg)));
 		break;
 	case MSG_RIGIDBODY_GRAVITY_SET:
 		m_rigidbody->setGravity(BtOgre::Convert::toBullet(*static_cast<Ogre::Vector3*>(msg)));
@@ -90,6 +93,46 @@ void RigidbodyComponent::Init(const Ogre::Vector3& position, Ogre::Entity* entit
 	m_physics_engine->GetDynamicWorld()->addRigidBody(m_rigidbody, def.collision_filter.filter, def.collision_filter.mask);
 }
 
+void RigidbodyComponent::Init(const Ogre::Vector3& position, PhysicsEngine* physics_engine, const RigidBodyDef& def){
+	m_physics_engine = physics_engine;
+	switch (def.collider_type){
+	case COLLIDER_BOX:
+		m_shape = new btBoxShape(btVector3(def.x,def.y,def.z));
+		break;
+	case COLLIDER_CAPSULE:
+		m_shape = new btCapsuleShape(def.radius, def.y);
+		break;
+	case COLLIDER_CYLINDER:
+		m_shape = new btCylinderShape(btVector3(def.x,def.y,def.z));
+		break;
+	case COLLIDER_SPHERE:
+		m_shape = new btSphereShape(def.radius);
+		break;
+	default:
+		break;
+	}
+	if (def.body_type == DYNAMIC_BODY){
+		btScalar mass = (btScalar)def.mass;
+		btVector3 inertia;
+		m_shape->calculateLocalInertia(mass, inertia);
+		m_motion_state = new BtOgre::RigidBodyState(m_messenger);
+		m_rigidbody = new btRigidBody(mass, m_motion_state, m_shape, inertia);
+	}
+	else if (def.body_type == STATIC_BODY){
+		m_motion_state = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)));
+		m_rigidbody = new btRigidBody(0, m_motion_state, m_shape, btVector3(0,0,0));
+	}
+	m_collision_def.flag = def.collision_flag;
+	m_collision_def.data = m_owner;
+	m_rigidbody->setUserPointer(&m_collision_def);
+	m_rigidbody->getWorldTransform().setOrigin(BtOgre::Convert::toBullet(position));
+	m_rigidbody->setCollisionFlags(m_rigidbody->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+	m_rigidbody->setRestitution(def.restitution);
+	m_rigidbody->setFriction(def.friction);
+	m_rigidbody->setRollingFriction(def.rolling_friction);
+	m_physics_engine->GetDynamicWorld()->addRigidBody(m_rigidbody, def.collision_filter.filter, def.collision_filter.mask);
+}
+
 void RigidbodyComponent::Shut(){
 	if (m_rigidbody){
 		m_physics_engine->GetDynamicWorld()->removeRigidBody(m_rigidbody);
@@ -112,6 +155,7 @@ void RigidbodyComponent::Shut(){
 	m_messenger->Unregister(MSG_RIGIDBODY_POSITION_SET, this);
 	m_messenger->Unregister(MSG_RIGIDBODY_APPLY_IMPULSE, this);
 	m_messenger->Unregister(MSG_RIGIDBODY_COLLISION_FLAG_REMOVE, this);
+	m_messenger->Unregister(MSG_SET_OBJECT_ORIENTATION, this);
 }
 
 void RigidbodyComponent::SetMessenger(ComponentMessenger* messenger){
@@ -124,6 +168,7 @@ void RigidbodyComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_RIGIDBODY_APPLY_IMPULSE, this);
 	m_messenger->Register(MSG_RIGIDBODY_COLLISION_FLAG_SET, this);
 	m_messenger->Register(MSG_RIGIDBODY_COLLISION_FLAG_REMOVE, this);
+	m_messenger->Register(MSG_SET_OBJECT_ORIENTATION, this);
 }
 
 class IgnoreBodyCast : public btCollisionWorld::ClosestRayResultCallback{
@@ -138,7 +183,6 @@ public:
 		}
 		return ClosestRayResultCallback::addSingleResult(ray_result, normal_in_world_space);
 	}
-
 private:
 	btRigidBody* m_body;
 };
@@ -274,9 +318,16 @@ void CharacterController::Update(float dt){
 		}
 	}
 	if (m_is_jumping){
-		float jump_strength = m_jump_pwr * dt;
-		vel = m_rigidbody->getLinearVelocity();
-		m_rigidbody->setLinearVelocity(btVector3(vel.x(), jump_strength, vel.z()));
+		m_jump_timer += dt;
+		if (m_jump_timer >= m_max_jump_height){
+			m_is_jumping = false;
+			m_jump_timer = 0.0f;
+		}
+		else{
+			float jump_strength = m_jump_pwr * dt;
+			m_rigidbody->applyCentralImpulse(btVector3(0.0f,jump_strength,0.0f));
+		}
+
 	}
 }
 
@@ -353,16 +404,18 @@ void CharacterController::SimulationStep(btScalar time_step){
 	Ogre::Vector2 velXZ(m_rigidbody->getLinearVelocity().x(), m_rigidbody->getLinearVelocity().z());
 	btScalar speedXZ = velXZ.length();
 	btScalar dir_speed = m_actual_direction.length();
+	if (dir_speed == 0.0f){
+		dir_speed = 1.0f;
+	}
 	btScalar relative_max_speed = (m_max_speed * dir_speed);
 	if (speedXZ > relative_max_speed){
 		velXZ = velXZ / speedXZ * relative_max_speed;
 		m_rigidbody->setLinearVelocity(btVector3(velXZ.x, m_rigidbody->getLinearVelocity().y(), velXZ.y));
 	}
 	if (m_is_jumping){
-		m_jump_timer += (float)time_step;
-		if (m_jump_timer >= m_max_jump_height){
-			m_is_jumping = false;
-			m_jump_timer = 0.0f;
+		btVector3 vel = m_rigidbody->getLinearVelocity();
+		if (vel.y() > 8.0f){
+			m_rigidbody->setLinearVelocity(btVector3(vel.x(), 8.0f, vel.z()));
 		}
 	}
 }

@@ -30,6 +30,9 @@ void NodeComponent::Notify(int type, void* msg){
 	case MSG_SET_OBJECT_POSITION:
 		m_node->setPosition(*static_cast<Ogre::Vector3*>(msg));
 		break;
+	case MSG_SET_OBJECT_ORIENTATION:
+		m_node->setOrientation(*static_cast<Ogre::Quaternion*>(msg));
+		break;
 	case MSG_NODE_ATTACH_ENTITY:
 		{
 			if (!m_has_attached_entity){
@@ -48,6 +51,7 @@ void NodeComponent::Shut(){
 		m_messenger->Unregister(MSG_NODE_GET_NODE, this);
 		m_messenger->Unregister(MSG_INCREASE_SCALE_BY_VALUE, this);
 		m_messenger->Unregister(MSG_SET_OBJECT_POSITION, this);
+		m_messenger->Unregister(MSG_SET_OBJECT_ORIENTATION, this);
 		m_messenger->Unregister(MSG_NODE_ATTACH_ENTITY, this);
 	}
 	if (m_node){
@@ -62,6 +66,7 @@ void NodeComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_INCREASE_SCALE_BY_VALUE, this);
 	m_messenger->Register(MSG_SET_OBJECT_POSITION, this);
 	m_messenger->Register(MSG_NODE_ATTACH_ENTITY, this);
+	m_messenger->Register(MSG_SET_OBJECT_ORIENTATION, this);
 }
 
 void MeshRenderComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager){

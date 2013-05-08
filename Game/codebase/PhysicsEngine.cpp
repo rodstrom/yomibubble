@@ -84,7 +84,7 @@ void PhysicsEngine::ShowDebugDraw(bool value){
 }
 
 void PhysicsEngine::Step(float dt){
-	float fixed_time_step = 1.0f/60.0f;
+	float fixed_time_step = 1.0f/80.0f;
 	int max_steps = 2;
 	while (dt > (float)max_steps * fixed_time_step){
 		max_steps++;

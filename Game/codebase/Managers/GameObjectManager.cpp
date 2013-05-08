@@ -468,14 +468,21 @@ GameObject* GameObjectManager::CreateGate(const Ogre::Vector3& position, void* d
 	go->AddComponent(nc);
 	MeshRenderComponent* mrc = new MeshRenderComponent;
 	go->AddComponent(mrc);
-	//RigidbodyComponent* rc = new RigidbodyComponent;
-	//go->AddComponent(rc);
+	RigidbodyComponent* rc = new RigidbodyComponent;
+	go->AddComponent(rc);
+	
+	RigidBodyDef def;
+	def.body_type = STATIC_BODY;
+	def.collider_type = COLLIDER_BOX;
+	def.mass = 1.0f;
+	def.collision_filter.filter = COL_WORLD_STATIC;
+	def.collision_filter.mask = COL_PLAYER | COL_TOTT | COL_BUBBLE;
 
 	nc->Init(position, m_scene_manager);
 	mrc->Init("Gate.mesh", m_scene_manager);
-	Ogre::Vector3 scale(0.02f);
-	nc->GetSceneNode()->setScale(scale);
 	mrc->GetEntity()->setMaterialName("Examples/Athene/NormalMapped");
+	
+	rc->Init(position, mrc->GetEntity(), m_physics_engine, def);
 	return go;
 }
 

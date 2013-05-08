@@ -17,6 +17,7 @@ GameObject::GameObject(int type, const Ogre::String& id){
 		m_id = id;
 	}
 	m_object_counter++;
+	m_type = type;
 }
 
 GameObject::~GameObject(void){}

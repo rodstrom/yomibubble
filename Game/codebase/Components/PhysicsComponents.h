@@ -12,6 +12,7 @@ public:
 	virtual ~RigidbodyComponent(void){}
 	virtual void Notify(int type, void* message);
 	virtual void Init(const Ogre::Vector3& position, Ogre::Entity* entity, PhysicsEngine* physics_engine, const RigidBodyDef& def);
+	virtual void Init(const Ogre::Vector3& position, PhysicsEngine* physics_engine, const RigidBodyDef& def);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
 	btRigidBody* GetRigidbody() { return m_rigidbody; }

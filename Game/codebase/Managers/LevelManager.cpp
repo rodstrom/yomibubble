@@ -5,7 +5,7 @@
 
 LevelManager::LevelManager(GameObjectManager* game_object_manager, Ogre::SceneManager* scene_manager,  MessageSystem* message_system) : 
 	m_game_object_manager(game_object_manager), m_scene_manager(scene_manager), m_message_system(message_system), m_current_level(0){
-		m_message_system->Register<LevelManager>(EEventType::EVT_CHANGE_LEVEL, this, &LevelManager::ChangeLevel);
+		m_message_system->Register<LevelManager>(EVT_CHANGE_LEVEL, this, &LevelManager::ChangeLevel);
 }
 LevelManager::~LevelManager(void){}
 

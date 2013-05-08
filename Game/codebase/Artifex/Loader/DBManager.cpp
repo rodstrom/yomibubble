@@ -143,7 +143,9 @@ int DBManager::Load() {
 							m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(x,y,z), &particleDef);
 						}
 						else if (i->second == "gate"){
-							
+							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_GATE, Ogre::Vector3(x,y,z), NULL);
+							Ogre::Quaternion quat(1.0f, spawn.rx, spawn.ry, spawn.rz);
+							temp->GetComponentMessenger()->Notify(MSG_SET_OBJECT_ORIENTATION, &quat);
 						}
 						interactive = true;
 					}

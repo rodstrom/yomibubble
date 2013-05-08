@@ -286,7 +286,6 @@ void ArtifexLoader::initOgreTerrain()
 	loadOrCreateBlendMaps(false);
 	
 	loadGlobalColourMap();	
-	
     mTerrainGroup->freeTemporaryResources();	
 };	
 void ArtifexLoader::loadTerrain()

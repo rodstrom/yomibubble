@@ -77,6 +77,7 @@ void FollowCameraComponent::Notify(int type, void* msg){
 			goal.y = 0.0f;
 			*static_cast<Ogre::Vector3*>(msg) = goal;	
 		}
+		break;
 	default:
 		break;
 	}

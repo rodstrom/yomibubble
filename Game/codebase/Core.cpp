@@ -47,7 +47,8 @@ bool Core::Init(){
 
 	rs->setConfigOption("Full Screen", fullscreen);
 	rs->setConfigOption("Video Mode", videoMode);
-
+	//rs->setConfigOption("VSync", "Yes");
+	
 	m_render_window = m_root->initialise(true, "Yomi's Bubble Adventure");
 	Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
 	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
@@ -66,21 +67,9 @@ void Core::Run(){
 Ogre::Timer timer;
 double dt = 0.0;
 double last_time = 0.0;
-double fps_cap = 60.0;
+double fps_cap = 80.0;
+m_root->clearEventTimes();
 	while (1){
-		bool render = true;
-		double curr_sec = (double)timer.getMilliseconds() * 0.001;
-		dt = curr_sec - last_time;
-		double limit = 1.0 / fps_cap;
-		if (dt < limit){
-			render = false;
-		}
-		else {
-			last_time = curr_sec;
-			if (dt > 1.0){
-				dt = 0.0;
-			}
-		}
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 
 		{
 			MSG msg;
@@ -95,13 +84,26 @@ double fps_cap = 60.0;
 			}
 		}
 #endif
+		bool render = true;
+		double curr_sec = (double)timer.getMilliseconds() * 0.001;
+		dt = curr_sec - last_time;
+		double limit = 1.0 / fps_cap;
+		if (dt < limit){
+			render = false;
+		}
+		else {
+			last_time = curr_sec;
+			if (dt > 1.0){
+				//dt = 0.0;
+			}
+		}
 		if (render){
 			m_game->UpdateInput();
 			m_input_system->Capture();
-			if (!m_game->Update(dt)){
+			if (!m_game->Update((float)dt)){
 				return;
 			}
-			m_root->renderOneFrame();
+			m_root->renderOneFrame((float)dt);
 		}
 	}
 }
