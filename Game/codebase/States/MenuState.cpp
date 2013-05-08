@@ -10,7 +10,7 @@ MenuState::~MenuState(void){}
 
 void MenuState::Enter(){
 	m_scene_manager = Ogre::Root::getSingleton().createSceneManager("OctreeSceneManager");
-	m_sound_manager->Init(m_scene_manager);
+	//m_sound_manager->Init(m_scene_manager);
 
 	m_camera = m_scene_manager->createCamera("MenuCamera");
 	m_camera->setNearClipDistance(0.1);
@@ -77,7 +77,7 @@ void MenuState::Exit(){
 	m_physics_engine = NULL;
 	//delete m_sound_manager;
 	//m_sound_manager = NULL;
-	m_sound_manager->Exit();
+	//m_sound_manager->Exit();
 	m_render_window->removeAllViewports();
 	Ogre::Root::getSingleton().destroySceneManager(m_scene_manager);
 	m_scene_manager = NULL;

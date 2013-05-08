@@ -455,6 +455,7 @@ void CountableResourceGUI::Shut(){
 	for (unsigned int i = 0; i < m_elements.size(); i++)
 	{
 		//delete m_elements.end();
+		m_elements[i]->hide();
 		m_elements[i]=NULL;
 		//delete m_elements[i];
 	}
