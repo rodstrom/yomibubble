@@ -52,11 +52,14 @@ bool Core::Init(){
 	Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
 	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
+	m_sound_manager = new SoundManager();
+	m_sound_manager->LoadAudio();
+
 	m_game = new Game;
-	m_game->Init(m_render_window, m_message_system);
+	m_game->Init(m_render_window, m_message_system, m_sound_manager);
 	m_input_system = new InputSystem(m_game, m_render_window);
 	m_input_system->Init();
-
+	
 	gContactAddedCallback = Collision::ContactCallback;
 	CollisionManager::GetSingletonPtr();	// creates and initializes the instance
 	return true;
@@ -120,6 +123,10 @@ void Core::Shut(){
 		m_input_system->Shut();
 		delete m_input_system;
 		m_input_system = NULL;
+	}
+	if (m_sound_manager){
+		delete m_sound_manager;
+		m_sound_manager = NULL;
 	}
 	OGRE_DELETE m_root;
 	m_root = NULL;

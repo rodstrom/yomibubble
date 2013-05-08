@@ -14,6 +14,7 @@ PlayState::~PlayState(void){}
 
 void PlayState::Enter(){
 	m_scene_manager = Ogre::Root::getSingleton().createSceneManager("OctreeSceneManager");
+	m_sound_manager->Init(m_scene_manager);
 	//m_scene_manager->setDisplaySceneNodes(true);
 	m_physics_engine = new PhysicsEngine;
 	m_physics_engine->Init();
@@ -26,8 +27,8 @@ void PlayState::Enter(){
 	m_camera->setAspectRatio(Ogre::Real(m_viewport->getActualWidth()) / Ogre::Real(m_viewport->getActualHeight()));
 
 	m_game_object_manager = new GameObjectManager;
-	m_sound_manager = new SoundManager(m_scene_manager, m_camera);
-	m_sound_manager->LoadAudio();
+	//m_sound_manager = new SoundManager(m_scene_manager, m_camera);
+	//m_sound_manager->LoadAudio();
 	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager, m_message_system);
 	
 	m_variable_manager = new VariableManager();
@@ -165,8 +166,9 @@ void PlayState::Exit(){
 	m_physics_engine->Shut();
 	delete m_physics_engine;
 	m_physics_engine = NULL;
-	delete m_sound_manager;
-	m_sound_manager = NULL;
+	//delete m_sound_manager;
+	//m_sound_manager = NULL;
+	m_sound_manager->Exit();
 	m_render_window->removeAllViewports();
 	Ogre::Root::getSingleton().destroySceneManager(m_scene_manager);
 	m_scene_manager = NULL;
@@ -181,7 +183,7 @@ bool PlayState::Update(float dt){
 	//	PushState(FindByName("PauseState"));
 	//}
 	//else {
-		m_sound_manager->Update(m_camera, m_scene_manager, dt);
+		m_sound_manager->Update(m_scene_manager, dt);
 		m_physics_engine->Step(dt);
 	
 		if (m_input_manager->IsButtonDown(BTN_ARROW_UP)){
