@@ -4,11 +4,29 @@
 #include "InputManager.h"
 
 StateManager::StateManager(Ogre::RenderWindow* render_window, InputListener* input_listener, MessageSystem* message_system) 
-	: m_render_window(render_window), m_input_listener(input_listener), m_message_system(message_system), m_next_state(NULL){}
+	: m_render_window(render_window), m_input_listener(input_listener), m_message_system(message_system), m_next_state(NULL), m_pop_on_update(false){}
 
 StateManager::~StateManager(void){}
 
 bool StateManager::Update(float dt){
+	if(m_pop_on_update) {
+		if (!m_state_stack.empty()){
+			Cleanup(m_state_stack.back());
+			m_state_stack.back()->Exit();
+			m_state_stack.pop_back();
+		}
+
+		if (!m_state_stack.empty()){
+			Init(m_state_stack.back());
+			m_state_stack.back()->Resume();
+		}
+		else{
+			//TODO send MSG to quit
+		}
+
+		m_pop_on_update = false;
+	}
+
 	if (m_next_state){
 		if (!m_state_stack.empty()){
 			Cleanup(m_state_stack.back());
@@ -61,19 +79,7 @@ bool StateManager::PushState(State* state){
 }
 
 void StateManager::PopState(){
-	if (!m_state_stack.empty()){
-		Cleanup(m_state_stack.back());
-		m_state_stack.back()->Exit();
-		m_state_stack.pop_back();
-	}
-
-	if (!m_state_stack.empty()){
-		Init(m_state_stack.back());
-		m_state_stack.back()->Resume();
-	}
-	else{
-		//TODO send MSG to quit
-	}
+	m_pop_on_update = true;
 }
 
 void StateManager::Init(State* state){

@@ -17,6 +17,7 @@ public:
 	
 	void AddWayPoint(Ogre::Vector3 way_point);
 	void AddWayPoint(Ogre::SceneNode* scene_node);
+	void SetLoopable(Ogre::String loop);
 
 private:
 	WayPoint* m_way_point;

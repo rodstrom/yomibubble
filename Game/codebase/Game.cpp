@@ -3,6 +3,7 @@
 #include "Managers\StateManager.h"
 #include "States\MenuState.h"
 #include "States\PlayState.h"
+#include "States\PauseState.h"
 
 Game::Game(void) : m_state_manager(NULL){}
 Game::~Game(void){}
@@ -15,6 +16,7 @@ bool Game::Init(Ogre::RenderWindow* render_window, MessageSystem* message_system
 	m_state_manager = new StateManager(render_window, this, message_system);
 	PlayState::Create<PlayState>(m_state_manager, "PlayState");
 	MenuState::Create<MenuState>(m_state_manager, "MenuState");
+	PauseState::Create<PauseState>(m_state_manager, "PauseState");
 	m_state_manager->ChangeState(m_state_manager->FindById("PlayState"));
 	return true;
 }

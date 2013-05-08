@@ -101,8 +101,9 @@ double fps_cap = 60.0;
 			if (!m_game->Update(dt)){
 				return;
 			}
-			m_root->renderOneFrame();
+			
 		}
+		m_root->renderOneFrame();
 	}
 }
 

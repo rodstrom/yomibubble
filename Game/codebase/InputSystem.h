@@ -2,8 +2,6 @@
 #define _INPUT_MANAGER_H_
 
 #include "InputPrereq.h"
-//#include <OGRE\SdkTrays.h>
-
 
 class Game;
 class InputSystem : public OIS::KeyListener, public OIS::MouseListener, public OIS::JoyStickListener, public Ogre::WindowEventListener
@@ -49,6 +47,8 @@ private:
 	float m_last_z;
 	float m_last_x;
 	float m_delta_zoom;
+	float m_camera_dead_zone;
+	float m_movement_dead_zone;
 
 	OIS::Mouse*			m_mouse;
 	OIS::Keyboard*		m_keyboard;

@@ -236,28 +236,38 @@ void ChildSceneNodeComponent::SetMessenger(ComponentMessenger* messenger){
 }
 
 void Overlay2DComponent::Init(const Ogre::String& p_overlay_name, const Ogre::String& p_cont_name){
-	Ogre::OverlayManager* overlay_manager = Ogre::OverlayManager::getSingletonPtr();
+ 	m_overlay_manager = Ogre::OverlayManager::getSingletonPtr();
 	m_id = p_overlay_name;
 	m_cont_name = p_cont_name;
 
-	m_overlay = overlay_manager->getByName(m_id);
-	m_overlay->show();
+	m_overlay = m_overlay_manager->getByName(m_id);
+	m_messenger->Notify(MSG_OVERLAY_SHOW, NULL);
+	//m_overlay->show();
 }
 
 void Overlay2DComponent::Shut()
 {
+	
 	if (m_messenger){
 		m_messenger->Unregister(MSG_GET_2D_OVERLAY_CONTAINER, this);
-		
+		m_messenger->Unregister(MSG_OVERLAY_SHOW, this);
+		m_messenger->Unregister(MSG_OVERLAY_HIDE, this);
 	}
-	//Ogre::OverlayManager& overlay_mrg = Ogre::OverlayManager::getSingleton();
-	//overlay_mrg.destroy(m_overlay);
+	//m_overlay_manager->destroyAllOverlayElements();
+	//m_overlay_manager->destroyAll();
 }
 
 void Overlay2DComponent::Notify(int type, void* msg){
 	switch(type){
 	case MSG_GET_2D_OVERLAY_CONTAINER:
 		*static_cast<Ogre::OverlayContainer**>(msg) = m_overlay->getChild(m_cont_name);	
+		break;
+	case MSG_OVERLAY_SHOW:
+		m_overlay->show();
+		break;
+
+	case MSG_OVERLAY_HIDE:
+		m_overlay->hide();
 		break;
 	default:
 		break;
@@ -267,6 +277,8 @@ void Overlay2DComponent::Notify(int type, void* msg){
 void Overlay2DComponent::SetMessenger(ComponentMessenger* messenger) {
 	m_messenger = messenger;
 	m_messenger->Register(MSG_GET_2D_OVERLAY_CONTAINER, this);
+	m_messenger->Register(MSG_OVERLAY_SHOW, this);
+	m_messenger->Register(MSG_OVERLAY_HIDE, this);
 	
 }
 
@@ -274,6 +286,7 @@ void OverlayCollisionCallbackComponent::Init(InputManager* p_input_manager, Ogre
 	m_input_manager = p_input_manager;
 	m_view_port = p_view_port;
 	m_ocs = OCS_DEFAULT;
+	m_show_overlay = true;
 }
 
 void OverlayCollisionCallbackComponent::Update(float dt){
@@ -306,7 +319,15 @@ void OverlayCollisionCallbackComponent::Update(float dt){
 	if(m_ocs == OCS_COLLISION && m_input_manager->IsButtonPressed(BTN_LEFT_MOUSE))
 	{
 		m_messenger->Notify(MSG_OVERLAY_CALLBACK, NULL);
+		m_messenger->Notify(MSG_OVERLAY_HIDE, NULL);
 	}
+
+	/*if(m_input_manager->IsButtonPressed(BTN_START)){
+		m_show_overlay = !m_show_overlay;
+		m_messenger->Notify(MSG_OVERLAY_SHOW, NULL);
+	}
+	if(!m_show_overlay)
+		m_messenger->Notify(MSG_OVERLAY_HIDE, NULL);*/
 }
 
 
@@ -356,8 +377,6 @@ void Overlay2DAnimatedComponent::SetMessenger(ComponentMessenger* messenger){
 void Overlay2DAnimatedComponent::Shut(){
 	m_messenger->Unregister(MSG_OVERLAY_HOVER_ENTER, this);
 	m_messenger->Unregister(MSG_OVERLAY_HOVER_EXIT, this);
-	Ogre::OverlayManager& overlay_mrg = Ogre::OverlayManager::getSingleton();
-	overlay_mrg.destroy(m_overlay);
 	Overlay2DComponent::Shut();
 }
 
@@ -524,10 +543,10 @@ void TerrainComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger = messenger;
 }
 
-void TerrainComponent::Init(Ogre::SceneManager* scene_manager, PhysicsEngine* physics_engine, const Ogre::String& filename){
+void TerrainComponent::Init(Ogre::SceneManager* scene_manager, PhysicsEngine* physics_engine, GameObjectManager* game_object_manager, SoundManager* sound_manager, const Ogre::String& filename){
 	m_scene_manager = scene_manager;
 	m_physics_engine = physics_engine;
-	m_artifex_loader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_scene_manager->getCamera("MainCamera"), physics_engine, "../../resources/terrain/");
+	m_artifex_loader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_scene_manager->getCamera("MainCamera"), physics_engine, game_object_manager, sound_manager, "../../resources/terrain/");
 
 //mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_camera, m_game_object_manager, m_sound_manager, "../../resources/terrain/");
 

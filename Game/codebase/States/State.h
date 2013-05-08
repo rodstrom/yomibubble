@@ -2,6 +2,7 @@
 #define _STATE_H_
 
 #include "..\Managers\InputManager.h"
+#include "..\Managers\GameObjectManager.h"
 
 class MessageSystem;
 class SoundManager;
@@ -31,6 +32,7 @@ public:
 	void Destroy(void) { delete this; }
 	void Init(Ogre::RenderWindow* render_window, MessageSystem* message_system) { m_render_window = render_window; m_message_system = message_system; }
 	InputManager* GetInputManager() const { return m_input_manager; }
+	Ogre::Viewport* GetViewport() const { return m_viewport; }
 	virtual bool Update(float dt) = 0;
 	virtual void Enter() = 0;
 	virtual void Exit() = 0;
@@ -54,6 +56,7 @@ protected:
 	InputManager*		m_input_manager;
 	MessageSystem*		m_message_system;
 	SoundManager*		m_sound_manager;
+	PhysicsEngine*		m_physics_engine;
 };
 
 

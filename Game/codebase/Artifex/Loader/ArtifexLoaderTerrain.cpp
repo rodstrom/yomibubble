@@ -357,12 +357,14 @@ void ArtifexLoader::configureTerrainDefaults(Ogre::Light* light)
     // composite map
     mTerrainGlobals->setCompositeMapDistance(30000);
     
-    mTerrainGlobals->setCastsDynamicShadows(true);
+    mTerrainGlobals->setCastsDynamicShadows(false);
  
     // Important to set these so that the terrain knows what to use for derived (non-realtime) data  
     mTerrainGlobals->setLightMapDirection(light->getDerivedDirection());  
-    mTerrainGlobals->setCompositeMapAmbient(mSceneMgr->getAmbientLight()*0.005f);
-	mTerrainGlobals->setCompositeMapDiffuse(light->getDiffuseColour()*0.002f);
+    //mTerrainGlobals->setCompositeMapAmbient(mSceneMgr->getAmbientLight()*0.005f);
+	//mTerrainGlobals->setCompositeMapDiffuse(light->getDiffuseColour()*0.002f);
+	mTerrainGlobals->setCompositeMapAmbient(mSceneMgr->getAmbientLight());
+	mTerrainGlobals->setCompositeMapDiffuse(light->getDiffuseColour());
  
     // Configure default import settings for if we use imported image
     Ogre::Terrain::ImportData& defaultimp = mTerrainGroup->getDefaultImportSettings();

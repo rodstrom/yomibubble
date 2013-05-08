@@ -7,17 +7,18 @@
 
 int GameObject::m_object_counter = 0;
 
-GameObject::GameObject(void){
+GameObject::GameObject(int type) : m_type(type){
 	m_messenger = new ComponentMessenger;
+	m_id = "GameObject" + NumberToString(m_object_counter);
 	m_object_counter++;
-	m_type = m_object_counter;
 	Init();
 }
 
-GameObject::GameObject(int type) : m_type(type){
+GameObject::GameObject(int type, const Ogre::String& id){
 	m_messenger = new ComponentMessenger;
-	m_object_counter++;
 	Init();
+	m_id = id;
+	m_object_counter++;
 }
 
 GameObject::~GameObject(void){}

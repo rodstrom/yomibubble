@@ -78,6 +78,7 @@ void FollowCameraComponent::Notify(int type, void* msg){
 			goal.y = 0.0f;
 			*static_cast<Ogre::Vector3*>(msg) = goal;	
 		}
+		break;
 	case MSG_CAMERA_ENV_COLLISION:
 		m_env_collision = true;
 		break;
@@ -113,6 +114,7 @@ void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewpo
 	m_camera_node->setFixedYawAxis(true);
 	m_camera_node->attachObject(m_camera);
 	m_getting_input = false;
+	m_check_cam = false;
 	m_env_collision = false;
 	m_player_direction = Ogre::Vector3::ZERO;
 	m_camera_goal->setPosition(0,0,12);
@@ -120,24 +122,24 @@ void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewpo
 	m_default_pitch = -25.7;
 	m_camera_pivot->pitch(Ogre::Degree(m_default_pitch), Ogre::Node::TS_LOCAL);
 
-
 	m_left_ray.origin = btVector3(m_bot_ray.node->getPosition().x, m_bot_ray.node->getPosition().y, m_bot_ray.node->getPosition().z);
-	m_left_ray.length = btVector3(-2, 0, 0);
+	m_left_ray.length = btVector3(-0.2, 0, 0);
 	m_right_ray.origin = btVector3(m_bot_ray.node->getPosition().x, m_bot_ray.node->getPosition().y, m_bot_ray.node->getPosition().z);
-	m_right_ray.length = btVector3(2, 0, 0);
+	m_right_ray.length = btVector3(1, 0, 0);
 	m_top_ray.origin = btVector3(m_bot_ray.node->getPosition().x, m_bot_ray.node->getPosition().y, m_bot_ray.node->getPosition().z); 
-	m_top_ray.length = btVector3(0, 2, 0);
+	m_top_ray.length = btVector3(0, 1, 0);
 	m_bot_ray.origin = btVector3(m_bot_ray.node->getPosition().x, m_bot_ray.node->getPosition().y, m_bot_ray.node->getPosition().z);
-	m_bot_ray.length = btVector3(0, -2, 0);
+	m_bot_ray.length = btVector3(0, -1, 0);
 }
 
 void FollowCameraComponent::Update(float dt){
-	//QueryRaycast();
+	QueryRaycast();
 	InputManager* input = NULL;
 	m_messenger->Notify(MSG_INPUT_MANAGER_GET, &input);
 	if (input){
 		CameraAxis axis = input->GetCameraAxis();
-		UpdateCameraGoal(-0.1f * axis.x, -0.1f * axis.y, -0.0005f * axis.z);
+		//UpdateCameraGoal(-0.1f * axis.x, -0.1f * axis.y, -0.0005f * axis.z);
+		UpdateCameraGoal(axis.x * m_movement_speed, axis.y * m_movement_speed, -0.0005f * axis.z);
 	}
 	Ogre::SceneNode* node = NULL;
 	m_messenger->Notify(MSG_NODE_GET_NODE, &node);
@@ -155,10 +157,32 @@ void FollowCameraComponent::Update(float dt){
 	//std::cout << "kiss " << m_camera->getDerivedPosition().x << std::endl;
 	m_camera->getDerivedRight(); //x-led
 	m_camera->getDerivedUp(); //y-led
+	/*
+	m_camera->getViewport()->getActualLeft();
+	m_camera->getViewport()->getActualTop();
+	m_camera->getViewport()->getActualHeight();
+	m_camera->getViewport()->getActualWidth();
+	*/
+	/*
+	m_camera->getViewport()->getLeft();
+	m_camera->getViewport()->getTop();
+	*/
 
-	m_node->setPosition(m_camera->getDerivedRight().x, m_camera->getDerivedUp().y, m_default_distance);
+	int x_distance_from_cam = (m_camera->getViewport()->getWidth() * 0.5); //so this did not work then, fucktard values
+	int y_distance_from_cam = (m_camera->getViewport()->getHeight() * 0.5);
 
-	std::cout << "node pos " << m_node->convertLocalToWorldPosition(m_node->getPosition()) << std::endl; //so this gives local space
+	int testbajs = m_camera->getViewport()->getHeight();
+	testbajs;
+
+	m_node->setPosition(m_camera->getDerivedPosition().x, m_camera->getDerivedPosition().y, m_camera->getDerivedPosition().z);
+	m_left_ray.origin = btVector3(m_camera->getDerivedPosition().x, m_camera->getDerivedPosition().y, m_camera->getDerivedPosition().z);
+	m_left_ray.length = btVector3(m_camera->getDerivedPosition().x - 2, m_camera->getDerivedPosition().y, m_camera->getDerivedPosition().z);
+
+	//std::cout << "Node Pos: " << m_node->convertLocalToWorldPosition(m_node->getPosition()) << std::endl;
+	std::cout << "Node Pos: " << m_node->getPosition() << std::endl; //so this gives local space
+	//std::cout << "ViewPort left: " << m_camera->getViewport()->getLeft() << std::endl;
+	//std::cout << "ViewPort up: " << m_camera->getViewport()->getTop() << std::endl;
+	std::cout << "Viewport derived pos: " << m_camera->getDerivedPosition() << std::endl;
 
 	//std::cout << "bajs" << m_camera->getBoundingBox().getCorner(Ogre::AxisAlignedBox::CornerEnum::NEAR_LEFT_TOP).x << std::endl;
 }
@@ -169,80 +193,62 @@ void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real de
 			|| delta_pitch != 0.0f
 			|| delta_zoom != 0.0f){
 				m_getting_input = true;
+				m_check_cam = false;
 		}
 		else{
 			m_getting_input = false;
+			m_check_cam = true;
 		}
+
+	if (!m_env_collision){
 
 		if (!m_getting_input){
 			m_camera_goal->setPosition(0, 0, m_default_distance);
 			m_pivot_pitch = m_default_pitch;
-			m_camera_pivot->yaw(Ogre::Degree(m_player_direction.x * -0.00015), Ogre::Node::TS_WORLD);
+			m_camera_pivot->yaw(Ogre::Degree(m_player_direction.x * -2.15), Ogre::Node::TS_WORLD);
 		}
 	
-		if (m_getting_input){
-			m_camera_pivot->yaw(Ogre::Degree(delta_yaw), Ogre::Node::TS_WORLD);
-		}
-		if (!(m_pivot_pitch + delta_pitch > 15 && delta_pitch > 0) && 
-			!(m_pivot_pitch + delta_pitch < -60 && delta_pitch < 0)
-			&& m_getting_input){
-				m_camera_pivot->pitch(Ogre::Degree(delta_pitch), Ogre::Node::TS_LOCAL);
-				m_pivot_pitch += delta_pitch;
-				m_default_pitch = m_pivot_pitch;
-		}
-		if (m_getting_input){
-			Ogre::Real dist = m_camera_goal->_getDerivedPosition().distance(m_camera_pivot->_getDerivedPosition());
-			Ogre::Real dist_change = delta_zoom * dist;
-			m_default_distance += (delta_zoom * dist);
+			if (m_getting_input){
+				m_camera_pivot->yaw(Ogre::Degree(delta_yaw), Ogre::Node::TS_WORLD);
+			}
+			if (!(m_pivot_pitch + delta_pitch > 15 && delta_pitch > 0) && 
+				!(m_pivot_pitch + delta_pitch < -60 && delta_pitch < 0)
+				&& m_getting_input){
+					m_camera_pivot->pitch(Ogre::Degree(delta_pitch), Ogre::Node::TS_LOCAL);
+					m_pivot_pitch += delta_pitch;
+					m_default_pitch = m_pivot_pitch;
+			}
+			if (m_getting_input){
+				Ogre::Real dist = m_camera_goal->_getDerivedPosition().distance(m_camera_pivot->_getDerivedPosition());
+				Ogre::Real dist_change = delta_zoom * dist;
+				m_default_distance += (delta_zoom * dist);
 
-			if (!(dist + dist_change < 2 && dist_change < 0) &&
-			!(dist + dist_change > 25 && dist_change > 0)){
-				m_camera_goal->translate(0,0, dist_change, Ogre::Node::TS_LOCAL);
+				if (!(dist + dist_change < 2 && dist_change < 0) &&
+				!(dist + dist_change > 25 && dist_change > 0)){
+					m_camera_goal->translate(0,0, dist_change, Ogre::Node::TS_LOCAL);
+				}
 			}
 		}
 	}
 	//std::cout << "Pitch degrees: " << m_pivot_pitch << std::endl;
 	//std::cout << "Camera goal: " << m_camera_goal->getPosition() << std::endl; //0,0,12
 }
-/*
-class IgnoreBodyCast : public btCollisionWorld::ClosestRayResultCallback{
-public:
-	IgnoreBodyCast(btRigidBody* body) :
-		btCollisionWorld::ClosestRayResultCallback(btVector3(0,0,0), btVector3(0,0,0)),
-		m_body(body){}
 
-	btScalar AddSingleResult(btCollisionWorld::LocalRayResult& ray_result, bool normal_in_world_space){
-		if (ray_result.m_collisionObject == m_body){
-			return 1.0f;
-		}
-		return ClosestRayResultCallback::addSingleResult(ray_result, normal_in_world_space);
-	}
-
-private:
-	btRigidBody* m_body;
-};
-*/
 void FollowCameraComponent::QueryRaycast(){
-	//IgnoreBodyCast ray_callback_bottom
-//	btBroadphaseRayCallback(
-	btCollisionWorld::ClosestRayResultCallback test_call_back = btCollisionWorld::ClosestRayResultCallback(btVector3(0,0,0), btVector3(0,0,0));
+	if (!m_check_cam) { return; }
 
-	m_physics_engine->GetDynamicWorld()->rayTest(m_left_ray.origin, m_left_ray.length, test_call_back);
+	btCollisionWorld::ClosestRayResultCallback call_back = btCollisionWorld::ClosestRayResultCallback(m_left_ray.origin, m_left_ray.length);
+	m_physics_engine->GetDynamicWorld()->rayTest(m_left_ray.origin, m_left_ray.length, call_back);
 
-//	m_physics_engine->GetDynamicWorld()->rayTest((m_rigidbody->getWorldTransform().getOrigin() + m_offset), (m_rigidbody->getWorldTransform().getOrigin() + m_offset) - btVector3(0,m_y_bottom_offset + m_step_height,0), ray_callback_bottom);
-	
-	if (test_call_back.hasHit()){
-		CollisionDef& def = *static_cast<CollisionDef*>(test_call_back.m_collisionObject->getUserPointer());
+	if (call_back.hasHit()){
+		CollisionDef& def = *static_cast<CollisionDef*>(call_back.m_collisionObject->getUserPointer());
+
 		if (def.flag == COLLISION_FLAG_STATIC){
-			m_messenger->Notify(MSG_RAYCAST_COLLISION_STATIC_ENVIRONMENT, NULL);
-			std::cout << "Hit a static object lol!\n";
+			std::cout << "Hit terrain lol!\n";
+			m_env_collision = true;
 		}
-		else if (def.flag == COLLISION_FLAG_GAME_OBJECT){
-			GameObject* go = static_cast<GameObject*>(def.data);
-			m_messenger->Notify(MSG_RAYCAST_COLLISION_GAME_OBJECT, &go);
-			std::cout << "Hit a game object lol!\n";
-		}
-	//	m_on_ground = true;
 	}
-	
+	else{
+		m_env_collision = false;
+	}	
 }

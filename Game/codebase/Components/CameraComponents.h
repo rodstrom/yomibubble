@@ -4,6 +4,7 @@
 #include "ComponentsPrereq.h"
 #include "PhysicsComponents.h"
 #include "..\PhysicsEngine.h"
+#include "..\InputSystem.h"
 
 class CameraComponent : public Component, public IComponentObserver, public IComponentUpdateable{
 public:
@@ -27,7 +28,7 @@ protected:
 
 class FollowCameraComponent : public CameraComponent{
 public:
-	FollowCameraComponent(void) : m_camera_goal(NULL), m_camera_pivot(NULL), m_camera_node(NULL), m_pivot_pitch(0) { m_type = COMPONENT_FOLLOW_CAMERA; }
+	FollowCameraComponent(void) : m_camera_goal(NULL), m_camera_pivot(NULL), m_camera_node(NULL), m_pivot_pitch(0), m_movement_speed(1.0f) { m_type = COMPONENT_FOLLOW_CAMERA; }
 	virtual ~FollowCameraComponent(void){}
 	virtual void Notify(int type, void* msg);
 	virtual void Shut();
@@ -36,6 +37,8 @@ public:
 	virtual void Update(float dt);
 	void SetTrigger(TriggerComponent* trigger) { m_trigger = trigger; }
 	void SetPhysEngine(PhysicsEngine* physics_engine) { m_physics_engine = physics_engine; }
+	void SetMovementSpeed(float value) { m_movement_speed = value; }
+	void SetInputSystem(InputSystem* input_system) { m_input_system = input_system; }
 
 	AltRaycastDef		m_left_ray;
 	AltRaycastDef		m_right_ray;
@@ -61,11 +64,15 @@ protected:
 	Ogre::Vector3		m_player_direction;
 	bool				m_getting_input;
 	bool				m_env_collision;
+	bool				m_check_cam;
 	float				m_default_distance;
 	float				m_default_pitch;
 	TriggerComponent*	m_trigger; //testing for env coll
 	Ogre::SceneNode*	m_node; //testing for env coll
 	PhysicsEngine*		m_physics_engine;
+	float				m_movement_speed;
+	InputSystem*		m_input_system;
+//	TriggerComponent*	m_trigger;
 };
 
 #endif //_N_CAMERA_COMPONENTS_H_

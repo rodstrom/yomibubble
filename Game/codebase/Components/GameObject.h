@@ -7,8 +7,8 @@ class GameObjectManager;
 class GameObject
 {
 public:
-	GameObject(void);
-	GameObject(int id);
+	GameObject(int type);
+	GameObject(int type, const Ogre::String& id);
 	~GameObject(void);
 
 	void Update(float dt);
@@ -23,9 +23,11 @@ public:
 	ComponentMessenger* GetComponentMessenger() const { return m_messenger; }
 	void RemoveComponent(Component* component);
 	void RemoveComponent(int type, bool all = false);
-	int GetType() { return m_type; }
+	int GetType() { return m_type; }	// Returns the type of game object (eg: Player, Tott, Leaf etc)
+	const Ogre::String& GetId() const { return m_id; }
 	void SetGameObjectManager(GameObjectManager* game_object_manager) { m_game_object_manager = game_object_manager; }
-	Component* CreateComponent(int type, const Ogre::Vector3& pos, void* data);
+	void SetId(const Ogre::String& id) { m_id = id; }
+	Component* CreateComponent(int type, const Ogre::Vector3& pos, void* data);		// Creates and adds a component of specified type
 
 private:
 	void Init();
@@ -35,6 +37,7 @@ private:
 	ComponentMessenger* m_messenger;
 	GameObjectManager* m_game_object_manager;
 	int m_type;
+	Ogre::String m_id;
 	static int m_object_counter;
 
 	typedef Component* (GameObject::*ComponentCreate)(const Ogre::Vector3&,void*);

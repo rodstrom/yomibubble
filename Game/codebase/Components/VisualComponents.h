@@ -7,6 +7,8 @@
 #include "..\Artifex\Loader\ArtifexLoader.h"
 #include "BulletCollision\CollisionShapes\btHeightfieldTerrainShape.h"
 #include <functional>
+class GameObjectManager;
+class SoundManager;
 
 class NodeComponent : public Component, public IComponentObserver{
 public:
@@ -92,6 +94,7 @@ protected:
 	Ogre::Overlay*					m_overlay;
 	Ogre::String					m_id;
 	Ogre::String					m_cont_name;
+	Ogre::OverlayManager*			m_overlay_manager;
 };
 
 class InputManager;
@@ -114,6 +117,7 @@ protected:
 	InputManager*			m_input_manager;
 	Ogre::Viewport*			m_view_port;
 	OverlayCollisionState	m_ocs;
+	bool					m_show_overlay;
 };
 
 class Overlay2DAnimatedComponent : public IComponentUpdateable, public Overlay2DComponent{
@@ -194,7 +198,7 @@ public:
 	virtual void Notify(int type, void* message);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
-	void Init(Ogre::SceneManager* scene_manager, PhysicsEngine* physics_engine, const Ogre::String& filename);
+	void Init(Ogre::SceneManager* scene_manager, PhysicsEngine* physics_engine, GameObjectManager* game_object_manager, SoundManager* sound_manager, const Ogre::String& filename);
 
 protected:
 	float*							m_data_converter;
