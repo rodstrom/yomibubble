@@ -96,7 +96,6 @@ void PlayerInputComponent::Normal(float dt){
 		m_anim_msg.id="Run";
 		m_anim_msg.blend = false;
 		m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
-		
 
 		//std::cout << "Yomi pos: " << dynamic_cast<NodeComponent*>(m_owner->GetComponent(COMPONENT_NODE))->GetSceneNode()->getPosition() << std::endl;
 		
@@ -111,6 +110,8 @@ void PlayerInputComponent::Normal(float dt){
 		m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
 		*/
 		
+		
+
 		m_anim_msg.id="Idle";
 		m_anim_msg.blend = false;
 		m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
@@ -118,6 +119,9 @@ void PlayerInputComponent::Normal(float dt){
 	//   m_animation_blender->blend("Run", AnimationBlender::BlendWhileAnimating, 0.2, false );
 		
 	}
+
+	m_camera_data_def.player_direction = Ogre::Vector3(dir.x, 0.0f, dir.z);
+	m_messenger->Notify(MSG_DEFAULT_CAMERA_POS, &m_camera_data_def);
 
 	if (!m_is_creating_bubble){
 		m_messenger->Notify(MSG_SFX2D_STOP, &m_bubble_blow_sound);
@@ -234,9 +238,6 @@ void PlayerInputComponent::Normal(float dt){
 		bool is_jumping = false;
 		m_messenger->Notify(MSG_CHARACTER_CONTROLLER_JUMP, &is_jumping);
 	}
-
-	Ogre::Vector3 acc = Ogre::Vector3::ZERO;
-	//Acceleration(dir, acc, dt);
 	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &dir);
 	m_messenger->Notify(MSG_START_TIMER, NULL);
 }

@@ -3,6 +3,7 @@
 #include "..\PhysicsEngine.h"
 #include "ComponentMessenger.h"
 #include "GameObject.h"
+#include "PlayerInputComponent.h"
 
 void RigidbodyComponent::Notify(int type, void* msg){
 	switch (type){
@@ -192,6 +193,7 @@ void CharacterController::Notify(int type, void* msg){
 		break;
 	case MSG_CHARACTER_CONTROLLER_SET_DIRECTION:
 		{
+			m_actual_direction = *static_cast<Ogre::Vector3*>(msg);
 			m_direction = *static_cast<Ogre::Vector3*>(msg);
 			if (m_on_ground){
 				m_direction *= 10.0f;
@@ -272,11 +274,6 @@ void CharacterController::Update(float dt){
 		}
 	}
 	if (m_is_jumping){
-		m_jump_timer += dt;
-		if (m_jump_timer >= m_max_jump_height){
-			m_is_jumping = false;
-			m_jump_timer = 0.0f;
-		}
 		float jump_strength = m_jump_pwr * dt;
 		vel = m_rigidbody->getLinearVelocity();
 		m_rigidbody->setLinearVelocity(btVector3(vel.x(), jump_strength, vel.z()));
@@ -355,9 +352,18 @@ void CharacterController::Init(const Ogre::Vector3& position, PhysicsEngine* phy
 void CharacterController::SimulationStep(btScalar time_step){
 	Ogre::Vector2 velXZ(m_rigidbody->getLinearVelocity().x(), m_rigidbody->getLinearVelocity().z());
 	btScalar speedXZ = velXZ.length();
-	if (speedXZ > m_max_speed){
-		velXZ = velXZ / speedXZ * m_max_speed;
+	btScalar dir_speed = m_actual_direction.length();
+	btScalar relative_max_speed = (m_max_speed * dir_speed);
+	if (speedXZ > relative_max_speed){
+		velXZ = velXZ / speedXZ * relative_max_speed;
 		m_rigidbody->setLinearVelocity(btVector3(velXZ.x, m_rigidbody->getLinearVelocity().y(), velXZ.y));
+	}
+	if (m_is_jumping){
+		m_jump_timer += (float)time_step;
+		if (m_jump_timer >= m_max_jump_height){
+			m_is_jumping = false;
+			m_jump_timer = 0.0f;
+		}
 	}
 }
 
@@ -409,33 +415,33 @@ void Point2PointConstraintComponent::Init(PhysicsEngine* physics_engine, btRigid
 	m_physics_engine->GetDynamicWorld()->addConstraint(m_constraint);
 }
 
-void TriggerComponent::Init(const Ogre::Vector3& pos, PhysicsEngine* physics_engine, TriggerDef* def){
+void TriggerComponent::Init(const Ogre::Vector3& pos, PhysicsEngine* physics_engine, const TriggerDef& def){
 	m_physics_engine = physics_engine;
-	switch (def->collider_type)
+	switch (def.collider_type)
 	{
 	case COLLIDER_BOX:
-		m_shape = new btBoxShape(btVector3(def->x, def->y, def->z));
+		m_shape = new btBoxShape(btVector3(def.x, def.y, def.z));
 		break;
 	case COLLIDER_SPHERE:
-		m_shape = new btSphereShape(def->radius);
+		m_shape = new btSphereShape(def.radius);
 		break;
 	case COLLIDER_CAPSULE:
-		m_shape = new btCapsuleShape(def->radius, def->y);
+		m_shape = new btCapsuleShape(def.radius, def.y);
 		break;
 	case COLLIDER_CYLINDER:
-		m_shape = new btCylinderShape(btVector3(def->x, def->y, def->z));
+		m_shape = new btCylinderShape(btVector3(def.x, def.y, def.z));
 		break;
 	default:
 		break;
 	}
 
-	if (def->body_type == DYNAMIC_BODY){
+	if (def.body_type == DYNAMIC_BODY){
 		btVector3 inertia;
-		m_shape->calculateLocalInertia(def->mass, inertia);
+		m_shape->calculateLocalInertia(def.mass, inertia);
 		m_motion_state = new btDefaultMotionState;
-		m_rigidbody = new btRigidBody(def->mass, m_motion_state, m_shape, inertia);
+		m_rigidbody = new btRigidBody(def.mass, m_motion_state, m_shape, inertia);
 	}
-	else if (def->body_type == STATIC_BODY){
+	else if (def.body_type == STATIC_BODY){
 		m_motion_state = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)));
 		m_rigidbody = new btRigidBody(0, m_motion_state, m_shape, btVector3(0,0,0));
 	}
@@ -444,7 +450,7 @@ void TriggerComponent::Init(const Ogre::Vector3& pos, PhysicsEngine* physics_eng
 	m_rigidbody->setUserPointer(&m_collision_def);
 	m_rigidbody->getWorldTransform().setOrigin(BtOgre::Convert::toBullet(pos));
 	m_rigidbody->setCollisionFlags(m_rigidbody->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK | btCollisionObject::CF_NO_CONTACT_RESPONSE);
-	m_physics_engine->GetDynamicWorld()->addRigidBody(m_rigidbody, def->collision_filter.filter, def->collision_filter.mask);
+	m_physics_engine->GetDynamicWorld()->addRigidBody(m_rigidbody, def.collision_filter.filter, def.collision_filter.mask);
 }
 
 void TriggerComponent::Notify(int type, void* msg){
@@ -599,6 +605,8 @@ void PlayerRaycastCollisionComponent::PlayerBubble(GameObject* go){
 				m_messenger->Notify(MSG_PLAYER_INPUT_SET_STATE, &player_state);
 				Ogre::Vector3 impulse(0.0f, y_vel * -2.3f, 0.0f);
 				m_messenger->Notify(MSG_RIGIDBODY_APPLY_IMPULSE, &impulse, "body");
+				m_messenger->Notify(MSG_RIGIDBODY_APPLY_IMPULSE, &impulse);
+				m_messenger->Notify(MSG_SFX2D_PLAY,  &static_cast<PlayerInputComponent*>(m_owner->GetComponent(COMPONENT_PLAYER_INPUT))->m_bounce_sound);
 			}
 			else if (y_vel < -10.0f){   // go inside bubble
 				player_state = PLAYER_STATE_INSIDE_BUBBLE;
@@ -667,7 +675,7 @@ void BobbingComponent::Update(float dt){
 };
 
 void SyncedTriggerComponent::Init(const Ogre::Vector3& pos, PhysicsEngine* physics_engine, struct TriggerDef* def){
-	TriggerComponent::Init(pos, physics_engine, def);
+	TriggerComponent::Init(pos, physics_engine, *def);
 	m_offset = def->offset;
 }
 

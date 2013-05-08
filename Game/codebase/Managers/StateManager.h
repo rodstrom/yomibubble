@@ -38,6 +38,7 @@ protected:
 	InputListener*				m_input_listener;
 	MessageSystem*				m_message_system;
 	State*						m_next_state;
+	bool						m_pop_on_update;
 };
 
 #endif // _STATE_MANAGER_H_

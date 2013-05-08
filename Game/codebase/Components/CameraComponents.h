@@ -2,6 +2,7 @@
 #define _N_CAMERA_COMPONENTS_H_
 
 #include "ComponentsPrereq.h"
+#include "PhysicsComponents.h"
 
 class CameraComponent : public Component, public IComponentObserver, public IComponentUpdateable{
 public:
@@ -25,13 +26,15 @@ protected:
 
 class FollowCameraComponent : public CameraComponent{
 public:
-	FollowCameraComponent(void) : m_camera_goal(NULL), m_camera_pivot(NULL), m_camera_node(NULL), m_pivot_pitch(0) { m_type = COMPONENT_FOLLOW_CAMERA; }
+	FollowCameraComponent(void) : m_camera_goal(NULL), m_camera_pivot(NULL), m_camera_node(NULL), m_pivot_pitch(0), m_movement_speed(1.0f) { m_type = COMPONENT_FOLLOW_CAMERA; }
 	virtual ~FollowCameraComponent(void){}
 	virtual void Notify(int type, void* msg);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
 	virtual void Init(Ogre::SceneManager* scene_manager, Ogre::Viewport* viewport, bool activate = false, const Ogre::String& camera_id = Ogre::StringUtil::BLANK);
 	virtual void Update(float dt);
+	void SetTrigger(TriggerComponent* trigger) { m_trigger = trigger; }
+	void SetMovementSpeed(float value) { m_movement_speed = value; }
 
 protected:
 	void UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real delta_pitch, Ogre::Real delta_zoom);
@@ -39,6 +42,13 @@ protected:
 	Ogre::SceneNode*	m_camera_goal;
 	Ogre::SceneNode*	m_camera_node;
 	Ogre::Real			m_pivot_pitch;
+	Ogre::Vector3		m_default_position;
+	Ogre::Vector3		m_player_direction;
+	bool				m_getting_input;
+	float				m_default_distance;
+	float				m_default_pitch;
+	float				m_movement_speed;
+	TriggerComponent*	m_trigger;
 };
 
 #endif //_N_CAMERA_COMPONENTS_H_
