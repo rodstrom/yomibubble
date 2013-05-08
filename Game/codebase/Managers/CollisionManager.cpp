@@ -7,6 +7,8 @@
 #include "..\Components\PhysicsComponents.h"
 #include "..\Components\PlayerInputComponent.h"
 #include <memory>
+#include "..\Components\CameraComponents.h"
+#include "OgreAxisAlignedBox.h"
 
 CollisionManager* CollisionManager::m_instance = NULL;
 
@@ -51,6 +53,7 @@ void CollisionManager::Init(){
 	m_raycast_map[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_PLANE)] = &CollisionManager::PlayerPlane;
 	m_raycast_map[MakeIntPair(GAME_OBJECT_PLANE, GAME_OBJECT_PLAYER)] = &CollisionManager::PlanePlayer;
 	m_raycast_map[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_TERRAIN)] = &CollisionManager::PlayerTerrain;
+	m_raycast_map[MakeIntPair(GAME_OBJECT_TERRAIN, GAME_OBJECT_PLAYER)] = &CollisionManager::TerrainPlayer;
 }
 
 void CollisionManager::ProcessCollision(const btCollisionObject* ob_a, const btCollisionObject* ob_b){
@@ -110,7 +113,8 @@ void CollisionManager::BlueBubbleBlueBubble(GameObject* blue_bubble_a, GameObjec
 }
 
 void CollisionManager::PlayerBlueBubble(GameObject* player, GameObject* blue_bubble){
-	/*PlayerInputComponent* pic = static_cast<PlayerInputComponent*>(player->GetComponent(COMPONENT_PLAYER_INPUT));
+	/*
+	PlayerInputComponent* pic = static_cast<PlayerInputComponent*>(player->GetComponent(COMPONENT_PLAYER_INPUT));
 	if (pic->GetPlayerState() == PLAYER_STATE_NORMAL || pic->GetPlayerState() == PLAYER_STATE_BOUNCING){
 		CharacterController* cc = static_cast<CharacterController*>(player->GetComponent(COMPONENT_CHARACTER_CONTROLLER));
 		float y_vel = cc->GetRigidbody()->getLinearVelocity().y();
@@ -143,7 +147,8 @@ void CollisionManager::PlayerBlueBubble(GameObject* player, GameObject* blue_bub
 				player->GetComponentMessenger()->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &gravity);
 			}
 		}
-	}*/
+	}
+	*/
 }
 
 void CollisionManager::PlayerPlane(GameObject* player, GameObject* plane){
@@ -179,5 +184,4 @@ void CollisionManager::PlayerTerrain(GameObject* player, GameObject* terrain){
 		player->GetComponentMessenger()->Notify(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_SET, &on_ground);
 		CharacterController* cc = static_cast<CharacterController*>(player->GetComponent(COMPONENT_CHARACTER_CONTROLLER));
 	}
-	
 }

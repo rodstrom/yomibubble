@@ -8,6 +8,7 @@
 #include "..\..\Components\VisualComponents.h"
 #include "..\..\Managers\SoundManager.h"
 #include "..\..\Components\AIComponents.h"
+#include "..\..\Managers\VariableManager.h"
 #include <map>
 
 DBManager::DBManager(ArtifexLoader *artifexloader, PhysicsEngine *physics_engine, GameObjectManager *game_object_manager, SoundManager *sound_manager) {
@@ -98,20 +99,29 @@ int DBManager::Load() {
 
 				//make sure to check if interactive first and get nodeName etc.
 				//attributemap::iterator i = spawn.attributes.begin();	
+				VariableManager* variable_manager = new VariableManager;
+				variable_manager->Init();
+				variable_manager->LoadVariables();
 				for ( attributemap::iterator i = spawn.attributes.begin(); i != spawn.attributes.end(); i++ )
 				{
 					if (i->first == "interactive") {
 						if (i->second == "player") {
 							CharacterControllerDef player_def;
 							player_def.friction = 1.0f;
-							player_def.velocity = 5.0f;
-							player_def.max_speed = 5.0f;
-							player_def.deceleration = 16.0f;
-							player_def.jump_power = 200.0f;
+							player_def.velocity = variable_manager->GetValue("Player_Speed");
+							player_def.max_speed = variable_manager->GetValue("Player_Max_Speed");
+							player_def.deceleration = variable_manager->GetValue("Player_Deceleration");
+							player_def.jump_power = variable_manager->GetValue("Player_Jump_Power");
 							player_def.restitution = 0.0f;
 							player_def.step_height = 0.35f;
 							player_def.turn_speed = 1000.0f;
-							player_def.max_jump_height = 10.0f;
+							player_def.max_jump_height = variable_manager->GetValue("Player_Max_Jump_Height");
+							player_def.offset.y = 0.5f;
+							player_def.radius = 0.3f;
+							player_def.height = 0.4f;
+							player_def.mass = 1.0f;
+							player_def.collision_filter.filter = COL_PLAYER;
+							player_def.collision_filter.mask = COL_BUBBLE | COL_BUBBLE_TRIG | COL_TOTT | COL_WORLD_STATIC | COL_WORLD_TRIGGER;
 							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(x,y,z), &player_def);
 						}
 						else if (i->second == "tott") {
@@ -123,6 +133,8 @@ int DBManager::Load() {
 							tott_def.step_height = 0.35f;
 							tott_def.turn_speed = 1000.0f;
 							tott_def.max_jump_height = 10.0f;
+							tott_def.collision_filter.filter = COL_TOTT;
+							tott_def.collision_filter.mask = COL_PLAYER | COL_WORLD_STATIC | COL_BUBBLE | COL_TOTT;
 							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y,z), &tott_def);
 						}
 						else if (i->second == "leaf") {
@@ -130,6 +142,9 @@ int DBManager::Load() {
 							ParticleDef particleDef;
 							particleDef.particle_name = "Particle/Smoke";
 							m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(x,y,z), &particleDef);
+						}
+						else if (i->second == "gate"){
+							
 						}
 						interactive = true;
 					}
@@ -166,6 +181,8 @@ int DBManager::Load() {
 						followers[temp] = i->second;
 					}
 				}
+				delete variable_manager;
+				variable_manager = NULL;
 			}
 
 			if(!interactive) {
@@ -199,35 +216,42 @@ int DBManager::Load() {
 				{
 					SceneNode *mNode = NULL;
 					try {
+						bool collision = true;
 						mNode = mArtifexLoader->mSceneMgr->getRootSceneNode()->createChildSceneNode(entName+"Node",Ogre::Vector3(spawn.x,spawn.y,spawn.z),Quaternion ((Degree(spawn.ry)), Vector3::UNIT_Y));
 						mNode->attachObject(newModel);
 						mNode->setScale(spawn.sx,spawn.sy,spawn.sz);
 						Ogre::Quaternion quat = Ogre::Quaternion ((Degree(spawn.rx)), Vector3::UNIT_X)*Quaternion ((Degree(spawn.ry)), Vector3::UNIT_Y)*Quaternion ((Degree(spawn.rz)), Vector3::UNIT_Z);
 						mNode->setOrientation(quat);
-					
-						// Create collision shape and set position
-						BtOgre::StaticMeshToShapeConverter converter(newModel);
-						btCollisionShape* shape = converter.createTrimesh();
-						m_shapes.push_back(shape);
-						btMotionState* motion_state = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)));
-						m_motion_states.push_back(motion_state);
-						btRigidBody* body = new btRigidBody(0, motion_state, shape, btVector3(0,0,0));
-						m_bodies.push_back(body);
+						
+						Ogre::String nocoll = meshFile.substr(0,6);
+						if (nocoll == "nocoll"){
+							collision = false;
+						}
+						// Create collision shape and set position if desired
+						if (collision){
+							BtOgre::StaticMeshToShapeConverter converter(newModel);
+							btCollisionShape* shape = converter.createTrimesh();
+							m_shapes.push_back(shape);
+							btMotionState* motion_state = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)));
+							m_motion_states.push_back(motion_state);
+							btRigidBody* body = new btRigidBody(0, motion_state, shape, btVector3(0,0,0));
+							m_bodies.push_back(body);
 
-					btTransform transform;
-					transform.setIdentity();
-					transform.setOrigin(btVector3(spawn.x, spawn.y, spawn.z));
-					transform.setRotation(BtOgre::Convert::toBullet(quat));
-					body->setWorldTransform(transform);
-					CollisionDef* collision_def = new CollisionDef;
-					collision_def->data = NULL;
-					collision_def->flag = COLLISION_FLAG_STATIC;
-					body->setUserPointer(collision_def);
-					body->setRestitution(1.0f);
-					body->setFriction(1.0f);
-					m_collision_defs.push_back(collision_def);
-					int mask = COL_TOTT | COL_BUBBLE | COL_PLAYER;
-					m_physics_engine->GetDynamicWorld()->addRigidBody(body, COL_WORLD_STATIC, mask);
+							btTransform transform;
+							transform.setIdentity();
+							transform.setOrigin(btVector3(spawn.x, spawn.y, spawn.z));
+							transform.setRotation(BtOgre::Convert::toBullet(quat));
+							body->setWorldTransform(transform);
+							CollisionDef* collision_def = new CollisionDef;
+							collision_def->data = NULL;
+							collision_def->flag = COLLISION_FLAG_STATIC;
+							body->setUserPointer(collision_def);
+							body->setRestitution(1.0f);
+							body->setFriction(1.0f);
+							m_collision_defs.push_back(collision_def);
+							int mask = COL_TOTT | COL_BUBBLE | COL_PLAYER;
+							m_physics_engine->GetDynamicWorld()->addRigidBody(body, COL_WORLD_STATIC, mask);
+						}
 
 				} catch (Exception &e) {
 					cout << "\n|= ArtifexTerra3D =| Zoneloader v1.0 RC1 OT beta SQLite: spawnloader error - problems creating " << spawn.name.c_str() << ":" << e.what() << "\n";
@@ -243,7 +267,7 @@ int DBManager::Load() {
 	}
 	followers.clear();
 
-	t.finalize();	
+	t.finalize();
 	return 0;	
 };
 

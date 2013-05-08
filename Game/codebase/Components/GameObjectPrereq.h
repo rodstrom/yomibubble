@@ -16,6 +16,7 @@ enum EGameObject{
 	GAME_OBJECT_TERRAIN,
 	GAME_OBJECT_GATE,
 	GAME_OBJECT_LOADING_SCREEN,
+	GAME_OBJECT_NEXT_LEVEL,
 	GAME_OBJECT_SIZE
 };
 
@@ -49,14 +50,19 @@ struct PlaneDef{
 	CollisionFilter collision_filter;
 };
 
+struct CameraDataDef{
+	Ogre::Vector3 player_direction;
+};
+
 struct CollisionDef {
 	short flag;
 	void* data;
 };
 
 enum ECollisionTypes{
+	COLLISION_FLAG_NONE,
 	COLLISION_FLAG_STATIC = 0,
-	COLLISION_FLAG_GAME_OBJECT
+	COLLISION_FLAG_GAME_OBJECT,
 };
 
 struct CharacterControllerDef{

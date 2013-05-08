@@ -5,7 +5,7 @@
 #include "..\Managers\SoundManager.h"
 #include "..\Managers\GameObjectManager.h"
 
-PauseState::PauseState(void) : m_quit(false) {} 
+PauseState::PauseState(void) : m_quit(false), m_current_selected_button(0) {} 
 PauseState::~PauseState(void){}
 
 void PauseState::Enter(){
@@ -42,14 +42,14 @@ void PauseState::Enter(){
 	buttonDef.mat_start_hover = "Menu/StartHover";
 	buttonDef.mat_start = "Menu/Start";
 	buttonDef.func = [this] { ResumeGame(); };
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_BUTTON, Ogre::Vector3(0,0,0), &buttonDef);
+	m_buttons[0] = m_game_object_manager->CreateGameObject(GAME_OBJECT_BUTTON, Ogre::Vector3(0,0,0), &buttonDef);
 	
 	buttonDef.overlay_name = "Pause";
 	buttonDef.cont_name = "Pause/Quit";
 	buttonDef.mat_start_hover = "Menu/QuitHover";
 	buttonDef.mat_start = "Menu/Quit";
 	buttonDef.func = [this] { ToMainMenu(); };
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_BUTTON, Ogre::Vector3(0,0,0), &buttonDef);
+	m_buttons[1] = m_game_object_manager->CreateGameObject(GAME_OBJECT_BUTTON, Ogre::Vector3(0,0,0), &buttonDef);
 }
 
 void PauseState::Exit(){
@@ -74,6 +74,36 @@ bool PauseState::Update(float dt){
 	//m_game_object_manager->LateUpdate(dt);
 	//if (m_input_manager->IsButtonPressed(BTN_BACK))
 		//return false;
+
+	if (m_input_manager->IsButtonPressed(BTN_BACK)) {
+		m_buttons[0]->GetComponentMessenger()->Notify(MSG_OVERLAY_CALLBACK, NULL);
+		m_buttons[0]->GetComponentMessenger()->Notify(MSG_OVERLAY_HIDE, NULL);
+	}
+
+	if (m_input_manager->IsButtonPressed(BTN_ARROW_DOWN)) 
+		m_current_selected_button++;
+	if (m_input_manager->IsButtonPressed(BTN_ARROW_UP)) 
+		m_current_selected_button--;
+	
+	if (m_current_selected_button < 0) 
+		m_current_selected_button = 1;
+	if (m_current_selected_button > 1) 
+		m_current_selected_button = 0;
+	
+	for (int i = 0; i < 2; i++){
+		if(i != m_current_selected_button) {
+			m_buttons[i]->GetComponentMessenger()->Notify(MSG_OVERLAY_HOVER_EXIT, NULL);
+		}
+		else {
+			m_buttons[i]->GetComponentMessenger()->Notify(MSG_OVERLAY_HOVER_ENTER, NULL);
+		}
+	}
+
+	if(m_input_manager->IsButtonPressed(BTN_A))
+	{
+		m_buttons[m_current_selected_button]->GetComponentMessenger()->Notify(MSG_OVERLAY_CALLBACK, NULL);
+		m_buttons[m_current_selected_button]->GetComponentMessenger()->Notify(MSG_OVERLAY_HIDE, NULL);
+	}
 
 	return !m_quit;
 }

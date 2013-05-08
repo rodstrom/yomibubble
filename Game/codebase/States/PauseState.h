@@ -3,6 +3,8 @@
 
 #include "State.h"
 
+#include "..\Components\GameObject.h"
+
 class PauseState : public State
 {
 public:
@@ -22,6 +24,8 @@ private:
 	PhysicsEngine*				m_physics_engine;
 	SoundManager*				m_sound_manager;
 	bool						m_quit;
+	int							m_current_selected_button;
+	GameObject*					m_buttons[2];
 
 };
 

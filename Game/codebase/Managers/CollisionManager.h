@@ -41,6 +41,7 @@ private:
 	void PlayerTrigger(GameObject* player, GameObject* trigger);
 
 	void PlayerTerrain(GameObject* player, GameObject* terrain);
+	void TerrainPlayer(GameObject* terrain, GameObject* player){ PlayerTerrain(player, terrain); }
 
 	
 	typedef void (CollisionManager::*DoubleDispatch)(GameObject*, GameObject*);

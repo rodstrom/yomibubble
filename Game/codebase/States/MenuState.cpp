@@ -39,29 +39,29 @@ void MenuState::Enter(){
 	buttonDef.mat_start_hover = "Menu/StartHover";
 	buttonDef.mat_start = "Menu/Start";
 	buttonDef.func = [this] { ChangeStateToPlayState(); };
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_BUTTON, Ogre::Vector3(0,0,0), &buttonDef);
+	m_buttons[0] = m_game_object_manager->CreateGameObject(GAME_OBJECT_BUTTON, Ogre::Vector3(0,0,0), &buttonDef);
 	
 	buttonDef.overlay_name = "Menu";
 	buttonDef.cont_name = "Menu/Options";
 	buttonDef.mat_start_hover = "Menu/OptionsHover";
 	buttonDef.mat_start = "Menu/Options";
 	buttonDef.func = [this] { ChangeStateToPlayState(); };
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_BUTTON, Ogre::Vector3(0,0,0), &buttonDef);
+	m_buttons[1] = m_game_object_manager->CreateGameObject(GAME_OBJECT_BUTTON, Ogre::Vector3(0,0,0), &buttonDef);
 	
 	buttonDef.overlay_name = "Menu";
 	buttonDef.cont_name = "Menu/Credits";
 	buttonDef.mat_start_hover = "Menu/CreditsHover";
 	buttonDef.mat_start = "Menu/Credits";
 	buttonDef.func = [this] { ChangeStateToPlayState(); };
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_BUTTON, Ogre::Vector3(0,0,0), &buttonDef);
+	m_buttons[2] = m_game_object_manager->CreateGameObject(GAME_OBJECT_BUTTON, Ogre::Vector3(0,0,0), &buttonDef);
 	
 	buttonDef.overlay_name = "Menu";
 	buttonDef.cont_name = "Menu/Quit";
 	buttonDef.mat_start_hover = "Menu/QuitHover";
 	buttonDef.mat_start = "Menu/Quit";
 	buttonDef.func = [this] { ChangeStateToExit(); };
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_BUTTON, Ogre::Vector3(0,0,0), &buttonDef);
-
+	m_buttons[3] = m_game_object_manager->CreateGameObject(GAME_OBJECT_BUTTON, Ogre::Vector3(0,0,0), &buttonDef);
+	
 	//m_scene_manager->setSkyDome(true, "Examples/CloudySky");
 }
 
@@ -97,27 +97,20 @@ bool MenuState::Update(float dt){
 		m_current_selected_button = 3;
 	if (m_current_selected_button > 3) 
 		m_current_selected_button = 0;
+	
+	for (int i = 0; i < 4; i++){
+		if(i != m_current_selected_button) {
+			m_buttons[i]->GetComponentMessenger()->Notify(MSG_OVERLAY_HOVER_EXIT, NULL);
+		}
+		else {
+			m_buttons[i]->GetComponentMessenger()->Notify(MSG_OVERLAY_HOVER_ENTER, NULL);
+		}
+	}
 
-	/*unsigned int w, h, d;
-	int x, y;
-	m_render_window->getMetrics(w,h,d,x,y);	*/
-
-	switch(m_current_selected_button){
-	case 0:	//hover start button
-		//m_input_manager->InjectMousePosition(x+80, y+h*0.25f);
-		//SetCursorPos(x+80, y+h*0.25f);
-		break;
-	case 1:	//hover options button
-		//SetCursorPos(x+80, y+h*0.4f);
-		break;
-	case 2:	//hover credits button
-		//SetCursorPos(x+80, y+h*0.55f);
-		break;
-	case 3:	//hover quit button
-		//SetCursorPos(x+80, y+h*0.7f);
-		break;
-	default: 
-		m_current_selected_button = 0;
+	if(m_input_manager->IsButtonPressed(BTN_A))
+	{
+		m_buttons[m_current_selected_button]->GetComponentMessenger()->Notify(MSG_OVERLAY_CALLBACK, NULL);
+		m_buttons[m_current_selected_button]->GetComponentMessenger()->Notify(MSG_OVERLAY_HIDE, NULL);
 	}
 
 	return !m_quit;

@@ -67,8 +67,6 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 	m_acc_x = 0.001f;
 	m_acc_z = 0.001f;
 	m_max_velocity = 0.00000002f;
-
-	
 }
 
 void PlayerInputComponent::SetMessenger(ComponentMessenger* messenger){
@@ -96,7 +94,6 @@ void PlayerInputComponent::Normal(float dt){
 		m_anim_msg.id="Run";
 		m_anim_msg.blend = false;
 		m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
-		
 
 		//std::cout << "Yomi pos: " << dynamic_cast<NodeComponent*>(m_owner->GetComponent(COMPONENT_NODE))->GetSceneNode()->getPosition() << std::endl;
 		
@@ -111,6 +108,8 @@ void PlayerInputComponent::Normal(float dt){
 		m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
 		*/
 		
+		
+
 		m_anim_msg.id="Idle";
 		m_anim_msg.blend = false;
 		m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
@@ -118,6 +117,9 @@ void PlayerInputComponent::Normal(float dt){
 	//   m_animation_blender->blend("Run", AnimationBlender::BlendWhileAnimating, 0.2, false );
 		
 	}
+
+	m_camera_data_def.player_direction = Ogre::Vector3(dir.x, 0.0f, dir.z);
+	m_messenger->Notify(MSG_DEFAULT_CAMERA_POS, &m_camera_data_def);
 
 	if (!m_is_creating_bubble){
 		m_messenger->Notify(MSG_SFX2D_STOP, &m_bubble_blow_sound);
@@ -226,17 +228,14 @@ void PlayerInputComponent::Normal(float dt){
 		}
 	}
 
-	if (m_input_manager->IsButtonPressed(BTN_START)){
+	if (m_input_manager->IsButtonPressed(BTN_A)){
 		bool is_jumping = true;
 		m_messenger->Notify(MSG_CHARACTER_CONTROLLER_JUMP, &is_jumping);
 	}
-	else if (m_input_manager->IsButtonReleased(BTN_START)){
+	else if (m_input_manager->IsButtonReleased(BTN_A)){
 		bool is_jumping = false;
 		m_messenger->Notify(MSG_CHARACTER_CONTROLLER_JUMP, &is_jumping);
 	}
-
-	Ogre::Vector3 acc = Ogre::Vector3::ZERO;
-	//Acceleration(dir, acc, dt);
 	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &dir);
 	m_messenger->Notify(MSG_START_TIMER, NULL);
 }
@@ -260,7 +259,7 @@ void PlayerInputComponent::OnBubble(float dt){
 			player_body->getWorldTransform().setOrigin(pos);
 		}
 	}
-	if (m_input_manager->IsButtonPressed(BTN_START)){
+	if (m_input_manager->IsButtonPressed(BTN_A)){
 		m_player_state = PLAYER_STATE_NORMAL;
 		bool jump = true;
 		m_messenger->Notify(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_SET, &jump);
@@ -302,7 +301,7 @@ void PlayerInputComponent::InsideBubble(float dt){
 			player_body->getWorldTransform().setOrigin(pos);
 		}
 	}
-	if (m_input_manager->IsButtonPressed(BTN_START)){
+	if (m_input_manager->IsButtonPressed(BTN_A)){
 		m_player_state = PLAYER_STATE_NORMAL;
 		int coll = btCollisionObject::CF_NO_CONTACT_RESPONSE;
 		bool jump = true;

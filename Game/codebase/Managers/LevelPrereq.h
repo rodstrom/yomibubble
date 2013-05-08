@@ -2,7 +2,6 @@
 #define _LEVEL_PREREQ_H_
 
 struct LevelDef{
-	Ogre::String id;
 	Ogre::String next_level;
 	Ogre::String filepath;
 };
