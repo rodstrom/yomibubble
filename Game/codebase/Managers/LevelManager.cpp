@@ -19,7 +19,7 @@ void LevelManager::ChangeLevel(IEvent*){
 
 void LevelManager::LoadLevel(const Ogre::String& level_id){
 	for (unsigned int i = 0; i < m_levels.size(); i++){
-		if (m_levels[i].id == level_id){
+		if (m_levels[i].filepath == level_id){
 			m_current_level = i;
 			Ogre::String filepath = m_levels[i].filepath;
 			m_game_object_manager->CreateGameObject(GAME_OBJECT_TERRAIN, Ogre::Vector3(0,0,0), &filepath);
@@ -44,14 +44,12 @@ void LevelManager::FixZFighting(){
 
 	   // Loop through the list of shadow materials
 	   unsigned int i = 0;
-	   for( ; i < tmpMaterials.size(); i++ )
-	   {
+	   for( ; i < tmpMaterials.size(); i++ ) {
 		// Check if the current shadow material exists
 		if( !tmpMaterials[i].isNull() )
 		 // Set the depth bias of the shadow material
 		 tmpMaterials[i]->getTechnique(0)->getPass(0)->setDepthBias(5.0f);
 	   }
-
 	   // Clear the temporary list of shadow materials
 	   tmpMaterials.clear();
 }

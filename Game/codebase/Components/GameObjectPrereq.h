@@ -16,6 +16,7 @@ enum EGameObject{
 	GAME_OBJECT_TERRAIN,
 	GAME_OBJECT_GATE,
 	GAME_OBJECT_LOADING_SCREEN,
+	GAME_OBJECT_NEXT_LEVEL,
 	GAME_OBJECT_SIZE
 };
 
@@ -47,6 +48,10 @@ struct PlaneDef{
 	float friction;
 	float restitution;
 	CollisionFilter collision_filter;
+};
+
+struct CameraDataDef{
+	Ogre::Vector3 player_direction;
 };
 
 struct CollisionDef {

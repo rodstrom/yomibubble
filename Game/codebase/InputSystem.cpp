@@ -10,7 +10,10 @@ m_render_window(render_window),
 m_mouse(nullptr),
 m_keyboard(nullptr),
 m_ois_input_manager(nullptr),
-m_last_x(0.0f), m_last_z(0.0f){}
+m_last_x(0.0f), m_last_z(0.0f), 
+m_delta_zoom(0.0f),
+m_movement_dead_zone(0.2f),
+m_camera_dead_zone(0.2f){}
 
 InputSystem::~InputSystem(void){}
 
@@ -79,9 +82,15 @@ void InputSystem::Capture(){
 		OIS::MouseState mouse_state = m_mouse->getMouseState();
 		m_game->InjectMouseState(mouse_state);
 		m_game->InjectMousePosition(mouse_state.X.abs, mouse_state.Y.abs);
-		m_game->InjectRelativeCameraAxis(mouse_state.X.rel, mouse_state.Y.rel, mouse_state.Z.rel);
-		if (mouse_state.X.rel + mouse_state.Y.rel + mouse_state.Z.rel != 0) mouse_change = true;
+		m_game->InjectRelativeCameraAxis(-0.1f * mouse_state.X.rel, -0.1f * mouse_state.Y.rel, (mouse_state.Z.rel + m_delta_zoom));
+
+		if (mouse_state.X.rel + mouse_state.Y.rel + mouse_state.Z.rel + m_delta_zoom != 0) { mouse_change = true; }
+		//m_delta_zoom = 0.0f;
 	}
+	/*
+	if (m_delta_zoom != 0.0f)
+	{ m_game->InjectRelativeCameraAxis(mouse_state.X.reö  m_delta_zoom); mouse_change = true; }
+	*/
 	bool changeXmove = false;
 	bool changeZmove = false;
 	if (m_keyboard){
@@ -108,12 +117,29 @@ void InputSystem::Capture(){
 		for (auto it = m_joysticks.begin(); it != m_joysticks.end(); it++){
 			(*it)->capture();
 			
-			if((*it)->getJoyStickState().mAxes[0].abs < 16384 && (*it)->getJoyStickState().mAxes[0].abs > -16384 && !changeZmove) m_game->InjectRelativeMovementZ(0.0f);
-			if((*it)->getJoyStickState().mAxes[1].abs < 16384 && (*it)->getJoyStickState().mAxes[1].abs > -16384 && !changeXmove) m_game->InjectRelativeMovementX(0.0f);
-			if(((*it)->getJoyStickState().mAxes[2].abs < 16384 && (*it)->getJoyStickState().mAxes[2].abs > -16384) 
-				&& ((*it)->getJoyStickState().mAxes[3].abs < 16384 && (*it)->getJoyStickState().mAxes[3].abs > -16384)
-				&& (!mouse_change))
-				m_game->InjectRelativeCameraAxis(0.0f, 0.0f, 0.0f);
+			float move_x = (float)(*it)->getJoyStickState().mAxes[1].abs / 32767.0f;
+			float move_z = (float)(*it)->getJoyStickState().mAxes[0].abs / 32767.0f;
+			float camera_x = (float)(*it)->getJoyStickState().mAxes[3].abs / 32767.0f;
+			float camera_y = (float)(*it)->getJoyStickState().mAxes[2].abs / 32767.0f;
+
+			if (move_x < m_movement_dead_zone &&  move_x > -m_movement_dead_zone){
+				move_x = 0.0f;
+			}
+			if (move_z < m_movement_dead_zone &&  move_z > -m_movement_dead_zone){
+				move_z = 0.0f;
+			}
+			if (camera_x < m_camera_dead_zone &&  camera_x > -m_camera_dead_zone){
+				camera_x = 0.0f;
+			}
+			if (camera_y < m_camera_dead_zone &&  camera_y > -m_camera_dead_zone){
+				camera_y = 0.0f;
+			}
+
+			m_game->InjectRelativeMovementZ(move_z);
+			m_game->InjectRelativeMovementX(move_x);
+			m_game->InjectRelativeCameraAxisX(camera_x);
+			m_game->InjectRelativeCameraAxisY(camera_y);
+
 		}
 	}
 }
@@ -250,19 +276,19 @@ bool InputSystem::povMoved(const OIS::JoyStickEvent& e, int pov){
 
 bool InputSystem::axisMoved(const OIS::JoyStickEvent& e, int axis){
 	if(e.state.mAxes[0].abs > 16384 || e.state.mAxes[0].abs < -16384) {
-		float movement = e.state.mAxes[0].abs * 0.00000005f;
-		m_game->InjectRelativeMovementZ(movement);
+		float movement = e.state.mAxes[0].abs * 0.50000005f;
+		//m_game->InjectRelativeMovementZ(movement);
 	}
 	else {
-		m_game->InjectRelativeMovementZ(0.0f);
+		//m_game->InjectRelativeMovementZ(0.0f);
 	}
 
 	if(e.state.mAxes[1].abs > 16384 || e.state.mAxes[1].abs < -16384) {
-		float movement = e.state.mAxes[1].abs * 0.00000005f;
-		m_game->InjectRelativeMovementX(movement);
+		float movement = e.state.mAxes[1].abs * 0.50000005f;
+		//m_game->InjectRelativeMovementX(movement);
 	}
 	else {
-		m_game->InjectRelativeMovementX(0.0f);
+		//m_game->InjectRelativeMovementX(0.0f);
 	}
 	
 	float camX = 0.0f; 
@@ -273,7 +299,7 @@ bool InputSystem::axisMoved(const OIS::JoyStickEvent& e, int axis){
 	if(e.state.mAxes[3].abs > 16384 || e.state.mAxes[3].abs < -16384) {
 		camX = e.state.mAxes[3].abs * 0.0005f;
 	}
-	m_game->InjectRelativeCameraAxis(camX, camY, 0.0f);
+	//m_game->InjectRelativeCameraAxis(camX, camY, 0.0f);
 
 	//std::cout << e.state.mAxes[4].abs << std::endl;
 
@@ -301,19 +327,19 @@ bool InputSystem::sliderMoved(const OIS::JoyStickEvent& e, int sliderID){
 bool InputSystem::buttonPressed(const OIS::JoyStickEvent& e, int button){
 	switch (button){
 	case 13:
-		m_game->InjectPressedButton(BTN_RIGHT_MOUSE);
+		//m_game->InjectPressedButton(BTN_RIGHT_MOUSE);
 		break;
 	case 12:
-		m_game->InjectPressedButton(BTN_RIGHT_MOUSE);
+		//m_game->InjectPressedButton(BTN_RIGHT_MOUSE);
 		break;
 	case 11:
-		m_game->InjectPressedButton(BTN_RIGHT_MOUSE);
+		//m_game->InjectPressedButton(BTN_RIGHT_MOUSE);
 		break;
 	case 10:
-		m_game->InjectPressedButton(BTN_RIGHT_MOUSE);
+		//m_game->InjectPressedButton(BTN_RIGHT_MOUSE);
 		break;
 	case 9:
-		m_game->InjectPressedButton(BTN_RIGHT_MOUSE);
+		//m_game->InjectPressedButton(BTN_RIGHT_MOUSE);
 		break;
 	case 8: //?
 
@@ -325,10 +351,14 @@ bool InputSystem::buttonPressed(const OIS::JoyStickEvent& e, int button){
 		
 		break;
 	case 5: //Right Button
-		
+		m_delta_zoom += 20.00005;
+		//m_game->InjectRelativeCameraAxisZ(m_delta_zoom);
+		//m_game->InjectRelativeCameraAxisZ(1000.0);
 		break;
 	case 4: //Left Button
-		
+		m_delta_zoom -= 20.00005;
+		//m_game->InjectRelativeCameraAxisZ(m_delta_zoom);
+		//m_game->InjectRelativeCameraAxisZ(-1000.0);
 		break;
 	case 3: //Y button
 		
@@ -351,19 +381,19 @@ bool InputSystem::buttonPressed(const OIS::JoyStickEvent& e, int button){
 bool InputSystem::buttonReleased(const OIS::JoyStickEvent& e, int button){
 	switch (button){
 	case 13:
-		m_game->InjectReleasedButton(BTN_RIGHT_MOUSE);
+		//m_game->InjectReleasedButton(BTN_RIGHT_MOUSE);
 		break;
 	case 12:
-		m_game->InjectReleasedButton(BTN_RIGHT_MOUSE);
+		//m_game->InjectReleasedButton(BTN_RIGHT_MOUSE);
 		break;
 	case 11:
-		m_game->InjectReleasedButton(BTN_RIGHT_MOUSE);
+		//m_game->InjectReleasedButton(BTN_RIGHT_MOUSE);
 		break;
 	case 10:
-		m_game->InjectReleasedButton(BTN_RIGHT_MOUSE);
+		//m_game->InjectReleasedButton(BTN_RIGHT_MOUSE);
 		break;
 	case 9:
-		m_game->InjectReleasedButton(BTN_RIGHT_MOUSE);
+		//m_game->InjectReleasedButton(BTN_RIGHT_MOUSE);
 		break;
 	case 8: //?
 		
@@ -375,10 +405,10 @@ bool InputSystem::buttonReleased(const OIS::JoyStickEvent& e, int button){
 		
 		break;
 	case 5: //Right Button
-		
+		m_delta_zoom = 0.0f;
 		break;
 	case 4: //Left Button
-		
+		m_delta_zoom = 0.0f;
 		break;
 	case 3: //Y button
 		

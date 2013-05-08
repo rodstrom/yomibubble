@@ -21,6 +21,8 @@ public:
 	void Shut();	// Closes the Game Object Manager, removes all objects and relations to method pointers. Only call this when you want to delete the instance.
 	void ClearAllGameObjects();		// Removes all game objects from the instance, call when you want to change level.
 
+	GameObject* GetGameObject(const Ogre::String& id);
+
 	Ogre::SceneManager* GetSceneManager() const { return m_scene_manager; }
 	InputManager* GetInputManager() const { return m_input_manager; }
 	PhysicsEngine* GetPhysicsEngine() const { return m_physics_engine; }
@@ -43,6 +45,7 @@ private:
 	GameObject* CreateTerrain(const Ogre::Vector3& position, void* data);
 	GameObject* CreateGate(const Ogre::Vector3& position, void* data);
 	GameObject* CreateLoadingScreen(const Ogre::Vector3& position, void* data);
+	GameObject* CreateNextLevelTrigger(const Ogre::Vector3& position, void* data);
 
 	typedef GameObject* (GameObjectManager::*CreateObjectFptr)(const Ogre::Vector3&, void* data);
 	

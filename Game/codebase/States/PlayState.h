@@ -10,6 +10,7 @@
 class LevelManager;
 class GameObjectManager;
 class PhysicsEngine;
+class VariableManager;
 class PlayState : public State
 {
 public:
@@ -30,6 +31,7 @@ private:
 	LevelManager*				m_level_manager;
 	bool m_pause;
 	bool m_running;
+	VariableManager* m_variable_manager;
 };
 
 #endif // _PLAY_STATE_H_
