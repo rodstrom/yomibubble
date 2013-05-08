@@ -126,9 +126,15 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	go->AddComponent(tc);
 	PlayerRaycastCollisionComponent* prcc = new PlayerRaycastCollisionComponent;
 	go->AddComponent(prcc);
+	/*
 	TriggerComponent* camera_tc = new TriggerComponent;
 	go->AddComponent(camera_tc);
-
+	RaycastComponent* camera_rc = new RaycastComponent;
+	go->AddComponent(camera_rc);
+	CameraRaycastCollisionComponent* camera_rcc = new CameraRaycastCollisionComponent;
+	go->AddComponent(camera_rcc);
+	//RigidbodyComponent* camera_rb = new RigidbodyComponent;
+	*/
 	//Ogre::Vector3 scale(0.007);
 
 	node_comp->Init(position, m_scene_manager);
@@ -168,22 +174,36 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	m_sound_manager->GetYomiNode(node_comp->GetSceneNode()->getName());
 	prcc->Init(m_physics_engine);
 	acomp->GetEntity()->setCastShadows(true);
-	
+
+	fcc->SetPhysEngine(m_physics_engine);
+	/*
 	TriggerDef trdef;
-	trdef.body_type = STATIC_BODY;
+	trdef.body_type = DYNAMIC_BODY;
 	trdef.collider_type = COLLIDER_SPHERE;
 	trdef.mass = 0.0f;
-	trdef.radius = 1.5f;
-	trdef.collision_filter.filter = COL_WORLD_TRIGGER;
+	trdef.radius = 10.5f;
+	trdef.collision_filter.filter = COL_CAMERA;
 	trdef.collision_filter.mask = COL_WORLD_STATIC;
 	camera_tc->Init(position, m_physics_engine, &trdef);
+
+	//camera_rb->Init(
 
 	fcc->Init(m_scene_manager, m_viewport, true);
 	fcc->GetCamera()->setNearClipDistance(0.1f);
 	fcc->SetTrigger(camera_tc);
+	fcc->SetNode(node_comp->GetSceneNode());
+	*/
+	//camera_rc->Init(m_physics_engine, node_comp->GetSceneNode());
+	//camera_rc->SetLength(Ogre::Vector3(-2,0,0));
+
+	//camera_rcc->Init(m_physics_engine);
 
 	//stc->Init(position, m_physics_engine, &trdef);
-	
+	/*
+	-  raycast->Init(m_physics_engine, contr->GetRigidbody(), "body");
+-  raycast->SetLength(Ogre::Vector3(0.0f,-1.0f,0.0f));
+-  raycast->SetAttached(true); 
+*/
 	//DEBUGGING GRAVITY
 	//contr->GetRigidbody()->setGravity(btVector3(0,0,0));
 
@@ -204,7 +224,6 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 	BubbleController* bc = new BubbleController;
 	go->AddComponent(bc);
 	go->AddUpdateable(bc);
-
 
 	bc->Init(m_physics_engine, 0.00001f, 0.00002f);
 	node_comp->Init(position, m_scene_manager);

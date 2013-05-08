@@ -3,6 +3,7 @@
 
 #include "ComponentsPrereq.h"
 #include "PhysicsComponents.h"
+#include "..\PhysicsEngine.h"
 
 class CameraComponent : public Component, public IComponentObserver, public IComponentUpdateable{
 public:
@@ -34,6 +35,21 @@ public:
 	virtual void Init(Ogre::SceneManager* scene_manager, Ogre::Viewport* viewport, bool activate = false, const Ogre::String& camera_id = Ogre::StringUtil::BLANK);
 	virtual void Update(float dt);
 	void SetTrigger(TriggerComponent* trigger) { m_trigger = trigger; }
+	void SetPhysEngine(PhysicsEngine* physics_engine) { m_physics_engine = physics_engine; }
+
+	AltRaycastDef		m_left_ray;
+	AltRaycastDef		m_right_ray;
+	AltRaycastDef		m_top_ray;
+	AltRaycastDef		m_bot_ray;
+
+	void SetNode(Ogre::SceneNode* node) { 
+		m_node = node; 
+		m_left_ray.node = node;
+		m_right_ray.node = node;
+		m_top_ray.node = node;
+		m_bot_ray.node = node;
+	}
+	void QueryRaycast();
 
 protected:
 	void UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real delta_pitch, Ogre::Real delta_zoom);
@@ -44,9 +60,12 @@ protected:
 	Ogre::Vector3		m_default_position;
 	Ogre::Vector3		m_player_direction;
 	bool				m_getting_input;
+	bool				m_env_collision;
 	float				m_default_distance;
 	float				m_default_pitch;
-	TriggerComponent*	m_trigger;
+	TriggerComponent*	m_trigger; //testing for env coll
+	Ogre::SceneNode*	m_node; //testing for env coll
+	PhysicsEngine*		m_physics_engine;
 };
 
 #endif //_N_CAMERA_COMPONENTS_H_

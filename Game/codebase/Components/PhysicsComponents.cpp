@@ -683,3 +683,42 @@ void SyncedTriggerComponent::Update(float dt){
 		m_rigidbody->getWorldTransform().setOrigin(BtOgre::Convert::toBullet(pos));
 	}
 }
+
+void CameraRaycastCollisionComponent::Shut(){
+	m_messenger->Unregister(MSG_CAMERA_RAYCAST_COLLISION_STATIC_ENVIRONMENT, this);
+	m_messenger = NULL;
+};
+
+void CameraRaycastCollisionComponent::Notify(int type, void* msg){
+	switch(type)
+	{
+		case MSG_CAMERA_RAYCAST_COLLISION_STATIC_ENVIRONMENT:
+			m_messenger->Notify(MSG_CAMERA_ENV_COLLISION, NULL);
+			break;
+		default:
+			break;
+	};
+
+
+
+	/*
+	IgnoreBodyCast ray_callback_bottom(m_rigidbody);
+	m_physics_engine->GetDynamicWorld()->rayTest((m_rigidbody->getWorldTransform().getOrigin() + m_offset), (m_rigidbody->getWorldTransform().getOrigin() + m_offset) - btVector3(0,m_y_bottom_offset + m_step_height,0), ray_callback_bottom);
+	if (ray_callback_bottom.hasHit()){
+		CollisionDef& def = *static_cast<CollisionDef*>(ray_callback_bottom.m_collisionObject->getUserPointer());
+		if (def.flag == COLLISION_FLAG_STATIC){
+			m_messenger->Notify(MSG_RAYCAST_COLLISION_STATIC_ENVIRONMENT, NULL);
+		}
+		else if (def.flag == COLLISION_FLAG_GAME_OBJECT){
+			GameObject* go = static_cast<GameObject*>(def.data);
+			m_messenger->Notify(MSG_RAYCAST_COLLISION_GAME_OBJECT, &go);
+		}
+		m_on_ground = true;
+	}
+	*/
+};
+	
+void CameraRaycastCollisionComponent::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
+	m_messenger->Register(MSG_CAMERA_RAYCAST_COLLISION_STATIC_ENVIRONMENT, this);
+};

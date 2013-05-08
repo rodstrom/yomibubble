@@ -179,6 +179,18 @@ protected:
 	PhysicsEngine* m_physics_engine;
 };
 
+class CameraRaycastCollisionComponent : public RaycastCollisionComponent {
+public:
+	CameraRaycastCollisionComponent(void){}
+	virtual ~CameraRaycastCollisionComponent(void){}
+
+	virtual void Shut();
+	virtual void Notify(int type, void* msg);
+	virtual void SetMessenger(ComponentMessenger* messenger);
+
+protected:
+};
+
 class PlayerRaycastCollisionComponent : public RaycastCollisionComponent {
 public:
 	PlayerRaycastCollisionComponent(void){}

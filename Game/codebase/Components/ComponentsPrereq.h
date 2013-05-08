@@ -83,6 +83,8 @@ enum EComponentMsg{
 	MSG_P2P_GET_CONSTRAINT_SET_PIVOTB,
 	MSG_RAYCAST_COLLISION_GAME_OBJECT,
 	MSG_RAYCAST_COLLISION_STATIC_ENVIRONMENT,
+	MSG_CAMERA_RAYCAST_COLLISION_STATIC_ENVIRONMENT,
+	MSG_CAMERA_ENV_COLLISION,
 	MSG_SIZE
 };
 
@@ -198,6 +200,12 @@ struct RaycastDef{
 	btVector3 origin;
 	btVector3 length;
 	Ogre::String body_id;
+};
+
+struct AltRaycastDef{
+	Ogre::SceneNode* node;
+	btVector3 origin;
+	btVector3 length;
 };
 
 struct BubbleDef{
