@@ -138,7 +138,6 @@ int DBManager::Load() {
 							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y,z), &tott_def);
 						}
 						else if (i->second == "leaf") {
-							
 							ParticleDef particleDef;
 							particleDef.particle_name = "Particle/Smoke";
 							m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(x,y,z), &particleDef);
