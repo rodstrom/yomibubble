@@ -60,8 +60,9 @@ struct CollisionDef {
 };
 
 enum ECollisionTypes{
+	COLLISION_FLAG_NONE,
 	COLLISION_FLAG_STATIC = 0,
-	COLLISION_FLAG_GAME_OBJECT
+	COLLISION_FLAG_GAME_OBJECT,
 };
 
 struct CharacterControllerDef{
