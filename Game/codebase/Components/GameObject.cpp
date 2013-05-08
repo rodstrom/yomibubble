@@ -61,6 +61,10 @@ Component* GameObject::GetComponent(int type){
 	return NULL;
 }
 
+GameObject* GameObject::GetGameObject(const Ogre::String& id) const{
+	return m_game_object_manager->GetGameObject(id);
+}
+
 void GameObject::AddComponent(Component* component){
 	m_components.push_back(component);
 	component->SetOwner(this);
