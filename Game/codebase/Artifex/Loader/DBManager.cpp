@@ -8,6 +8,7 @@
 #include "..\..\Managers\SoundManager.h"
 #include "..\..\Components\AIComponents.h"
 #include <map>
+#include "..\..\PhysicsPrereq.h"
 
 DBManager::DBManager(ArtifexLoader *artifexloader, PhysicsEngine *physics_engine, GameObjectManager *game_object_manager, SoundManager *sound_manager) {
 
@@ -213,28 +214,28 @@ int DBManager::Load() {
 						btRigidBody* body = new btRigidBody(0, motion_state, shape, btVector3(0,0,0));
 						m_bodies.push_back(body);
 
-						btTransform transform;
-						transform.setIdentity();
-						transform.setOrigin(btVector3(spawn.x, spawn.y, spawn.z));
-						transform.setRotation(BtOgre::Convert::toBullet(quat));
-						body->setWorldTransform(transform);
-						CollisionDef* collision_def = new CollisionDef;
-						collision_def->data = NULL;
-						collision_def->flag = COLLISION_FLAG_STATIC;
-						body->setUserPointer(collision_def);
-						body->setRestitution(1.0f);
-						body->setFriction(1.0f);
-						m_collision_defs.push_back(collision_def);
-						m_physics_engine->GetDynamicWorld()->addRigidBody(body);
-					
-					} catch (Exception &e) {
-						cout << "\n|= ArtifexTerra3D =| Zoneloader v1.0 RC1 OT beta SQLite: spawnloader error - problems creating " << spawn.name.c_str() << ":" << e.what() << "\n";
-					};
-				}
-				//***************************	
+					btTransform transform;
+					transform.setIdentity();
+					transform.setOrigin(btVector3(spawn.x, spawn.y, spawn.z));
+					transform.setRotation(BtOgre::Convert::toBullet(quat));
+					body->setWorldTransform(transform);
+					CollisionDef* collision_def = new CollisionDef;
+					collision_def->data = NULL;
+					collision_def->flag = COLLISION_FLAG_STATIC;
+					body->setUserPointer(collision_def);
+					body->setRestitution(1.0f);
+					body->setFriction(1.0f);
+					m_collision_defs.push_back(collision_def);
+					int mask = COL_TOTT | COL_BUBBLE | COL_PLAYER;
+					m_physics_engine->GetDynamicWorld()->addRigidBody(body, COL_WORLD_STATIC, mask);
+
+				} catch (Exception &e) {
+					cout << "\n|= ArtifexTerra3D =| Zoneloader v1.0 RC1 OT beta SQLite: spawnloader error - problems creating " << spawn.name.c_str() << ":" << e.what() << "\n";
+				};
 			}
 		}		
-	} 			
+	 }
+	 }
 
 	std::map<GameObject*, std::string>::iterator goIter;
 	for (goIter = followers.begin(); goIter != followers.end(); goIter++) {

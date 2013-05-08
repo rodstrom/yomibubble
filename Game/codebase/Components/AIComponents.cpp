@@ -6,34 +6,47 @@
 #include <functional>
 
 void WayPointComponent::Notify(int type, void* message){
+	switch(type){
+	case MSG_IN_DISTANCE_PLAYER:
+		break;
+	case MSG_IN_DISTANCE_FRIENDS:
+		break;
+	default:
+		break;
+	}
 };
 
 void WayPointComponent::Shut(){
+	delete m_way_point;
 	m_way_point = NULL;
+	m_messenger->Unregister(MSG_IN_DISTANCE_PLAYER, this);
+	m_messenger->Unregister(MSG_IN_DISTANCE_FRIENDS, this);
 };
 
-void WayPointComponent::Init(Ogre::SceneNode* node, float walk_speed){
+void WayPointComponent::Init(Ogre::SceneNode* node, const Ogre::String& p_loop_way_points){
 	m_way_point = new WayPoint();
-	m_way_point->Init(node, walk_speed);
-	float turn_speed = m_way_point->m_walk_speed * 2.0f;
-	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_TURN_SPEED_SET, &turn_speed);
+	m_way_point->Init(node);
+	m_way_point->setLoopable(p_loop_way_points);
 };
 
 
 void WayPointComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger = messenger;
+	m_messenger->Register(MSG_IN_DISTANCE_PLAYER, this);
+	m_messenger->Register(MSG_IN_DISTANCE_FRIENDS, this);
 };
 
 void WayPointComponent::Update(float dt){
 	m_way_point->Update(dt);
-	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &m_way_point->m_direction);
-	float speed = m_way_point->getSpeed();
-	Ogre::Vector3 speed3(speed);
-	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_VELOCITY_SET, &speed3);
+	Ogre::Vector3 dir = m_way_point->m_direction.normalisedCopy();
+	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &dir);
+
+
 };
 
-void WayPointComponent::SetLoopable(Ogre::String loop){
+void WayPointComponent::SetLoopable(const Ogre::String& loop){
 	m_way_point->setLoopable(loop);
+	
 };
 
 void WayPointComponent::AddWayPoint(Ogre::Vector3 way_point){

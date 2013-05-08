@@ -11,7 +11,7 @@ public:
 	RigidbodyComponent(void) : m_rigidbody(NULL), m_shape(NULL), m_motion_state(NULL){ m_type = COMPONENT_RIGIDBODY; }
 	virtual ~RigidbodyComponent(void){}
 	virtual void Notify(int type, void* message);
-	virtual void Init(const Ogre::Vector3& position, Ogre::Entity* entity, PhysicsEngine* physics_engine, float mass, int collider_type, int body_type = DYNAMIC_BODY);
+	virtual void Init(const Ogre::Vector3& position, Ogre::Entity* entity, PhysicsEngine* physics_engine, const RigidBodyDef& def);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
 	btRigidBody* GetRigidbody() { return m_rigidbody; }
@@ -27,7 +27,7 @@ protected:
 
 class TriggerComponent : public RigidbodyComponent{
 public:
-	TriggerComponent(void){}
+	TriggerComponent(void){ m_type = COMPONENT_TRIGGER; }
 	virtual ~TriggerComponent(void){}
 
 	virtual void Init(const Ogre::Vector3& pos, PhysicsEngine* physics_engine, struct TriggerDef* def);
@@ -39,10 +39,23 @@ protected:
 
 };
 
+class SyncedTriggerComponent : public TriggerComponent, public IComponentUpdateable{
+public:
+	SyncedTriggerComponent(void){ m_type = COMPONENT_TRIGGER; }
+	virtual ~SyncedTriggerComponent(void){}
+
+	virtual void Init(const Ogre::Vector3& pos, PhysicsEngine* physics_engine, struct TriggerDef* def);
+	virtual void Update(float dt);
+
+protected:
+	Ogre::Vector3 m_offset;
+};
+
+
 class CharacterController : public RigidbodyComponent, public IComponentUpdateable, public IComponentSimulationStep{
 public:
 	CharacterController(void) : m_velocity(0.0), m_turn_speed(0.0f), 
-		m_has_follow_cam(false), m_is_jumping(false), m_on_ground(true), m_start_y_pos(0.0f), m_y_bottom_offset(0.0f),
+		m_has_follow_cam(false), m_is_jumping(false), m_on_ground(true), m_jump_timer(0.0f), m_y_bottom_offset(0.0f), m_compound_shape(NULL),
 		m_max_jump_height(0.0f), m_direction(btVector3(0,0,0)), m_deceleration(0.0f), m_max_speed(0.0f), m_step_height(0.0f)
 	{ m_type = COMPONENT_CHARACTER_CONTROLLER; m_update = true; }
 	virtual ~CharacterController(void){}
@@ -62,9 +75,10 @@ public:
 
 protected:
 	void QueryRaycast();
-	void Deceleration(float dt);
 
 	Ogre::Vector3	m_direction;
+	btVector3 m_offset;
+	btCompoundShape* m_compound_shape;
 
 	float		m_max_speed;
 	float		m_velocity;
@@ -73,7 +87,7 @@ protected:
 	float		m_turn_speed;
 	float		m_max_jump_height;
 	float		m_jump_pwr;
-	float		m_start_y_pos;
+	float		m_jump_timer;
 	float		m_step_height;
 	float		m_y_bottom_offset;
 	bool		m_has_follow_cam;

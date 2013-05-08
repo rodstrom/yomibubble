@@ -10,8 +10,9 @@ public:
 	~WayPoint();
 
 	bool NextLocation();
-	void Init(Ogre::SceneNode* node, float walk_speed);
+	void Init(Ogre::SceneNode* node);
 	void Update(float dt);
+	void Test();
 	
 	void AddWayPoint(Ogre::Vector3 way_point);
 	void AddWayPoint(Ogre::SceneNode* scene_node);
@@ -26,10 +27,11 @@ public:
 
 	Ogre::SceneNode* m_follow_node;
 
-	void setLoopable(Ogre::String loop);
+	void setLoopable(const Ogre::String& loop);
 	float getSpeed();
-private:
 	bool withinDistance(float meters);
+private:
+	
 	bool m_follow_node_moving;
 	bool m_loop_waypoints;
 	int m_current_waypoint;

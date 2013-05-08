@@ -4,7 +4,7 @@
 #include "..\PhysicsEngine.h"
 #include "..\Managers\SoundManager.h"
 #include "..\Managers\GameObjectManager.h"
-//#include "..\Components\SkyXPrereq.h"
+#include "..\PhysicsPrereq.h"
 #include <sstream>
 
 PlayState::PlayState(void) : m_physics_engine(NULL), m_game_object_manager(NULL), m_pause(false){}
@@ -12,11 +12,12 @@ PlayState::~PlayState(void){}
 
 void PlayState::Enter(){
 	m_scene_manager = Ogre::Root::getSingleton().createSceneManager("OctreeSceneManager");
+	//m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_MODULATIVE);
 	//m_scene_manager->setAmbientLight(Ogre::ColourValue(0.2f,0.2f,0.2f,1.0f));
 	//m_scene_manager->setDisplaySceneNodes(true);
 	m_physics_engine = new PhysicsEngine;
 	m_physics_engine->Init();
-	//m_physics_engine->SetDebugDraw(m_scene_manager);
+	m_physics_engine->SetDebugDraw(m_scene_manager);
 	m_camera = m_scene_manager->createCamera("MainCamera");
 	//m_camera->setPosition(Ogre::Vector3(500,500,500));
 	//m_camera->lookAt(Ogre::Vector3(0,0,0));
@@ -26,25 +27,11 @@ void PlayState::Enter(){
 	//m_viewport->setBackgroundColour(Ogre::ColourValue(0.0,0.0,1.0));
 	m_camera->setAspectRatio(Ogre::Real(m_viewport->getActualWidth()) / Ogre::Real(m_viewport->getActualHeight()));
 	//m_cam_node = m_scene_manager->getRootSceneNode()->createChildSceneNode("camNode");
-	int p = 0;
+
 	m_game_object_manager = new GameObjectManager;
 	m_sound_manager = new SoundManager(m_scene_manager, m_camera);
 	m_sound_manager->LoadAudio();
 	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager);
-	
-	/*ParticleDef particleDef;
-	particleDef.particle_name = "Particle/Smoke";
-	particleDef.test = "Test";
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(180,78,225), &particleDef);
-
-	ParticleDef particleDef2;
-	particleDef2.particle_name = "Particle/Smoke";
-	particleDef2.test = "Test2";
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(300,78,225), &particleDef2);*/
-	
-	
-
-	
 	
 	// Create plane mesh
 	Ogre::Plane plane(Ogre::Vector3::UNIT_Y, -10);
@@ -97,7 +84,7 @@ void PlayState::Enter(){
 	//m_physics_engine->ShowDebugDraw(true);
 	//m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y+1.0f,z+3.0f), &tott_def);
 	//	m_physics_engine->CreateTerrainCollision(mArtifexLoader->mTerrain);
-	//m_scene_manager->setSkyDome(true, "Examples/CloudySky");
+	m_scene_manager->setSkyDome(true, "Examples/CloudySky");
 	
 	/*TriggerDef trigger_def;
 	trigger_def.body_type = STATIC_BODY;
@@ -114,15 +101,36 @@ void PlayState::Enter(){
 	player_def.velocity = 5.0f;
 	player_def.max_speed = 3.0f;
 	player_def.deceleration = 10.0f;
-	player_def.jump_power = 300.0f;
+	player_def.jump_power = 250.0f;
 	player_def.restitution = 0.0f;
 	player_def.step_height = 0.35f;
 	player_def.turn_speed = 1000.0f;
-	player_def.max_jump_height = 1.7f;
+	player_def.max_jump_height = 0.6f;
 	player_def.mass = 1.0f;
 	player_def.radius = 0.3f;
 	player_def.height = 0.4f;
-	/*DynamicCharacterControllerDef player_def;
+	player_def.collision_filter.filter = COL_PLAYER;
+	player_def.collision_filter.mask = COL_BUBBLE | COL_BUBBLE_TRIG | COL_TOTT | COL_WORLD_STATIC | COL_WORLD_TRIGGER;
+	player_def.offset.y = 0.5f;
+
+	CharacterControllerDef companion_def;
+	companion_def.friction = 0.1f;
+	companion_def.velocity = 2.0f;
+	companion_def.max_speed = 4.0f;
+	companion_def.deceleration = 10.0f;
+	companion_def.jump_power = 250.0f;
+	companion_def.restitution = 0.0f;
+	companion_def.step_height = 0.35f;
+	companion_def.turn_speed = 1000.0f;
+	companion_def.max_jump_height = 0.6f;
+	companion_def.mass = 1.0f;
+	companion_def.radius = 0.3f;
+	companion_def.height = 0.4f;
+	companion_def.collision_filter.filter = COL_COMPANION;
+	companion_def.collision_filter.mask = COL_BUBBLE | COL_BUBBLE_TRIG | COL_TOTT | COL_WORLD_STATIC | COL_WORLD_TRIGGER;
+	companion_def.offset.y = 0.5f;			  
+
+	/*DynamicCharaheight = 0.4f;cterControllerDef player_def;
 	player_def.deceleration = 1.0f;
 	player_def.height = 1.0f;
 	player_def.jump_impulse = 10.0f;
@@ -136,7 +144,28 @@ void PlayState::Enter(){
 
 	Ogre::Vector3 player_pos = Ogre::Vector3::ZERO;
 	//Ogre::Vector3 player_pos(700.0f, 800.0f, 700.0f);
-
+	Ogre::String terrain = "Dayarea";
+	if (terrain == "NightArea"){
+		player_pos = Ogre::Vector3(230, 72, 298);
+	}
+	else if (terrain == "Dayarea"){
+		player_pos = Ogre::Vector3(170, 75, 173);
+		
+		ParticleDef particleDef;
+		particleDef.particle_name = "Particle/Smoke";
+		m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(168,75,175), &particleDef);
+		m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(179,84,191), &particleDef);
+		m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(178,79,229), &particleDef);
+		m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(236,90,234), &particleDef);
+		m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(157,77,213), &particleDef);
+		m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(149,79,202), &particleDef);
+		m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(131,89,203), &particleDef);
+		
+		
+	}
+	else if (terrain == "try"){
+		player_pos = Ogre::Vector3(230, 72, 298);
+	}
 	//if (terrain == "NightArea"){
 	//	player_pos = Ogre::Vector3(230, 72, 298);
 	//}
@@ -148,25 +177,25 @@ void PlayState::Enter(){
 	//	player_pos = Ogre::Vector3(230, 72, 298);
 	//}
 
-	/*Ogre::Light* light = m_scene_manager->createLight("light1");
+	Ogre::Light* light = m_scene_manager->createLight("light1");
 	light->setType(Ogre::Light::LT_POINT);
 	light->setPosition(player_pos);
 	light->setSpecularColour(Ogre::ColourValue::Blue);
 	light->setDiffuseColour(Ogre::ColourValue::White);
 	light->setAttenuation(75.0f, 0.0f, 0.1f, 0.012f);
-	light->setPowerScale(0.01f);*/
+	light->setPowerScale(0.01f);
 
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(player_pos.x,player_pos.y+1.0f,player_pos.z), &player_def);
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_GATE, player_pos, NULL);
-
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_COMPANION, Ogre::Vector3(player_pos.x+10.0f, player_pos.y+1.0f, player_pos.z), &companion_def);
+	//m_game_object_manager->CreateGameObject(GAME_OBJECT_GATE, player_pos, NULL);
 	PlaneDef plane_def;
 	plane_def.material_name = "Examples/BeachStones";
 	plane_def.plane_name = "plane";
 	plane_def.friction = 1.0f;
 	plane_def.restitution = 0.8f;
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(player_pos.x, player_pos.y - 4.0f, player_pos.y), &plane_def);
-
-	m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_MODULATIVE);
+	plane_def.collision_filter.filter = COL_WORLD_STATIC;
+	plane_def.collision_filter.mask = COL_BUBBLE | COL_PLAYER | COL_TOTT | COL_COMPANION;
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(player_pos.x,player_pos.y - 2.0f,player_pos.z), &plane_def);
 }
 
 

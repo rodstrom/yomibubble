@@ -11,6 +11,7 @@
 #include "..\Components\AudioComponents.h"
 #include "..\Components\PlayerInputComponent.h"
 #include "..\Managers\SoundManager.h"
+#include "..\PhysicsPrereq.h"
 
 GameObjectManager::GameObjectManager(void) : 
 	m_physics_engine(NULL), m_scene_manager(NULL), m_input_manager(NULL), m_viewport(NULL){}
@@ -166,7 +167,7 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	gui->Init("Examples/Empty", "Examples/Filled", 6);
 	fcc->Init(m_scene_manager, m_viewport, true);
 	fcc->GetCamera()->setNearClipDistance(0.1f);
-	csnc->Init(Ogre::Vector3(0.0f, 0.0f, 1.0f), "CreateBubble", node_comp->GetSceneNode());
+	csnc->Init(Ogre::Vector3(0.0f, def.offset.y, 1.0f), "CreateBubble", node_comp->GetSceneNode());
 	m_sound_manager->GetYomiNode(node_comp->GetSceneNode()->getName());
 	prcc->Init(m_physics_engine);
 	acomp->GetEntity()->setCastShadows(true);
@@ -197,14 +198,18 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 	//Ogre::Vector3 scale(def.start_scale);
 	Ogre::Vector3 scale(0.1f);
 	node_comp->GetSceneNode()->setScale(scale);
-	mrc->GetEntity()->setMaterialName("BlueBubble");
-	rc->Init(position,  mrc->GetEntity(), m_physics_engine, 1.0f, COLLIDER_SPHERE, DYNAMIC_BODY);
+	//mrc->GetEntity()->setMaterialName("BlueBubble");
+	RigidBodyDef body_def;
+	body_def.body_type = DYNAMIC_BODY;
+	body_def.collider_type = COLLIDER_SPHERE;
+	body_def.friction = def.friction;
+	body_def.mass = 1.0f;
+	body_def.collision_filter.filter = COL_BUBBLE;
+	body_def.collision_filter.mask = COL_PLAYER | COL_TOTT | COL_BUBBLE | COL_WORLD_STATIC;
+	rc->Init(position,  mrc->GetEntity(), m_physics_engine, body_def);
 	rc->GetRigidbody()->setGravity(btVector3(0.0f, 0.0f, 0.0f));
-	rc->GetRigidbody()->setRestitution(def.restitution);
-	rc->GetRigidbody()->setFriction(def.friction);
 	rc->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
 	rc->GetRigidbody()->setGravity(btVector3(0.0f, 0.0f, 0.0f));
-	rc->GetRigidbody()->setRollingFriction(0.9f);
 	rc->GetRigidbody()->setActivationState(DISABLE_DEACTIVATION);
 	cons->Init(m_physics_engine,rc->GetRigidbody(), def.connection_body, btVector3(0,0,0), btVector3(0,0,0));
 	return go;
@@ -230,12 +235,16 @@ GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, v
 	mrc->Init("PinkBubble.mesh", m_scene_manager);
 	Ogre::Vector3 scale(def.start_scale);
 	node_comp->GetSceneNode()->setScale(scale);
-	mrc->GetEntity()->setMaterialName("PinkBubble");
-	rc->Init(position,  mrc->GetEntity(), m_physics_engine, 1.0f, COLLIDER_SPHERE, DYNAMIC_BODY);
+	//mrc->GetEntity()->setMaterialName("PinkBubble");
+	RigidBodyDef body_def;
+	body_def.body_type = DYNAMIC_BODY;
+	body_def.collider_type = COLLIDER_SPHERE;
+	body_def.friction = def.friction;
+	body_def.mass = 1.0f;
+	body_def.collision_filter.filter = COL_BUBBLE;
+	body_def.collision_filter.mask = COL_PLAYER | COL_TOTT | COL_BUBBLE | COL_WORLD_STATIC;
+	rc->Init(position,  mrc->GetEntity(), m_physics_engine, body_def);
 	rc->GetRigidbody()->setGravity(btVector3(0.0f, 0.0f, 0.0f));
-	//rc->GetRigidbody()->setLinearFactor(btVector3(1,0,1));
-	rc->GetRigidbody()->setRestitution(def.restitution);
-	rc->GetRigidbody()->setFriction(def.friction);
 	rc->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
 	rc->GetRigidbody()->setActivationState(DISABLE_DEACTIVATION);
 	cons->Init(m_physics_engine,rc->GetRigidbody(), def.connection_body, btVector3(0,0,0), btVector3(0,0,0));
@@ -262,7 +271,7 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 	acomp->Init("Yomi_2Yomi.mesh", m_scene_manager);
 	acomp->GetEntity()->setMaterialName("SolidColor/Green");
 	m_sound_manager->GetTottNode(node_comp->GetSceneNode()->getName());
-	way_point->Init(node_comp->GetSceneNode(), 0.001f);
+	way_point->Init(node_comp->GetSceneNode(), "false");
 	way_point->AddWayPoint(Ogre::Vector3(15.0f, -10.0f, 21.0f));
 	
 	contr->Init(position, m_physics_engine, def);
@@ -290,13 +299,16 @@ GameObject* GameObjectManager::CreatePlane(const Ogre::Vector3& position, void* 
 	PlaneDef& plane_def = *static_cast<PlaneDef*>(data);
 	mrc->Init(plane_def.plane_name, m_scene_manager);
 	mrc->GetEntity()->setMaterialName(plane_def.material_name);
-	
-	rc->Init(position, mrc->GetEntity(), m_physics_engine, 0.0f, COLLIDER_TRIANGLE_MESH_SHAPE, STATIC_BODY);
-	rc->GetRigidbody()->setRestitution(plane_def.restitution);
-	rc->GetRigidbody()->setFriction(plane_def.friction);
+	RigidBodyDef def;
+	def.body_type = STATIC_BODY;
+	def.collider_type = COLLIDER_TRIANGLE_MESH_SHAPE;
+	def.friction = plane_def.friction;
+	def.restitution = plane_def.restitution;
+	def.mass = 0.0f;
+	def.collision_filter.filter = COL_WORLD_STATIC;
+	def.collision_filter.mask = COL_PLAYER | COL_BUBBLE | COL_TOTT | COL_COMPANION;
+	rc->Init(position, mrc->GetEntity(), m_physics_engine, def);
 	rc->GetCollisionDef().flag = COLLISION_FLAG_STATIC;
-	//mrc->GetSceneNode()->setPosition(BtOgre::Convert::toOgre(rc->GetRigidbody()->getWorldTransform().getOrigin()));
-
 	return go;
 }
 GameObject* GameObjectManager::CreateButton(const Ogre::Vector3& position, void* data) {
@@ -363,7 +375,15 @@ GameObject* GameObjectManager::CreateLeaf(const Ogre::Vector3& position, void* d
 	bc->Init(node_comp->GetSceneNode());
 	//Ogre::Vector3 scale(0.002f);
 	//node_comp->GetSceneNode()->setScale(scale);
-	rb->Init(position, mrc->GetEntity(), m_physics_engine, 1, COLLIDER_BOX, STATIC_BODY);
+	RigidBodyDef def;
+	def.body_type = STATIC_BODY;
+	def.collider_type = COLLIDER_BOX;
+	def.friction = 0.0f;
+	def.restitution = 0.0f;
+	def.mass = 0.0f;
+	def.collision_filter.filter = COL_WORLD_TRIGGER;
+	def.collision_filter.mask = COL_PLAYER;
+	rb->Init(position, mrc->GetEntity(), m_physics_engine, def);
 	//particle->Init(m_scene_manager, particleDef.test, particleDef.particle_name);
 	//particle->Init(m_scene_manager, "ring_flare2", particleDef.particle_name);
 	mrc->GetEntity()->setMaterialName("Examples/Leaf");
@@ -383,7 +403,6 @@ GameObject* GameObjectManager::CreateTestTrigger(const Ogre::Vector3& position, 
 }
 
 GameObject* GameObjectManager::CreateCompanion(const Ogre::Vector3& position, void* data){
-	ButtonDef& buttonDef = *static_cast<ButtonDef*>(data);
 	CharacterControllerDef& def = *static_cast<CharacterControllerDef*>(data);
 	GameObject* go = new GameObject(GAME_OBJECT_COMPANION);
 	TimerComponent* timer = new TimerComponent;
@@ -391,8 +410,6 @@ GameObject* GameObjectManager::CreateCompanion(const Ogre::Vector3& position, vo
 	go->AddUpdateable(timer);
 	NodeComponent* node_comp = new NodeComponent;
 	go->AddComponent(node_comp);
-	MeshRenderComponent* mrc = new MeshRenderComponent;
-	go->AddComponent(mrc);
 	AnimationComponent* acomp = new AnimationComponent;
 	acomp->AddAnimationStates(1);
 	go->AddComponent(acomp);
@@ -400,15 +417,29 @@ GameObject* GameObjectManager::CreateCompanion(const Ogre::Vector3& position, vo
 	CharacterController* contr = new CharacterController;
 	go->AddComponent(contr);
 	go->AddUpdateable(contr);
+	SyncedTriggerComponent* stc = new SyncedTriggerComponent;
+	go->AddComponent(stc);
 	WayPointComponent* way_point = new WayPointComponent;
 	go->AddComponent(way_point);
 	go->AddUpdateable(way_point);
 
+	TriggerDef tdef;
+	tdef.body_type = STATIC_BODY;
+	tdef.collider_type = COLLIDER_SPHERE;
+	tdef.radius = 0.1f;
+
 	node_comp->Init(position, m_scene_manager);
-	mrc->Init("yomi.mesh", m_scene_manager);
-	Ogre::Vector3 scale(0.0002f);
-	node_comp->GetSceneNode()->setScale(scale);
-	acomp->GetEntity()->setMaterialName("_YomiFBXASC039sFBXASC032staffMaterial__191");	
+	node_comp->SetId("companion");
+	
+	acomp->Init("Yomi.mesh", m_scene_manager, node_comp->GetId());
+	acomp->GetEntity()->setMaterialName("_YomiFBXASC039sFBXASC032staffMaterial__191");
+	stc->Init(position, m_physics_engine, &tdef);
+	contr->Init(position, m_physics_engine, def);
+	//rb->Init(position, acomp->GetEntity(), m_physics_engine, rdef);
+	way_point->Init(node_comp->GetSceneNode(), "false");
+	way_point->AddWayPoint(Ogre::Vector3(170, 75, 173));
+	way_point->AddWayPoint(Ogre::Vector3(180.0f, 75.0f, 173.0f));
+	node_comp->GetSceneNode()->setPosition(Ogre::Vector3(position));
 	return go;
 }
 
@@ -429,7 +460,7 @@ GameObject* GameObjectManager::CreateGate(const Ogre::Vector3& position, void* d
 	go->AddComponent(mrc);
 
 	nc->Init(position, m_scene_manager);
-	mrc->Init("sphere.mesh", m_scene_manager);
+	mrc->Init("Gate.mesh", m_scene_manager);
 	Ogre::Vector3 scale(0.02f);
 	nc->GetSceneNode()->setScale(scale);
 	mrc->GetEntity()->setMaterialName("Examples/Athene/NormalMapped");

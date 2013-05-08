@@ -20,6 +20,7 @@ enum EComponentType{
 	COMPONENT_NODE,
 	COMPONENT_CHILD_NODE,
 	COMPONENT_TRIGGER,
+	COMPONENT_SYNCED_TRIGGER,
 	COMPONENT_RAYCAST,
 	COMPONENT_SIZE
 };
@@ -84,6 +85,8 @@ enum EComponentMsg{
 	MSG_START_TIMER,
 	MSG_RAYCAST_COLLISION_GAME_OBJECT,
 	MSG_RAYCAST_COLLISION_STATIC_ENVIRONMENT,
+	MSG_IN_DISTANCE_PLAYER,
+	MSG_IN_DISTANCE_FRIENDS,
 	MSG_SIZE
 };
 
@@ -161,25 +164,11 @@ public:
 	virtual void SimulationStep(btScalar time_step) = 0;
 };
 
-struct RigidBodyDef{
-	int collider_type;
-	float mass;
-	float restitution;
-	float friction;
-};
-
 struct AnimationMsg{
 	bool blend;
 	Ogre::String id;
 	Ogre::String bottom_anim;
 	Ogre::String top_anim;
-};
-
-struct CharControllerJumpDef{
-	CharControllerJumpDef(void) : jump(false), _override(false){}
-	CharControllerJumpDef(bool p_jump, bool p_override) : jump(p_jump), _override(p_override){}
-	bool jump;
-	bool _override;
 };
 
 struct AddForceMsg{
@@ -231,39 +220,6 @@ struct BubbleDef{
 	float start_scale;
 	float restitution;
 	float friction;
-};
-
-struct PlayerInputDef{
-
-};
-
-struct CharacterControllerDef{
-	CharacterControllerDef(void) : step_height(0.0f), turn_speed(0.0f), velocity(0.0f), max_jump_height(0.0f), friction(0.0f), mass(0.0f),
-		restitution(0.0f), jump_power(0.0f), max_speed(0.0f), deceleration(0.0f), air_deceleration(0.0f), radius(0.0f), height(0.0f) {}
-	float step_height;
-	float turn_speed;
-	float velocity;
-	float max_jump_height;
-	float jump_power;
-	float friction;
-	float restitution;
-	float max_speed;
-	float deceleration;
-	float air_deceleration;
-	float radius;
-	float height;
-	float mass;
-};
-
-struct DynamicCharacterControllerDef{
-	float step_height;
-	float radius;
-	float height;
-	float jump_impulse;
-	float deceleration;
-	float max_speed;
-	float jump_recharge_time;
-	float mass;
 };
 
 #endif // _N_COMPONENTS_PREREQ_H_

@@ -11,13 +11,13 @@ public:
 
 	virtual void Notify(int type, void* message);
 	virtual void Shut();
-	virtual void Init(Ogre::SceneNode *m_node, float walk_speed);
+	virtual void Init(Ogre::SceneNode *p_node, const Ogre::String& p_loop_way_points);
 	virtual void SetMessenger(ComponentMessenger* messenger);
 	virtual void Update(float dt);
 	
 	void AddWayPoint(Ogre::Vector3 way_point);
 	void AddWayPoint(Ogre::SceneNode* scene_node);
-	void SetLoopable(Ogre::String loop);
+	void SetLoopable(const Ogre::String& loop);
 
 private:
 	WayPoint* m_way_point;
