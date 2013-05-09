@@ -30,7 +30,11 @@ void PlayState::Enter(){
 	//m_sound_manager = new SoundManager(m_scene_manager, m_camera);
 	//m_sound_manager->LoadAudio();
 	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager, m_message_system);
-	
+
+	//RUN SECONDLOADING
+}
+
+void PlayState::SecondLoading(){
 	m_variable_manager = new VariableManager();
 	m_variable_manager->Init();
 	m_variable_manager->LoadVariables();
@@ -128,33 +132,31 @@ void PlayState::Enter(){
 	m_scene_manager->setShadowFarDistance(30.0f);
 	m_camera->setNearClipDistance(1.0f);
 	
-if(MaterialManager::getSingleton().getByName("Ogre/TextureShadowCaster").isNull())
-    // Render a frame to get the shadow materials created
+	if(MaterialManager::getSingleton().getByName("Ogre/TextureShadowCaster").isNull())
+	// Render a frame to get the shadow materials created
 		Ogre::Root::getSingleton().renderOneFrame();
 
-   // Get all shadow materials
+	// Get all shadow materials
 	std::vector<MaterialPtr> tmpMaterials;
-   TexturePtr tmpTexturePtr = m_scene_manager->getShadowTexture(0);
-   String tmpMaterialName = tmpTexturePtr->getName() + "Mat" + m_scene_manager->getName();
-   tmpMaterials.push_back(MaterialManager::getSingleton().getByName(tmpMaterialName));
-   tmpMaterials.push_back(MaterialManager::getSingleton().getByName("Ogre/TextureShadowCaster"));
-   tmpMaterials.push_back(MaterialManager::getSingleton().getByName("Ogre/TextureShadowReceiver"));
+	TexturePtr tmpTexturePtr = m_scene_manager->getShadowTexture(0);
+	String tmpMaterialName = tmpTexturePtr->getName() + "Mat" + m_scene_manager->getName();
+	tmpMaterials.push_back(MaterialManager::getSingleton().getByName(tmpMaterialName));
+	tmpMaterials.push_back(MaterialManager::getSingleton().getByName("Ogre/TextureShadowCaster"));
+	tmpMaterials.push_back(MaterialManager::getSingleton().getByName("Ogre/TextureShadowReceiver"));
 
-   // Loop through the list of shadow materials
-   unsigned int i = 0;
-   for( ; i < tmpMaterials.size(); i++ )
-   {
-    // Check if the current shadow material exists
-    if( !tmpMaterials[i].isNull() )
-     // Set the depth bias of the shadow material
-     tmpMaterials[i]->getTechnique(0)->getPass(0)->setDepthBias(5.0f);
-   }
+	// Loop through the list of shadow materials
+	unsigned int i = 0;
+	for( ; i < tmpMaterials.size(); i++ )
+	{
+	// Check if the current shadow material exists
+	if( !tmpMaterials[i].isNull() )
+		// Set the depth bias of the shadow material
+		tmpMaterials[i]->getTechnique(0)->getPass(0)->setDepthBias(5.0f);
+	}
 
-   // Clear the temporary list of shadow materials
-   tmpMaterials.clear();
-
+	// Clear the temporary list of shadow materials
+	tmpMaterials.clear();
 }
-
 
 void PlayState::Exit(){
 	delete m_level_manager;

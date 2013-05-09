@@ -119,7 +119,7 @@ void InputSystem::Capture(){
 			
 			float move_x = (float)(*it)->getJoyStickState().mAxes[1].abs / 32767.0f;
 			float move_z = (float)(*it)->getJoyStickState().mAxes[0].abs / 32767.0f;
-			float camera_x = (float)(*it)->getJoyStickState().mAxes[3].abs / 32767.0f;
+			float camera_x = -(float)(*it)->getJoyStickState().mAxes[3].abs / 32767.0f;
 			float camera_y = (float)(*it)->getJoyStickState().mAxes[2].abs / 32767.0f;
 
 			if (move_x < m_movement_dead_zone &&  move_x > -m_movement_dead_zone){

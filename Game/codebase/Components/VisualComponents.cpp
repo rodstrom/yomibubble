@@ -247,7 +247,7 @@ void Overlay2DComponent::Init(const Ogre::String& p_overlay_name, const Ogre::St
 
 void Overlay2DComponent::Shut()
 {
-	
+	m_overlay->hide();
 	if (m_messenger){
 		m_messenger->Unregister(MSG_GET_2D_OVERLAY_CONTAINER, this);
 		m_messenger->Unregister(MSG_OVERLAY_SHOW, this);

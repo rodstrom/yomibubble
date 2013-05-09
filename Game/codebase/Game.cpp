@@ -4,6 +4,7 @@
 #include "States\MenuState.h"
 #include "States\PlayState.h"
 #include "States\PauseState.h"
+#include "States\LoadingState.h"
 
 Game::Game(void) : m_state_manager(NULL){}
 Game::~Game(void){}
@@ -17,6 +18,7 @@ bool Game::Init(Ogre::RenderWindow* render_window, MessageSystem* message_system
 	PlayState::Create<PlayState>(m_state_manager, "PlayState");
 	MenuState::Create<MenuState>(m_state_manager, "MenuState");
 	PauseState::Create<PauseState>(m_state_manager, "PauseState");
+	LoadingState::Create<LoadingState>(m_state_manager, "LoadingState");
 	m_state_manager->ChangeState(m_state_manager->FindById("MenuState"));
 
 	//ShowCursor(false);
