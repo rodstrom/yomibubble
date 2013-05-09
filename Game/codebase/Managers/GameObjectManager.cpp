@@ -469,8 +469,8 @@ GameObject* GameObjectManager::CreateGate(const Ogre::Vector3& position, void* d
 	go->AddComponent(nc);
 	MeshRenderComponent* mrc = new MeshRenderComponent;
 	go->AddComponent(mrc);
-	//RigidbodyComponent* rc = new RigidbodyComponent;
-	//go->AddComponent(rc);
+	RigidbodyComponent* rc = new RigidbodyComponent;
+	go->AddComponent(rc);
 	
 	RigidBodyDef def;
 	def.body_type = STATIC_BODY;
@@ -482,7 +482,7 @@ GameObject* GameObjectManager::CreateGate(const Ogre::Vector3& position, void* d
 	nc->Init(position, m_scene_manager);
 	mrc->Init("Gate.mesh", m_scene_manager);
 	
-	//rc->Init(position, mrc->GetEntity(), m_physics_engine, def);
+	rc->Init(position, mrc->GetEntity(), m_physics_engine, def);
 	return go;
 }
 

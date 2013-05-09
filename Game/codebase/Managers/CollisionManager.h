@@ -1,6 +1,7 @@
 #ifndef _N_COLLISION_MANAGER_H_
 #define _N_COLLISION_MANAGER_H_
 
+class MessageSystem;
 class GameObject;
 namespace Collision {
 	bool ContactCallback(btManifoldPoint& cp,	const btCollisionObjectWrapper* colObj0Wrap,int partId0,int index0,const btCollisionObjectWrapper* colObj1Wrap,int partId1,int index1);
@@ -14,6 +15,7 @@ public:
 	void ProcessCollision(const btCollisionObject* ob_a, const btCollisionObject* ob_b);
 	void ProcessRaycast(const btCollisionObject* ob_a, const btCollisionObject* ob_b);
 	void UpdateColliisonChache();
+	void SetMessageSystem(MessageSystem* message_system) { m_message_system = message_system; }
 	
 private:
 	CollisionManager(void);
@@ -49,6 +51,7 @@ private:
 	typedef std::list<std::pair<void*,void*>> BeginEndChache;
 	HitMap m_collision;
 	HitMap m_raycast_map;
+	MessageSystem* m_message_system;
 };
 
 #endif // _N_COLLISION_MANAGER_H_

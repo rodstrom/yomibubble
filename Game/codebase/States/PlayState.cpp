@@ -62,7 +62,7 @@ void PlayState::SecondLoading(){
 	m_scene_manager->setShadowColour(Ogre::ColourValue(0.6f,0.6f,0.6f,1.0f));
 	m_scene_manager->setShadowFarDistance(25.0f);
 
-	/*LevelDef level1;
+	LevelDef level1;
 	level1.filepath = "try";
 	level1.next_level = "Dayarea";
 	LevelDef level2;
@@ -74,9 +74,9 @@ void PlayState::SecondLoading(){
 	m_level_manager->AddLevel(level1);
 	m_level_manager->AddLevel(level2);
 	m_level_manager->AddLevel(level3);
-	m_level_manager->LoadLevel("Dayarea");*/
+	m_level_manager->LoadLevel("try");
 	
-	float x = 180.0f;
+	/*float x = 180.0f;
 	float y = 90.0f;
 	float z = 230.0f;
 
@@ -89,7 +89,7 @@ void PlayState::SecondLoading(){
 	tott_def.turn_speed = 1000.0f;
 	tott_def.max_jump_height = 10.0f;
 
-	Ogre::String terrain = "Dayarea";
+	Ogre::String terrain = "NightArea";
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_TERRAIN, Ogre::Vector3(0,0,0), &terrain);
 
 	CharacterControllerDef player_def;
@@ -124,7 +124,7 @@ void PlayState::SecondLoading(){
 		player_pos = Ogre::Vector3(230, 72, 298);
 	}
 
-//	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(player_pos.x,player_pos.y+8.5f,player_pos.z), &player_def, "Player");
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(player_pos.x,player_pos.y+8.5f,player_pos.z), &player_def, "Player");
 	PlaneDef plane_def;
 	plane_def.material_name = "Examples/BeachStones";
 	plane_def.plane_name = "plane";
@@ -132,7 +132,7 @@ void PlayState::SecondLoading(){
 	plane_def.restitution = 0.8f;
 	plane_def.collision_filter.filter = COL_WORLD_STATIC;
 	plane_def.collision_filter.mask = COL_BUBBLE | COL_PLAYER | COL_TOTT;
-//	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(player_pos.x,player_pos.y + 8.0f,player_pos.z), &plane_def);
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(player_pos.x,player_pos.y + 8.0f,player_pos.z), &plane_def);
 	m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
 	m_scene_manager->setShadowUseInfiniteFarPlane(false);
 	m_scene_manager->setShadowTextureSelfShadow(true);
@@ -165,7 +165,7 @@ void PlayState::SecondLoading(){
 	}
 
 	// Clear the temporary list of shadow materials
-	tmpMaterials.clear();
+	tmpMaterials.clear();*/
 }
 
 void PlayState::Exit(){
