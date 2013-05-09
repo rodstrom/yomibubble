@@ -1,12 +1,14 @@
 #include "stdafx.h"
 #include "InputSystem.h"
 #include "Game.h"
+#include "MessageSystem.h"
 
 #include <iostream>
 
-InputSystem::InputSystem(Game* game, Ogre::RenderWindow* render_window) : 
+InputSystem::InputSystem(Game* game, Ogre::RenderWindow* render_window, MessageSystem* message_system) : 
 m_game(game),
 m_render_window(render_window),
+m_message_system(message_system),
 m_mouse(nullptr),
 m_keyboard(nullptr),
 m_ois_input_manager(nullptr),
@@ -119,7 +121,7 @@ void InputSystem::Capture(){
 			
 			float move_x = (float)(*it)->getJoyStickState().mAxes[1].abs / 32767.0f;
 			float move_z = (float)(*it)->getJoyStickState().mAxes[0].abs / 32767.0f;
-			float camera_x = (float)(*it)->getJoyStickState().mAxes[3].abs / 32767.0f;
+			float camera_x = -(float)(*it)->getJoyStickState().mAxes[3].abs / 32767.0f;
 			float camera_y = (float)(*it)->getJoyStickState().mAxes[2].abs / 32767.0f;
 
 			if (move_x < m_movement_dead_zone &&  move_x > -m_movement_dead_zone){
@@ -278,9 +280,17 @@ bool InputSystem::axisMoved(const OIS::JoyStickEvent& e, int axis){
 	if(e.state.mAxes[0].abs > 16384 || e.state.mAxes[0].abs < -16384) {
 		float movement = e.state.mAxes[0].abs * 0.50000005f;
 		//m_game->InjectRelativeMovementZ(movement);
+		if(e.state.mAxes[0].abs < 0) {
+			m_game->InjectPressedButton(BTN_ARROW_UP);
+		}
+		else {			
+			m_game->InjectPressedButton(BTN_ARROW_DOWN);
+		}
 	}
 	else {
 		//m_game->InjectRelativeMovementZ(0.0f);
+		m_game->InjectReleasedButton(BTN_ARROW_UP);
+		m_game->InjectReleasedButton(BTN_ARROW_DOWN);
 	}
 
 	if(e.state.mAxes[1].abs > 16384 || e.state.mAxes[1].abs < -16384) {
@@ -345,18 +355,18 @@ bool InputSystem::buttonPressed(const OIS::JoyStickEvent& e, int button){
 
 		break;
 	case 7: //Start Button
-		
+		m_game->InjectPressedButton(BTN_START);	
 		break;
 	case 6: //Back Button
-		
+		m_game->InjectPressedButton(BTN_BACK);
 		break;
 	case 5: //Right Button
-		m_delta_zoom += 20.00005;
+		m_delta_zoom += 30.00005;
 		//m_game->InjectRelativeCameraAxisZ(m_delta_zoom);
 		//m_game->InjectRelativeCameraAxisZ(1000.0);
 		break;
 	case 4: //Left Button
-		m_delta_zoom -= 20.00005;
+		m_delta_zoom -= 30.00005;
 		//m_game->InjectRelativeCameraAxisZ(m_delta_zoom);
 		//m_game->InjectRelativeCameraAxisZ(-1000.0);
 		break;
@@ -367,10 +377,10 @@ bool InputSystem::buttonPressed(const OIS::JoyStickEvent& e, int button){
 		
 		break;
 	case 1: //OIS::MouseButtonID::MB_Right: //or GamePad B
-		m_game->InjectPressedButton(BTN_LEFT_MOUSE);
+		m_game->InjectPressedButton(BTN_B);
 		break;
 	case 0: //OIS::MouseButtonID::MB_Left: //or GamePad A
-		m_game->InjectPressedButton(BTN_START);
+		m_game->InjectPressedButton(BTN_A);
 		break;
 	default:
 		break;
@@ -399,10 +409,10 @@ bool InputSystem::buttonReleased(const OIS::JoyStickEvent& e, int button){
 		
 		break;
 	case 7: //Start Button
-		
+		m_game->InjectReleasedButton(BTN_START);
 		break;
 	case 6: //Back Button
-		
+		m_game->InjectReleasedButton(BTN_BACK);
 		break;
 	case 5: //Right Button
 		m_delta_zoom = 0.0f;
@@ -417,10 +427,10 @@ bool InputSystem::buttonReleased(const OIS::JoyStickEvent& e, int button){
 		
 		break;
 	case 1: //OIS::MouseButtonID::MB_Right: //or GamePad B
-		m_game->InjectReleasedButton(BTN_LEFT_MOUSE);
+		m_game->InjectReleasedButton(BTN_B);
 		break;
 	case 0: //OIS::MouseButtonID::MB_Left: //or GamePad A
-		m_game->InjectReleasedButton(BTN_START);
+		m_game->InjectReleasedButton(BTN_A);
 		break;
 	default:
 		break;
@@ -433,5 +443,7 @@ void InputSystem::windowResized(Ogre::RenderWindow* rw){
 }
 
 void InputSystem::windowClosed(Ogre::RenderWindow* rw){
-	
+	IEvent evt;
+	evt.m_type = EVT_QUIT;
+	m_message_system->Notify(&evt);
 }

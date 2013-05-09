@@ -133,7 +133,7 @@ void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewpo
 }
 
 void FollowCameraComponent::Update(float dt){
-	//QueryRaycast();
+	QueryRaycast();
 	InputManager* input = NULL;
 	m_messenger->Notify(MSG_INPUT_MANAGER_GET, &input);
 	if (input){
@@ -185,6 +185,42 @@ void FollowCameraComponent::Update(float dt){
 	//std::cout << "Viewport derived pos: " << m_camera->getDerivedPosition() << std::endl;
 
 	//std::cout << "bajs" << m_camera->getBoundingBox().getCorner(Ogre::AxisAlignedBox::CornerEnum::NEAR_LEFT_TOP).x << std::endl;
+
+
+	
+	//Assume world->stepSimulation or world->performDiscreteCollisionDetection has been called
+
+	btPersistentManifold* contactManifold = m_physics_engine->GetDynamicWorld()->getDispatcher()->getManifoldByIndexInternal(0);
+	btCollisionObject* obA = static_cast<btCollisionObject*>( );
+	btCollisionObject* obB = static_cast<btCollisionObject*>(static_cast<CharacterController*>(m_owner->GetComponent(COMPONENT_CHARACTER_CONTROLLER))->GetRigidbody());
+	
+	btManifoldPoint& pt = contactManifold->getContactPoint(0);
+			if (pt.getDistance()<0.f)
+			{
+				std::cout << "Collision!!\n";
+			}
+
+	/*
+	int numManifolds = world->getDispatcher()->getNumManifolds();
+	for (int i=0;i<numManifolds;i++)
+	{
+		btPersistentManifold* contactManifold =  world->getDispatcher()->getManifoldByIndexInternal(i);
+		btCollisionObject* obA = static_cast<btCollisionObject*>(contactManifold->getBody0());
+		btCollisionObject* obB = static_cast<btCollisionObject*>(contactManifold->getBody1());
+	
+		int numContacts = contactManifold->getNumContacts();
+		for (int j=0;j<numContacts;j++)
+		{
+			btManifoldPoint& pt = contactManifold->getContactPoint(j);
+			if (pt.getDistance()<0.f)
+			{
+				const btVector3& ptA = pt.getPositionWorldOnA();
+				const btVector3& ptB = pt.getPositionWorldOnB();
+				const btVector3& normalOnB = pt.m_normalWorldOnB;
+			}
+		}
+	}
+	*/
 }
 
 void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real delta_pitch, Ogre::Real delta_zoom){
@@ -272,7 +308,7 @@ void CameraCollisionComponent::Init(GameObject* player){
 void CameraCollisionComponent::Update(float dt){
 	Ogre::Vector3 new_position = static_cast<FollowCameraComponent*>(m_player->GetComponent(COMPONENT_FOLLOW_CAMERA))->m_node->getPosition();
 	//new_position;
-	m_messenger->Notify(MSG_SET_OBJECT_POSITION, &new_position);
+	m_messenger->Notify(MSG_RIGIDBODY_POSITION_SET, &new_position);
 
 	//m_player->GetComponentMessenger()->Notify(MSG_CAMERA_COLL_UPDATE, NULL); //så skickar man med en position typ
 

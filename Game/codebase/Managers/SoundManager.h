@@ -39,8 +39,11 @@ struct SoundData2D{
 class SoundManager
 {
 public:
-	SoundManager(Ogre::SceneManager* scene_manager, Ogre::Camera* camera);
+	SoundManager();
 	~SoundManager();
+
+	void Init(Ogre::SceneManager* scene_manager);
+	void Exit();
 
     void deleteSoundInstance(OgreOggISound* sound);
    
@@ -71,7 +74,7 @@ public:
 	OgreOggSoundManager* GetSoundManager() { return m_sound_manager; };
 	void GetYomiNode(Ogre::String node_name);
 	void GetTottNode(Ogre::String node_name);
-	void Update(Ogre::Camera* camera, Ogre::SceneManager* scene_manager, float dt); 
+	void Update(Ogre::SceneManager* scene_manager, float dt); 
 	
 	std::vector<Ogre::String> m_scene_nodes;
 	std::vector<Ogre::String> m_music_playlist;

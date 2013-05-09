@@ -23,7 +23,7 @@ PhysicsEngine::PhysicsEngine(void) :
 PhysicsEngine::~PhysicsEngine(void){}
 
 bool PhysicsEngine::Init(){
-	m_broadphase = new btDbvtBroadphase;
+	/*m_broadphase = new btDbvtBroadphase;
 	m_ghost_pair_callback = new btGhostPairCallback;
 	m_broadphase->getOverlappingPairCache()->setInternalGhostPairCallback(m_ghost_pair_callback);
 	m_collision_configuration = new btDefaultCollisionConfiguration;
@@ -32,6 +32,17 @@ bool PhysicsEngine::Init(){
 	m_dynamic_world = new btDiscreteDynamicsWorld(m_collision_dispatcher, m_broadphase, m_seq_impulse_con_solver, m_collision_configuration);
 	m_dynamic_world->setGravity(btVector3(0.0f, -10.0f, 0.0f));
 	m_dynamic_world->setInternalTickCallback(GameTickCallback, static_cast<void*>(this), true);
+	*/
+	m_broadphase = new btDbvtBroadphase;
+	//m_ghost_pair_callback = new btGhostPairCallback;
+	//m_broadphase->getOverlappingPairCache()->setInternalGhostPairCallback(m_ghost_pair_callback);
+	m_collision_configuration = new btDefaultCollisionConfiguration;
+	m_collision_dispatcher = new btCollisionDispatcher(m_collision_configuration);
+	m_seq_impulse_con_solver = new btSequentialImpulseConstraintSolver;
+	m_dynamic_world = new btDiscreteDynamicsWorld(m_collision_dispatcher, m_broadphase, m_seq_impulse_con_solver, m_collision_configuration);
+	m_dynamic_world->setGravity(btVector3(0.0f, -10.0f, 0.0f));
+	m_dynamic_world->setInternalTickCallback(GameTickCallback, static_cast<void*>(this), true);
+
 	return true;
 }
 
@@ -84,15 +95,11 @@ void PhysicsEngine::ShowDebugDraw(bool value){
 }
 
 void PhysicsEngine::Step(float dt){
-	
 	float fixed_time_step = 1.0f/60.0f;
-	float physics_time = dt / 1000.0f;
-
 	int max_steps = 2;
 	while (dt > (float)max_steps * fixed_time_step){
 		max_steps++;
 	}
-	
 	m_dynamic_world->stepSimulation(dt, max_steps, fixed_time_step);
 	
 	if (m_debug_drawer){

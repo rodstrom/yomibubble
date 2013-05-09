@@ -247,7 +247,7 @@ void Overlay2DComponent::Init(const Ogre::String& p_overlay_name, const Ogre::St
 
 void Overlay2DComponent::Shut()
 {
-	
+	m_overlay->hide();
 	if (m_messenger){
 		m_messenger->Unregister(MSG_GET_2D_OVERLAY_CONTAINER, this);
 		m_messenger->Unregister(MSG_OVERLAY_SHOW, this);
@@ -455,6 +455,7 @@ void CountableResourceGUI::Shut(){
 	for (unsigned int i = 0; i < m_elements.size(); i++)
 	{
 		//delete m_elements.end();
+		m_elements[i]->hide();
 		m_elements[i]=NULL;
 		//delete m_elements[i];
 	}
@@ -551,7 +552,7 @@ void TerrainComponent::Init(Ogre::SceneManager* scene_manager, PhysicsEngine* ph
 //mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_camera, m_game_object_manager, m_sound_manager, "../../resources/terrain/");
 
 
-	m_artifex_loader->loadZone(filename);
+	m_artifex_loader->loadZone(filename, true, true, true, true, true, false);
 	Ogre::Terrain* terrain = m_artifex_loader->mTerrain;
 	size_t w = terrain->getSize();
 	float* terrain_height_data = terrain->getHeightData();
@@ -590,14 +591,14 @@ void TerrainComponent::Init(Ogre::SceneManager* scene_manager, PhysicsEngine* ph
 		btQuaternion(Ogre::Quaternion::IDENTITY.x, Ogre::Quaternion::IDENTITY.y, Ogre::Quaternion::IDENTITY.z, Ogre::Quaternion::IDENTITY.w)
 		);
 
-	m_terrain_body->setCollisionFlags(m_terrain_body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
+	m_terrain_body->setCollisionFlags(m_terrain_body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 	m_terrain_body->setRestitution(0.5f);
 	m_terrain_body->setRollingFriction(1.0f);
 	m_terrain_body->setFriction(1.0f);
 	int filter = COL_WORLD_STATIC;
 	int mask = COL_PLAYER | COL_TOTT | COL_BUBBLE | COL_CAMERA;
 	m_physics_engine->GetDynamicWorld()->addRigidBody(m_terrain_body, filter, mask);
-	m_collision_def.flag = COLLISION_FLAG_STATIC;
+	m_collision_def.flag = COLLISION_FLAG_GAME_OBJECT;
 	m_collision_def.data = m_owner;
 	m_terrain_body->setUserPointer(&m_collision_def);
 }

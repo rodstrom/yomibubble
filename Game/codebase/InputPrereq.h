@@ -14,6 +14,8 @@ enum EButtonType {
 	BTN_ARROW_LEFT,
 	BTN_ARROW_DOWN,
 	BTN_ARROW_RIGHT,
+	BTN_A,
+	BTN_B,
 	BTN_SIZE
 };
 

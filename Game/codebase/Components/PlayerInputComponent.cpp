@@ -67,8 +67,6 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 	m_acc_x = 0.001f;
 	m_acc_z = 0.001f;
 	m_max_velocity = 0.00000002f;
-
-	
 }
 
 void PlayerInputComponent::SetCustomVariables(float min_bubble_size, float max_bubble_size){
@@ -238,11 +236,11 @@ void PlayerInputComponent::Normal(float dt){
 		}
 	}
 
-	if (m_input_manager->IsButtonPressed(BTN_START)){
+	if (m_input_manager->IsButtonPressed(BTN_A)){
 		bool is_jumping = true;
 		m_messenger->Notify(MSG_CHARACTER_CONTROLLER_JUMP, &is_jumping);
 	}
-	else if (m_input_manager->IsButtonReleased(BTN_START)){
+	else if (m_input_manager->IsButtonReleased(BTN_A)){
 		bool is_jumping = false;
 		m_messenger->Notify(MSG_CHARACTER_CONTROLLER_JUMP, &is_jumping);
 	}
@@ -269,7 +267,7 @@ void PlayerInputComponent::OnBubble(float dt){
 			player_body->getWorldTransform().setOrigin(pos);
 		}
 	}
-	if (m_input_manager->IsButtonPressed(BTN_START)){
+	if (m_input_manager->IsButtonPressed(BTN_A)){
 		m_player_state = PLAYER_STATE_NORMAL;
 		bool jump = true;
 		m_messenger->Notify(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_SET, &jump);
@@ -311,7 +309,7 @@ void PlayerInputComponent::InsideBubble(float dt){
 			player_body->getWorldTransform().setOrigin(pos);
 		}
 	}
-	if (m_input_manager->IsButtonPressed(BTN_START)){
+	if (m_input_manager->IsButtonPressed(BTN_A)){
 		m_player_state = PLAYER_STATE_NORMAL;
 		int coll = btCollisionObject::CF_NO_CONTACT_RESPONSE;
 		bool jump = true;

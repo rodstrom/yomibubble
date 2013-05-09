@@ -5,6 +5,8 @@
 
 class MessageSystem;
 class StateManager;
+class SoundManager;
+
 class Game : public InputListener
 {
 public:
@@ -12,7 +14,7 @@ public:
 	~Game(void);
 
 	bool Update(float dt);
-	bool Init(Ogre::RenderWindow* render_window, MessageSystem* message_system);
+	bool Init(Ogre::RenderWindow* render_window, MessageSystem* message_system, SoundManager* sound_manager);
 	void Shut();
 
 	void InjectPressedButton(int btn);

@@ -255,7 +255,7 @@ GameObject* GameObjectManager::CreatePlayerCamera(const Ogre::Vector3& position,
 	trdef.body_type = DYNAMIC_BODY;
 	trdef.collider_type = COLLIDER_SPHERE;
 	trdef.mass = 0.0f;
-	trdef.radius = 10.5f;
+	trdef.radius = 1000.5f;
 	trdef.collision_filter.filter = COL_CAMERA;
 	trdef.collision_filter.mask = COL_WORLD_STATIC;
 	camera_tc->Init(position, m_physics_engine, trdef);
@@ -465,6 +465,7 @@ GameObject* GameObjectManager::CreateLeaf(const Ogre::Vector3& position, void* d
 
 	node_comp->Init(position, m_scene_manager);
 	mrc->Init("Collectable_Leaf.mesh", m_scene_manager);
+	mrc->GetEntity()->setMaterialName("CollectibleLeaf");
 	bc->Init(node_comp->GetSceneNode());
 	//Ogre::Vector3 scale(0.002f);
 	//node_comp->GetSceneNode()->setScale(scale);
@@ -515,6 +516,9 @@ GameObject* GameObjectManager::CreateTerrain(const Ogre::Vector3& position, void
 	go->AddComponent(tc);
 
 	tc->Init(m_scene_manager, m_physics_engine, this, m_sound_manager, *static_cast<Ogre::String*>(data));
+
+	go->SetId("Terrain");
+
 	return go;
 }
 
@@ -524,11 +528,22 @@ GameObject* GameObjectManager::CreateGate(const Ogre::Vector3& position, void* d
 	go->AddComponent(nc);
 	MeshRenderComponent* mrc = new MeshRenderComponent;
 	go->AddComponent(mrc);
+	//RigidbodyComponent* rc = new RigidbodyComponent;
+	//go->AddComponent(rc);
+	
+	RigidBodyDef def;
+	def.body_type = STATIC_BODY;
+	def.collider_type = COLLIDER_BOX;
+	def.mass = 1.0f;
+	def.collision_filter.filter = COL_WORLD_STATIC;
+	def.collision_filter.mask = COL_PLAYER | COL_TOTT | COL_BUBBLE;
 
 	nc->Init(position, m_scene_manager);
 	mrc->Init("Gate.mesh", m_scene_manager);
 	Ogre::Vector3 scale(0.02f);
 	nc->GetSceneNode()->setScale(scale);
+	
+	//rc->Init(position, mrc->GetEntity(), m_physics_engine, def);
 	return go;
 }
 

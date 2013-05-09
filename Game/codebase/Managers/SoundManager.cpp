@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-SoundManager::SoundManager(Ogre::SceneManager* scene_manager, Ogre::Camera* camera){
+SoundManager::SoundManager(){
 
     m_sound_manager = OgreOggSound::OgreOggSoundManager::getSingletonPtr();
     mSoundDeletesPending = new std::list<OgreOggISound*>;
@@ -12,7 +12,7 @@ SoundManager::SoundManager(Ogre::SceneManager* scene_manager, Ogre::Camera* came
 
 	//m_ear_node = scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(0,0,0), Ogre::Quaternion::IDENTITY);
 //	m_ear_node->attachObject(m_sound_manager->getListener());
-	m_scene_manager = scene_manager;
+	//m_scene_manager = scene_manager;
 	m_sound_manager->setDistanceModel(AL_LINEAR_DISTANCE_CLAMPED);
 }
 
@@ -21,6 +21,14 @@ SoundManager::~SoundManager(){
 	m_sound_manager->destroyAllSounds();
 	m_scene_manager = NULL;
 	m_sound_manager = NULL;
+}
+
+void SoundManager::Init(Ogre::SceneManager* scene_manager){
+	m_scene_manager = scene_manager;
+}
+
+void SoundManager::Exit(){
+	m_scene_manager = NULL;
 }
 
 void SoundManager::LoadAudio(){
@@ -41,8 +49,8 @@ void SoundManager::LoadAudio(){
 
 	Init3D("Main_Theme", 10.0f, 10.0f, 150.0f);
 
-	bool bajs = m_sound_manager->createEFXSlot();
-	bajs;
+	//bool bajs = m_sound_manager->createEFXSlot();
+	//bajs;
 
 //	m_sound_manager->createEFXEffect("Main_Theme", 
 }
@@ -130,7 +138,7 @@ void SoundManager::ChangePitch(Ogre::String name, float new_pitch){ //Around 0.0
 	m_sound_manager->getSound(name)->setPitch(new_pitch);
 };
 
-void SoundManager::Update(Ogre::Camera* camera, Ogre::SceneManager* scene_manager, float dt){
+void SoundManager::Update(Ogre::SceneManager* scene_manager, float dt){
 	m_sound_manager->update(dt);
 
 	//m_ear_node->setPosition(scene_manager->getSceneNode(m_yomi_node_name)->getPosition());
