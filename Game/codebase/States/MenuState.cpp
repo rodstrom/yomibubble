@@ -22,7 +22,7 @@ void MenuState::Enter(){
 	m_sound_manager = new SoundManager(m_scene_manager, m_camera);
 	m_sound_manager->LoadAudio();
 	m_game_object_manager = new GameObjectManager;
-	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager, m_message_system);
+	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager, m_message_system, NULL);
 
 	OverlayDef menuBackground;
 	menuBackground.overlay_name = "Menu";

@@ -45,6 +45,8 @@ void CollisionManager::Init(){
 	m_collision[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_TRIGGER_TEST)] = &CollisionManager::PlayerTrigger;
 	m_collision[MakeIntPair(GAME_OBJECT_LEAF, GAME_OBJECT_PLAYER)] = &CollisionManager::LeafPlayer;
 	m_collision[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_LEAF)] = &CollisionManager::PlayerLeaf;
+	m_collision[MakeIntPair(GAME_OBJECT_CAMERA, GAME_OBJECT_TERRAIN)] = &CollisionManager::CameraTerrain;
+	m_collision[MakeIntPair(GAME_OBJECT_TERRAIN, GAME_OBJECT_CAMERA)] = &CollisionManager::TerrainCamera;
 
 	m_raycast_map[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_BLUE_BUBBLE)] = &CollisionManager::PlayerBlueBubble;
 	m_raycast_map[MakeIntPair(GAME_OBJECT_BLUE_BUBBLE, GAME_OBJECT_PLAYER)] = &CollisionManager::BlueBubblePlayer;
@@ -185,3 +187,9 @@ void CollisionManager::PlayerTerrain(GameObject* player, GameObject* terrain){
 		CharacterController* cc = static_cast<CharacterController*>(player->GetComponent(COMPONENT_CHARACTER_CONTROLLER));
 	}
 }
+
+void CollisionManager::CameraTerrain(GameObject* camera, GameObject* terrain){
+	//wizardry goes here
+	//send info to component (invert camera target?)
+	std::cout << "Camera Terrain collision!\n";
+};

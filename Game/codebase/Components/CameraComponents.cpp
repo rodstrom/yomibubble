@@ -133,7 +133,7 @@ void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewpo
 }
 
 void FollowCameraComponent::Update(float dt){
-	QueryRaycast();
+	//QueryRaycast();
 	InputManager* input = NULL;
 	m_messenger->Notify(MSG_INPUT_MANAGER_GET, &input);
 	if (input){
@@ -179,10 +179,10 @@ void FollowCameraComponent::Update(float dt){
 	m_left_ray.length = btVector3(m_camera->getDerivedPosition().x - 2, m_camera->getDerivedPosition().y, m_camera->getDerivedPosition().z);
 
 	//std::cout << "Node Pos: " << m_node->convertLocalToWorldPosition(m_node->getPosition()) << std::endl;
-	std::cout << "Node Pos: " << m_node->getPosition() << std::endl; //so this gives local space
+	//std::cout << "Node Pos: " << m_node->getPosition() << std::endl; //so this gives local space
 	//std::cout << "ViewPort left: " << m_camera->getViewport()->getLeft() << std::endl;
 	//std::cout << "ViewPort up: " << m_camera->getViewport()->getTop() << std::endl;
-	std::cout << "Viewport derived pos: " << m_camera->getDerivedPosition() << std::endl;
+	//std::cout << "Viewport derived pos: " << m_camera->getDerivedPosition() << std::endl;
 
 	//std::cout << "bajs" << m_camera->getBoundingBox().getCorner(Ogre::AxisAlignedBox::CornerEnum::NEAR_LEFT_TOP).x << std::endl;
 }
@@ -252,3 +252,29 @@ void FollowCameraComponent::QueryRaycast(){
 		m_env_collision = false;
 	}	
 }
+
+void CameraCollisionComponent::Notify(int type, void* msg){
+};
+
+void CameraCollisionComponent::Shut(){
+	m_messenger->Unregister(MSG_CAMERA_COLL_UPDATE, this);
+};
+
+void CameraCollisionComponent::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
+	m_messenger->Register(MSG_CAMERA_COLL_UPDATE, this);
+};
+
+void CameraCollisionComponent::Init(GameObject* player){
+	m_player = player;
+};
+
+void CameraCollisionComponent::Update(float dt){
+	Ogre::Vector3 new_position = static_cast<FollowCameraComponent*>(m_player->GetComponent(COMPONENT_FOLLOW_CAMERA))->m_node->getPosition();
+	//new_position;
+	m_messenger->Notify(MSG_SET_OBJECT_POSITION, &new_position);
+
+	//m_player->GetComponentMessenger()->Notify(MSG_CAMERA_COLL_UPDATE, NULL); //så skickar man med en position typ
+
+	//trigger : MSG_SET_OBJECT_POSITION
+};

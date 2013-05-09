@@ -202,7 +202,10 @@ public:
 	virtual void Notify(int type, void* msg);
 	virtual void SetMessenger(ComponentMessenger* messenger);
 
+	virtual void SetCustomVariables(float bounce_mod);
+
 protected:
+	float m_bounce_mod;
 	void PlayerBubble(GameObject*);
 	void PlayerLandscape();
 };

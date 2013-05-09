@@ -40,6 +40,9 @@ private:
 	void PlayerLeaf(GameObject* player, GameObject* leaf) { LeafPlayer(leaf, player); }
 	void PlayerTrigger(GameObject* player, GameObject* trigger);
 
+	void CameraTerrain(GameObject* camera, GameObject* terrain);
+	void TerrainCamera(GameObject* terrain, GameObject* camera) { CameraTerrain(camera, terrain); }
+
 	void PlayerTerrain(GameObject* player, GameObject* terrain);
 	void TerrainPlayer(GameObject* terrain, GameObject* player){ PlayerTerrain(player, terrain); }
 

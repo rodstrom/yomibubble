@@ -26,6 +26,8 @@ public:
 	AnimationMsg m_anim_msg;
 	SoundData2D m_bounce_sound;
 
+	void SetCustomVariables(float min_bubble_size, float max_bubble_size);
+
 	float m_min_bubble_size;
 	float m_max_bubble_size;
 

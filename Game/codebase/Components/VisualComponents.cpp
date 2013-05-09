@@ -595,7 +595,7 @@ void TerrainComponent::Init(Ogre::SceneManager* scene_manager, PhysicsEngine* ph
 	m_terrain_body->setRollingFriction(1.0f);
 	m_terrain_body->setFriction(1.0f);
 	int filter = COL_WORLD_STATIC;
-	int mask = COL_PLAYER | COL_TOTT | COL_BUBBLE;
+	int mask = COL_PLAYER | COL_TOTT | COL_BUBBLE | COL_CAMERA;
 	m_physics_engine->GetDynamicWorld()->addRigidBody(m_terrain_body, filter, mask);
 	m_collision_def.flag = COLLISION_FLAG_STATIC;
 	m_collision_def.data = m_owner;

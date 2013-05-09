@@ -123,6 +123,7 @@ int DBManager::Load() {
 							player_def.collision_filter.filter = COL_PLAYER;
 							player_def.collision_filter.mask = COL_BUBBLE | COL_BUBBLE_TRIG | COL_TOTT | COL_WORLD_STATIC | COL_WORLD_TRIGGER;
 							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(x,y,z), &player_def);
+							m_game_object_manager->CreateGameObject(GAME_OBJECT_CAMERA, Ogre::Vector3(x,y,z), m_game_object_manager->GetGameObject("Player"));
 						}
 						else if (i->second == "tott") {
 							CharacterControllerDef tott_def;

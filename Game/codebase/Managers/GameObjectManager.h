@@ -9,12 +9,13 @@ class GameObject;
 class InputManager;
 class PhysicsEngine;
 class SoundManager;
+class VariableManager;
 class GameObjectManager
 {
 public:
 	GameObjectManager(void);
 	~GameObjectManager(void);
-	void Init(PhysicsEngine* physics_engine, Ogre::SceneManager* scene_manager, InputManager* input_manager, Ogre::Viewport* viewport, SoundManager* sound_manager, MessageSystem* message_system);
+	void Init(PhysicsEngine* physics_engine, Ogre::SceneManager* scene_manager, InputManager* input_manager, Ogre::Viewport* viewport, SoundManager* sound_manager, MessageSystem* message_system, VariableManager* variable_manager);
 	void Update(float dt);
 	void RemoveGameObject(GameObject* gameobject);
 	GameObject* CreateGameObject(int type, const Ogre::Vector3& position, void* data);
@@ -46,6 +47,7 @@ private:
 	GameObject* CreateGate(const Ogre::Vector3& position, void* data);
 	GameObject* CreateLoadingScreen(const Ogre::Vector3& position, void* data);
 	GameObject* CreateNextLevelTrigger(const Ogre::Vector3& position, void* data);
+	GameObject* CreatePlayerCamera(const Ogre::Vector3& position, void* data);
 
 	typedef GameObject* (GameObjectManager::*CreateObjectFptr)(const Ogre::Vector3&, void* data);
 	
@@ -59,6 +61,7 @@ private:
 	SoundManager*			m_sound_manager;
 	MessageSystem*			m_message_system;
 	Ogre::SceneNode*		m_node;
+	VariableManager*		m_variable_manager;
 };
 
 #endif // _N_GAME_OBJECT_MANAGER_H_

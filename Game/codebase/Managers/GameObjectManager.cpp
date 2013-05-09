@@ -13,17 +13,19 @@
 #include "..\Managers\SoundManager.h"
 #include "..\PhysicsPrereq.h"
 #include "..\MessageSystem.h"
+#include "VariableManager.h"
 
 GameObjectManager::GameObjectManager(void) : 
 	m_physics_engine(NULL), m_scene_manager(NULL), m_input_manager(NULL), m_viewport(NULL){}
 GameObjectManager::~GameObjectManager(void){}
 
-void GameObjectManager::Init(PhysicsEngine* physics_engine, Ogre::SceneManager* scene_manager, InputManager* input_manager, Ogre::Viewport* viewport, SoundManager* sound_manager, MessageSystem* message_system){	
+void GameObjectManager::Init(PhysicsEngine* physics_engine, Ogre::SceneManager* scene_manager, InputManager* input_manager, Ogre::Viewport* viewport, SoundManager* sound_manager, MessageSystem* message_system, VariableManager* variable_manager){	
 	m_physics_engine = physics_engine;
 	m_scene_manager = scene_manager;
 	m_input_manager = input_manager;
 	m_viewport = viewport;
 	m_sound_manager = sound_manager;
+	m_variable_manager = variable_manager;
 	m_message_system = message_system;
 	m_create_fptr[GAME_OBJECT_PLAYER]      =	&GameObjectManager::CreatePlayer;
 	m_create_fptr[GAME_OBJECT_BLUE_BUBBLE] =	&GameObjectManager::CreateBlueBubble;
@@ -38,6 +40,7 @@ void GameObjectManager::Init(PhysicsEngine* physics_engine, Ogre::SceneManager* 
 	m_create_fptr[GAME_OBJECT_COMPANION]   =	&GameObjectManager::CreateCompanion;
 	m_create_fptr[GAME_OBJECT_TERRAIN]	   =	&GameObjectManager::CreateTerrain;
 	m_create_fptr[GAME_OBJECT_GATE]		   =	&GameObjectManager::CreateGate;
+	m_create_fptr[GAME_OBJECT_CAMERA]	   =	&GameObjectManager::CreatePlayerCamera;
 }
 
 void GameObjectManager::Update(float dt){
@@ -169,6 +172,8 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	go->AddComponent(camera_rcc);
 	//RigidbodyComponent* camera_rb = new RigidbodyComponent;
 	*/
+	go->SetId("Player");
+
 	node_comp->Init(position, m_scene_manager);
 	node_comp->SetId("player_node");
 
@@ -187,6 +192,7 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	contr->SetId("body");
 	contr->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
 	pccomp->Init(m_input_manager, m_sound_manager);
+	pccomp->SetCustomVariables(m_variable_manager->GetValue("Min_Bubble_Size"), m_variable_manager->GetValue("Max_Bubble_Size")); 
 	sound2D->Init(m_sound_manager);
 	sound3D->Init(m_sound_manager);
 	music2D->Init(m_sound_manager);
@@ -195,6 +201,7 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	csnc->Init(Ogre::Vector3(0.0f, def.offset.y, 1.0f), "CreateBubble", node_comp->GetSceneNode());
 	m_sound_manager->GetYomiNode(node_comp->GetSceneNode()->getName());
 	prcc->Init(m_physics_engine);
+	prcc->SetCustomVariables(m_variable_manager->GetValue("Bounce_Jump_Mod"));
 
 	fcc->SetNode(node_comp->GetSceneNode());
 	fcc->Init(m_scene_manager, m_viewport, true);
@@ -230,9 +237,33 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 */
 	//DEBUGGING GRAVITY
 	//contr->GetRigidbody()->setGravity(btVector3(0,0,0));
+	//CreatePlayerCamera(position, go);
+
 
 	return go;
 }
+
+GameObject* GameObjectManager::CreatePlayerCamera(const Ogre::Vector3& position, void* data){
+	GameObject* go = new GameObject(GAME_OBJECT_CAMERA);
+	TriggerComponent* camera_tc = new TriggerComponent;
+	go->AddComponent(camera_tc);
+	CameraCollisionComponent* ccc = new CameraCollisionComponent;
+	go->AddComponent(ccc);
+	go->AddUpdateable(ccc);
+
+	TriggerDef trdef;
+	trdef.body_type = DYNAMIC_BODY;
+	trdef.collider_type = COLLIDER_SPHERE;
+	trdef.mass = 0.0f;
+	trdef.radius = 10.5f;
+	trdef.collision_filter.filter = COL_CAMERA;
+	trdef.collision_filter.mask = COL_WORLD_STATIC;
+	camera_tc->Init(position, m_physics_engine, trdef);
+
+	ccc->Init(static_cast<GameObject*>(data));
+
+	return go;
+};
 
 GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, void* data){
 	BubbleDef& def = *static_cast<BubbleDef*>(data);
@@ -268,7 +299,7 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 	rc->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
 	rc->GetRigidbody()->setGravity(btVector3(0.0f, 0.0f, 0.0f));
 	rc->GetRigidbody()->setActivationState(DISABLE_DEACTIVATION);
-	rc->GetRigidbody()->setDamping(0.5f, 0.2f);
+	rc->GetRigidbody()->setDamping(m_variable_manager->GetValue("Bubble_Linear_Damping"), m_variable_manager->GetValue("Bubble_Angular_Damping"));
 	cons->Init(m_physics_engine,rc->GetRigidbody(), def.connection_body, btVector3(0,0,0), btVector3(0,0,0));
 
 	return go;
@@ -438,7 +469,7 @@ GameObject* GameObjectManager::CreateLeaf(const Ogre::Vector3& position, void* d
 	//Ogre::Vector3 scale(0.002f);
 	//node_comp->GetSceneNode()->setScale(scale);
 
-	mrc->GetEntity()->setMaterialName("Examples/Leaf");
+	mrc->GetEntity()->setMaterialName("CollectibleLeaf");
 	node_comp->GetSceneNode()->setPosition(Ogre::Vector3(position));
 	//particle->Init(m_scene_manager, "bajs", particleDef.particle_name);
 	//particle->CreateParticle(node_comp->GetSceneNode(), node_comp->GetSceneNode()->getPosition(), Ogre::Vector3(0,-3,0));
@@ -498,7 +529,6 @@ GameObject* GameObjectManager::CreateGate(const Ogre::Vector3& position, void* d
 	mrc->Init("Gate.mesh", m_scene_manager);
 	Ogre::Vector3 scale(0.02f);
 	nc->GetSceneNode()->setScale(scale);
-	mrc->GetEntity()->setMaterialName("Examples/Athene/NormalMapped");
 	return go;
 }
 

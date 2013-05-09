@@ -13,6 +13,12 @@ void VariableManager::Init(){
 	m_variable_map.insert(std::pair<std::string, float>("Player_Deceleration", 10.0));
 	m_variable_map.insert(std::pair<std::string, float>("Player_Jump_Power", 300.0));
 	m_variable_map.insert(std::pair<std::string, float>("Player_Max_Jump_Height", 1.7));
+	m_variable_map.insert(std::pair<std::string, float>("Bubble_Linear_Damping", 1.5));
+	m_variable_map.insert(std::pair<std::string, float>("Bubble_Angular_Damping", 1.5));
+	m_variable_map.insert(std::pair<std::string, float>("Min_Bubble_Size", 0.805));
+	m_variable_map.insert(std::pair<std::string, float>("Max_Bubble_Size", 1.907));
+	m_variable_map.insert(std::pair<std::string, float>("Bounce_Jump_Mod", 1.3));
+	m_variable_map.insert(std::pair<std::string, float>("Level_Choice", 1));
 };
 
 void VariableManager::LoadVariables(){

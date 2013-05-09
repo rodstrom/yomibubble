@@ -591,6 +591,10 @@ void PlayerRaycastCollisionComponent::SetMessenger(ComponentMessenger* messenger
 	m_messenger->Register(MSG_RAYCAST_COLLISION_STATIC_ENVIRONMENT, this);
 }
 
+void PlayerRaycastCollisionComponent::SetCustomVariables(float bounce_mod){
+	m_bounce_mod = bounce_mod;
+};
+
 void PlayerRaycastCollisionComponent::PlayerBubble(GameObject* go){
 	int player_state = 0;
 	m_messenger->Notify(MSG_PLAYER_INPUT_STATE_GET, &player_state);
@@ -603,7 +607,7 @@ void PlayerRaycastCollisionComponent::PlayerBubble(GameObject* go){
 				player_state = PLAYER_STATE_BOUNCING;
 				m_messenger->Notify(MSG_PLAYER_INPUT_SET_BUBBLE, &go);
 				m_messenger->Notify(MSG_PLAYER_INPUT_SET_STATE, &player_state);
-				Ogre::Vector3 impulse(0.0f, y_vel * -2.3f, 0.0f);
+				Ogre::Vector3 impulse(0.0f, y_vel * -m_bounce_mod, 0.0f);
 				m_messenger->Notify(MSG_RIGIDBODY_APPLY_IMPULSE, &impulse, "body");
 				m_messenger->Notify(MSG_RIGIDBODY_APPLY_IMPULSE, &impulse);
 				m_messenger->Notify(MSG_SFX2D_PLAY,  &static_cast<PlayerInputComponent*>(m_owner->GetComponent(COMPONENT_PLAYER_INPUT))->m_bounce_sound);

@@ -59,8 +59,8 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 	m_states[PLAYER_STATE_INSIDE_BUBBLE] =	&PlayerInputComponent::InsideBubble;
 	m_states[PLAYER_STATE_BOUNCING] =		&PlayerInputComponent::Bouncing;
 
-	m_min_bubble_size = 0.805f;
-	m_max_bubble_size = 1.907f;
+	//m_min_bubble_size = 0.805f;
+	//m_max_bubble_size = 1.907f;
 
 	m_velocity = 0.0000001f;
 	m_deacc = 0.002f;
@@ -70,6 +70,11 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 
 	
 }
+
+void PlayerInputComponent::SetCustomVariables(float min_bubble_size, float max_bubble_size){
+	m_min_bubble_size = min_bubble_size;
+	m_max_bubble_size = max_bubble_size;
+};
 
 void PlayerInputComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger = messenger;
@@ -93,6 +98,8 @@ void PlayerInputComponent::Normal(float dt){
 		m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
 		*/
 		
+		//m_anim_msg.bottom_anim="BASE_Run";
+		//m_anim_msg.top_anim="TOP_Run";
 		m_anim_msg.id="Run";
 		m_anim_msg.blend = false;
 		m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
@@ -111,7 +118,8 @@ void PlayerInputComponent::Normal(float dt){
 		*/
 		
 		
-
+		//m_anim_msg.bottom_anim="BASE_Idle";
+		//m_anim_msg.top_anim="TOP_Idle";
 		m_anim_msg.id="Idle";
 		m_anim_msg.blend = false;
 		m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);

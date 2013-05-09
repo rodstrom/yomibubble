@@ -20,6 +20,10 @@ void PlayState::Enter(){
 	//m_physics_engine->SetDebugDraw(m_scene_manager);
 	m_camera = m_scene_manager->createCamera("MainCamera");
 
+	m_variable_manager = new VariableManager();
+	m_variable_manager->Init();
+	m_variable_manager->LoadVariables();
+
 	m_camera->setFarClipDistance(5000.0f);
 	m_camera->setNearClipDistance(1.0f);
 	m_viewport = m_render_window->addViewport(m_camera);
@@ -28,11 +32,7 @@ void PlayState::Enter(){
 	m_game_object_manager = new GameObjectManager;
 	m_sound_manager = new SoundManager(m_scene_manager, m_camera);
 	m_sound_manager->LoadAudio();
-	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager, m_message_system);
-	
-	m_variable_manager = new VariableManager();
-	m_variable_manager->Init();
-	m_variable_manager->LoadVariables();
+	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager, m_message_system, m_variable_manager);
 	
 	// Create plane mesh
 	Ogre::Plane plane(Ogre::Vector3::UNIT_Y, -10);
@@ -75,6 +75,22 @@ void PlayState::Enter(){
 	tott_def.max_jump_height = 10.0f;
 	*/
 	Ogre::String terrain = "Dayarea";
+	
+	float terrain_choice = m_variable_manager->GetValue("Level_Choice");
+
+	if (terrain_choice == 0.0f){
+		terrain = "try";
+	}
+	else if(terrain_choice == 1.0f){
+		terrain = "Dayarea";
+	} 
+	else if(terrain_choice == 2.0f){
+		terrain = "NightArea";
+	} 
+	else{
+		terrain = "Dayarea";
+	}
+	
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_TERRAIN, Ogre::Vector3(0,0,0), &terrain);
 
 	CharacterControllerDef player_def;
@@ -109,7 +125,7 @@ void PlayState::Enter(){
 		player_pos = Ogre::Vector3(230, 72, 298);
 	}
 
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(player_pos.x,player_pos.y+8.5f,player_pos.z), &player_def);
+//	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(player_pos.x,player_pos.y+8.5f,player_pos.z), &player_def);
 	/*
 	PlaneDef plane_def;
 	plane_def.material_name = "Examples/BeachStones";
