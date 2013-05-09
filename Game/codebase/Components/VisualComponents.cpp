@@ -252,7 +252,7 @@ void Overlay2DComponent::Init(const Ogre::String& p_overlay_name, const Ogre::St
 
 void Overlay2DComponent::Shut()
 {
-	
+	m_overlay->hide();
 	if (m_messenger){
 		m_messenger->Unregister(MSG_GET_2D_OVERLAY_CONTAINER, this);
 		m_messenger->Unregister(MSG_OVERLAY_SHOW, this);
@@ -460,6 +460,7 @@ void CountableResourceGUI::Shut(){
 	for (unsigned int i = 0; i < m_elements.size(); i++)
 	{
 		//delete m_elements.end();
+		m_elements[i]->hide();
 		m_elements[i]=NULL;
 		//delete m_elements[i];
 	}

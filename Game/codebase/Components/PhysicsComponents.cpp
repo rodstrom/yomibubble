@@ -320,15 +320,9 @@ void CharacterController::Update(float dt){
 	}
 	if (m_is_jumping){
 		m_jump_timer += dt;
-		if (m_jump_timer >= m_max_jump_height){
-			m_is_jumping = false;
-			m_jump_timer = 0.0f;
-		}
-		else{
-			float jump_strength = m_jump_pwr * dt;
-			m_rigidbody->applyCentralImpulse(btVector3(0.0f,jump_strength,0.0f));
-		}
-
+		//float jump_strength = m_jump_pwr * dt;
+		//vel = m_rigidbody->getLinearVelocity();
+		//m_rigidbody->setLinearVelocity(btVector3(vel.x(), jump_strength, vel.z()));
 	}
 }
 
@@ -414,10 +408,13 @@ void CharacterController::SimulationStep(btScalar time_step){
 		m_rigidbody->setLinearVelocity(btVector3(velXZ.x, m_rigidbody->getLinearVelocity().y(), velXZ.y));
 	}
 	if (m_is_jumping){
-		btVector3 vel = m_rigidbody->getLinearVelocity();
-		if (vel.y() > 8.0f){
-			m_rigidbody->setLinearVelocity(btVector3(vel.x(), 8.0f, vel.z()));
+		if (m_jump_timer >= m_max_jump_height){
+			m_is_jumping = false;
+			m_jump_timer = 0.0f;
 		}
+		float jump_strength = m_jump_pwr * time_step;
+		btVector3 vel = m_rigidbody->getLinearVelocity();
+		m_rigidbody->setLinearVelocity(btVector3(vel.x(), jump_strength, vel.z()));
 	}
 }
 

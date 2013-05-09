@@ -14,6 +14,7 @@ PlayState::~PlayState(void){}
 
 void PlayState::Enter(){
 	m_scene_manager = Ogre::Root::getSingleton().createSceneManager("OctreeSceneManager");
+	//m_sound_manager->Init(m_scene_manager);
 	//m_scene_manager->setDisplaySceneNodes(true);
 	m_physics_engine = new PhysicsEngine;
 	m_physics_engine->Init();
@@ -26,10 +27,14 @@ void PlayState::Enter(){
 	m_camera->setAspectRatio(Ogre::Real(m_viewport->getActualWidth()) / Ogre::Real(m_viewport->getActualHeight()));
 
 	m_game_object_manager = new GameObjectManager;
-	m_sound_manager = new SoundManager(m_scene_manager, m_camera);
-	m_sound_manager->LoadAudio();
+	//m_sound_manager = new SoundManager(m_scene_manager, m_camera);
+	//m_sound_manager->LoadAudio();
 	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager, m_message_system);
-	
+
+	//RUN SECONDLOADING
+}
+
+void PlayState::SecondLoading(){
 	m_variable_manager = new VariableManager();
 	m_variable_manager->Init();
 	m_variable_manager->LoadVariables();
@@ -57,7 +62,7 @@ void PlayState::Enter(){
 	m_scene_manager->setShadowColour(Ogre::ColourValue(0.6f,0.6f,0.6f,1.0f));
 	m_scene_manager->setShadowFarDistance(25.0f);
 
-	LevelDef level1;
+	/*LevelDef level1;
 	level1.filepath = "try";
 	level1.next_level = "Dayarea";
 	LevelDef level2;
@@ -69,9 +74,9 @@ void PlayState::Enter(){
 	m_level_manager->AddLevel(level1);
 	m_level_manager->AddLevel(level2);
 	m_level_manager->AddLevel(level3);
-	m_level_manager->LoadLevel("Dayarea");
+	m_level_manager->LoadLevel("Dayarea");*/
 	
-	/*float x = 180.0f;
+	float x = 180.0f;
 	float y = 90.0f;
 	float z = 230.0f;
 
@@ -119,7 +124,7 @@ void PlayState::Enter(){
 		player_pos = Ogre::Vector3(230, 72, 298);
 	}
 
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(player_pos.x,player_pos.y+8.5f,player_pos.z), &player_def);
+//	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(player_pos.x,player_pos.y+8.5f,player_pos.z), &player_def, "Player");
 	PlaneDef plane_def;
 	plane_def.material_name = "Examples/BeachStones";
 	plane_def.plane_name = "plane";
@@ -127,7 +132,7 @@ void PlayState::Enter(){
 	plane_def.restitution = 0.8f;
 	plane_def.collision_filter.filter = COL_WORLD_STATIC;
 	plane_def.collision_filter.mask = COL_BUBBLE | COL_PLAYER | COL_TOTT;
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(player_pos.x,player_pos.y + 8.0f,player_pos.z), &plane_def);
+//	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(player_pos.x,player_pos.y + 8.0f,player_pos.z), &plane_def);
 	m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
 	m_scene_manager->setShadowUseInfiniteFarPlane(false);
 	m_scene_manager->setShadowTextureSelfShadow(true);
@@ -137,33 +142,31 @@ void PlayState::Enter(){
 	m_scene_manager->setShadowFarDistance(30.0f);
 	m_camera->setNearClipDistance(1.0f);
 	
-if(MaterialManager::getSingleton().getByName("Ogre/TextureShadowCaster").isNull())
-    // Render a frame to get the shadow materials created
+	if(MaterialManager::getSingleton().getByName("Ogre/TextureShadowCaster").isNull())
+	// Render a frame to get the shadow materials created
 		Ogre::Root::getSingleton().renderOneFrame();
 
-   // Get all shadow materials
+	// Get all shadow materials
 	std::vector<MaterialPtr> tmpMaterials;
-   TexturePtr tmpTexturePtr = m_scene_manager->getShadowTexture(0);
-   String tmpMaterialName = tmpTexturePtr->getName() + "Mat" + m_scene_manager->getName();
-   tmpMaterials.push_back(MaterialManager::getSingleton().getByName(tmpMaterialName));
-   tmpMaterials.push_back(MaterialManager::getSingleton().getByName("Ogre/TextureShadowCaster"));
-   tmpMaterials.push_back(MaterialManager::getSingleton().getByName("Ogre/TextureShadowReceiver"));
+	TexturePtr tmpTexturePtr = m_scene_manager->getShadowTexture(0);
+	String tmpMaterialName = tmpTexturePtr->getName() + "Mat" + m_scene_manager->getName();
+	tmpMaterials.push_back(MaterialManager::getSingleton().getByName(tmpMaterialName));
+	tmpMaterials.push_back(MaterialManager::getSingleton().getByName("Ogre/TextureShadowCaster"));
+	tmpMaterials.push_back(MaterialManager::getSingleton().getByName("Ogre/TextureShadowReceiver"));
 
-   // Loop through the list of shadow materials
-   unsigned int i = 0;
-   for( ; i < tmpMaterials.size(); i++ )
-   {
-    // Check if the current shadow material exists
-    if( !tmpMaterials[i].isNull() )
-     // Set the depth bias of the shadow material
-     tmpMaterials[i]->getTechnique(0)->getPass(0)->setDepthBias(5.0f);
-   }
+	// Loop through the list of shadow materials
+	unsigned int i = 0;
+	for( ; i < tmpMaterials.size(); i++ )
+	{
+	// Check if the current shadow material exists
+	if( !tmpMaterials[i].isNull() )
+		// Set the depth bias of the shadow material
+		tmpMaterials[i]->getTechnique(0)->getPass(0)->setDepthBias(5.0f);
+	}
 
-   // Clear the temporary list of shadow materials
-   tmpMaterials.clear();*/
-
+	// Clear the temporary list of shadow materials
+	tmpMaterials.clear();
 }
-
 
 void PlayState::Exit(){
 	delete m_level_manager;
@@ -175,8 +178,9 @@ void PlayState::Exit(){
 	m_physics_engine->Shut();
 	delete m_physics_engine;
 	m_physics_engine = NULL;
-	delete m_sound_manager;
-	m_sound_manager = NULL;
+	//delete m_sound_manager;
+	//m_sound_manager = NULL;
+	//m_sound_manager->Exit();
 	m_render_window->removeAllViewports();
 	Ogre::Root::getSingleton().destroySceneManager(m_scene_manager);
 	m_scene_manager = NULL;
@@ -191,7 +195,7 @@ bool PlayState::Update(float dt){
 	//	PushState(FindByName("PauseState"));
 	//}
 	//else {
-		m_sound_manager->Update(m_camera, m_scene_manager, dt);
+		m_sound_manager->Update(m_scene_manager, dt);
 		m_physics_engine->Step(dt);
 	
 		if (m_input_manager->IsButtonDown(BTN_ARROW_UP)){
@@ -212,40 +216,4 @@ bool PlayState::Update(float dt){
 		}
 	//}
 	return m_running;
-}
-
-
-void PlayState::CreatePauseScreen(){
-	OverlayDef menuBackground;
-	menuBackground.overlay_name = "Menu";
-	menuBackground.cont_name = "Menu/Background";
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_OVERLAY, Ogre::Vector3(0,0,0), &menuBackground);
-
-	menuBackground.overlay_name = "Menu";
-	menuBackground.cont_name = "Menu/BackgroundBubbles";
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_OVERLAY, Ogre::Vector3(0,0,0), &menuBackground);
-
-	ButtonDef buttonDef;
-	buttonDef.overlay_name = "Menu";
-	buttonDef.cont_name = "Menu/Start";
-	buttonDef.mat_start_hover = "Menu/StartHover";
-	buttonDef.mat_start = "Menu/Start";
-	buttonDef.func = [this] { Resume(); };
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_BUTTON, Ogre::Vector3(0,0,0), &buttonDef);
-	
-	buttonDef.overlay_name = "Menu";
-	buttonDef.cont_name = "Menu/Options";
-	buttonDef.mat_start_hover = "Menu/OptionsHover";
-	buttonDef.mat_start = "Menu/Options";
-	buttonDef.func = [this] { Quit(); };
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_BUTTON, Ogre::Vector3(0,0,0), &buttonDef);
-
-}
-
-void PlayState::Resume(){
-	m_pause = false;
-}
-
-void PlayState::Quit(){
-	m_running = false;
 }
