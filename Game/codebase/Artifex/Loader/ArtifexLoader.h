@@ -59,7 +59,7 @@ THE SOFTWARE.
 #endif
 
 // enable grass loading
-#define PG_GRASSLOADER
+//#define PG_GRASSLOADER
 
 #ifdef PG_GRASSLOADER
 #include "ArtifexLoaderPGGrass.h"

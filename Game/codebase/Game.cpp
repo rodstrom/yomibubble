@@ -19,7 +19,7 @@ bool Game::Init(Ogre::RenderWindow* render_window, MessageSystem* message_system
 	MenuState::Create<MenuState>(m_state_manager, "MenuState");
 	PauseState::Create<PauseState>(m_state_manager, "PauseState");
 	LoadingState::Create<LoadingState>(m_state_manager, "LoadingState");
-	m_state_manager->ChangeState(m_state_manager->FindById("MenuState"));
+	m_state_manager->ChangeState(m_state_manager->FindById("PlayState"));
 
 	//ShowCursor(false);
 

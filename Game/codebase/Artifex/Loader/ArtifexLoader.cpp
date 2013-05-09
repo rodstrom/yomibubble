@@ -104,14 +104,14 @@ if (water) createWater();
 if (skye) createSkye();
 if (fog) createFog();
 if (light) createLight();
-if (grass) createGrass();
+//if (grass) createGrass();
 
 } else {
 createLight();
 createSkye();
 createFog();
 if (mWaterVisible==1) createWater();
-if (mLoadGrass==1) createGrass();
+//if (mLoadGrass==1) createGrass();
 }
 
 #ifdef TSM_TERRAIN

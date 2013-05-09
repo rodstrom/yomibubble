@@ -114,7 +114,7 @@ void PlayState::SecondLoading(){
 		player_pos = Ogre::Vector3(230, 72, 298);
 	}
 
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(player_pos.x,player_pos.y+8.5f,player_pos.z), &player_def, "Player");
+//	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(player_pos.x,player_pos.y+8.5f,player_pos.z), &player_def, "Player");
 	PlaneDef plane_def;
 	plane_def.material_name = "Examples/BeachStones";
 	plane_def.plane_name = "plane";
@@ -122,7 +122,7 @@ void PlayState::SecondLoading(){
 	plane_def.restitution = 0.8f;
 	plane_def.collision_filter.filter = COL_WORLD_STATIC;
 	plane_def.collision_filter.mask = COL_BUBBLE | COL_PLAYER | COL_TOTT;
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(player_pos.x,player_pos.y + 8.0f,player_pos.z), &plane_def);
+//	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(player_pos.x,player_pos.y + 8.0f,player_pos.z), &plane_def);
 	m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
 	m_scene_manager->setShadowUseInfiniteFarPlane(false);
 	m_scene_manager->setShadowTextureSelfShadow(true);
