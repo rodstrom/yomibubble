@@ -409,11 +409,12 @@ GameObject* GameObjectManager::CreateLeaf(const Ogre::Vector3& position, void* d
 
 	node_comp->Init(position, m_scene_manager);
 	mrc->Init("Collectable_Leaf.mesh", m_scene_manager);
+	mrc->GetEntity()->setMaterialName("CollectibleLeaf");
 	bc->Init(node_comp->GetSceneNode());
 	//Ogre::Vector3 scale(0.002f);
 	//node_comp->GetSceneNode()->setScale(scale);
 
-	mrc->GetEntity()->setMaterialName("Examples/Leaf");
+	//mrc->GetEntity()->setMaterialName("Examples/Leaf");
 	node_comp->GetSceneNode()->setPosition(Ogre::Vector3(position));
 	//particle->Init(m_scene_manager, "bajs", particleDef.particle_name);
 	//particle->CreateParticle(node_comp->GetSceneNode(), node_comp->GetSceneNode()->getPosition(), Ogre::Vector3(0,-3,0));
@@ -468,8 +469,8 @@ GameObject* GameObjectManager::CreateGate(const Ogre::Vector3& position, void* d
 	go->AddComponent(nc);
 	MeshRenderComponent* mrc = new MeshRenderComponent;
 	go->AddComponent(mrc);
-	RigidbodyComponent* rc = new RigidbodyComponent;
-	go->AddComponent(rc);
+	//RigidbodyComponent* rc = new RigidbodyComponent;
+	//go->AddComponent(rc);
 	
 	RigidBodyDef def;
 	def.body_type = STATIC_BODY;
@@ -480,9 +481,8 @@ GameObject* GameObjectManager::CreateGate(const Ogre::Vector3& position, void* d
 
 	nc->Init(position, m_scene_manager);
 	mrc->Init("Gate.mesh", m_scene_manager);
-	mrc->GetEntity()->setMaterialName("Examples/Athene/NormalMapped");
 	
-	rc->Init(position, mrc->GetEntity(), m_physics_engine, def);
+	//rc->Init(position, mrc->GetEntity(), m_physics_engine, def);
 	return go;
 }
 

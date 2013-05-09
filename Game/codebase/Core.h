@@ -1,6 +1,7 @@
 #ifndef _CORE_H_
 #define _CORE_H_
 
+struct IEvent;
 class MessageSystem;
 class InputSystem;
 class Game;
@@ -13,7 +14,10 @@ public:
 	bool Init();
 	void Run();
 	void Shut();
+
+	void QuitMsg(IEvent*);
 private:
+	bool				m_run;
 	Ogre::Root*			m_root;
 	Ogre::RenderWindow* m_render_window;
 	InputSystem*		m_input_system;

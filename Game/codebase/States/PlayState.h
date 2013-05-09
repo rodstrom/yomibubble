@@ -17,6 +17,8 @@ public:
 	PlayState(void);
 	~PlayState(void);
 
+
+
 	bool Update(float dt);
 	void Enter();
 	void Exit();

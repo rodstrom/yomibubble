@@ -6,11 +6,12 @@
 #include "Managers\SoundManager.h"
 #include "Managers\CollisionManager.h"
 
-Core::Core(void) : m_root(NULL), m_game(NULL), m_message_system(NULL), m_input_system(NULL) {}
+Core::Core(void) : m_root(NULL), m_game(NULL), m_message_system(NULL), m_input_system(NULL), m_run(true) {}
 Core::~Core(void){}
 
 bool Core::Init(){
 	m_message_system = new MessageSystem;
+	m_message_system->Register(EVT_QUIT, this, &Core::QuitMsg);
 	Ogre::String pluginsCfg = Ogre::StringUtil::BLANK;
 	Ogre::String resourceCfg  = "../../resources/config/resources.cfg";
 #ifdef _DEBUG
@@ -47,7 +48,7 @@ bool Core::Init(){
 
 	rs->setConfigOption("Full Screen", fullscreen);
 	rs->setConfigOption("Video Mode", videoMode);
-	//rs->setConfigOption("VSync", "Yes");
+	rs->setConfigOption("VSync", "No");
 	
 	m_render_window = m_root->initialise(true, "Yomi's Bubble Adventure");
 	Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
@@ -55,7 +56,7 @@ bool Core::Init(){
 
 	m_game = new Game;
 	m_game->Init(m_render_window, m_message_system);
-	m_input_system = new InputSystem(m_game, m_render_window);
+	m_input_system = new InputSystem(m_game, m_render_window, m_message_system);
 	m_input_system->Init();
 
 	gContactAddedCallback = Collision::ContactCallback;
@@ -64,46 +65,37 @@ bool Core::Init(){
 }
 
 void Core::Run(){
-Ogre::Timer timer;
-double dt = 0.0;
-double last_time = 0.0;
-double fps_cap = 80.0;
-m_root->clearEventTimes();
-	while (1){
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 
-		{
-			MSG msg;
-			while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)){
-				if (msg.message == WM_QUIT){
-					return;
-				}
-				else{
-					TranslateMessage(&msg);
-					DispatchMessage(&msg);
-				}
-			}
-		}
-#endif
+	Ogre::Timer timer;
+	double last_time = 0.0;
+	double fps_cap = 60.0;
+	double dt = 0.0f;
+	m_root->clearEventTimes();
+	while (m_run){
+		Ogre::WindowEventUtilities::messagePump();
 		bool render = true;
 		double curr_sec = (double)timer.getMilliseconds() * 0.001;
 		dt = curr_sec - last_time;
+		
 		double limit = 1.0 / fps_cap;
 		if (dt < limit){
 			render = false;
 		}
 		else {
-			last_time = curr_sec;
 			if (dt > 1.0){
-				//dt = 0.0;
+				dt = 0.0;
 			}
+			last_time = curr_sec;
 		}
+		
 		if (render){
 			m_game->UpdateInput();
 			m_input_system->Capture();
 			if (!m_game->Update((float)dt)){
 				return;
 			}
-			m_root->renderOneFrame((float)dt);
+			if (!m_root->renderOneFrame((float)dt)){
+				return;
+			}
 		}
 	}
 }
@@ -126,4 +118,8 @@ void Core::Shut(){
 	OGRE_DELETE m_root;
 	m_root = NULL;
 	m_render_window = NULL;
+}
+
+void Core::QuitMsg(IEvent* evt){
+	m_run = false;
 }

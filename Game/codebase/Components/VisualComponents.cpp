@@ -556,7 +556,7 @@ void TerrainComponent::Init(Ogre::SceneManager* scene_manager, PhysicsEngine* ph
 //mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_camera, m_game_object_manager, m_sound_manager, "../../resources/terrain/");
 
 
-	m_artifex_loader->loadZone(filename);
+	m_artifex_loader->loadZone(filename, true, true, true, true, true, false);
 	Ogre::Terrain* terrain = m_artifex_loader->mTerrain;
 	size_t w = terrain->getSize();
 	float* terrain_height_data = terrain->getHeightData();

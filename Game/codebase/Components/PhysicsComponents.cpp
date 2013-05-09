@@ -259,6 +259,7 @@ void CharacterController::Notify(int type, void* msg){
 }
 
 void CharacterController::Update(float dt){
+	btVector3 pos = m_rigidbody->getWorldTransform().getOrigin();
 	m_on_ground = false;
 	QueryRaycast();
 	btVector3 vel = m_rigidbody->getLinearVelocity();

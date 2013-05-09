@@ -128,12 +128,12 @@ void ArtifexLoaderPGGrass::update() {
 void ArtifexLoaderPGGrass::unload() {
 	//Delete the GrassLoader instance
 	try {
-		delete mGrass->getPageLoader();
+		//delete mGrass->getPageLoader();
 	} catch(...) {};
 
 	//Delete the PagedGeometry instance
 	try {
-		delete mGrass;
+		//delete mGrass;
 	} catch(...) {};
 };
 

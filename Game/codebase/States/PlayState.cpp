@@ -22,7 +22,6 @@ void PlayState::Enter(){
 
 	m_camera->setFarClipDistance(5000.0f);
 	m_camera->setNearClipDistance(1.0f);
-	m_camera->setLodBias(0.5f);
 	m_viewport = m_render_window->addViewport(m_camera);
 	m_camera->setAspectRatio(Ogre::Real(m_viewport->getActualWidth()) / Ogre::Real(m_viewport->getActualHeight()));
 
@@ -38,6 +37,16 @@ void PlayState::Enter(){
 	// Create plane mesh
 	Ogre::Plane plane(Ogre::Vector3::UNIT_Y, -10);
 	Ogre::MeshManager::getSingleton().createPlane("plane", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane, 50, 50, 20, 20, true, 1, 5, 5, Ogre::Vector3::UNIT_Z);
+	/*PlaneDef plane_def;
+	plane_def.material_name = "CollectableLeaf";
+	plane_def.plane_name = "plane";
+	plane_def.friction = 1.0f;
+	plane_def.restitution = 0.8f;
+	plane_def.collision_filter.filter = COL_WORLD_STATIC;
+	plane_def.collision_filter.mask = COL_BUBBLE | COL_PLAYER | COL_TOTT;
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(170, 85, 173), &plane_def);*/
+	//m_game_object_manager->CreateGameObject(GAME_OBJECT_GATE, Ogre::Vector3(170, 75, 173), NULL);
+	
 	m_level_manager = new LevelManager(m_game_object_manager, m_scene_manager, m_message_system);
 
 	m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
@@ -61,7 +70,7 @@ void PlayState::Enter(){
 	m_level_manager->AddLevel(level2);
 	m_level_manager->AddLevel(level3);
 	m_level_manager->LoadLevel("Dayarea");
-
+	
 	/*float x = 180.0f;
 	float y = 90.0f;
 	float z = 230.0f;

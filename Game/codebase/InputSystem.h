@@ -3,11 +3,12 @@
 
 #include "InputPrereq.h"
 
+class MessageSystem;
 class Game;
 class InputSystem : public OIS::KeyListener, public OIS::MouseListener, public OIS::JoyStickListener, public Ogre::WindowEventListener
 {
 public:
-	InputSystem(Game* bubble_adventure, Ogre::RenderWindow* render_window);
+	InputSystem(Game* bubble_adventure, Ogre::RenderWindow* render_window, MessageSystem* message_system);
 	~InputSystem(void);
 	
 	void Capture();
@@ -59,6 +60,7 @@ private:
 	//std::vector<OIS::JoyStickListener*>		m_joystick_listeners;
 
 	Ogre::RenderWindow* m_render_window;
+	MessageSystem* m_message_system;
 };
 
 #endif // _INPUT_MANAGER_H_
