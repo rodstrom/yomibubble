@@ -85,6 +85,9 @@ void FollowCameraComponent::Notify(int type, void* msg){
 
 void FollowCameraComponent::Shut(){
 	CameraComponent::Shut();
+	m_camera_node->detachAllObjects();
+	m_scene_manager->destroySceneNode(m_camera_pivot);
+	m_scene_manager->destroySceneNode(m_camera_node);
 	m_messenger->Unregister(MSG_CAMERA_GET_CAMERA_NODE, this);
 	m_messenger->Unregister(MSG_DEFAULT_CAMERA_POS, this);
 	m_messenger->Unregister(MSG_FOLLOW_CAMERA_GET_ORIENTATION, this);

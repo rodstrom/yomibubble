@@ -127,7 +127,8 @@ GameObject* GameObjectManager::GetGameObject(const Ogre::String& id){
 }
 
 GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void* data, const Ogre::String& id){
-	CharacterControllerDef& def = *static_cast<CharacterControllerDef*>(data);
+	PlayerDef& def = *static_cast<PlayerDef*>(data);
+	CharacterControllerDef& char_def = *def.character_contr;
 	GameObject* go = new GameObject(GAME_OBJECT_PLAYER);
 	NodeComponent* node_comp = new NodeComponent;
 	go->AddComponent(node_comp);
@@ -176,7 +177,7 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 
 	tc->Init(position, m_physics_engine, tdef);
 	tc->SetId("btrig");
-	contr->Init(position, m_physics_engine, def);
+	contr->Init(position, m_physics_engine, char_def);
 	contr->HasFollowCam(true);
 	contr->SetId("body");
 	contr->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
@@ -185,8 +186,9 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	sound3D->Init(m_sound_manager);
 	music2D->Init(m_sound_manager);
 	music3D->Init(m_sound_manager);
-	gui->Init("Examples/Empty", "Examples/Filled", 6);
-	csnc->Init(Ogre::Vector3(0.0f, def.offset.y, 1.0f), "CreateBubble", node_comp->GetSceneNode());
+	//gui->Init("Examples/Empty", "Examples/Filled", 6);
+	gui->Init(def.level_id);
+	csnc->Init(Ogre::Vector3(0.0f, char_def.offset.y, 1.0f), "CreateBubble", node_comp->GetSceneNode());
 	m_sound_manager->GetYomiNode(node_comp->GetSceneNode()->getName());
 	prcc->Init(m_physics_engine);
 	
@@ -201,7 +203,7 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 
 	fcc->Init(m_scene_manager, m_viewport, true);
 	fcc->SetTrigger(camera_tc);
-	fcc->SetMovementSpeed(2.5f);
+	fcc->SetMovementSpeed(def.camera_speed);
 	//DEBUGGING GRAVITY
 	//contr->GetRigidbody()->setGravity(btVector3(0,0,0));
 
@@ -387,7 +389,7 @@ GameObject* GameObjectManager::CreateGUI(const Ogre::Vector3& position, void* da
 	CountableResourceGUI* gui = new CountableResourceGUI;
 	go->AddComponent(gui);
 
-	gui->Init(guiDef.tex_inact, guiDef.tex_act, guiDef.num_elems);
+	//gui->Init(guiDef.tex_inact, guiDef.tex_act, guiDef.num_elems);
 	
 	return go;
 };
