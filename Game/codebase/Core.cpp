@@ -12,6 +12,7 @@ Core::~Core(void){}
 bool Core::Init(){
 	m_message_system = new MessageSystem;
 	m_message_system->Register(EVT_QUIT, this, &Core::QuitMsg);
+	CollisionManager::GetSingletonPtr()->SetMessageSystem(m_message_system);
 	Ogre::String pluginsCfg = Ogre::StringUtil::BLANK;
 	Ogre::String resourceCfg  = "../../resources/config/resources.cfg";
 #ifdef _DEBUG
@@ -68,7 +69,6 @@ bool Core::Init(){
 	m_input_system->Init();
 	
 	gContactAddedCallback = Collision::ContactCallback;
-	CollisionManager::GetSingletonPtr();	// creates and initializes the instance
 	return true;
 }
 

@@ -91,7 +91,7 @@ int DBManager::Load() {
 			
 			if (spawn.spawntype.length() < 1) spawn.spawntype = "default";
 			
-			mArtifexLoader->mObjectFile.push_back(spawn);
+			//mArtifexLoader->mObjectFile.push_back(spawn);
 			
 			bool interactive = false;
 			if (spawn.attributes.size() > 0) {
@@ -217,6 +217,7 @@ int DBManager::Load() {
 				{
 					SceneNode *mNode = NULL;
 					try {
+						mArtifexLoader->mObjectFile.push_back(spawn);
 						bool collision = true;
 						mNode = mArtifexLoader->mSceneMgr->getRootSceneNode()->createChildSceneNode(entName+"Node",Ogre::Vector3(spawn.x,spawn.y,spawn.z),Quaternion ((Degree(spawn.ry)), Vector3::UNIT_Y));
 						mNode->attachObject(newModel);

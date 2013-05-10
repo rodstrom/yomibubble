@@ -3,14 +3,13 @@
 #include "GameObjectManager.h"
 #include "..\MessageSystem.h"
 
-LevelManager::LevelManager(GameObjectManager* game_object_manager, Ogre::SceneManager* scene_manager,  MessageSystem* message_system) : 
-	m_game_object_manager(game_object_manager), m_scene_manager(scene_manager), m_message_system(message_system), m_current_level(0){
-		m_message_system->Register<LevelManager>(EVT_CHANGE_LEVEL, this, &LevelManager::ChangeLevel);
+LevelManager::LevelManager(GameObjectManager* game_object_manager, Ogre::SceneManager* scene_manager) : 
+	m_game_object_manager(game_object_manager), m_scene_manager(scene_manager), m_current_level(0){
 }
 LevelManager::~LevelManager(void){}
 
 
-void LevelManager::ChangeLevel(IEvent*){
+void LevelManager::ChangeLevel(){
 	Ogre::String next_level = m_levels[m_current_level].next_level;
 	m_game_object_manager->ClearAllGameObjects();
 	// set loading screen game object here

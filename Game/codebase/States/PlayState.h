@@ -7,6 +7,7 @@
 #include "..\Functor.h"
 #include <functional>
 
+struct IEvent;
 class LevelManager;
 class GameObjectManager;
 class PhysicsEngine;
@@ -25,6 +26,7 @@ public:
 	bool Pause() { return m_pause; }
 	
 	void SecondLoading();
+	void ChangeLevel(IEvent*);
 
 private:
 	PhysicsEngine*				m_physics_engine;
@@ -32,6 +34,7 @@ private:
 	LevelManager*				m_level_manager;
 	bool						m_pause;
 	bool						m_running;
+	bool						m_change_level;
 	VariableManager*			m_variable_manager;
 };
 

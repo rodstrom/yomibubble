@@ -45,6 +45,9 @@ private:
 	void PlayerTerrain(GameObject* player, GameObject* terrain);
 	void TerrainPlayer(GameObject* terrain, GameObject* player){ PlayerTerrain(player, terrain); }
 
+	void GatePlayer(GameObject* gate, GameObject* player);
+	void PlayerGate(GameObject* player, GameObject* gate) { GatePlayer(gate, player); }
+
 	
 	typedef void (CollisionManager::*DoubleDispatch)(GameObject*, GameObject*);
 	typedef std::map<std::pair<int, int>, DoubleDispatch> HitMap;
