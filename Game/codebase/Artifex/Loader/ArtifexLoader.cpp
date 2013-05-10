@@ -239,6 +239,8 @@ mSceneMgr->clearScene();
 
 #ifdef OT_TERRAIN
 try {
+	//OGRE_DELETE mTerrainGroup;
+	OGRE_DELETE mTerrainGlobals;
 mTerrainGroup->removeAllTerrains();
 } catch (Exception &e) {};
 #endif

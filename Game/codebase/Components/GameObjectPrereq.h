@@ -86,6 +86,12 @@ struct CharacterControllerDef{
 	CollisionFilter collision_filter;
 };
 
+struct PlayerDef{
+	CharacterControllerDef* character_contr;
+	Ogre::String level_id;
+	float camera_speed;
+};
+
 struct RigidBodyDef{
 	RigidBodyDef(void) : collider_type(0.0f), mass(0.0f), body_type(0), restitution(0.0f), friction(0.0f), rolling_friction(0.0f), 
 		radius(0.0f), x(0.0f), y(0.0f), z(0.0f), collision_flag(COLLISION_FLAG_GAME_OBJECT) {}

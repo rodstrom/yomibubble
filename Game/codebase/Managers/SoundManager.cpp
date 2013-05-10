@@ -49,8 +49,8 @@ void SoundManager::LoadAudio(){
 
 	Init3D("Main_Theme", 10.0f, 10.0f, 150.0f);
 
-	//bool bajs = m_sound_manager->createEFXSlot();
-	//bajs;
+	//bool bajs = m_sound_manager->createEFXSlot(); //tiny was here
+	//bajs; //tiny was here
 
 //	m_sound_manager->createEFXEffect("Main_Theme", 
 }
