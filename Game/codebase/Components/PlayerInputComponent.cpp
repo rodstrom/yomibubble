@@ -59,7 +59,7 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 	m_states[PLAYER_STATE_INSIDE_BUBBLE] =	&PlayerInputComponent::InsideBubble;
 	m_states[PLAYER_STATE_BOUNCING] =		&PlayerInputComponent::Bouncing;
 
-	m_min_bubble_size = 0.805f;	// Tiny was here
+	m_min_bubble_size = 0.805f;
 	m_max_bubble_size = 1.907f;
 
 	m_velocity = 0.0000001f;

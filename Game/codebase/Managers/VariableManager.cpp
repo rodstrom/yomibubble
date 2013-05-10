@@ -16,7 +16,7 @@ void VariableManager::Init(){
 };
 
 void VariableManager::LoadVariables(){
-	m_config_file = new Config("player_variables.ini");
+	m_config_file = new Config("../../resources/config/player_variables.ini");
 	m_config_file->parse();
 
 	std::map<std::string, float>::iterator it;
