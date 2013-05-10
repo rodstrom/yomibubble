@@ -122,6 +122,7 @@ int DBManager::Load() {
 							player_def.mass = 1.0f;
 							player_def.collision_filter.filter = COL_PLAYER;
 							player_def.collision_filter.mask = COL_BUBBLE | COL_BUBBLE_TRIG | COL_TOTT | COL_WORLD_STATIC | COL_WORLD_TRIGGER;
+							player_def.mesh = meshFile;
 							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(x,y,z), &player_def);
 						}
 						else if (i->second == "tott") {
@@ -135,6 +136,7 @@ int DBManager::Load() {
 							tott_def.max_jump_height = 10.0f;
 							tott_def.collision_filter.filter = COL_TOTT;
 							tott_def.collision_filter.mask = COL_PLAYER | COL_WORLD_STATIC | COL_BUBBLE | COL_TOTT;
+							tott_def.mesh = meshFile;
 							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y,z), &tott_def);
 						}
 						else if (i->second == "leaf") {

@@ -28,6 +28,16 @@ void WayPointComponent::Update(float dt){
 	m_way_point->Update(dt);
 	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &m_way_point->m_direction);
 	float speed = m_way_point->getSpeed();
+	if (speed != 0.0f) {
+		m_anim_msg.id="Run";
+		m_anim_msg.blend = false;
+		m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
+	}
+	else {
+		m_anim_msg.id="Idle";
+		m_anim_msg.blend = false;
+		m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
+	}
 	Ogre::Vector3 speed3(speed);
 	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_VELOCITY_SET, &speed3);
 };

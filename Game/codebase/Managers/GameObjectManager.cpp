@@ -165,8 +165,9 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 
 	node_comp->Init(position, m_scene_manager);
 	node_comp->SetId("player_node");
-
-	acomp->Init("Yomi.mesh", m_scene_manager, node_comp->GetId());
+	
+	if(def.mesh == "") def.mesh = "Yomi.mesh";
+	acomp->Init(def.mesh, m_scene_manager, node_comp->GetId());
 	acomp->GetEntity()->setMaterialName("_YomiFBXASC039sFBXASC032staffMaterial__191");
 
 	TriggerDef tdef;
@@ -292,7 +293,7 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 	NodeComponent* node_comp = new NodeComponent;
 	go->AddComponent(node_comp);
 	AnimationComponent* acomp = new AnimationComponent;
-	acomp->AddAnimationStates(1);
+	acomp->AddAnimationStates(2);
 	go->AddComponent(acomp);
 	go->AddUpdateable(acomp);
 	CharacterController* contr = new CharacterController;
@@ -303,8 +304,11 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 	go->AddUpdateable(way_point);
 
 	node_comp->Init(position, m_scene_manager);
-	acomp->Init("Yomi_2Yomi.mesh", m_scene_manager);
-	acomp->GetEntity()->setMaterialName("SolidColor/Green");
+
+	if(def.mesh == "") def.mesh = "Yomi.mesh";
+	acomp->Init(def.mesh, m_scene_manager, node_comp->GetId());
+	acomp->GetEntity()->setMaterialName("_YomiFBXASC039sFBXASC032staffMaterial__191");
+
 	m_sound_manager->GetTottNode(node_comp->GetSceneNode()->getName());
 	way_point->Init(node_comp->GetSceneNode(), 0.001f);
 	way_point->AddWayPoint(Ogre::Vector3(15.0f, -10.0f, 21.0f));
@@ -316,7 +320,7 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 	contr->GetRigidbody()->setFriction(def.friction);
 	
 	//DEBUGGING GRAVITY
-	contr->GetRigidbody()->setGravity(btVector3(0,0,0));
+	//contr->GetRigidbody()->setGravity(btVector3(0,0,0));
 
 	return go;
 }

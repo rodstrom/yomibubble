@@ -67,7 +67,7 @@ enum ECollisionTypes{
 
 struct CharacterControllerDef{
 	CharacterControllerDef(void) : step_height(0.0f), turn_speed(0.0f), velocity(0.0f), max_jump_height(0.0f), friction(0.0f), mass(0.0f),
-		restitution(0.0f), jump_power(0.0f), max_speed(0.0f), deceleration(0.0f), air_deceleration(0.0f), radius(0.0f), height(0.0f), offset(Ogre::Vector3::ZERO) {}
+		restitution(0.0f), jump_power(0.0f), max_speed(0.0f), deceleration(0.0f), air_deceleration(0.0f), radius(0.0f), height(0.0f), offset(Ogre::Vector3::ZERO), mesh("") {}
 	float step_height;
 	float turn_speed;
 	float velocity;
@@ -81,6 +81,7 @@ struct CharacterControllerDef{
 	float radius;
 	float height;
 	float mass;
+	Ogre::String mesh;
 	Ogre::Vector3 offset;
 	CollisionFilter collision_filter;
 };
