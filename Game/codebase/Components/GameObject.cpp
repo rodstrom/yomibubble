@@ -52,6 +52,10 @@ void GameObject::Update(float dt){
 	}
 }
 
+GameObject* GameObject::GetGameObject(const Ogre::String& id) const{
+ return m_game_object_manager->GetGameObject(id);
+}
+
 Component* GameObject::GetComponent(int type){
 	if (!m_components.empty()){
 		for (unsigned int i = 0; i < m_components.size(); i++){

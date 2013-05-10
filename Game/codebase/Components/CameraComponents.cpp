@@ -4,6 +4,7 @@
 #include "..\Managers\InputManager.h"
 #include "GameObject.h"
 #include "GameObjectPrereq.h"
+#include "VisualComponents.h"
 
 #include <iostream> //for debugging, wohoo
 
@@ -93,6 +94,7 @@ void FollowCameraComponent::Shut(){
 	m_messenger->Unregister(MSG_DEFAULT_CAMERA_POS, this);
 	m_messenger->Unregister(MSG_FOLLOW_CAMERA_GET_ORIENTATION, this);
 	m_messenger->Unregister(MSG_CAMERA_ENV_COLLISION, this);
+	m_physics_engine->RemoveObjectSimulationStep(this);
 }
 
 void FollowCameraComponent::SetMessenger(ComponentMessenger* messenger){
@@ -130,6 +132,8 @@ void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewpo
 	m_top_ray.length = btVector3(0, 1, 0);
 	m_bot_ray.origin = btVector3(m_bot_ray.node->getPosition().x, m_bot_ray.node->getPosition().y, m_bot_ray.node->getPosition().z);
 	m_bot_ray.length = btVector3(0, -1, 0);
+
+	
 }
 
 void FollowCameraComponent::Update(float dt){
@@ -189,17 +193,9 @@ void FollowCameraComponent::Update(float dt){
 
 	
 	//Assume world->stepSimulation or world->performDiscreteCollisionDetection has been called
-
-	btPersistentManifold* contactManifold = m_physics_engine->GetDynamicWorld()->getDispatcher()->getManifoldByIndexInternal(0);
-	btCollisionObject* obA = static_cast<btCollisionObject*>( );
-	btCollisionObject* obB = static_cast<btCollisionObject*>(static_cast<CharacterController*>(m_owner->GetComponent(COMPONENT_CHARACTER_CONTROLLER))->GetRigidbody());
 	
-	btManifoldPoint& pt = contactManifold->getContactPoint(0);
-			if (pt.getDistance()<0.f)
-			{
-				std::cout << "Collision!!\n";
-			}
 
+			
 	/*
 	int numManifolds = world->getDispatcher()->getNumManifolds();
 	for (int i=0;i<numManifolds;i++)
@@ -222,6 +218,49 @@ void FollowCameraComponent::Update(float dt){
 	}
 	*/
 }
+void FollowCameraComponent::SimulationStep(btScalar time_step){
+	//btPersistentManifold* contactManifold = m_physics_engine->GetDynamicWorld()->getDispatcher()->getManifoldByIndexInternal(0);
+	//btCollisionObject* obA = static_cast<btCollisionObject*>(static_cast<TerrainComponent*>(m_owner->GetGameObject("Terrain")->GetComponent(COMPONENT_TERRAIN))->GetRigidBody());
+	//btCollisionObject* obB = static_cast<btCollisionObject*>(static_cast<CharacterController*>(m_owner->GetComponent(COMPONENT_CHARACTER_CONTROLLER))->GetRigidbody());
+	
+	btCollisionObject* obA = static_cast<btCollisionObject*>(static_cast<TerrainComponent*>(m_owner->GetGameObject("Terrain")->GetComponent(COMPONENT_TERRAIN))->GetRigidBody());
+	btCollisionObject* obB = static_cast<btCollisionObject*>(static_cast<TriggerComponent*>(m_owner->GetGameObject("CameraTrig")->GetComponent(COMPONENT_TRIGGER))->GetRigidbody());
+	/*
+	btManifoldPoint& pt = contactManifold->getContactPoint(0);
+			if (pt.getDistance()<0.f)
+			{
+				std::cout << "Collision!!\n";
+			}
+			*/
+	//std::cout << "Cam pos: " << BtOgre::Convert::toOgre(obB->getWorldTransform().getOrigin()) << std::endl;
+
+	bool bajsmacka = obB->checkCollideWith(obA);
+
+	//btCollisionWorld::contactPairTest(
+
+	//btCollisionWorld::ContactResultCallback test;
+//	m_physics_engine->GetDynamicWorld()->contactPairTest(obA, obB, test);
+
+//	static_cast<TerrainComponent*>(m_owner->GetGameObject("Terrain")->GetComponent(COMPONENT_TERRAIN))->
+
+	//btCollisionWorld::contactPairTest(obA, obB, test);
+
+	
+
+
+	//bajsmacka = obA->
+
+	if (bajsmacka)
+	{
+		//std::cout << "Terrain coll\n";
+		m_env_collision = true;
+	}
+	else
+	{
+		//std::cout << "NOT Terrain coll\n";
+		m_env_collision = false;
+	}
+};
 
 void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real delta_pitch, Ogre::Real delta_zoom){
 	if (!m_env_collision){

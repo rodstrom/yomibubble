@@ -144,14 +144,10 @@ int DBManager::Load() {
 							particleDef.particle_name = "Particle/Smoke";
 							m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(x,y,z), &particleDef);
 						}
-						else if (i->second == "nextlevel"){
-							TriggerDef trdef;
-							trdef.body_type = STATIC_BODY;
-							trdef.collider_type = COLLIDER_BOX;
-							trdef.mass = 1.0f;
-							trdef.x = spawn.sx * 0.5f;
-							trdef.y = spawn.sy * 0.5f;
-							trdef.z = spawn.sz * 0.5f;
+						else if (i->second == "gate"){
+							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_GATE, Ogre::Vector3(x,y,z), NULL);
+							Ogre::Quaternion quat = Ogre::Quaternion ((Degree(spawn.rx)), Vector3::UNIT_X)*Quaternion ((Degree(spawn.ry)), Vector3::UNIT_Y)*Quaternion ((Degree(spawn.rz)), Vector3::UNIT_Z);
+							temp->GetComponentMessenger()->Notify(MSG_SET_OBJECT_ORIENTATION, &quat);
 						}
 						interactive = true;
 					}

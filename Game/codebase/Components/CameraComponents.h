@@ -26,7 +26,7 @@ protected:
 	Ogre::String		m_camera_id;
 };
 
-class FollowCameraComponent : public CameraComponent{
+class FollowCameraComponent : public CameraComponent, public IComponentSimulationStep{
 public:
 	FollowCameraComponent(void) : m_camera_goal(NULL), m_camera_pivot(NULL), m_camera_node(NULL), m_pivot_pitch(0), m_movement_speed(1.0f) { m_type = COMPONENT_FOLLOW_CAMERA; }
 	virtual ~FollowCameraComponent(void){}
@@ -35,8 +35,9 @@ public:
 	virtual void SetMessenger(ComponentMessenger* messenger);
 	virtual void Init(Ogre::SceneManager* scene_manager, Ogre::Viewport* viewport, bool activate = false, const Ogre::String& camera_id = Ogre::StringUtil::BLANK);
 	virtual void Update(float dt);
+	virtual void SimulationStep(btScalar time_step);
 	void SetTrigger(TriggerComponent* trigger) { m_trigger = trigger; }
-	void SetPhysEngine(PhysicsEngine* physics_engine) { m_physics_engine = physics_engine; }
+	void SetPhysEngine(PhysicsEngine* physics_engine) { m_physics_engine = physics_engine; m_physics_engine->AddObjectSimulationStep(this); }
 	void SetMovementSpeed(float value) { m_movement_speed = value; }
 	void SetInputSystem(InputSystem* input_system) { m_input_system = input_system; }
 

@@ -275,7 +275,7 @@ void PlayerInputComponent::OnBubble(float dt){
 		return;
 	}
 
-	float speed = 10.0f * dt;
+	float speed = 80.0f * dt;
 	bool follow_cam = false;
 	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_GET, &follow_cam);
 	if (follow_cam){
@@ -319,7 +319,7 @@ void PlayerInputComponent::InsideBubble(float dt){
 		return;
 	}
 
-	float speed = 10.0f * dt;
+	float speed = 80.0f * dt;
 	bool follow_cam = false;
 	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_GET, &follow_cam);
 	if (follow_cam){

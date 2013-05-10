@@ -28,6 +28,7 @@ public:
 	void SetGameObjectManager(GameObjectManager* game_object_manager) { m_game_object_manager = game_object_manager; }
 	void SetId(const Ogre::String& id) { m_id = id; }
 	Component* CreateComponent(int type, const Ogre::Vector3& pos, void* data);		// Creates and adds a component of specified type
+	GameObject* GetGameObject(const Ogre::String& id) const;
 
 private:
 	void Init();
