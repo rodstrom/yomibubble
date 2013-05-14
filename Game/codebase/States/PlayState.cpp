@@ -21,6 +21,7 @@ void PlayState::Enter(){
 	m_physics_engine = new PhysicsEngine;
 	m_physics_engine->Init();
 	//m_physics_engine->SetDebugDraw(m_scene_manager);
+	//m_physics_engine->ShowDebugDraw(true);
 	m_camera = m_scene_manager->createCamera("MainCamera");
 
 	m_camera->setFarClipDistance(5000.0f);
@@ -36,11 +37,7 @@ void PlayState::Enter(){
 	//RUN SECONDLOADING
 }
 
-void PlayState::SecondLoading(){
-	m_variable_manager = new VariableManager();
-	m_variable_manager->Init();
-	m_variable_manager->LoadVariables();
-	
+void PlayState::SecondLoading(){	
 	// Create plane mesh
 	Ogre::Plane plane(Ogre::Vector3::UNIT_Y, -10);
 	Ogre::MeshManager::getSingleton().createPlane("plane", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane, 50, 50, 20, 20, true, 1, 5, 5, Ogre::Vector3::UNIT_Z);
@@ -76,6 +73,7 @@ void PlayState::SecondLoading(){
 	m_level_manager->AddLevel(level1);
 	m_level_manager->AddLevel(level2);
 	m_level_manager->AddLevel(level3);
+	
 	m_level_manager->LoadLevel("try");
 	
 	/*float x = 180.0f;
@@ -92,24 +90,30 @@ void PlayState::SecondLoading(){
 	tott_def.max_jump_height = 10.0f;
 
 	Ogre::String terrain = "NightArea";
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_TERRAIN, Ogre::Vector3(0,0,0), &terrain);
+	//m_game_object_manager->CreateGameObject(GAME_OBJECT_TERRAIN, Ogre::Vector3(0,0,0), &terrain);
 
-	CharacterControllerDef player_def;
-	player_def.friction = 1.0f;
-	player_def.velocity = m_variable_manager->GetValue("Player_Speed");
-	player_def.max_speed = m_variable_manager->GetValue("Player_Max_Speed");
-	player_def.deceleration = m_variable_manager->GetValue("Player_Deceleration");
-	player_def.jump_power = m_variable_manager->GetValue("Player_Jump_Power");
-	player_def.restitution = 0.0f;
-	player_def.step_height = 0.35f;
-	player_def.turn_speed = 1000.0f;
-	player_def.max_jump_height = m_variable_manager->GetValue("Player_Max_Jump_Height");
-	player_def.mass = 1.0f;
-	player_def.radius = 0.3f;
-	player_def.height = 0.4f;
-	player_def.collision_filter.filter = COL_PLAYER;
-	player_def.collision_filter.mask = COL_BUBBLE | COL_BUBBLE_TRIG | COL_TOTT | COL_WORLD_STATIC | COL_WORLD_TRIGGER;
-	player_def.offset.y = 0.5f;
+	CharacterControllerDef char_def;
+	char_def.friction = 1.0f;
+	char_def.velocity = m_variable_manager->GetValue("Player_Speed");
+	char_def.max_speed = m_variable_manager->GetValue("Player_Max_Speed");
+	char_def.deceleration = m_variable_manager->GetValue("Player_Deceleration");
+	char_def.jump_power = m_variable_manager->GetValue("Player_Jump_Power");
+	char_def.restitution = 0.0f;
+	char_def.step_height = 0.25f;
+	char_def.turn_speed = 1000.0f;
+	char_def.max_jump_height = m_variable_manager->GetValue("Player_Max_Jump_Height");
+	char_def.mass = 1.0f;
+	char_def.radius = 0.3f;
+	char_def.height = 0.4f;
+	char_def.collision_filter.filter = COL_PLAYER;
+	char_def.collision_filter.mask = COL_BUBBLE | COL_BUBBLE_TRIG | COL_TOTT | COL_WORLD_STATIC | COL_WORLD_TRIGGER;
+	char_def.offset.y = 0.5f;
+	char_def.fall_acceleration = 20.0f;
+	char_def.max_fall_speed = 10.0f;
+	PlayerDef player_def;
+	player_def.character_contr = &char_def;
+	player_def.camera_speed = 2.5f;
+	player_def.level_id = "try";
 
 	Ogre::Vector3 player_pos = Ogre::Vector3::ZERO;
 	if (terrain == "NightArea"){
@@ -134,7 +138,7 @@ void PlayState::SecondLoading(){
 	plane_def.restitution = 0.8f;
 	plane_def.collision_filter.filter = COL_WORLD_STATIC;
 	plane_def.collision_filter.mask = COL_BUBBLE | COL_PLAYER | COL_TOTT;
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(player_pos.x,player_pos.y + 8.0f,player_pos.z), &plane_def);
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(player_pos.x,player_pos.y,player_pos.z), &plane_def);
 	m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
 	m_scene_manager->setShadowUseInfiniteFarPlane(false);
 	m_scene_manager->setShadowTextureSelfShadow(true);
@@ -181,9 +185,6 @@ void PlayState::Exit(){
 	m_physics_engine->Shut();
 	delete m_physics_engine;
 	m_physics_engine = NULL;
-	//delete m_sound_manager;
-	//m_sound_manager = NULL;
-	//m_sound_manager->Exit();
 	m_render_window->removeAllViewports();
 	Ogre::Root::getSingleton().destroySceneManager(m_scene_manager);
 	m_scene_manager = NULL;
@@ -204,12 +205,12 @@ bool PlayState::Update(float dt){
 		m_sound_manager->Update(m_scene_manager, dt);
 		m_physics_engine->Step(dt);
 	
-		if (m_input_manager->IsButtonDown(BTN_ARROW_UP)){
+		/*if (m_input_manager->IsButtonDown(BTN_ARROW_UP)){
 			m_physics_engine->ShowDebugDraw(true);
 		}
 		else{
 			m_physics_engine->ShowDebugDraw(false);
-		}
+		}*/
 		
 		if (m_input_manager->IsButtonPressed(BTN_BACK)){
 			m_pause = true;

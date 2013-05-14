@@ -11,7 +11,6 @@ struct IEvent;
 class LevelManager;
 class GameObjectManager;
 class PhysicsEngine;
-class VariableManager;
 class PlayState : public State
 {
 public:
@@ -35,7 +34,6 @@ private:
 	bool						m_pause;
 	bool						m_running;
 	bool						m_change_level;
-	VariableManager*			m_variable_manager;
 };
 
 #endif // _PLAY_STATE_H_

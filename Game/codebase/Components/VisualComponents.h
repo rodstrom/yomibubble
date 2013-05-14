@@ -64,21 +64,25 @@ protected:
 
 class AnimationComponent : public MeshRenderComponent, public IComponentUpdateable{
 public:
-	AnimationComponent(void){ m_type = COMPONENT_ANIMATION; m_update = true; }
+	AnimationComponent(void) : m_callback(NULL), m_send_callback(false){ m_type = COMPONENT_ANIMATION; m_update = true; }
 	virtual ~AnimationComponent(void){}
 	virtual void Update(float dt);
 	virtual void Notify(int type, void* message);
-	virtual void Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager);
-	virtual void Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager, const Ogre::String& node_id);
+	virtual void Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager, bool remove_weights = false);
+	virtual void Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager, const Ogre::String& node_id, bool remove_weights = false);
 	virtual void AddAnimationStates(unsigned int value = 1);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
+	virtual void SertAnimationCallback(IFunctor* callback) { m_callback = callback; }
 
 	AnimationBlender* m_animation_blender;
 
 protected:
+	IFunctor* m_callback;		// called when animation has ended if requested
+	void FixPlayerWeights();	// Ugly hack for the player to fix animation weights because we didn't do enough research in the beginning
+	void RemoveWeights(std::vector<std::string>& list, Ogre::Animation* anim);
 	std::vector<Ogre::AnimationState*>	m_animation_states;
-	
+	bool m_send_callback;
 };
 
 class Overlay2DComponent : public Component, public IComponentObserver {

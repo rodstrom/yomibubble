@@ -13,6 +13,8 @@
 #include "..\Managers\SoundManager.h"
 #include "..\PhysicsPrereq.h"
 #include "..\MessageSystem.h"
+#include "VariableManager.h"
+#include "..\Managers\AnimationManager.h"
 
 GameObjectManager::GameObjectManager(void) : 
 	m_physics_engine(NULL), m_scene_manager(NULL), m_input_manager(NULL), m_viewport(NULL){}
@@ -129,7 +131,7 @@ GameObject* GameObjectManager::GetGameObject(const Ogre::String& id){
 GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void* data, const Ogre::String& id){
 	PlayerDef& def = *static_cast<PlayerDef*>(data);
 	CharacterControllerDef& char_def = *def.character_contr;
-	GameObject* go = new GameObject(GAME_OBJECT_PLAYER);
+	GameObject* go = new GameObject(GAME_OBJECT_PLAYER, "player");
 	NodeComponent* node_comp = new NodeComponent;
 	go->AddComponent(node_comp);
 	AnimationComponent* acomp = new AnimationComponent;
@@ -167,8 +169,8 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	node_comp->Init(position, m_scene_manager);
 	node_comp->SetId("player_node");
 
-	acomp->Init("Yomi.mesh", m_scene_manager, node_comp->GetId());
-	acomp->GetEntity()->setMaterialName("_YomiFBXASC039sFBXASC032staffMaterial__191");
+	acomp->Init("Yomi.mesh", m_scene_manager, node_comp->GetId(), true);
+	//acomp->GetEntity()->setMaterialName("_YomiFBXASC039sFBXASC032staffMaterial__191");
 
 	TriggerDef tdef;
 	tdef.body_type = STATIC_BODY;
@@ -181,7 +183,7 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	contr->HasFollowCam(true);
 	contr->SetId("body");
 	contr->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
-	pccomp->Init(m_input_manager, m_sound_manager);
+	pccomp->Init(m_input_manager, m_sound_manager, m_physics_engine);
 	sound2D->Init(m_sound_manager);
 	sound3D->Init(m_sound_manager);
 	music2D->Init(m_sound_manager);
@@ -226,7 +228,7 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 	go->AddUpdateable(bc);
 
 
-	bc->Init(m_physics_engine, 0.00001f, 0.00002f);
+	bc->Init(m_physics_engine, VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleImpulse"), VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleMaxVelocity"));
 	node_comp->Init(position, m_scene_manager);
 	mrc->Init("BlueBubble.mesh", m_scene_manager);
 	//Ogre::Vector3 scale(def.start_scale);
@@ -241,13 +243,12 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 	body_def.collision_filter.filter = COL_BUBBLE;
 	body_def.collision_filter.mask = COL_PLAYER | COL_TOTT | COL_BUBBLE | COL_WORLD_STATIC;
 	rc->Init(position,  mrc->GetEntity(), m_physics_engine, body_def);
-	rc->GetRigidbody()->setGravity(btVector3(0.0f, 0.0f, 0.0f));
+	rc->SetId("body");
 	rc->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
 	rc->GetRigidbody()->setGravity(btVector3(0.0f, 0.0f, 0.0f));
 	rc->GetRigidbody()->setActivationState(DISABLE_DEACTIVATION);
 	rc->GetRigidbody()->setDamping(0.5f, 0.2f);
 	cons->Init(m_physics_engine,rc->GetRigidbody(), def.connection_body, btVector3(0,0,0), btVector3(0,0,0));
-
 	return go;
 }
 
@@ -266,7 +267,7 @@ GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, v
 	go->AddComponent(bc);
 	go->AddUpdateable(bc);
 
-	bc->Init(m_physics_engine, 10.0f, 50.0f);
+	bc->Init(m_physics_engine, VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleImpulse"), VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleMaxVelocity"));
 	node_comp->Init(position, m_scene_manager);
 	mrc->Init("PinkBubble.mesh", m_scene_manager);
 	Ogre::Vector3 scale(def.start_scale);
@@ -284,6 +285,7 @@ GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, v
 	rc->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
 	rc->GetRigidbody()->setActivationState(DISABLE_DEACTIVATION);
 	rc->GetRigidbody()->setDamping(0.5f, 0.2f);
+	rc->SetId("body");
 	cons->Init(m_physics_engine,rc->GetRigidbody(), def.connection_body, btVector3(0,0,0), btVector3(0,0,0));
 	return go;
 }

@@ -99,9 +99,6 @@ int DBManager::Load() {
 
 				//make sure to check if interactive first and get nodeName etc.
 				//attributemap::iterator i = spawn.attributes.begin();	
-				VariableManager* variable_manager = new VariableManager;
-				variable_manager->Init();
-				variable_manager->LoadVariables();
 				for ( attributemap::iterator i = spawn.attributes.begin(); i != spawn.attributes.end(); i++ )
 				{
 					if (i->first == "interactive") {
@@ -109,18 +106,20 @@ int DBManager::Load() {
 							PlayerDef player_def;
 							CharacterControllerDef char_def;
 							char_def.friction = 1.0f;
-							char_def.velocity = variable_manager->GetValue("Player_Speed");
-							char_def.max_speed = variable_manager->GetValue("Player_Max_Speed");
-							char_def.deceleration = variable_manager->GetValue("Player_Deceleration");
-							char_def.jump_power = variable_manager->GetValue("Player_Jump_Power");
+							char_def.velocity = VariableManager::GetSingletonPtr()->GetAsFloat("Player_Speed");
+							char_def.max_speed = VariableManager::GetSingletonPtr()->GetAsFloat("Player_Max_Speed");
+							char_def.deceleration = VariableManager::GetSingletonPtr()->GetAsFloat("Player_Deceleration");
+							char_def.jump_power = VariableManager::GetSingletonPtr()->GetAsFloat("Player_Jump_Power");
 							char_def.restitution = 0.0f;
-							char_def.step_height = 0.35f;
-							char_def.turn_speed = 1000.0f;
-							char_def.max_jump_height = variable_manager->GetValue("Player_Max_Jump_Height");
+							char_def.step_height = 0.15f;
+							char_def.turn_speed = 800.0f;
+							char_def.max_jump_height = VariableManager::GetSingletonPtr()->GetAsFloat("Player_Max_Jump_Height");
 							char_def.offset.y = 0.5f;
 							char_def.radius = 0.3f;
 							char_def.height = 0.4f;
 							char_def.mass = 1.0f;
+							char_def.max_fall_speed = VariableManager::GetSingletonPtr()->GetAsFloat("Player_Max_Fall_Speed");
+							char_def.fall_acceleration = VariableManager::GetSingletonPtr()->GetAsFloat("Player_Fall_Acceleration");
 							char_def.collision_filter.filter = COL_PLAYER;
 							char_def.collision_filter.mask = COL_BUBBLE | COL_BUBBLE_TRIG | COL_TOTT | COL_WORLD_STATIC | COL_WORLD_TRIGGER;
 							player_def.character_contr = &char_def;
@@ -186,8 +185,6 @@ int DBManager::Load() {
 						followers[temp] = i->second;
 					}
 				}
-				delete variable_manager;
-				variable_manager = NULL;
 			}
 
 			if(!interactive) {

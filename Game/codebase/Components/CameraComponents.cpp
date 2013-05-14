@@ -113,8 +113,8 @@ void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewpo
 	m_getting_input = false;
 	m_player_direction = Ogre::Vector3::ZERO;
 	m_camera_goal->setPosition(0,0,12);
-	m_default_distance = 12.0;
-	m_default_pitch = -25.7;
+	m_default_distance = 12.0f;
+	m_default_pitch = -25.7f;
 	m_camera_pivot->pitch(Ogre::Degree(m_default_pitch), Ogre::Node::TS_LOCAL);
 }
 

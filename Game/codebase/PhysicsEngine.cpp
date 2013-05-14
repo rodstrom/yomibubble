@@ -23,26 +23,13 @@ PhysicsEngine::PhysicsEngine(void) :
 PhysicsEngine::~PhysicsEngine(void){}
 
 bool PhysicsEngine::Init(){
-	/*m_broadphase = new btDbvtBroadphase;
-	m_ghost_pair_callback = new btGhostPairCallback;
-	m_broadphase->getOverlappingPairCache()->setInternalGhostPairCallback(m_ghost_pair_callback);
-	m_collision_configuration = new btDefaultCollisionConfiguration;
-	m_collision_dispatcher = new btCollisionDispatcher(m_collision_configuration);
-	m_seq_impulse_con_solver = new btSequentialImpulseConstraintSolver;
-	m_dynamic_world = new btDiscreteDynamicsWorld(m_collision_dispatcher, m_broadphase, m_seq_impulse_con_solver, m_collision_configuration);
-	m_dynamic_world->setGravity(btVector3(0.0f, -10.0f, 0.0f));
-	m_dynamic_world->setInternalTickCallback(GameTickCallback, static_cast<void*>(this), true);
-	*/
 	m_broadphase = new btDbvtBroadphase;
-	//m_ghost_pair_callback = new btGhostPairCallback;
-	//m_broadphase->getOverlappingPairCache()->setInternalGhostPairCallback(m_ghost_pair_callback);
 	m_collision_configuration = new btDefaultCollisionConfiguration;
 	m_collision_dispatcher = new btCollisionDispatcher(m_collision_configuration);
 	m_seq_impulse_con_solver = new btSequentialImpulseConstraintSolver;
 	m_dynamic_world = new btDiscreteDynamicsWorld(m_collision_dispatcher, m_broadphase, m_seq_impulse_con_solver, m_collision_configuration);
 	m_dynamic_world->setGravity(btVector3(0.0f, -10.0f, 0.0f));
 	m_dynamic_world->setInternalTickCallback(GameTickCallback, static_cast<void*>(this), true);
-
 	return true;
 }
 

@@ -103,10 +103,13 @@ void AnimationComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_ANIMATION_BLEND, this);
 }
 
-void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager){
+void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager, bool remove_weights){
 	MeshRenderComponent::Init(filename, scene_manager);
 	
 	m_animation_blender = new AnimationBlender(GetEntity());
+	if (remove_weights){
+		FixPlayerWeights();
+	}
 	/*
 	m_animation_blender->init("Idle");
 	m_animation_blender->init("Run");
@@ -115,17 +118,101 @@ void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* 
 	*/
 }
 
-void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager, const Ogre::String& node_id){
+void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager, const Ogre::String& node_id, bool remove_weights){
 	MeshRenderComponent::Init(filename, scene_manager, node_id);
-	
+	m_entity->getSkeleton()->setBlendMode(ANIMBLEND_CUMULATIVE);
 	m_animation_blender = new AnimationBlender(GetEntity());
-	/*
-	m_animation_blender->init("Idle");
-	m_animation_blender->init("Run");
-	m_animation_blender->init("Walk");
-	m_animation_blender->init("Jump");
-	*/
-	
+	if (remove_weights){
+		FixPlayerWeights();
+	}
+}
+
+void AnimationComponent::FixPlayerWeights(){
+	std::vector<std::string> base_anims;
+	base_anims.push_back("CATRigLLegPlatform");
+	base_anims.push_back("CATRigLLegAnkle");
+	base_anims.push_back("CATRigLLeg2");
+	base_anims.push_back("CATRigLLeg1");
+	base_anims.push_back("Yomi_Pelvis");
+	base_anims.push_back("CATRigRLeg1");
+	base_anims.push_back("CATRigRLeg2");
+	base_anims.push_back("CATRigRLegAnkle");
+	base_anims.push_back("CATRigAnkleBone001");
+	base_anims.push_back("CATRigRLegPlatform");
+	base_anims.push_back("CATRigTail1");
+	base_anims.push_back("CATRigTail2");
+	base_anims.push_back("CATRigTail3");
+	base_anims.push_back("CATRigTail4");
+	base_anims.push_back("CATRigTail5");
+	std::vector<std::string> top_anims;
+	top_anims.push_back("CATRigSpine1");
+	top_anims.push_back("CATRigSpine2");
+	top_anims.push_back("CATRigSpine3");
+	top_anims.push_back("Yomi_Torso");
+	top_anims.push_back("CATRigLArmCollarbone");
+	top_anims.push_back("CATRigLArm1");
+	top_anims.push_back("CATRigLArm21");
+	top_anims.push_back("CATRigLArm22");
+	top_anims.push_back("CATRigLArmPalm");
+	top_anims.push_back("CATRigLArmDigit21");
+	top_anims.push_back("CATRigLArmDigit22");
+	top_anims.push_back("CATRigLArmDigit11");
+	top_anims.push_back("CATRigRArmCollarbone");
+	top_anims.push_back("CATRigRArm1");
+	top_anims.push_back("CATRigRArm21");
+	top_anims.push_back("CATRigRArm22");
+	top_anims.push_back("CATRigRArmPalm");
+	top_anims.push_back("CATRigRArmDigit21");
+	top_anims.push_back("CATRigRArmDigit22");
+	top_anims.push_back("CATRigRArmDigit11");
+	top_anims.push_back("CATRigRightHair1");
+	top_anims.push_back("CATRigRightHair2");
+	top_anims.push_back("CATRigRightHair3");
+	top_anims.push_back("CATRigLeftHair1");
+	top_anims.push_back("CATRigLeftHair2");
+	top_anims.push_back("CATRigLeftHair3");
+	top_anims.push_back("CATRigBackHair1");
+	top_anims.push_back("CATRigBackHair2");
+	top_anims.push_back("CATRigBackHair3");
+	top_anims.push_back("Yomi_Head");
+
+	Ogre::String line = Ogre::StringUtil::BLANK;
+	Ogre::String anim_id = Ogre::StringUtil::BLANK;
+	Ogre::String base = "Base";
+	Ogre::String blow = "Blow";
+	Ogre::String top = "Top";
+
+	for (int i = 0; i < m_entity->getSkeleton()->getNumAnimations(); i++){
+		Ogre::Animation* anim = m_entity->getSkeleton()->getAnimation(i);
+		anim_id = anim->getName();
+		size_t find = anim_id.find(base);
+		if (find  != std::string::npos){
+			RemoveWeights(top_anims, anim);
+			continue;
+		}
+		find = anim_id.find(blow);
+		if (find != std::string::npos){
+			RemoveWeights(top_anims, anim);
+			continue;
+		}
+		find = anim_id.find(top);
+		if (find != std::string::npos){
+			RemoveWeights(base_anims, anim);
+			continue;
+		}
+	}
+}
+
+void AnimationComponent::RemoveWeights(std::vector<std::string>& list, Ogre::Animation* anim){
+	Ogre::Skeleton::BoneIterator bone_it = m_entity->getSkeleton()->getBoneIterator();
+	while (bone_it.hasMoreElements()){
+		Ogre::Bone* bone = bone_it.getNext();
+		Ogre::String bone_id = bone->getName();
+		std::vector<std::string>::iterator it = std::find(list.begin(), list.end(), bone_id);
+		if (it != list.end()){
+			anim->destroyNodeTrack(bone->getHandle());
+		}
+	}
 }
 
 void AnimationComponent::AddAnimationStates(unsigned int value){
@@ -140,6 +227,11 @@ void AnimationComponent::Update(float dt){
 		if (m_animation_states[i] != NULL){
 			if (m_animation_states[i]->getEnabled()){
 				m_animation_states[i]->addTime(dt);
+				if (!m_animation_states[i]->getLoop() && m_animation_states[i]->hasEnded()){
+					if (m_send_callback && m_callback != NULL){
+						m_callback->Call(NULL);
+					}
+				}
 			}
 		}
 	}
@@ -148,47 +240,37 @@ void AnimationComponent::Update(float dt){
 
 void AnimationComponent::Notify(int type, void* msg){
 	MeshRenderComponent::Notify(type, msg);
-	AnimationMsg* anim_msg = static_cast<AnimationMsg*>(msg);
-
 	switch (type){
 	case MSG_ANIMATION_PLAY:
 		{
-			if (anim_msg->blend){
-				m_animation_states[0] = m_entity->getAnimationState(anim_msg->bottom_anim);
-				if (m_animation_states[0] != NULL){
-					m_animation_states[0]->setEnabled(true);
-					m_animation_states[0]->setLoop(true);
-				}
-
-				m_animation_states[1] = m_entity->getAnimationState(anim_msg->top_anim);
-				if (m_animation_states[1] != NULL){
-					m_animation_states[1]->setEnabled(true);
-					m_animation_states[1]->setLoop(true);
+			AnimationMsg& anim_msg = *static_cast<AnimationMsg*>(msg);
+			if (m_animation_states[anim_msg.index] != NULL){
+				if (m_animation_states[anim_msg.index]->getAnimationName() != anim_msg.id){
+					m_animation_states[anim_msg.index]->setEnabled(false);
+					m_animation_states[anim_msg.index] = m_entity->getAnimationState(anim_msg.id);
+					m_animation_states[anim_msg.index]->setEnabled(true);
+					m_animation_states[anim_msg.index]->setLoop(anim_msg.loop);
+					m_animation_states[anim_msg.index]->setTimePosition(0);
+					if (anim_msg.send_callback){
+						m_send_callback = true;
+					}
 				}
 			}
-			else{
-				m_animation_states[0] = m_entity->getAnimationState(anim_msg->id);
-				if (m_animation_states[0] != NULL){
-					m_animation_states[0]->setEnabled(true);
-					m_animation_states[0]->setLoop(true);
-					//m_animation_blender->init("Walk");
-					//m_animation_blender->blend("Idle", AnimationBlender::BlendWhileAnimating, 0.2, true);
+			else {
+				m_animation_states[anim_msg.index] = m_entity->getAnimationState(anim_msg.id);
+				m_animation_states[anim_msg.index]->setEnabled(true);
+				m_animation_states[anim_msg.index]->setLoop(anim_msg.loop);
+				if (anim_msg.send_callback){
+					m_send_callback = true;
 				}
 			}
 		}
 		break;
 	case MSG_ANIMATION_PAUSE:
 		{
-			if (m_animation_states[0] != NULL){
-					m_animation_states[0]->setEnabled(false);
-					m_animation_states[0]->setLoop(false);
-				}
-
-			if (anim_msg->blend){
-				if (m_animation_states[1] != NULL){
-					m_animation_states[1]->setEnabled(false);
-					m_animation_states[1]->setLoop(false);
-				}
+			int index = *static_cast<int*>(msg);
+			if (m_animation_states[index] != NULL){
+				m_animation_states[index]->setEnabled(false);
 			}
 		}
 		break;
@@ -198,6 +280,10 @@ void AnimationComponent::Notify(int type, void* msg){
 }
 
 void AnimationComponent::Shut(){
+	if (m_callback){
+		delete m_callback;
+		m_callback = NULL;
+	}
 	if (!m_animation_states.empty()){
 		for (unsigned int i = 0; i < m_animation_states.size(); i++){
 			if (m_animation_states[i] != NULL){
