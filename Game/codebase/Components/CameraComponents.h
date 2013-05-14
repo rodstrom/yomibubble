@@ -75,6 +75,12 @@ protected:
 	PhysicsEngine*		m_physics_engine;
 	float				m_movement_speed;
 	InputSystem*		m_input_system;
+
+	bool				m_env_coll_left;
+	bool				m_env_coll_right;
+	bool				m_env_coll_up;
+	bool				m_env_coll_down;
+
 //	TriggerComponent*	m_trigger;
 };
 

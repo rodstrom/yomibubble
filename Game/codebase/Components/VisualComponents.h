@@ -140,12 +140,12 @@ protected:
 
 class CountableResourceGUI : public Component, public IComponentObserver{
 public:
-	CountableResourceGUI(void){}
+	CountableResourceGUI(void) : m_total_number(0), m_current_number(0){}
 	virtual ~CountableResourceGUI(void){}
 	virtual void Notify(int type, void*message);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
-	void Init(const Ogre::String& material_name_inactive, const Ogre::String& material_name_active, int total_number);
+	void Init(const Ogre::String& level_id);
 
 protected:
 	int						m_total_number;
@@ -154,6 +154,7 @@ protected:
 	Ogre::String			m_material_name_active;
 	Ogre::String			m_material_name_inactive;
 	
+	Ogre::Overlay*			m_overlay;
 	std::vector<Ogre::OverlayContainer*> m_elements;
 };
 

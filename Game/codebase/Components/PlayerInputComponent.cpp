@@ -40,11 +40,21 @@ void PlayerInputComponent::Shut(){
 	m_messenger->Unregister(MSG_PLAYER_INPUT_STATE_GET, this);
 }
 
-void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound_manager){
+void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound_manager, int current_level){
 	m_input_manager = input_manager;
+	m_current_level = current_level;
+
+	if (m_current_level == 0){
+		m_def_music= sound_manager->Create2DData("Menu_Theme", false, false, false, false, 1.0f, 1.0f);
+	}
+	else if (m_current_level == 1){
+		m_def_music= sound_manager->Create2DData("Main_Theme", false, false, false, false, 1.0f, 1.0f);
+	}
+	else if (m_current_level == 2){
+		m_def_music= sound_manager->Create2DData("Main_Theme", false, false, false, false, 1.0f, 1.0f);
+	}
 
 	m_walk_sound = sound_manager->Create2DData("Yomi_Walk", false, false, false, false, 1.0f, 1.0f);
-	m_def_music= sound_manager->Create2DData("Menu_Theme", false, false, false, false, 1.0f, 1.0f);
 	m_test_sfx = sound_manager->Create2DData("Dun_Dun", true, false, false, false, 1.0f, 1.0f);
 	m_3D_music_data = sound_manager->Create3DData("Main_Theme", "", false, false, false, 1.0f, 1.0f);
 	m_leaf_sfx = sound_manager->Create2DData("Take_Leaf", false, false, false, false, 1.0f, 1.0f);
@@ -58,6 +68,8 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 	m_states[PLAYER_STATE_ON_BUBBLE] =		&PlayerInputComponent::OnBubble;
 	m_states[PLAYER_STATE_INSIDE_BUBBLE] =	&PlayerInputComponent::InsideBubble;
 	m_states[PLAYER_STATE_BOUNCING] =		&PlayerInputComponent::Bouncing;
+
+	
 
 	//m_min_bubble_size = 0.805f;
 	//m_max_bubble_size = 1.907f;
@@ -98,9 +110,9 @@ void PlayerInputComponent::Normal(float dt){
 		
 		//m_anim_msg.bottom_anim="BASE_Run";
 		//m_anim_msg.top_anim="TOP_Run";
-		m_anim_msg.id="Run";
+		m_anim_msg.id="Jump_Loop";
 		m_anim_msg.blend = false;
-		m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
+		//m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
 
 		//std::cout << "Yomi pos: " << dynamic_cast<NodeComponent*>(m_owner->GetComponent(COMPONENT_NODE))->GetSceneNode()->getPosition() << std::endl;
 		
@@ -118,9 +130,10 @@ void PlayerInputComponent::Normal(float dt){
 		
 		//m_anim_msg.bottom_anim="BASE_Idle";
 		//m_anim_msg.top_anim="TOP_Idle";
+		
 		m_anim_msg.id="Idle";
 		m_anim_msg.blend = false;
-		m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
+		//m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
 		
 	//   m_animation_blender->blend("Run", AnimationBlender::BlendWhileAnimating, 0.2, false );
 		
@@ -275,7 +288,7 @@ void PlayerInputComponent::OnBubble(float dt){
 		return;
 	}
 
-	float speed = 80.0f * dt;
+	float speed = 50.0f * dt;
 	bool follow_cam = false;
 	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_GET, &follow_cam);
 	if (follow_cam){
@@ -319,7 +332,7 @@ void PlayerInputComponent::InsideBubble(float dt){
 		return;
 	}
 
-	float speed = 80.0f * dt;
+	float speed = 50.0f * dt;
 	bool follow_cam = false;
 	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_GET, &follow_cam);
 	if (follow_cam){

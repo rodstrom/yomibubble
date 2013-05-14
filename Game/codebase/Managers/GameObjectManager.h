@@ -62,6 +62,8 @@ private:
 	MessageSystem*			m_message_system;
 	Ogre::SceneNode*		m_node;
 	VariableManager*		m_variable_manager;
+
+	int m_leaf_iterations;
 };
 
 #endif // _N_GAME_OBJECT_MANAGER_H_

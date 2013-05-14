@@ -15,7 +15,7 @@ public:
 	virtual void Update(float dt);
 	virtual void Notify(int type, void* message);
 	virtual void Shut();
-	virtual void Init(InputManager* input_manager, SoundManager* sound_manager);
+	virtual void Init(InputManager* input_manager, SoundManager* sound_manager, int current_level);
 	virtual void SetMessenger(ComponentMessenger* messenger);
 	int GetPlayerState() { return m_player_state; }
 	void SetVelocity(float value) { m_velocity = value; }
@@ -73,6 +73,8 @@ protected:
 	float m_acc_z;
 	float m_max_velocity;
 
+	int m_current_level;
+
 	CameraDataDef m_camera_data_def;
 };
 
@@ -100,6 +102,7 @@ protected:
 	float m_velocity;
 	float m_max_velocity;
 	bool m_can_be_attached;
+	
 };
 
 #endif // _N_PLAYER_CONTROLLER_H_

@@ -9,6 +9,7 @@
 #include <memory>
 #include "..\Components\CameraComponents.h"
 #include "OgreAxisAlignedBox.h"
+#include "..\MessageSystem.h"
 
 CollisionManager* CollisionManager::m_instance = NULL;
 
@@ -47,6 +48,8 @@ void CollisionManager::Init(){
 	m_collision[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_LEAF)] = &CollisionManager::PlayerLeaf;
 	m_collision[MakeIntPair(GAME_OBJECT_CAMERA, GAME_OBJECT_TERRAIN)] = &CollisionManager::CameraTerrain;
 	m_collision[MakeIntPair(GAME_OBJECT_TERRAIN, GAME_OBJECT_CAMERA)] = &CollisionManager::TerrainCamera;
+	m_collision[MakeIntPair(GAME_OBJECT_GATE, GAME_OBJECT_PLAYER)] = &CollisionManager::GatePlayer;
+	m_collision[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_GATE)] = &CollisionManager::PlayerGate;
 
 	m_raycast_map[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_BLUE_BUBBLE)] = &CollisionManager::PlayerBlueBubble;
 	m_raycast_map[MakeIntPair(GAME_OBJECT_BLUE_BUBBLE, GAME_OBJECT_PLAYER)] = &CollisionManager::BlueBubblePlayer;
@@ -176,7 +179,6 @@ void CollisionManager::PlayerTrigger(GameObject* player, GameObject* trigger){
 }
 
 void CollisionManager::PlayerTerrain(GameObject* player, GameObject* terrain){
-	
 	bool on_ground = true;
 	int current_state = PLAYER_STATE_INSIDE_BUBBLE;
 	player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_STATE_GET, &current_state);
@@ -193,3 +195,9 @@ void CollisionManager::CameraTerrain(GameObject* camera, GameObject* terrain){
 	//send info to component (invert camera target?)
 	std::cout << "Camera Terrain collision!\n";
 };
+
+void CollisionManager::GatePlayer(GameObject* gate, GameObject* player){
+	IEvent evt;
+	evt.m_type = EVT_CHANGE_LEVEL;
+	m_message_system->Notify(&evt);
+}

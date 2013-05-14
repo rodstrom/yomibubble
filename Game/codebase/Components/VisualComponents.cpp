@@ -440,25 +440,27 @@ void CountableResourceGUI::Notify(int type, void* message){
 	{
 		if (m_current_number < m_total_number)
 		{
-			m_current_number++;
-			
-			for(int i = 0; i < m_current_number; i++)
-			{
-				m_elements[i]->setMaterialName(m_material_name_active);
+			Ogre::Overlay::Overlay2DElementsIterator it = m_overlay->get2DElementsIterator();
+			int i = 0;
+			while (i < m_current_number){
+				it.moveNext();
+				i++;
 			}
+			Ogre::OverlayContainer* container = it.peekNext();
+			if (i == 0){ 
+				container->setMaterialName("HUD/Leaf/FilledFront"); }
+			else if (i == m_total_number-1){
+			container->setMaterialName("HUD/Leaf/FilledEnd"); }
+			else{
+			container->setMaterialName("HUD/Leaf/FilledMiddle"); }
+			m_current_number++;
 		}
 	}
 };
 
 void CountableResourceGUI::Shut(){
 	m_messenger->Unregister(MSG_LEAF_PICKUP, this);
-	for (unsigned int i = 0; i < m_elements.size(); i++)
-	{
-		//delete m_elements.end();
-		m_elements[i]->hide();
-		m_elements[i]=NULL;
-		//delete m_elements[i];
-	}
+	m_overlay->hide();
 };
 
 void CountableResourceGUI::SetMessenger(ComponentMessenger* messenger){
@@ -466,61 +468,22 @@ void CountableResourceGUI::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_LEAF_PICKUP, this);
 };
 
-void CountableResourceGUI::Init(const Ogre::String& material_name_inactive, const Ogre::String& material_name_active, int total_number){
-	m_total_number = total_number;
-	m_current_number = 0;
-	m_material_name_active = material_name_active;
-	m_material_name_inactive = material_name_inactive;
-
-	Ogre::OverlayManager& overlayManager = Ogre::OverlayManager::getSingleton();
-	Ogre::Overlay* overlay = overlayManager.create( "OverlayName" );
-
-	Ogre::Vector2 temppos(0.0f, 0.0f);
-
-	if (total_number < 6)
-	{ temppos.x = 0.0 + (((6-total_number)/2) * 0.15); }
-
-	float rows = total_number / 6;
-
-	int counter = 0;
-
-	for (int i = 0; i < total_number; i++)
-	{
-		if (counter == 6)
-		{
-			counter = 0;
-			temppos.x = 15.0f;
-			temppos.y += 0.2f;
-
-			if (total_number - i < 6)
-			{ temppos.x = 0.0 + (((6-(total_number-i))/2) * 0.15); }
-		}
-		std::ostringstream stream;
-		stream << "Panel" << i;
-		Ogre::String panel_name = stream.str();
-
-		m_elements.push_back(static_cast<Ogre::OverlayContainer*>( overlayManager.createOverlayElement( "Panel", panel_name ) ));
-		m_elements[i]->setPosition( temppos.x, temppos.y );
-		m_elements[i]->setDimensions( 0.15f, 0.15f );
-		m_elements[i]->setMaterialName(m_material_name_inactive);
-		overlay->add2D(m_elements[i]);
-		counter++;
-		temppos.x += 0.15f;
-	};
-
-    overlay->show();
-};
+void CountableResourceGUI::Init(const Ogre::String& level_id){
+	m_overlay = Ogre::OverlayManager::getSingleton().getByName(level_id);
+	Ogre::Overlay::Overlay2DElementsIterator it = m_overlay->get2DElementsIterator();
+	while (it.hasMoreElements()){
+		m_total_number++;		// Search the overlay for X amount of containers so we know how many leaves the level has.
+		it.moveNext();
+	}
+	m_overlay->show();
+}
 
 void TerrainComponent::Notify(int type, void* message){
 
 }
 
 void TerrainComponent::Shut(){
-	if (m_artifex_loader){
-		m_artifex_loader->unloadZone();
-		delete m_artifex_loader;
-		m_artifex_loader = NULL;
-	}
+
 	if (m_terrain_body){
 		m_physics_engine->GetDynamicWorld()->removeRigidBody(m_terrain_body);
 		delete m_terrain_body;
@@ -537,6 +500,11 @@ void TerrainComponent::Shut(){
 	if (m_data_converter){
 		delete[] m_data_converter;
 		m_data_converter = NULL;
+	}
+	if (m_artifex_loader){
+		m_artifex_loader->unloadZone();
+		delete m_artifex_loader;
+		m_artifex_loader = NULL;
 	}
 }
 
@@ -598,7 +566,7 @@ void TerrainComponent::Init(Ogre::SceneManager* scene_manager, PhysicsEngine* ph
 	int filter = COL_WORLD_STATIC;
 	int mask = COL_PLAYER | COL_TOTT | COL_BUBBLE | COL_CAMERA;
 	m_physics_engine->GetDynamicWorld()->addRigidBody(m_terrain_body, filter, mask);
-	m_collision_def.flag = COLLISION_FLAG_GAME_OBJECT;
+	m_collision_def.flag = COLLISION_FLAG_STATIC;
 	m_collision_def.data = m_owner;
 	m_terrain_body->setUserPointer(&m_collision_def);
 }

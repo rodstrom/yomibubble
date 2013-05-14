@@ -15,6 +15,8 @@
 #include "..\MessageSystem.h"
 #include "VariableManager.h"
 
+#include <sstream>
+
 GameObjectManager::GameObjectManager(void) : 
 	m_physics_engine(NULL), m_scene_manager(NULL), m_input_manager(NULL), m_viewport(NULL){}
 GameObjectManager::~GameObjectManager(void){}
@@ -41,6 +43,8 @@ void GameObjectManager::Init(PhysicsEngine* physics_engine, Ogre::SceneManager* 
 	m_create_fptr[GAME_OBJECT_TERRAIN]	   =	&GameObjectManager::CreateTerrain;
 	m_create_fptr[GAME_OBJECT_GATE]		   =	&GameObjectManager::CreateGate;
 	m_create_fptr[GAME_OBJECT_CAMERA]	   =	&GameObjectManager::CreatePlayerCamera;
+
+	m_leaf_iterations = 0;
 }
 
 void GameObjectManager::Update(float dt){
@@ -129,22 +133,9 @@ GameObject* GameObjectManager::GetGameObject(const Ogre::String& id){
  return NULL;
 }
 
-/*
-GameObject* GameObjectManager::GetGameObject(const Ogre::String& id){
-	GameObject* go = NULL;
-	std::list<GameObject*>::iterator it;
-	for (it = m_game_objects.begin(); it != m_game_objects.end(); it++){
-		go = *it;
-		if (go->GetId() == id){
-			return go;
-		}
-	}
-	return NULL;
-}
-*/
-
 GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void* data, const Ogre::String& id){
-	CharacterControllerDef& def = *static_cast<CharacterControllerDef*>(data);
+	PlayerDef& def = *static_cast<PlayerDef*>(data);
+	CharacterControllerDef& char_def = *def.character_contr;
 	GameObject* go = new GameObject(GAME_OBJECT_PLAYER);
 	NodeComponent* node_comp = new NodeComponent;
 	go->AddComponent(node_comp);
@@ -192,7 +183,7 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	node_comp->SetId("player_node");
 
 	acomp->Init("Yomi.mesh", m_scene_manager, node_comp->GetId());
-	acomp->GetEntity()->setMaterialName("_YomiFBXASC039sFBXASC032staffMaterial__191");
+	//acomp->GetEntity()->setMaterialName("_YomiFBXASC039sFBXASC032staffMaterial__191");
 
 	TriggerDef tdef;
 	tdef.body_type = STATIC_BODY;
@@ -201,18 +192,19 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 
 	tc->Init(position, m_physics_engine, tdef);
 	tc->SetId("btrig");
-	contr->Init(position, m_physics_engine, def);
+	contr->Init(position, m_physics_engine, char_def);
 	contr->HasFollowCam(true);
 	contr->SetId("body");
 	contr->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
-	pccomp->Init(m_input_manager, m_sound_manager);
+	pccomp->Init(m_input_manager, m_sound_manager, m_variable_manager->GetValue("Level_Choice"));
 	pccomp->SetCustomVariables(m_variable_manager->GetValue("Min_Bubble_Size"), m_variable_manager->GetValue("Max_Bubble_Size")); 
 	sound2D->Init(m_sound_manager);
 	sound3D->Init(m_sound_manager);
 	music2D->Init(m_sound_manager);
 	music3D->Init(m_sound_manager);
-	gui->Init("Examples/Empty", "Examples/Filled", 6);
-	csnc->Init(Ogre::Vector3(0.0f, def.offset.y, 1.0f), "CreateBubble", node_comp->GetSceneNode());
+	//gui->Init("Examples/Empty", "Examples/Filled", 6);
+	gui->Init(def.level_id);
+	csnc->Init(Ogre::Vector3(0.0f, char_def.offset.y, 1.0f), "CreateBubble", node_comp->GetSceneNode());
 	m_sound_manager->GetYomiNode(node_comp->GetSceneNode()->getName());
 	prcc->Init(m_physics_engine);
 	prcc->SetCustomVariables(m_variable_manager->GetValue("Bounce_Jump_Mod"));
@@ -234,6 +226,9 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	trdef.collision_filter.mask = COL_WORLD_STATIC;
 	camera_tc->Init(position, m_physics_engine, trdef);
 
+	fcc->Init(m_scene_manager, m_viewport, true);
+	fcc->SetTrigger(camera_tc);
+	fcc->SetMovementSpeed(def.camera_speed);
 	//camera_rb->Init(
 
 
@@ -457,7 +452,7 @@ GameObject* GameObjectManager::CreateGUI(const Ogre::Vector3& position, void* da
 	CountableResourceGUI* gui = new CountableResourceGUI;
 	go->AddComponent(gui);
 
-	gui->Init(guiDef.tex_inact, guiDef.tex_act, guiDef.num_elems);
+	//gui->Init(guiDef.tex_inact, guiDef.tex_act, guiDef.num_elems);
 	
 	return go;
 };
@@ -465,8 +460,8 @@ GameObject* GameObjectManager::CreateGUI(const Ogre::Vector3& position, void* da
 GameObject* GameObjectManager::CreateLeaf(const Ogre::Vector3& position, void* data, const Ogre::String& id){
 	ParticleDef& particleDef = *static_cast<ParticleDef*>(data);
 	GameObject* go = new GameObject(GAME_OBJECT_LEAF);
-	//ParticleComponent* particle = new ParticleComponent;
-	//go->AddComponent(particle);
+	ParticleComponent* particle = new ParticleComponent;
+	go->AddComponent(particle);
 	NodeComponent* node_comp = new NodeComponent;
 	go->AddComponent(node_comp);
 	MeshRenderComponent* mrc = new MeshRenderComponent;
@@ -486,8 +481,14 @@ GameObject* GameObjectManager::CreateLeaf(const Ogre::Vector3& position, void* d
 
 	mrc->GetEntity()->setMaterialName("CollectibleLeaf");
 	node_comp->GetSceneNode()->setPosition(Ogre::Vector3(position));
-	//particle->Init(m_scene_manager, "bajs", particleDef.particle_name);
-	//particle->CreateParticle(node_comp->GetSceneNode(), node_comp->GetSceneNode()->getPosition(), Ogre::Vector3(0,-3,0));
+
+	std::ostringstream stream;
+	stream << "Leaf_" << m_leaf_iterations;
+	m_leaf_iterations++;
+	Ogre::String leaf_id = stream.str();
+
+	particle->Init(m_scene_manager, leaf_id, particleDef.particle_name);
+	particle->CreateParticle(node_comp->GetSceneNode(), node_comp->GetSceneNode()->getPosition(), Ogre::Vector3(0,-1.8,0));
 
 	TriggerDef trdef;
 	trdef.body_type = STATIC_BODY;
@@ -554,8 +555,6 @@ GameObject* GameObjectManager::CreateGate(const Ogre::Vector3& position, void* d
 
 	nc->Init(position, m_scene_manager);
 	mrc->Init("Gate.mesh", m_scene_manager);
-	Ogre::Vector3 scale(0.02f);
-	nc->GetSceneNode()->setScale(scale);
 	
 	rc->Init(position, mrc->GetEntity(), m_physics_engine, def);
 	return go;

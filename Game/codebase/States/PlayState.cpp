@@ -8,11 +8,13 @@
 #include "..\Managers\LevelManager.h"
 #include <sstream>
 #include "..\Managers\VariableManager.h"
+#include "..\MessageSystem.h"
 
-PlayState::PlayState(void) : m_physics_engine(NULL), m_game_object_manager(NULL), m_level_manager(NULL), m_pause(false), m_running(true){}
+PlayState::PlayState(void) : m_physics_engine(NULL), m_game_object_manager(NULL), m_level_manager(NULL), m_pause(false), m_running(true), m_change_level(false){}
 PlayState::~PlayState(void){}
 
 void PlayState::Enter(){
+	m_message_system->Register(EVT_CHANGE_LEVEL, this, &PlayState::ChangeLevel);
 	m_scene_manager = Ogre::Root::getSingleton().createSceneManager("OctreeSceneManager");
 	//m_sound_manager->Init(m_scene_manager);
 	//m_scene_manager->setDisplaySceneNodes(true);
@@ -52,7 +54,7 @@ void PlayState::SecondLoading(){
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(170, 85, 173), &plane_def);*/
 	//m_game_object_manager->CreateGameObject(GAME_OBJECT_GATE, Ogre::Vector3(170, 75, 173), NULL);
 	
-	m_level_manager = new LevelManager(m_game_object_manager, m_scene_manager, m_message_system);
+	m_level_manager = new LevelManager(m_game_object_manager, m_scene_manager);
 
 	m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
 	m_scene_manager->setShadowUseInfiniteFarPlane(false);
@@ -61,7 +63,7 @@ void PlayState::SecondLoading(){
 	m_scene_manager->setShadowTextureSize(1024);
 	m_scene_manager->setShadowColour(Ogre::ColourValue(0.6f,0.6f,0.6f,1.0f));
 	m_scene_manager->setShadowFarDistance(25.0f);
-	/*
+	
 	LevelDef level1;
 	level1.filepath = "try";
 	level1.next_level = "Dayarea";
@@ -89,6 +91,7 @@ void PlayState::SecondLoading(){
 	tott_def.turn_speed = 1000.0f;
 	tott_def.max_jump_height = 10.0f;
 	*/
+	/*
 	Ogre::String terrain = "Dayarea";
 	
 	float terrain_choice = m_variable_manager->GetValue("Level_Choice");
@@ -150,7 +153,7 @@ void PlayState::SecondLoading(){
 	plane_def.collision_filter.mask = COL_BUBBLE | COL_PLAYER | COL_TOTT;
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(player_pos.x,player_pos.y + 8.0f,player_pos.z), &plane_def);
 	//*/
-	
+	/*
 	m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
 	m_scene_manager->setShadowUseInfiniteFarPlane(false);
 	m_scene_manager->setShadowTextureSelfShadow(true);
@@ -187,6 +190,7 @@ void PlayState::SecondLoading(){
 }
 
 void PlayState::Exit(){
+	m_message_system->Unregister(EVT_CHANGE_LEVEL, this);
 	delete m_level_manager;
 	m_level_manager = NULL;
 	m_game_object_manager->Shut();
@@ -205,7 +209,10 @@ void PlayState::Exit(){
 }
 
 bool PlayState::Update(float dt){
-
+	if (m_change_level){
+		m_level_manager->ChangeLevel();
+		m_change_level = false;
+	}
 	m_game_object_manager->Update(dt);
 
 	//if(m_pause){
@@ -234,4 +241,8 @@ bool PlayState::Update(float dt){
 		}
 	//}
 	return m_running;
+}
+
+void PlayState::ChangeLevel(IEvent*) {
+	m_change_level = true;
 }
