@@ -22,6 +22,7 @@ enum EComponentType{
 	COMPONENT_TRIGGER,
 	COMPONENT_SYNCED_TRIGGER,
 	COMPONENT_RAYCAST,
+	COMPONENT_PLAYER_STAFF,
 	COMPONENT_SIZE
 };
 
@@ -40,6 +41,12 @@ enum EComponentMsg{
 	MSG_ANIMATION_PLAY,
 	MSG_ANIMATION_PAUSE,
 	MSG_ANIMATION_BLEND,
+	MSG_ANIMATION_LOOP,
+	MSG_ANIMATION_QUEUE,
+	MSG_ANIMATION_CLEAR_QUEUE,
+	MSG_ANIMATION_CLEAR_CALLBACK,
+	MSG_ANIMATION_CALLBACK,
+	MSG_ANIMATION_SET_WAIT,
 	MSG_CHARACTER_CONTROLLER_VELOCITY_SET,
 	MSG_CHARACTER_CONTROLLER_TURN_SPEED_SET,
 	MSG_CHARACTER_CONTROLLER_SET_DIRECTION,
@@ -106,12 +113,15 @@ enum EBodyType{
 };
 
 enum EPlayerState{
-	PLAYER_STATE_NORMAL = 0,
+	PLAYER_STATE_IDLE = 0,
+	PLAYER_STATE_MOVE,
+	PLAYER_STATE_BLOW_BUBBLE,
 	PLAYER_STATE_ON_BUBBLE,
 	PLAYER_STATE_INSIDE_BUBBLE,
-	PLAYER_STATE_BOUNCING,
-	PLAYER_STATE_ONTO_BUBBLE_TRANSITION,
-	PLAYER_STATE_INTO_BUBBLE_TRANSITION,
+	PLAYER_STATE_JUMP,
+	PLAYER_STATE_FALLING,
+	PLAYER_STATE_LAND,
+	PLAYER_STATE_BOUNCE,
 	PLAYER_STATE_SIZE
 };
 
@@ -128,6 +138,7 @@ public:
 	virtual void SetMessenger(ComponentMessenger* messenger) = 0;
 	virtual void Shut() = 0;
 	virtual bool DoUpdate() const { return m_update; }
+	ComponentMessenger* GetMessenger() const { return m_messenger; }
 protected:
 	ComponentMessenger* m_messenger;
 	GameObject* m_owner;
@@ -169,18 +180,26 @@ public:
 };
 
 struct AnimationMsg{
-	AnimationMsg(void) : index(0), loop(true), send_callback(false), next_anim(NULL){}
+	AnimationMsg(void) : index(0), loop(true), full_body(false), blend(false), wait(false){}
 	int index;
 	bool blend;
 	bool loop;
-	bool send_callback;
+	bool full_body;
+	bool wait;
 	Ogre::String id;
-	AnimationMsg* next_anim;
 };
 
 struct AddForceMsg{
 	Ogre::Vector3 pwr;
 	Ogre::Vector3 dir;
+};
+
+struct AnimationData{
+	AnimationData(void) : anim_state(NULL), id(Ogre::StringUtil::BLANK), wait(false){}
+	AnimationData(Ogre::AnimationState* p_anim_state, const Ogre::String& p_id, bool p_wait) : anim_state(p_anim_state), id(p_id), wait(p_wait) {}
+	Ogre::AnimationState* anim_state;
+	Ogre::String id;
+	bool wait;
 };
 
 struct ButtonDef{

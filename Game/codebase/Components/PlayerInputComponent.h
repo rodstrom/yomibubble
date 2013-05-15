@@ -5,13 +5,14 @@
 #include "GameObjectPrereq.h"
 #include "..\Managers\SoundManager.h"
 
+class PlayerStateManager;
 class AnimationManager;
 class PhysicsEngine;
 class InputManager;
 class PlayerInputComponent : public Component, public IComponentUpdateable, public IComponentObserver, public IComponentSimulationStep{
 public:
 	PlayerInputComponent(void) : m_input_manager(NULL), m_current_bubble(NULL), m_is_creating_bubble(false), m_bubble_type(0), m_bubble_create_position(Ogre::Vector3::ZERO),
-		m_max_scale(2.0f), m_current_scale(0.0f), m_player_state(0), m_physics_engine(NULL), m_animation_manager(NULL)
+		m_max_scale(2.0f), m_current_scale(0.0f), m_player_state(0), m_physics_engine(NULL), m_animation_manager(NULL), m_direction(Ogre::Vector3::ZERO)
 	{ m_type = COMPONENT_PLAYER_INPUT; m_update = true; }
 	virtual ~PlayerInputComponent(void){}
 	virtual void Update(float dt);
@@ -29,9 +30,15 @@ public:
 	float m_min_bubble_size;
 	float m_max_bubble_size;
 	AnimationManager* GetAnimationManager() const { return m_animation_manager; }
+	InputManager* GetInputManager() const { return m_input_manager; }
+	const Ogre::Vector3& GetDirection() const { return m_direction; }
+	bool IsOnGround() const { return m_on_ground; }
+	GameObject* GetBubble() const { return m_current_bubble; }
 
 protected:
+	Ogre::Vector3 m_direction;
 	AnimationManager* m_animation_manager;
+	PlayerStateManager* m_player_state_manager;
 	void Jump(float dt);
 	void BlowBubble(float dt);
 
@@ -45,7 +52,6 @@ protected:
 	void OnBubble(float dt);
 	void InsideBubble(float dt);
 	void Bouncing(float dt);
-
 
 	int m_player_action;
 

@@ -78,7 +78,9 @@ void MeshRenderComponent::Init(const Ogre::String& filename, Ogre::SceneManager*
 void MeshRenderComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager, const Ogre::String& node_id){
 	m_scene_manager = scene_manager;
 	m_entity = m_scene_manager->createEntity(filename);
-	m_messenger->Notify(MSG_NODE_ATTACH_ENTITY, &m_entity, node_id);
+	if (node_id != Ogre::StringUtil::BLANK){
+		m_messenger->Notify(MSG_NODE_ATTACH_ENTITY, &m_entity, node_id);
+	}
 }
 
 void MeshRenderComponent::Notify(int type, void* msg){
@@ -101,6 +103,12 @@ void AnimationComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_ANIMATION_PLAY, this);
 	m_messenger->Register(MSG_ANIMATION_PAUSE, this);
 	m_messenger->Register(MSG_ANIMATION_BLEND, this);
+	m_messenger->Register(MSG_ANIMATION_LOOP, this);
+	m_messenger->Register(MSG_ANIMATION_QUEUE, this);
+	m_messenger->Register(MSG_ANIMATION_CALLBACK, this);
+	m_messenger->Register(MSG_ANIMATION_CLEAR_QUEUE, this);
+	m_messenger->Register(MSG_ANIMATION_CLEAR_CALLBACK, this);
+	m_messenger->Register(MSG_ANIMATION_SET_WAIT, this);
 }
 
 void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager, bool remove_weights){
@@ -110,12 +118,6 @@ void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* 
 	if (remove_weights){
 		FixPlayerWeights();
 	}
-	/*
-	m_animation_blender->init("Idle");
-	m_animation_blender->init("Run");
-	m_animation_blender->init("Walk");
-	m_animation_blender->init("Jump");
-	*/
 }
 
 void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager, const Ogre::String& node_id, bool remove_weights){
@@ -192,7 +194,7 @@ void AnimationComponent::FixPlayerWeights(){
 		}
 		find = anim_id.find(blow);
 		if (find != std::string::npos){
-			RemoveWeights(top_anims, anim);
+			RemoveWeights(base_anims, anim);
 			continue;
 		}
 		find = anim_id.find(top);
@@ -218,24 +220,55 @@ void AnimationComponent::RemoveWeights(std::vector<std::string>& list, Ogre::Ani
 void AnimationComponent::AddAnimationStates(unsigned int value){
 	for (unsigned int i = 0; i < value; i++){
 		Ogre::AnimationState* a = NULL;
-		m_animation_states.push_back(a);
+		m_animation_states.push_back(AnimationData(NULL, Ogre::StringUtil::BLANK, false));
 	}
 }
 
 void AnimationComponent::Update(float dt){
 	for (unsigned int i = 0; i < m_animation_states.size(); i++){
-		if (m_animation_states[i] != NULL){
-			if (m_animation_states[i]->getEnabled()){
-				m_animation_states[i]->addTime(dt);
-				if (!m_animation_states[i]->getLoop() && m_animation_states[i]->hasEnded()){
-					if (m_send_callback && m_callback != NULL){
-						m_callback->Call(NULL);
+		if (m_animation_states[i].anim_state != NULL){
+			if (m_animation_states[i].anim_state->getEnabled()){
+				m_animation_states[i].anim_state->addTime(dt);
+				if (!m_animation_states[i].anim_state->getLoop() && m_animation_states[i].anim_state->hasEnded()){
+					if (m_animation_states[i].wait){
+						m_animation_states[i].wait = false;
 					}
+					if (m_callback){
+						m_callback();
+						m_callback = NULL;
+					}
+					PlayQueued();
 				}
 			}
 		}
 	}
-	//m_animation_blender->addTime(dt);
+}
+
+void AnimationComponent::PlayQueued(){
+	if (!m_queue.empty()){
+		if (m_animation_states[m_queue.front().index].anim_state != NULL){
+			if (m_animation_states[m_queue.front().index].anim_state->getEnabled()){
+				m_animation_states[m_queue.front().index].anim_state->setTimePosition(0);
+				m_animation_states[m_queue.front().index].anim_state->setEnabled(false);
+				m_animation_states[m_queue.front().index].id = Ogre::StringUtil::BLANK;
+			}
+		}
+		if (m_queue.front().full_body){
+			if (m_animation_states[1].anim_state != NULL){
+				if (m_animation_states[1].anim_state->getEnabled()){
+					m_animation_states[1].anim_state->setTimePosition(0);
+					m_animation_states[1].anim_state->setEnabled(false);
+					m_animation_states[1].id = Ogre::StringUtil::BLANK;
+				}
+			}
+		}
+		m_animation_states[m_queue.front().index].anim_state = m_entity->getAnimationState(m_queue.front().id);
+		m_animation_states[m_queue.front().index].anim_state->setEnabled(true);
+		m_animation_states[m_queue.front().index].anim_state->setLoop(m_queue.front().loop);
+		m_animation_states[m_queue.front().index].anim_state->setTimePosition(0);
+		m_animation_states[m_queue.front().index].id = m_queue.front().id;
+		m_queue.pop_front();
+	}
 }
 
 void AnimationComponent::Notify(int type, void* msg){
@@ -244,24 +277,25 @@ void AnimationComponent::Notify(int type, void* msg){
 	case MSG_ANIMATION_PLAY:
 		{
 			AnimationMsg& anim_msg = *static_cast<AnimationMsg*>(msg);
-			if (m_animation_states[anim_msg.index] != NULL){
-				if (m_animation_states[anim_msg.index]->getAnimationName() != anim_msg.id){
-					m_animation_states[anim_msg.index]->setEnabled(false);
-					m_animation_states[anim_msg.index] = m_entity->getAnimationState(anim_msg.id);
-					m_animation_states[anim_msg.index]->setEnabled(true);
-					m_animation_states[anim_msg.index]->setLoop(anim_msg.loop);
-					m_animation_states[anim_msg.index]->setTimePosition(0);
-					if (anim_msg.send_callback){
-						m_send_callback = true;
+			if (!m_animation_states[anim_msg.index].wait){
+				if (m_animation_states[anim_msg.index].anim_state != NULL){
+					if (m_animation_states[anim_msg.index].id != anim_msg.id){
+						if (m_animation_states[anim_msg.index].anim_state->getEnabled()){
+							m_animation_states[anim_msg.index].anim_state->setTimePosition(0);
+							m_animation_states[anim_msg.index].anim_state->setEnabled(false);
+						}
+						m_animation_states[anim_msg.index].anim_state = m_entity->getAnimationState(anim_msg.id);
+						m_animation_states[anim_msg.index].anim_state->setEnabled(true);
+						m_animation_states[anim_msg.index].anim_state->setLoop(anim_msg.loop);
+						m_animation_states[anim_msg.index].anim_state->setTimePosition(0);
+						m_animation_states[anim_msg.index].id = anim_msg.id;
 					}
 				}
-			}
-			else {
-				m_animation_states[anim_msg.index] = m_entity->getAnimationState(anim_msg.id);
-				m_animation_states[anim_msg.index]->setEnabled(true);
-				m_animation_states[anim_msg.index]->setLoop(anim_msg.loop);
-				if (anim_msg.send_callback){
-					m_send_callback = true;
+				else {
+					m_animation_states[anim_msg.index].anim_state = m_entity->getAnimationState(anim_msg.id);
+					m_animation_states[anim_msg.index].anim_state->setEnabled(true);
+					m_animation_states[anim_msg.index].anim_state->setLoop(anim_msg.loop);
+					m_animation_states[anim_msg.index].id = anim_msg.id;
 				}
 			}
 		}
@@ -269,9 +303,44 @@ void AnimationComponent::Notify(int type, void* msg){
 	case MSG_ANIMATION_PAUSE:
 		{
 			int index = *static_cast<int*>(msg);
-			if (m_animation_states[index] != NULL){
-				m_animation_states[index]->setEnabled(false);
+			if (m_animation_states[index].anim_state != NULL){
+				if (m_animation_states[index].anim_state->getLoop()){
+					m_animation_states[index].anim_state->setLoop(false);
+				}
+				m_animation_states[index].anim_state->setTimePosition(0);
+				m_animation_states[index].anim_state->setEnabled(false);
+				m_animation_states[index].id = Ogre::StringUtil::BLANK;
+				m_animation_states[index].wait = false;
 			}
+		}
+		break;
+	case MSG_ANIMATION_LOOP:
+		{
+			AnimationMsg& anim_msg = *static_cast<AnimationMsg*>(msg);
+			if (m_animation_states[anim_msg.index].anim_state != NULL){
+				m_animation_states[anim_msg.index].anim_state->setLoop(anim_msg.loop);
+			}
+		}
+		break;
+	case MSG_ANIMATION_QUEUE:
+		{
+			AnimationMsg& anim_msg = *static_cast<AnimationMsg*>(msg);
+			m_queue.push_back(anim_msg);
+		}
+		break;
+	case MSG_ANIMATION_CALLBACK:
+		m_callback = *static_cast<std::function<void()>*>(msg);
+		break;
+	case MSG_ANIMATION_CLEAR_QUEUE:
+		m_queue.clear();
+		break;
+	case MSG_ANIMATION_CLEAR_CALLBACK:
+		m_callback = NULL;
+		break;
+	case MSG_ANIMATION_SET_WAIT:
+		{
+			int index = *static_cast<int*>(msg);
+			m_animation_states[index].wait = true;
 		}
 		break;
 	default:
@@ -280,14 +349,10 @@ void AnimationComponent::Notify(int type, void* msg){
 }
 
 void AnimationComponent::Shut(){
-	if (m_callback){
-		delete m_callback;
-		m_callback = NULL;
-	}
 	if (!m_animation_states.empty()){
 		for (unsigned int i = 0; i < m_animation_states.size(); i++){
-			if (m_animation_states[i] != NULL){
-				m_animation_states[i]->setEnabled(false);
+			if (m_animation_states[i].anim_state != NULL){
+				m_animation_states[i].anim_state->setEnabled(false);
 			}
 		}
 	}
@@ -295,6 +360,12 @@ void AnimationComponent::Shut(){
 	m_messenger->Unregister(MSG_ANIMATION_PLAY, this);
 	m_messenger->Unregister(MSG_ANIMATION_PAUSE, this);
 	m_messenger->Unregister(MSG_ANIMATION_BLEND, this);
+	m_messenger->Unregister(MSG_ANIMATION_LOOP, this);
+	m_messenger->Unregister(MSG_ANIMATION_QUEUE, this);
+	m_messenger->Unregister(MSG_ANIMATION_CALLBACK, this);
+	m_messenger->Unregister(MSG_ANIMATION_CLEAR_QUEUE, this);
+	m_messenger->Unregister(MSG_ANIMATION_CLEAR_CALLBACK, this);
+	m_messenger->Unregister(MSG_ANIMATION_SET_WAIT, this);
 	MeshRenderComponent::Shut();
 }
 
@@ -655,4 +726,30 @@ void TerrainComponent::Init(Ogre::SceneManager* scene_manager, PhysicsEngine* ph
 	m_collision_def.flag = COLLISION_FLAG_STATIC;
 	m_collision_def.data = m_owner;
 	m_terrain_body->setUserPointer(&m_collision_def);
+}
+
+void PlayerStaffComponent::Notify(int type, void* msg){
+
+}
+
+void PlayerStaffComponent::Update(float dt){
+	Ogre::Bone* bone = m_player_entity->getSkeleton()->getBone("CATRigLArmDigit21");
+	Ogre::Vector3 pos = bone->_getDerivedPosition() * m_node->_getDerivedPosition();
+}
+
+void PlayerStaffComponent::Shut(){
+	m_scene_manager->destroySceneNode(m_node);
+	m_scene_manager->destroyEntity(m_entity);
+}
+
+void PlayerStaffComponent::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
+}
+
+void PlayerStaffComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Entity* player_entity){
+	m_scene_manager = scene_manager;
+	m_player_entity = player_entity;
+	m_entity = m_scene_manager->createEntity("Staff.mesh");
+	m_node = m_scene_manager->getRootSceneNode()->createChildSceneNode();
+	m_node->attachObject(m_entity);
 }

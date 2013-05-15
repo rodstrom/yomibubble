@@ -138,6 +138,8 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	acomp->AddAnimationStates(2);
 	go->AddComponent(acomp);
 	go->AddUpdateable(acomp);
+	MeshRenderComponent* staff_mesh_comp = new MeshRenderComponent;
+	go->AddComponent(staff_mesh_comp);
 	CharacterController* contr = new CharacterController;
 	go->AddComponent(contr);
 	go->AddUpdateable(contr);
@@ -206,6 +208,11 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	fcc->Init(m_scene_manager, m_viewport, true);
 	fcc->SetTrigger(camera_tc);
 	fcc->SetMovementSpeed(def.camera_speed);
+
+	staff_mesh_comp->Init("Staff.mesh", m_scene_manager, Ogre::StringUtil::BLANK);
+	acomp->GetEntity()->attachObjectToBone("CATRigLArmDigit21", staff_mesh_comp->GetEntity());
+
+	
 	//DEBUGGING GRAVITY
 	//contr->GetRigidbody()->setGravity(btVector3(0,0,0));
 
