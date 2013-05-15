@@ -102,6 +102,10 @@ public:
 	void SetVelocity(float value) { m_velocity = value; }
 	void SetMaxVelocity(float value) { m_max_velocity = value; }
 
+	void SetCustomVariables(float life_time) { m_life_time = life_time; }
+	float m_time_counter;
+	float m_life_time;
+
 protected:
 	//void ApplyImpulse(const btVector3& dir);
 	PhysicsEngine* m_physics_engine;

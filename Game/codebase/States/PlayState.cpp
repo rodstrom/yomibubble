@@ -9,6 +9,7 @@
 #include <sstream>
 #include "..\Managers\VariableManager.h"
 #include "..\MessageSystem.h"
+#include "LoadingState.h"
 
 PlayState::PlayState(void) : m_physics_engine(NULL), m_game_object_manager(NULL), m_level_manager(NULL), m_pause(false), m_running(true), m_change_level(false){}
 PlayState::~PlayState(void){}
@@ -218,6 +219,8 @@ bool PlayState::Update(float dt){
     
 		State* loading = FindByName("LoadingState");
 		m_parent->Init(loading);
+
+		static_cast<LoadingState*>(loading)->SetLevel(m_level_manager->GetCurrentLevel());
 		loading->Enter();
 		loading->Update(1.0f);
 

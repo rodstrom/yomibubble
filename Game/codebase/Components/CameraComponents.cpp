@@ -142,10 +142,13 @@ void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewpo
 	m_env_coll_right = false;
 	m_env_coll_up = false;
 	m_env_coll_down = false;
+
+	m_min_pitch_angle = 140;
+	m_max_pitch_angle = 160;
 }
 
 void FollowCameraComponent::Update(float dt){
-	//QueryRaycast();
+	QueryRaycast();
 
 	//m_camera->lookAt(Ogre::Vector3(150.872f,75.6166f,244.42f));
 	//m_camera->rotate(Ogre::Vector3(0.0491129,0.92081,0.123328), Ogre::Radian(-0.366698));
@@ -195,17 +198,18 @@ void FollowCameraComponent::Update(float dt){
 
 	m_node->setPosition(m_camera->getDerivedPosition().x, m_camera->getDerivedPosition().y, m_camera->getDerivedPosition().z);
 	m_left_ray.origin = btVector3(m_camera->getDerivedPosition().x, m_camera->getDerivedPosition().y, m_camera->getDerivedPosition().z);
-	m_left_ray.length = btVector3(m_camera->getDerivedPosition().x - 1.5, m_camera->getDerivedPosition().y, m_camera->getDerivedPosition().z);
+	m_left_ray.length = btVector3(m_camera->getDerivedPosition().x - 1.0, m_camera->getDerivedPosition().y, m_camera->getDerivedPosition().z);
 
 	m_right_ray.origin = btVector3(m_camera->getDerivedPosition().x, m_camera->getDerivedPosition().y, m_camera->getDerivedPosition().z);
-	m_right_ray.length = btVector3(m_camera->getDerivedPosition().x + 1.5, m_camera->getDerivedPosition().y, m_camera->getDerivedPosition().z);
+	m_right_ray.length = btVector3(m_camera->getDerivedPosition().x + 1.0, m_camera->getDerivedPosition().y, m_camera->getDerivedPosition().z);
 
 	m_bot_ray.origin = btVector3(m_camera->getDerivedPosition().x, m_camera->getDerivedPosition().y, m_camera->getDerivedPosition().z);
-	m_bot_ray.length = btVector3(m_camera->getDerivedPosition().x, m_camera->getDerivedPosition().y - 1.5, m_camera->getDerivedPosition().z);
+	m_bot_ray.length = btVector3(m_camera->getDerivedPosition().x, m_camera->getDerivedPosition().y - 2.5, m_camera->getDerivedPosition().z);
 
 	//std::cout << "Node Pos: " << m_node->convertLocalToWorldPosition(m_node->getPosition()) << std::endl;
 	//std::cout << "Node Pos: " << m_node->getPosition() << std::endl; //so this gives local space
-	//std::cout << "ViewPort left: " << m_camera->getViewport()->getLeft() << std::endl;
+	//std::cout << "ViewPort left: " << m_camera->getFrustumPlane(0).normal.x << std::endl;
+	
 	//std::cout << "ViewPort up: " << m_camera->getViewport()->getTop() << std::endl;
 	//std::cout << "Viewport derived pos: " << m_camera->getDerivedPosition() << std::endl;
 
@@ -239,14 +243,16 @@ void FollowCameraComponent::Update(float dt){
 	}
 	*/
 
-	std::cout << "Camera goal pos: " << m_camera_goal->getPosition().x << "," << m_camera_goal->getPosition().y << "," << m_camera_goal->getPosition().z << std::endl;
+	
 	
 	//m_camera->setPosition(0,0,12);
 	
-	
+	/*
 	std::cout << "Camera pos: " << m_camera->getDerivedPosition() << std::endl;
-
 	std::cout << "Camera Orientation: " << m_camera->getRealOrientation().x << "," << m_camera->getRealOrientation().y << "," << m_camera->getRealOrientation().z << "," << m_camera->getRealOrientation().w << std::endl;
+	std::cout << "Camera goal pos: " << m_camera_goal->getPosition().x << "," << m_camera_goal->getPosition().y << "," << m_camera_goal->getPosition().z << std::endl;
+	*/
+	//std::cout << "Camera Left: " << m_camera->getViewport()->getActualLeft() << std::endl;
 }
 
 class BajsCallBack : btCollisionWorld::ContactResultCallback {
@@ -274,7 +280,7 @@ void FollowCameraComponent::SimulationStep(btScalar time_step){
 			*/
 	//std::cout << "Cam pos: " << BtOgre::Convert::toOgre(obB->getWorldTransform().getOrigin()) << std::endl;
 
-	bool bajsmacka = obB->checkCollideWith(obA);
+	bool bajsmacka = obB->checkCollideWith(obA); //this just checks IF they are supposed to collide with each other
 
 	//btCollisionWorld::contactPairTest(
 	/*
@@ -299,8 +305,56 @@ void FollowCameraComponent::SimulationStep(btScalar time_step){
 	else
 	{
 		//std::cout << "NOT Terrain coll\n";
-	//	m_env_collision = false;
+		//	m_env_collision = false;
 	}
+	/*/
+	struct ContactSensorCallback : public btCollisionWorld::ContactResultCallback {
+	
+	//! Constructor, pass whatever context you want to have available when processing contacts
+	/*! You may also want to set m_collisionFilterGroup and m_collisionFilterMask
+	 *  (supplied by the superclass) for needsCollision() */
+	/*
+	ContactSensorCallback(btRigidBody& tgtBody , YourContext& context /*, ... *//*)
+		: btCollisionWorld::ContactResultCallback(), body(tgtBody), ctxt(context) { }
+	
+	btRigidBody& body; //!< The body the sensor is monitoring
+	YourContext& ctxt; //!< External information for contact processing
+	
+	//! If you don't want to consider collisions where the bodies are joined by a constraint, override needsCollision:
+	/*! However, if you use a btCollisionObject for #body instead of a btRigidBody,
+	 *  then this is unnecessary—checkCollideWithOverride isn't available */
+	/*virtual bool needsCollision(btBroadphaseProxy* proxy) const {
+		// superclass will check m_collisionFilterGroup and m_collisionFilterMask
+		if(!btCollisionWorld::ContactResultCallback::needsCollision(proxy))
+			return false;
+		// if passed filters, may also want to avoid contacts between constraints
+		return body.checkCollideWithOverride(static_cast<btCollisionObject*>(proxy->m_clientObject));
+	}
+	
+	//! Called with each contact for your own processing (e.g. test if contacts fall in within sensor parameters)
+	virtual btScalar addSingleResult(btManifoldPoint& cp,
+		const btCollisionObject* colObj0,int partId0,int index0,
+		const btCollisionObject* colObj1,int partId1,int index1)
+	{
+		btVector3 pt; // will be set to point of collision relative to body
+		if(colObj0==&body) {
+			pt = cp.m_localPointA;
+		} else {
+			assert(colObj1==&body && "body does not match either collision object");
+			pt = cp.m_localPointB;
+		}
+		// do stuff with the collision point
+		return 0; // not actually sure if return value is used for anything...?
+	}
+};
+
+// USAGE:
+btRigidBody* tgtBody /* = ... *//*;
+YourContext foo;
+ContactSensorCallback callback(*tgtBody, foo);
+world->contactTest(tgtBody,callback);
+
+*/
 };
 
 void FollowCameraComponent::SetCustomVariables(int inverted_camera, float camera_zoom_speed, float stick_rotation_acceleration, float change_angle_after_player, float default_distance, float default_pitch){
@@ -317,6 +371,8 @@ void FollowCameraComponent::SetCustomVariables(int inverted_camera, float camera
 };
 
 void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real delta_pitch, Ogre::Real delta_zoom){
+	std::cout << "Pitch degrees: " << m_pivot_pitch << std::endl;
+	
 	if (delta_yaw != 0.0f
 			|| delta_pitch != 0.0f
 			|| delta_zoom != 0.0f){
@@ -328,7 +384,11 @@ void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real de
 			m_check_cam = true;
 		}
 	
-	if (!m_env_collision){
+		if (!m_env_collision && !m_getting_input){
+			return;
+		}
+
+//	if (!m_env_collision){
 		
 
 	//if (!m_env_collision){
@@ -362,11 +422,20 @@ void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real de
 				}
 			}
 		//}
-	}
-	else { //if environment collision
+	//}
+//	else { //if environment collision
 		
+		
+
 		//magical repositioning goes here (check which ray that hits)
-		if (m_env_coll_left){
+		if (m_env_coll_down){
+			float pitch_change = 2.15;
+			m_camera_pivot->pitch(Ogre::Degree(pitch_change), Ogre::Node::TS_WORLD);
+			m_pivot_pitch += pitch_change;
+			m_default_pitch = m_pivot_pitch;
+			return;
+		}	
+		else if (m_env_coll_left){
 			m_camera_pivot->yaw(Ogre::Degree(2.15), Ogre::Node::TS_WORLD);
 		}
 		else if (m_env_coll_right){
@@ -375,11 +444,10 @@ void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real de
 		else if (m_env_coll_up){
 			//magic
 		}
-		else if (m_env_coll_down){
-			m_camera_pivot->pitch(Ogre::Degree(-2.15), Ogre::Node::TS_WORLD);
-		}
-	}
-	std::cout << "Pitch degrees: " << m_pivot_pitch << std::endl;
+
+//	}
+	
+	//std::cout << "Pitch degrees: " << m_camera_pivot->pitch(0) << std::endl;
 	//std::cout << "Camera goal: " << m_camera_goal->getPosition() << std::endl; //0,0,12
 }
 

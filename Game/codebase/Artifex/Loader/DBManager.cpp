@@ -142,7 +142,6 @@ int DBManager::Load() {
 							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y,z), &tott_def);
 						}
 						else if (i->second == "leaf") {
-							
 							ParticleDef particleDef;
 							particleDef.particle_name = "Particle/Smoke";
 							m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(x,y,z), &particleDef);
@@ -151,6 +150,11 @@ int DBManager::Load() {
 							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_GATE, Ogre::Vector3(x,y,z), NULL);
 							Ogre::Quaternion quat = Ogre::Quaternion ((Degree(spawn.rx)), Vector3::UNIT_X)*Quaternion ((Degree(spawn.ry)), Vector3::UNIT_Y)*Quaternion ((Degree(spawn.rz)), Vector3::UNIT_Z);
 							temp->GetComponentMessenger()->Notify(MSG_SET_OBJECT_ORIENTATION, &quat);
+						}
+						else if (i->second == "particle"){
+							ParticleDef particleDef;
+							particleDef.particle_name = "Particle/Smoke";
+							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_PARTICLE, Ogre::Vector3(x,y,z), &particleDef);
 						}
 						
 						interactive = true;

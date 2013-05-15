@@ -12,6 +12,7 @@ public:
 	void AddLevel(const LevelDef& level_def) { m_levels.push_back(level_def); }
 	void ChangeLevel();
 	void LoadLevel(const Ogre::String& level_id);
+	Ogre::String GetCurrentLevel() { return m_str_current_level; }
 
 protected:
 	void FixZFighting();	// Hack to fix Z fighting with shadows on the terrain
@@ -19,6 +20,7 @@ protected:
 	std::vector<LevelDef> m_levels;
 	GameObjectManager* m_game_object_manager;
 	Ogre::SceneManager* m_scene_manager;
+	Ogre::String m_str_current_level;
 };
 
 #endif // _LEVEL_MANAGER_H_

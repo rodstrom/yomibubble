@@ -15,10 +15,13 @@ public:
 	void Enter();
 	void Exit();
 
+	void SetLevel(Ogre::String level) { m_level = level; }
+
 	//DECLARE_STATE_CLASS(LoadingState);
 
 private:
 	GameObjectManager*			m_game_object_manager;
+	Ogre::String m_level;
 };
 
 

@@ -28,8 +28,30 @@ void LoadingState::Enter(){
 	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager, m_message_system, NULL);
 
 	OverlayDef menuBackground;
-	menuBackground.overlay_name = "Loading";
-	menuBackground.cont_name = "Loading/Background";
+
+	if (m_level != "try"
+		&& m_level != "Dayarea"
+		&& m_level != "NightArea")
+	{ 
+		menuBackground.overlay_name = "LoadingFirst";
+		menuBackground.cont_name = "Loading/Background1"; 
+	}
+
+	
+	
+	if (m_level == "try") { 
+		menuBackground.overlay_name = "LoadingDay";
+		menuBackground.cont_name = "Loading/Background2"; 
+	}
+	else if (m_level == "Dayarea") { 
+		menuBackground.overlay_name = "LoadingNight";
+		menuBackground.cont_name = "Loading/Background3"; 
+	}
+	else if (m_level == "NightArea") { //so this is like the "end graphics"
+		menuBackground.overlay_name = "LoadingNight";
+		menuBackground.cont_name = "Loading/Background3"; 
+	}
+	//menuBackground.cont_name = "Loading/Background"; //+1,2,3
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_OVERLAY, Ogre::Vector3(0,0,0), &menuBackground);
 }
 

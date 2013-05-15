@@ -360,7 +360,7 @@ void PlayerInputComponent::OnBubble(float dt){
 	}
 
 	float speed = m_on_bubble_speed_mod * dt;
-	bool follow_cam = false;
+	bool follow_cam = true;
 	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_GET, &follow_cam);
 	if (follow_cam){
 		if (bubble_node){
@@ -510,6 +510,14 @@ void BubbleController::SetMessenger(ComponentMessenger* messenger){
 }*/
 
 void BubbleController::Update(float dt){
+	/*
+	m_time_counter += dt;
+
+	if (m_time_counter >= m_time_counter){
+		m_owner->GetGameObjectManager()->RemoveGameObject(m_owner);
+		//add pop sound
+	}
+	*/
 	if (m_apply_impulse){
 		Ogre::Vector3 impulse = (m_impulse * 8.0f) * dt;
 		m_messenger->Notify(MSG_RIGIDBODY_APPLY_IMPULSE, &impulse, "body");

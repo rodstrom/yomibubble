@@ -17,6 +17,7 @@ void LevelManager::ChangeLevel(){
 }
 
 void LevelManager::LoadLevel(const Ogre::String& level_id){
+	m_str_current_level = level_id;
 	for (unsigned int i = 0; i < m_levels.size(); i++){
 		if (m_levels[i].filepath == level_id){
 			m_current_level = i;
