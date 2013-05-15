@@ -137,7 +137,7 @@ void PlayState::Enter(){
 	light->setPowerScale(0.01f);
 
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(player_pos.x,player_pos.y+1.0f,player_pos.z), &player_def, "Player");
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_COMPANION, Ogre::Vector3(player_pos.x+10.0f, player_pos.y+1.0f, player_pos.z), &companion_def);
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_COMPANION, Ogre::Vector3(player_pos.x+15.0f, player_pos.y+1.0f, player_pos.z), &companion_def);
 	//m_game_object_manager->CreateGameObject(GAME_OBJECT_GATE, player_pos, NULL);
 	PlaneDef plane_def;
 	plane_def.material_name = "Examples/BeachStones";

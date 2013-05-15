@@ -15,6 +15,7 @@ void WayPoint::Init(Ogre::SceneNode* node){
 	m_destination = Ogre::Vector3::ZERO;
 
 	m_follow_node = NULL;
+	m_game_object = NULL;
 	m_old_destination = Ogre::Vector3::ZERO;
 	m_follow_node_moving = false;
 	m_loop_waypoints = false;
@@ -60,6 +61,7 @@ bool WayPoint::withinDistance(float meters){
 			return true;
 		}
 	}
+
 	return false;
 }
 

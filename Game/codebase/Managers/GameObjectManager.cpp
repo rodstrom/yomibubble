@@ -474,9 +474,8 @@ GameObject* GameObjectManager::CreateCompanion(const Ogre::Vector3& position, vo
 	stc->Init(position, m_physics_engine, &tdef);
 	contr->Init(position, m_physics_engine, def);
 	//rb->Init(position, acomp->GetEntity(), m_physics_engine, rdef);
-	way_point->Init(node_comp->GetSceneNode(), "false");
-	way_point->AddWayPoint(Ogre::Vector3(170, 75, 173));
-	way_point->AddWayPoint(Ogre::Vector3(180.0f, 75.0f, 173.0f));
+	way_point->Init(node_comp->GetSceneNode(), "true");
+	//way_point->AddWayPoint(static_cast<NodeComponent*>(GetGameObject("GameObject1")->GetComponent(EComponentType::COMPONENT_NODE))->GetSceneNode());
 	node_comp->GetSceneNode()->setPosition(Ogre::Vector3(position));
 	return go;
 }
