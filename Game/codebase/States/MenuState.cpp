@@ -13,7 +13,7 @@ void MenuState::Enter(){
 	//m_sound_manager->Init(m_scene_manager);
 
 	m_camera = m_scene_manager->createCamera("MenuCamera");
-	m_camera->setNearClipDistance(0.1);
+	m_camera->setNearClipDistance(0.1f);
 	m_viewport = m_render_window->addViewport(m_camera);
 	m_viewport->setBackgroundColour(Ogre::ColourValue(0.0,0.0,1.0));
 	m_camera->setAspectRatio(Ogre::Real(m_viewport->getActualWidth()) / Ogre::Real(m_viewport->getActualHeight()));

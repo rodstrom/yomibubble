@@ -196,11 +196,19 @@ Component* GameObject::CreateFollowCameraComponent(const Ogre::Vector3& pos, voi
 }
 
 Component* GameObject::CreatePoint2PointConstraintComponent(const Ogre::Vector3& pos, void* data){
-	return NULL;
+	Point2PointConstraintDef& def = *static_cast<Point2PointConstraintDef*>(data);
+	Point2PointConstraintComponent* cons = new Point2PointConstraintComponent;
+	AddComponentToFront(cons);
+	cons->Init(GetGameObjectManager()->GetPhysicsEngine(), def.body_a, def.body_b, def.pivot_a, def.pivot_b);
+	return cons;
 }
 
 Component* GameObject::CreateHingeConstraintComponent(const Ogre::Vector3& pos, void* data){
-	return NULL;
+	HingeConstraintDef& def = *static_cast<HingeConstraintDef*>(data);
+	HingeConstraintComponent* hcc = new HingeConstraintComponent;
+	AddComponentToFront(hcc);
+	hcc->Init(GetGameObjectManager()->GetPhysicsEngine(), def.body_a, def.body_b, def.pivot_a, def.pivot_b, def.axis_a, def.axis_b);
+	return hcc;
 }
 
 Component* GameObject::CreateChildNode(const Ogre::Vector3& pos, void* data){

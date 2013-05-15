@@ -81,6 +81,8 @@ struct CharacterControllerDef{
 	float radius;
 	float height;
 	float mass;
+	float fall_acceleration;
+	float max_fall_speed;
 	Ogre::Vector3 offset;
 	CollisionFilter collision_filter;
 };

@@ -41,6 +41,8 @@ public:
 	void SetMovementSpeed(float value) { m_movement_speed = value; }
 	void SetInputSystem(InputSystem* input_system) { m_input_system = input_system; }
 
+	void SetCustomVariables(int inverted_camera, float camera_zoom_speed, float stick_rotation_acceleration, float change_angle_after_player, float default_distance, float default_pitch);
+
 	AltRaycastDef		m_left_ray;
 	AltRaycastDef		m_right_ray;
 	AltRaycastDef		m_top_ray;
@@ -80,6 +82,12 @@ protected:
 	bool				m_env_coll_right;
 	bool				m_env_coll_up;
 	bool				m_env_coll_down;
+
+	bool				m_inverted_controller;
+
+	float				m_camera_zoom_speed;
+	float				m_camera_stick_rotation_acceleration;
+	float				m_camera_change_angle_after_player;
 
 //	TriggerComponent*	m_trigger;
 };

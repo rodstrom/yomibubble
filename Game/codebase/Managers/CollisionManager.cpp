@@ -98,8 +98,8 @@ void CollisionManager::PlayerTott(GameObject* player, GameObject* tott){
 }
 
 void CollisionManager::BlueBubbleBlueBubble(GameObject* blue_bubble_a, GameObject* blue_bubble_b){
-	Component* comp_a = blue_bubble_a->GetComponent(COMPONENT_POINT2POINT_CONSTRAINT);
-	Component* comp_b = blue_bubble_b->GetComponent(COMPONENT_POINT2POINT_CONSTRAINT);
+	Component* comp_a = blue_bubble_a->GetComponent(COMPONENT_HINGE_CONSTRAINT);
+	Component* comp_b = blue_bubble_b->GetComponent(COMPONENT_HINGE_CONSTRAINT);
 	if (!comp_a && !comp_b){
 		RigidbodyComponent* rc_a = static_cast<RigidbodyComponent*>(blue_bubble_a->GetComponent(COMPONENT_RIGIDBODY));
 		RigidbodyComponent* rc_b = static_cast<RigidbodyComponent*>(blue_bubble_b->GetComponent(COMPONENT_RIGIDBODY));
@@ -118,42 +118,7 @@ void CollisionManager::BlueBubbleBlueBubble(GameObject* blue_bubble_a, GameObjec
 }
 
 void CollisionManager::PlayerBlueBubble(GameObject* player, GameObject* blue_bubble){
-	/*
-	PlayerInputComponent* pic = static_cast<PlayerInputComponent*>(player->GetComponent(COMPONENT_PLAYER_INPUT));
-	if (pic->GetPlayerState() == PLAYER_STATE_NORMAL || pic->GetPlayerState() == PLAYER_STATE_BOUNCING){
-		CharacterController* cc = static_cast<CharacterController*>(player->GetComponent(COMPONENT_CHARACTER_CONTROLLER));
-		float y_vel = cc->GetRigidbody()->getLinearVelocity().y();
-		if (y_vel < 0.0f){
-			if (y_vel < -4.0f && y_vel > -10.0f){   // bounce on bubble
-				int player_state = PLAYER_STATE_BOUNCING;
-				player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_SET_BUBBLE, &blue_bubble);
-				player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_SET_STATE, &player_state);
-				Ogre::Vector3 impulse(0.0f, cc->GetRigidbody()->getLinearVelocity().y() * -2.2f, 0.0f);
-				player->GetComponentMessenger()->Notify(MSG_RIGIDBODY_APPLY_IMPULSE, &impulse);
-				player->GetComponentMessenger()->Notify(MSG_SFX2D_PLAY,  &static_cast<PlayerInputComponent*>(player->GetComponent(COMPONENT_PLAYER_INPUT))->m_bounce_sound);
-			}
-			else if (y_vel < -10.0f){  // go inside bubble
-				int player_state = PLAYER_STATE_INSIDE_BUBBLE;
-				Ogre::Vector3 gravity(0,0,0);
-				bool can_land = false;
-				int coll = btCollisionObject::CF_NO_CONTACT_RESPONSE;
-				player->GetComponentMessenger()->Notify(MSG_RIGIDBODY_COLLISION_FLAG_SET, &coll);
-				player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_SET_BUBBLE, &blue_bubble);
-				player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_SET_STATE, &player_state);
-				player->GetComponentMessenger()->Notify(MSG_CHARACTER_CONTROLLER_GRAVITY_SET, &gravity);
-				player->GetComponentMessenger()->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &gravity);
-			}
-			else {   //Stand on bubble if lower than 4.0
-				int player_state = PLAYER_STATE_ON_BUBBLE;
-				Ogre::Vector3 gravity(0,0,0);
-				player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_SET_BUBBLE, &blue_bubble);
-				player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_SET_STATE, &player_state);
-				player->GetComponentMessenger()->Notify(MSG_CHARACTER_CONTROLLER_GRAVITY_SET, &gravity);
-				player->GetComponentMessenger()->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &gravity);
-			}
-		}
-	}
-	*/
+
 }
 
 void CollisionManager::PlayerPlane(GameObject* player, GameObject* plane){

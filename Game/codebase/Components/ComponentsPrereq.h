@@ -35,6 +35,7 @@ enum EComponentMsg{
 	MSG_RIGIDBODY_GET_BODY,
 	MSG_RIGIDBODY_GRAVITY_SET,
 	MSG_RIGIDBODY_POSITION_SET,
+	MSG_RIGIDBODY_POSITION_GET,
 	MSG_RIGIDBODY_APPLY_IMPULSE,
 	MSG_RIGIDBODY_COLLISION_FLAG_SET,
 	MSG_RIGIDBODY_COLLISION_FLAG_REMOVE,
@@ -92,7 +93,7 @@ enum EComponentMsg{
 	MSG_RAYCAST_COLLISION_STATIC_ENVIRONMENT,
 	MSG_CAMERA_RAYCAST_COLLISION_STATIC_ENVIRONMENT,
 	MSG_CAMERA_ENV_COLLISION,
-	MSG_SIZE
+	MSG_ON_GROUND,	MSG_SIZE
 };
 
 enum EColliderType{
@@ -113,6 +114,8 @@ enum EPlayerState{
 	PLAYER_STATE_ON_BUBBLE,
 	PLAYER_STATE_INSIDE_BUBBLE,
 	PLAYER_STATE_BOUNCING,
+	PLAYER_STATE_ONTO_BUBBLE_TRANSITION,
+	PLAYER_STATE_INTO_BUBBLE_TRANSITION,
 	PLAYER_STATE_SIZE
 };
 
@@ -170,10 +173,13 @@ public:
 };
 
 struct AnimationMsg{
+	AnimationMsg(void) : index(0), loop(true), send_callback(false), next_anim(NULL){}
+	int index;
 	bool blend;
+	bool loop;
+	bool send_callback;
 	Ogre::String id;
-	Ogre::String bottom_anim;
-	Ogre::String top_anim;
+	AnimationMsg* next_anim;
 };
 
 struct AddForceMsg{
@@ -231,6 +237,24 @@ struct BubbleDef{
 	float start_scale;
 	float restitution;
 	float friction;
+};
+
+struct HingeConstraintDef{
+	HingeConstraintDef(void) : body_a(NULL), body_b(NULL), pivot_a(btVector3(0,0,0)), pivot_b(btVector3(0,0,0)), axis_a(btVector3(0,0,0)), axis_b(btVector3(0,0,0)) {}
+	btRigidBody* body_a;
+	btRigidBody* body_b;
+	btVector3 pivot_a;
+	btVector3 pivot_b;
+	btVector3 axis_a;
+	btVector3 axis_b;
+};
+
+struct Point2PointConstraintDef{
+	Point2PointConstraintDef(void) : body_a(NULL), body_b(NULL), pivot_a(btVector3(0,0,0)), pivot_b(btVector3(0,0,0)) {}
+	btRigidBody* body_a;
+	btRigidBody* body_b;
+	btVector3 pivot_a;
+	btVector3 pivot_b;
 };
 
 #endif // _N_COMPONENTS_PREREQ_H_

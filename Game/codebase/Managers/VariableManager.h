@@ -5,21 +5,24 @@
 #include <string>
 #include "../ConfigFile.h"
 
+class IniFile;
 class VariableManager{
 public:
+	static VariableManager* GetSingletonPtr();
+	static void CleanSingleton();
+	
+	bool Init();
+
+	const std::string& GetAsString(const std::string& value, const std::string& def = " ");
+	float GetAsFloat(const std::string& value, float def = 0.0f);
+	int GetAsInt(const std::string& value, int def = 0);
+	
+private:
 	VariableManager();
 	~VariableManager();
 
-	void Init();
-
-	float GetValue(std::string name);
-
-	void LoadVariables();
-	void SaveVariables();
-
-private:
-	Config* m_config_file;
-	std::map<std::string, float> m_variable_map;
+	static VariableManager* m_instance;
+	IniFile* m_values;
 };
 
 #endif //VARIABLE_MANAGER_H
