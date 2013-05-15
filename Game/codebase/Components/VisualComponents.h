@@ -64,7 +64,7 @@ protected:
 
 class AnimationComponent : public MeshRenderComponent, public IComponentUpdateable{
 public:
-	AnimationComponent(void) : m_callback(NULL), m_send_callback(false){ m_type = COMPONENT_ANIMATION; m_update = true; }
+	AnimationComponent(void) : m_callback(NULL){ m_type = COMPONENT_ANIMATION; m_update = true; }
 	virtual ~AnimationComponent(void){}
 	virtual void Update(float dt);
 	virtual void Notify(int type, void* message);
@@ -73,16 +73,15 @@ public:
 	virtual void AddAnimationStates(unsigned int value = 1);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
-	virtual void SertAnimationCallback(IFunctor* callback) { m_callback = callback; }
 
 	AnimationBlender* m_animation_blender;
-
 protected:
-	IFunctor* m_callback;		// called when animation has ended if requested
+	void PlayQueued();
 	void FixPlayerWeights();	// Ugly hack for the player to fix animation weights because we didn't do enough research in the beginning
 	void RemoveWeights(std::vector<std::string>& list, Ogre::Animation* anim);
-	std::vector<Ogre::AnimationState*>	m_animation_states;
-	bool m_send_callback;
+	std::vector<AnimationData>	m_animation_states;
+	std::deque<AnimationMsg> m_queue;
+	std::function<void()> m_callback;
 };
 
 class Overlay2DComponent : public Component, public IComponentObserver {
@@ -122,6 +121,22 @@ protected:
 	Ogre::Viewport*			m_view_port;
 	OverlayCollisionState	m_ocs;
 	bool					m_show_overlay;
+};
+
+class PlayerStaffComponent : public Component, public IComponentUpdateable, public IComponentObserver{
+public:
+	PlayerStaffComponent(void){ m_type = COMPONENT_PLAYER_STAFF; }
+	virtual ~PlayerStaffComponent(void) {}
+	virtual void Notify(int type, void* msg);
+	virtual void Update(float dt);
+	virtual void Shut();
+	virtual void SetMessenger(ComponentMessenger* messenger);
+	virtual void Init(Ogre::SceneManager* scene_manager, Ogre::Entity* player_entity);
+protected:
+	Ogre::SceneManager* m_scene_manager;
+	Ogre::Entity* m_entity;
+	Ogre::SceneNode* m_node;
+	Ogre::Entity* m_player_entity;
 };
 
 class Overlay2DAnimatedComponent : public IComponentUpdateable, public Overlay2DComponent{

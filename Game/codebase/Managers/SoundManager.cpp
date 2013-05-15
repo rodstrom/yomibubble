@@ -44,10 +44,12 @@ void SoundManager::LoadAudio(){
 	m_sound_manager->getSound("Dun_Dun")->setMinVolume(0.0f);
 	m_sound_manager->getSound("Dun_Dun")->setMaxVolume(1.0f);
 
-	m_sound_manager->createSound("Main_Theme", "Music/Day_area_theme_mono.wav", false, true, true);
-	m_sound_manager->createSound("Menu_Theme", "Music/Menu_theme.wav", false, true, true);
+	//m_sound_manager->createSound("Main_Theme", "Music/Day_area_theme_mono.wav", false, true, true);
+	m_sound_manager->createSound("Tutorial_Theme", "Music/Menu_theme.wav", false, true, true);
+	m_sound_manager->createSound("Day_Theme", "Music/Day_area_theme.wav", false, true, true);
+	m_sound_manager->createSound("Night_Theme", "Music/Night_area_theme.wav", false, true, true);
 
-	Init3D("Main_Theme", 10.0f, 10.0f, 150.0f);
+	//Init3D("Main_Theme", 10.0f, 10.0f, 150.0f);
 
 	//bool bajs = m_sound_manager->createEFXSlot();
 	//bajs;

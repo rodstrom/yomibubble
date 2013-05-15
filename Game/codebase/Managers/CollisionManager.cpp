@@ -122,7 +122,7 @@ void CollisionManager::PlayerBlueBubble(GameObject* player, GameObject* blue_bub
 }
 
 void CollisionManager::PlayerPlane(GameObject* player, GameObject* plane){
-	bool on_ground = true;
+	/*bool on_ground = true;
 	int current_state = PLAYER_STATE_INSIDE_BUBBLE;
 	player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_STATE_GET, &current_state);
 	if (current_state != PLAYER_STATE_INSIDE_BUBBLE){
@@ -130,7 +130,7 @@ void CollisionManager::PlayerPlane(GameObject* player, GameObject* plane){
 		player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_SET_STATE, &player_state);
 		player->GetComponentMessenger()->Notify(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_SET, &on_ground);
 		CharacterController* cc = static_cast<CharacterController*>(player->GetComponent(COMPONENT_CHARACTER_CONTROLLER));
-	}
+	}*/
 }
 
 void CollisionManager::LeafPlayer(GameObject* leaf, GameObject* player){
@@ -144,7 +144,7 @@ void CollisionManager::PlayerTrigger(GameObject* player, GameObject* trigger){
 }
 
 void CollisionManager::PlayerTerrain(GameObject* player, GameObject* terrain){
-	bool on_ground = true;
+	/*bool on_ground = true;
 	int current_state = PLAYER_STATE_INSIDE_BUBBLE;
 	player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_STATE_GET, &current_state);
 	if (current_state != PLAYER_STATE_INSIDE_BUBBLE){
@@ -152,7 +152,7 @@ void CollisionManager::PlayerTerrain(GameObject* player, GameObject* terrain){
 		player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_SET_STATE, &player_state);
 		player->GetComponentMessenger()->Notify(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_SET, &on_ground);
 		CharacterController* cc = static_cast<CharacterController*>(player->GetComponent(COMPONENT_CHARACTER_CONTROLLER));
-	}
+	}*/
 }
 
 void CollisionManager::CameraTerrain(GameObject* camera, GameObject* terrain){

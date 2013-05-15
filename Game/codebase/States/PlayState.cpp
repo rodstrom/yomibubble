@@ -39,6 +39,8 @@ void PlayState::Enter(){
 	//m_sound_manager->LoadAudio();
 	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager, m_message_system, NULL);
 
+	//Ogre::CompositorManager::getSingleton().addCompositor(m_viewport, "Bloom");
+	//Ogre::CompositorManager::getSingleton().setCompositorEnabled(m_viewport, "Bloom", true);
 	//RUN SECONDLOADING
 }
 
@@ -56,7 +58,7 @@ void PlayState::SecondLoading(){
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(170, 85, 173), &plane_def);*/
 	//m_game_object_manager->CreateGameObject(GAME_OBJECT_GATE, Ogre::Vector3(170, 75, 173), NULL);
 	
-	m_level_manager = new LevelManager(m_game_object_manager, m_scene_manager);
+	m_level_manager = new LevelManager(m_game_object_manager, m_scene_manager, m_physics_engine);
 
 	m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
 	m_scene_manager->setShadowUseInfiniteFarPlane(false);
@@ -65,6 +67,8 @@ void PlayState::SecondLoading(){
 	m_scene_manager->setShadowTextureSize(1024);
 	m_scene_manager->setShadowColour(Ogre::ColourValue(0.6f,0.6f,0.6f,1.0f));
 	m_scene_manager->setShadowFarDistance(25.0f);
+	
+
 	
 	LevelDef level1;
 	level1.filepath = "try";

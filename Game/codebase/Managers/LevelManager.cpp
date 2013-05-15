@@ -2,9 +2,10 @@
 #include "LevelManager.h"
 #include "GameObjectManager.h"
 #include "..\MessageSystem.h"
+#include "..\PhysicsEngine.h"
 
-LevelManager::LevelManager(GameObjectManager* game_object_manager, Ogre::SceneManager* scene_manager) : 
-	m_game_object_manager(game_object_manager), m_scene_manager(scene_manager), m_current_level(0){
+LevelManager::LevelManager(GameObjectManager* game_object_manager, Ogre::SceneManager* scene_manager, PhysicsEngine* physics_engine) : 
+	m_game_object_manager(game_object_manager), m_scene_manager(scene_manager), m_physics_engine(physics_engine), m_current_level(0){
 }
 LevelManager::~LevelManager(void){}
 
@@ -12,6 +13,8 @@ LevelManager::~LevelManager(void){}
 void LevelManager::ChangeLevel(){
 	Ogre::String next_level = m_levels[m_current_level].next_level;
 	m_game_object_manager->ClearAllGameObjects();
+	m_scene_manager->clearScene();
+	m_physics_engine->ResetPhysicsEngine();
 	// set loading screen game object here
 	LoadLevel(next_level);
 }
