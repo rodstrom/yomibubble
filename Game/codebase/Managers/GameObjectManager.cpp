@@ -38,6 +38,11 @@ void GameObjectManager::Init(PhysicsEngine* physics_engine, Ogre::SceneManager* 
 	//m_create_fptr[GAME_OBJECT_COMPANION]   =	&GameObjectManager::CreateCompanion;
 	m_create_fptr[GAME_OBJECT_TERRAIN]	   =	&GameObjectManager::CreateTerrain;
 	m_create_fptr[GAME_OBJECT_GATE]		   =	&GameObjectManager::CreateGate;
+	m_create_fptr[GAME_OBJECT_CAMERA]	   =	&GameObjectManager::CreatePlayerCamera;
+	m_create_fptr[GAME_OBJECT_PARTICLE]	   =    &GameObjectManager::CreateParticleEffect;
+
+	m_leaf_iterations = 0;
+	m_particle_iterations = 0;
 }
 
 void GameObjectManager::Update(float dt){
@@ -135,6 +140,8 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	acomp->AddAnimationStates(2);
 	go->AddComponent(acomp);
 	go->AddUpdateable(acomp);
+	MeshRenderComponent* staff_mesh_comp = new MeshRenderComponent;
+	go->AddComponent(staff_mesh_comp);
 	CharacterController* contr = new CharacterController;
 	go->AddComponent(contr);
 	go->AddUpdateable(contr);
@@ -201,7 +208,27 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 
 	fcc->Init(m_scene_manager, m_viewport, true);
 	fcc->SetTrigger(camera_tc);
-	fcc->SetMovementSpeed(2.5f);
+	fcc->SetMovementSpeed(def.camera_speed);
+
+	staff_mesh_comp->Init("Staff.mesh", m_scene_manager, Ogre::StringUtil::BLANK);
+	acomp->GetEntity()->attachObjectToBone("CATRigLArmDigit21", staff_mesh_comp->GetEntity());
+
+	
+	//camera_rb->Init(
+
+
+	*/
+	//camera_rc->Init(m_physics_engine, node_comp->GetSceneNode());
+	//camera_rc->SetLength(Ogre::Vector3(-2,0,0));
+
+	//camera_rcc->Init(m_physics_engine);
+
+	//stc->Init(position, m_physics_engine, &trdef);
+	/*
+	-  raycast->Init(m_physics_engine, contr->GetRigidbody(), "body");
+-  raycast->SetLength(Ogre::Vector3(0.0f,-1.0f,0.0f));
+-  raycast->SetAttached(true); 
+*/
 	//DEBUGGING GRAVITY
 	//contr->GetRigidbody()->setGravity(btVector3(0,0,0));
 
@@ -225,6 +252,7 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 
 
 	bc->Init(m_physics_engine, 0.00001f, 0.00002f);
+	bc->SetCustomVariables(VariableManager::GetSingletonPtr()->GetAsFloat("Blue_Bubble_Life_Time"));
 	node_comp->Init(position, m_scene_manager);
 	mrc->Init("BlueBubble.mesh", m_scene_manager);
 	//Ogre::Vector3 scale(def.start_scale);
@@ -265,6 +293,7 @@ GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, v
 	go->AddUpdateable(bc);
 
 	bc->Init(m_physics_engine, 10.0f, 50.0f);
+	bc->SetCustomVariables(VariableManager::GetSingletonPtr()->GetAsFloat("Pink_Bubble_Life_Time"));
 	node_comp->Init(position, m_scene_manager);
 	mrc->Init("PinkBubble.mesh", m_scene_manager);
 	Ogre::Vector3 scale(def.start_scale);
@@ -281,7 +310,7 @@ GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, v
 	rc->GetRigidbody()->setGravity(btVector3(0.0f, 0.0f, 0.0f));
 	rc->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
 	rc->GetRigidbody()->setActivationState(DISABLE_DEACTIVATION);
-	rc->GetRigidbody()->setDamping(0.5f, 0.2f);
+	rc->GetRigidbody()->setDamping(VariableManager::GetSingletonPtr()->GetAsFloat("Bubble_Linear_Damping"), VariableManager::GetSingletonPtr()->GetAsFloat("Bubble_Angular_Damping"));
 	cons->Init(m_physics_engine,rc->GetRigidbody(), def.connection_body, btVector3(0,0,0), btVector3(0,0,0));
 	return go;
 }
@@ -395,8 +424,8 @@ GameObject* GameObjectManager::CreateGUI(const Ogre::Vector3& position, void* da
 GameObject* GameObjectManager::CreateLeaf(const Ogre::Vector3& position, void* data, const Ogre::String& id){
 	ParticleDef& particleDef = *static_cast<ParticleDef*>(data);
 	GameObject* go = new GameObject(GAME_OBJECT_LEAF);
-	//ParticleComponent* particle = new ParticleComponent;
-	//go->AddComponent(particle);
+	ParticleComponent* particle = new ParticleComponent;
+	go->AddComponent(particle);
 	NodeComponent* node_comp = new NodeComponent;
 	go->AddComponent(node_comp);
 	MeshRenderComponent* mrc = new MeshRenderComponent;
@@ -417,6 +446,14 @@ GameObject* GameObjectManager::CreateLeaf(const Ogre::Vector3& position, void* d
 	node_comp->GetSceneNode()->setPosition(Ogre::Vector3(position));
 	//particle->Init(m_scene_manager, "bajs", particleDef.particle_name);
 	//particle->CreateParticle(node_comp->GetSceneNode(), node_comp->GetSceneNode()->getPosition(), Ogre::Vector3(0,-3,0));
+
+	std::ostringstream stream;
+	stream << "Leaf_" << m_leaf_iterations;
+	m_leaf_iterations++;
+	Ogre::String leaf_id = stream.str();
+
+	particle->Init(m_scene_manager, leaf_id, particleDef.particle_name);
+	particle->CreateParticle(node_comp->GetSceneNode(), node_comp->GetSceneNode()->getPosition(), Ogre::Vector3(0,-1.8,0));
 
 	TriggerDef trdef;
 	trdef.body_type = STATIC_BODY;
@@ -520,3 +557,32 @@ GameObject* GameObjectManager::CreateNextLevelTrigger(const Ogre::Vector3& posit
 	tc->Init(position, m_physics_engine, def);
 	return go;
 }
+
+GameObject* GameObjectManager::CreateParticleEffect(const Ogre::Vector3& position, void* data, const Ogre::String& id){
+	ParticleDef& particleDef = *static_cast<ParticleDef*>(data);
+	GameObject* go = new GameObject(GAME_OBJECT_PARTICLE);
+	
+	ParticleComponent* particle = new ParticleComponent;
+	go->AddComponent(particle);
+	MeshRenderComponent* mrc = new MeshRenderComponent;
+	go->AddComponent(mrc);
+	NodeComponent* node_comp = new NodeComponent;
+	go->AddComponent(node_comp);
+
+	node_comp->Init(position, m_scene_manager);
+	mrc->Init("Collectable_Leaf.mesh", m_scene_manager);
+	mrc->GetEntity()->setMaterialName("CollectibleLeaf");
+
+	mrc->GetEntity()->setMaterialName("CollectibleLeaf");
+	node_comp->GetSceneNode()->setPosition(Ogre::Vector3(position));
+
+	std::ostringstream stream;
+	stream << "Particle_" << m_particle_iterations;
+	m_particle_iterations++;
+	Ogre::String particle_id = stream.str();
+
+	particle->Init(m_scene_manager, particle_id, particleDef.particle_name);
+	particle->CreateParticle(node_comp->GetSceneNode(), node_comp->GetSceneNode()->getPosition(), Ogre::Vector3(0,-1.8,0));
+
+	return go;
+};

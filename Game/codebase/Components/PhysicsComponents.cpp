@@ -23,6 +23,9 @@ void RigidbodyComponent::Notify(int type, void* msg){
 	case MSG_SET_OBJECT_POSITION:
 			m_rigidbody->getWorldTransform().setOrigin(BtOgre::Convert::toBullet(*static_cast<Ogre::Vector3*>(msg)));
 		break;
+	case MSG_SET_OBJECT_ORIENTATION:
+		m_rigidbody->getWorldTransform().setRotation(BtOgre::Convert::toBullet(*static_cast<Ogre::Quaternion*>(msg)));
+		break;
 	case MSG_RIGIDBODY_GRAVITY_SET:
 		m_rigidbody->setGravity(BtOgre::Convert::toBullet(*static_cast<Ogre::Vector3*>(msg)));
 		break;
@@ -108,6 +111,7 @@ void RigidbodyComponent::Shut(){
 	m_messenger->Unregister(MSG_RIGIDBODY_GET_BODY, this);
 	m_messenger->Unregister(MSG_INCREASE_SCALE_BY_VALUE, this);
 	m_messenger->Unregister(MSG_SET_OBJECT_POSITION, this);
+	m_messenger->Unregister(MSG_SET_OBJECT_ORIENTATION, this);
 	m_messenger->Unregister(MSG_RIGIDBODY_GRAVITY_SET, this);
 	m_messenger->Unregister(MSG_RIGIDBODY_POSITION_SET, this);
 	m_messenger->Unregister(MSG_RIGIDBODY_APPLY_IMPULSE, this);
@@ -119,6 +123,7 @@ void RigidbodyComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_RIGIDBODY_GET_BODY, this);
 	m_messenger->Register(MSG_INCREASE_SCALE_BY_VALUE, this);
 	m_messenger->Register(MSG_SET_OBJECT_POSITION, this);
+	m_messenger->Register(MSG_SET_OBJECT_ORIENTATION, this);
 	m_messenger->Register(MSG_RIGIDBODY_GRAVITY_SET, this);
 	m_messenger->Register(MSG_RIGIDBODY_POSITION_SET, this);
 	m_messenger->Register(MSG_RIGIDBODY_APPLY_IMPULSE, this);
@@ -594,13 +599,13 @@ void PlayerRaycastCollisionComponent::SetMessenger(ComponentMessenger* messenger
 void PlayerRaycastCollisionComponent::PlayerBubble(GameObject* go){
 	int player_state = 0;
 	m_messenger->Notify(MSG_PLAYER_INPUT_STATE_GET, &player_state);
-	if (player_state == PLAYER_STATE_NORMAL || player_state == PLAYER_STATE_BOUNCING){
-		btRigidBody* body = NULL;
-		m_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &body, "body");
-		if (body){   // bounce on bubble
-			float y_vel = body->getLinearVelocity().y();
-			if (y_vel < -4.0f && y_vel > -10.0f){
-				player_state = PLAYER_STATE_BOUNCING;
+	btRigidBody* body = NULL;
+	m_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &body, "body");
+	if (body){
+		float y_vel = body->getLinearVelocity().y();
+		if (y_vel < 0.0f && player_state == PLAYER_STATE_FALLING){
+			if (y_vel < -m_bounce_vel && y_vel > -m_into_bubble_vel){   // bounce on bubble
+				player_state = PLAYER_STATE_BOUNCE;
 				m_messenger->Notify(MSG_PLAYER_INPUT_SET_BUBBLE, &go);
 				m_messenger->Notify(MSG_PLAYER_INPUT_SET_STATE, &player_state);
 				Ogre::Vector3 impulse(0.0f, y_vel * -2.3f, 0.0f);
@@ -608,7 +613,7 @@ void PlayerRaycastCollisionComponent::PlayerBubble(GameObject* go){
 				m_messenger->Notify(MSG_RIGIDBODY_APPLY_IMPULSE, &impulse);
 				m_messenger->Notify(MSG_SFX2D_PLAY,  &static_cast<PlayerInputComponent*>(m_owner->GetComponent(COMPONENT_PLAYER_INPUT))->m_bounce_sound);
 			}
-			else if (y_vel < -10.0f){   // go inside bubble
+			else if (y_vel < -m_into_bubble_vel){   // go inside bubble
 				player_state = PLAYER_STATE_INSIDE_BUBBLE;
 				Ogre::Vector3 gravity(0,0,0);
 				int coll = btCollisionObject::CF_NO_CONTACT_RESPONSE;
@@ -618,9 +623,13 @@ void PlayerRaycastCollisionComponent::PlayerBubble(GameObject* go){
 				m_messenger->Notify(MSG_CHARACTER_CONTROLLER_GRAVITY_SET, &gravity);
 				m_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &gravity);	// make sure direction is set to zero
 			}
-			else {
+			else {   // stand on bubble
 				player_state = PLAYER_STATE_ON_BUBBLE;
 				Ogre::Vector3 gravity(0,0,0);
+				body->clearForces();
+				//body->setLinearFactor(btVector3(1,0,1));
+				int coll = btCollisionObject::CF_NO_CONTACT_RESPONSE;
+				m_messenger->Notify(MSG_RIGIDBODY_COLLISION_FLAG_SET, &coll, "body");
 				m_messenger->Notify(MSG_PLAYER_INPUT_SET_BUBBLE, &go);
 				m_messenger->Notify(MSG_PLAYER_INPUT_SET_STATE, &player_state);
 				m_messenger->Notify(MSG_CHARACTER_CONTROLLER_GRAVITY_SET, &gravity);
@@ -631,12 +640,12 @@ void PlayerRaycastCollisionComponent::PlayerBubble(GameObject* go){
 }
 
 void PlayerRaycastCollisionComponent::PlayerLandscape(){
-	int player_state = PLAYER_STATE_INSIDE_BUBBLE;
+	/*int player_state = PLAYER_STATE_INSIDE_BUBBLE;
 	m_messenger->Notify(MSG_PLAYER_INPUT_STATE_GET, &player_state);
-	if (player_state != PLAYER_STATE_INSIDE_BUBBLE){
+	if (player_state != PLAYER_STATE_INSIDE_BUBBLE && player_state != PLAYER_STATE_NORMAL && player_state != PLAYER_STATE_ON_BUBBLE){
 		player_state = PLAYER_STATE_NORMAL;
 		m_messenger->Notify(MSG_PLAYER_INPUT_SET_STATE, &player_state);
-	}
+	}*/
 }
 
 void BobbingComponent::Shut(){

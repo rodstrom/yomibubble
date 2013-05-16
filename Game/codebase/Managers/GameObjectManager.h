@@ -41,11 +41,13 @@ private:
 	GameObject* CreateLeaf(const Ogre::Vector3& position, void* data, const Ogre::String& id = Ogre::StringUtil::BLANK);
 	GameObject* CreateGUI(const Ogre::Vector3& position, void* data, const Ogre::String& id = Ogre::StringUtil::BLANK);
 	GameObject* CreateTestTrigger(const Ogre::Vector3& position, void* data, const Ogre::String& id = Ogre::StringUtil::BLANK);
-	//GameObject* CreateCompanion(const Ogre::Vector3& position, void* data, const Ogre::String& id = Ogre::StringUtil::BLANK);
+	GameObject* CreateCompanion(const Ogre::Vector3& position, void* data, const Ogre::String& id = Ogre::StringUtil::BLANK);
 	GameObject* CreateTerrain(const Ogre::Vector3& position, void* data, const Ogre::String& id = Ogre::StringUtil::BLANK);
 	GameObject* CreateGate(const Ogre::Vector3& position, void* data, const Ogre::String& id = Ogre::StringUtil::BLANK);
 	GameObject* CreateLoadingScreen(const Ogre::Vector3& position, void* data, const Ogre::String& id = Ogre::StringUtil::BLANK);
 	GameObject* CreateNextLevelTrigger(const Ogre::Vector3& position, void* data, const Ogre::String& id = Ogre::StringUtil::BLANK);
+	GameObject* CreatePlayerCamera(const Ogre::Vector3& position, void* data, const Ogre::String& id = Ogre::StringUtil::BLANK);
+	GameObject* CreateParticleEffect(const Ogre::Vector3& position, void* data, const Ogre::String& id = Ogre::StringUtil::BLANK);
 
 	typedef GameObject* (GameObjectManager::*CreateObjectFptr)(const Ogre::Vector3&, void* data, const Ogre::String&);
 	
@@ -59,6 +61,7 @@ private:
 	SoundManager*			m_sound_manager;
 	MessageSystem*			m_message_system;
 	Ogre::SceneNode*		m_node;
+	int m_particle_iterations;
 };
 
 #endif // _N_GAME_OBJECT_MANAGER_H_

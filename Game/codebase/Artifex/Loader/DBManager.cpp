@@ -3,7 +3,6 @@
 #include "..\..\Managers\GameObjectManager.h"
 #include "..\..\PhysicsEngine.h"
 #include "..\..\Components\GameObjectPrereq.h"
-
 #include "..\..\PhysicsPrereq.h"
 #include "..\..\Components\GameObject.h"
 #include "..\..\Components\VisualComponents.h"
@@ -11,7 +10,6 @@
 #include "..\..\Components\AIComponents.h"
 #include "..\..\Managers\VariableManager.h"
 #include <map>
-#include "..\..\PhysicsPrereq.h"
 
 DBManager::DBManager(ArtifexLoader *artifexloader, PhysicsEngine *physics_engine, GameObjectManager *game_object_manager, SoundManager *sound_manager) {
 
@@ -93,7 +91,7 @@ int DBManager::Load() {
 			
 			if (spawn.spawntype.length() < 1) spawn.spawntype = "default";
 			
-			mArtifexLoader->mObjectFile.push_back(spawn);
+			//mArtifexLoader->mObjectFile.push_back(spawn);
 			
 			bool interactive = false;
 			if (spawn.attributes.size() > 0) {
@@ -101,30 +99,34 @@ int DBManager::Load() {
 
 				//make sure to check if interactive first and get nodeName etc.
 				//attributemap::iterator i = spawn.attributes.begin();	
-				VariableManager* variable_manager = new VariableManager;
-				variable_manager->Init();
-				variable_manager->LoadVariables();
 				for ( attributemap::iterator i = spawn.attributes.begin(); i != spawn.attributes.end(); i++ )
 				{
 					if (i->first == "interactive") {
 						if (i->second == "player") {
-							CharacterControllerDef player_def;
-							player_def.friction = 1.0f;
-							player_def.velocity = variable_manager->GetValue("Player_Speed");
-							player_def.max_speed = variable_manager->GetValue("Player_Max_Speed");
-							player_def.deceleration = variable_manager->GetValue("Player_Deceleration");
-							player_def.jump_power = variable_manager->GetValue("Player_Jump_Power");
-							player_def.restitution = 0.0f;
-							player_def.step_height = 0.35f;
-							player_def.turn_speed = 1000.0f;
-							player_def.max_jump_height = variable_manager->GetValue("Player_Max_Jump_Height");
-							player_def.offset.y = 0.5f;
-							player_def.radius = 0.3f;
-							player_def.height = 0.4f;
-							player_def.mass = 1.0f;
-							player_def.collision_filter.filter = COL_PLAYER;
-							player_def.collision_filter.mask = COL_BUBBLE | COL_BUBBLE_TRIG | COL_TOTT | COL_WORLD_STATIC | COL_WORLD_TRIGGER;
+							PlayerDef player_def;
+							CharacterControllerDef char_def;
+							char_def.friction = 1.0f;
+							char_def.velocity = VariableManager::GetSingletonPtr()->GetAsFloat("Player_Speed");
+							char_def.max_speed = VariableManager::GetSingletonPtr()->GetAsFloat("Player_Max_Speed");
+							char_def.deceleration = VariableManager::GetSingletonPtr()->GetAsFloat("Player_Deceleration");
+							char_def.jump_power = VariableManager::GetSingletonPtr()->GetAsFloat("Player_Jump_Power");
+							char_def.restitution = 0.0f;
+							char_def.step_height = 0.15f;
+							char_def.turn_speed = 800.0f;
+							char_def.max_jump_height = VariableManager::GetSingletonPtr()->GetAsFloat("Player_Max_Jump_Height");
+							char_def.offset.y = 0.5f;
+							char_def.radius = 0.3f;
+							char_def.height = 0.4f;
+							char_def.mass = 1.0f;
+							char_def.max_fall_speed = VariableManager::GetSingletonPtr()->GetAsFloat("Player_Max_Fall_Speed");
+							char_def.fall_acceleration = VariableManager::GetSingletonPtr()->GetAsFloat("Player_Fall_Acceleration");
+							char_def.collision_filter.filter = COL_PLAYER;
+							char_def.collision_filter.mask = COL_BUBBLE | COL_BUBBLE_TRIG | COL_TOTT | COL_WORLD_STATIC | COL_WORLD_TRIGGER;
+							player_def.character_contr = &char_def;
+							player_def.level_id = mArtifexLoader->mZoneName;
+							player_def.camera_speed = 2.5f;
 							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(x,y,z), &player_def);
+							m_game_object_manager->CreateGameObject(GAME_OBJECT_CAMERA, Ogre::Vector3(x,y,z), m_game_object_manager->GetGameObject("Player"));
 						}
 						else if (i->second == "tott") {
 							CharacterControllerDef tott_def;
@@ -137,7 +139,7 @@ int DBManager::Load() {
 							tott_def.max_jump_height = 10.0f;
 							tott_def.collision_filter.filter = COL_TOTT;
 							tott_def.collision_filter.mask = COL_PLAYER | COL_WORLD_STATIC | COL_BUBBLE | COL_TOTT;
-							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y,z), &tott_def);
+							//temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y,z), &tott_def);
 						}
 						else if (i->second == "leaf") {
 							ParticleDef particleDef;
@@ -145,8 +147,16 @@ int DBManager::Load() {
 							m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(x,y,z), &particleDef);
 						}
 						else if (i->second == "gate"){
-							
+							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_GATE, Ogre::Vector3(x,y,z), NULL);
+							Ogre::Quaternion quat = Ogre::Quaternion ((Degree(spawn.rx)), Vector3::UNIT_X)*Quaternion ((Degree(spawn.ry)), Vector3::UNIT_Y)*Quaternion ((Degree(spawn.rz)), Vector3::UNIT_Z);
+							temp->GetComponentMessenger()->Notify(MSG_SET_OBJECT_ORIENTATION, &quat);
 						}
+						else if (i->second == "particle"){
+							ParticleDef particleDef;
+							particleDef.particle_name = "Particle/Smoke";
+							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_PARTICLE, Ogre::Vector3(x,y,z), &particleDef);
+						}
+						
 						interactive = true;
 					}
 				}
@@ -160,30 +170,28 @@ int DBManager::Load() {
 							false, false, false, 1.0f, 1.0f);
 					} 
 					else if (i->first == "waypoints") {
-						WayPointComponent* tempWP = static_cast<WayPointComponent*>(temp->GetComponent(EComponentType::COMPONENT_AI));
-						std::vector<std::string> waypoints = split(i->second, ',');
-						for(int j = 0; j < waypoints.size(); j++) tempWP->AddWayPoint(getWaypoint(waypoints.at(j)));
+						//WayPointComponent* tempWP = static_cast<WayPointComponent*>(temp->GetComponent(EComponentType::COMPONENT_AI));
+						//std::vector<std::string> waypoints = split(i->second, ',');
+						//for(int j = 0; j < waypoints.size(); j++) tempWP->AddWayPoint(getWaypoint(waypoints.at(j)));
 					}
 					else if (i->first == "loopWaypoints") {
-						WayPointComponent* tempWP = static_cast<WayPointComponent*>(temp->GetComponent(EComponentType::COMPONENT_AI));
-						tempWP->SetLoopable(i->second);
+						//WayPointComponent* tempWP = static_cast<WayPointComponent*>(temp->GetComponent(EComponentType::COMPONENT_AI));
+						//tempWP->SetLoopable(i->second);
 					}
 					else if (i->first == "waypoint") {		//dont render the waypoints
-						interactive = true;
+						//interactive = true;
 					}
 					else if (i->first == "followable") { 
-						followables[i->second] = static_cast<NodeComponent*>(temp->GetComponent(EComponentType::COMPONENT_NODE))->GetSceneNode();
+						//followables[i->second] = static_cast<NodeComponent*>(temp->GetComponent(EComponentType::COMPONENT_NODE))->GetSceneNode();
 					}
 				}
 
 				for ( attributemap::iterator i = spawn.attributes.begin(); i != spawn.attributes.end(); i++ )
 				{
 					if (i->first == "follow") { 
-						followers[temp] = i->second;
+						//followers[temp] = i->second;
 					}
 				}
-				delete variable_manager;
-				variable_manager = NULL;
 			}
 
 			if(!interactive) {
@@ -217,6 +225,7 @@ int DBManager::Load() {
 				{
 					SceneNode *mNode = NULL;
 					try {
+						mArtifexLoader->mObjectFile.push_back(spawn);
 						bool collision = true;
 						mNode = mArtifexLoader->mSceneMgr->getRootSceneNode()->createChildSceneNode(entName+"Node",Ogre::Vector3(spawn.x,spawn.y,spawn.z),Quaternion ((Degree(spawn.ry)), Vector3::UNIT_Y));
 						mNode->attachObject(newModel);
@@ -260,8 +269,7 @@ int DBManager::Load() {
 				}
 			}
 		}		
-	 }
-	 
+	} 			
 
 	std::map<GameObject*, std::string>::iterator goIter;
 	for (goIter = followers.begin(); goIter != followers.end(); goIter++) {
