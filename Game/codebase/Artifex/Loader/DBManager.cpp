@@ -170,26 +170,26 @@ int DBManager::Load() {
 							false, false, false, 1.0f, 1.0f);
 					} 
 					else if (i->first == "waypoints") {
-						WayPointComponent* tempWP = static_cast<WayPointComponent*>(temp->GetComponent(EComponentType::COMPONENT_AI));
-						std::vector<std::string> waypoints = split(i->second, ',');
-						for(int j = 0; j < waypoints.size(); j++) tempWP->AddWayPoint(getWaypoint(waypoints.at(j)));
+						//WayPointComponent* tempWP = static_cast<WayPointComponent*>(temp->GetComponent(EComponentType::COMPONENT_AI));
+						//std::vector<std::string> waypoints = split(i->second, ',');
+						//for(int j = 0; j < waypoints.size(); j++) tempWP->AddWayPoint(getWaypoint(waypoints.at(j)));
 					}
 					else if (i->first == "loopWaypoints") {
-						WayPointComponent* tempWP = static_cast<WayPointComponent*>(temp->GetComponent(EComponentType::COMPONENT_AI));
-						tempWP->SetLoopable(i->second);
+						//WayPointComponent* tempWP = static_cast<WayPointComponent*>(temp->GetComponent(EComponentType::COMPONENT_AI));
+						//tempWP->SetLoopable(i->second);
 					}
 					else if (i->first == "waypoint") {		//dont render the waypoints
-						interactive = true;
+						//interactive = true;
 					}
 					else if (i->first == "followable") { 
-						followables[i->second] = static_cast<NodeComponent*>(temp->GetComponent(EComponentType::COMPONENT_NODE))->GetSceneNode();
+						//followables[i->second] = static_cast<NodeComponent*>(temp->GetComponent(EComponentType::COMPONENT_NODE))->GetSceneNode();
 					}
 				}
 
 				for ( attributemap::iterator i = spawn.attributes.begin(); i != spawn.attributes.end(); i++ )
 				{
 					if (i->first == "follow") { 
-						followers[temp] = i->second;
+						//followers[temp] = i->second;
 					}
 				}
 			}

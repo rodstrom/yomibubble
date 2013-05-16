@@ -67,7 +67,6 @@ void PlayState::SecondLoading(){
 	m_scene_manager->setShadowTextureSize(1024);
 	m_scene_manager->setShadowColour(Ogre::ColourValue(0.6f,0.6f,0.6f,1.0f));
 	m_scene_manager->setShadowFarDistance(25.0f);
-	
 
 	
 	LevelDef level1;

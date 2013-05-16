@@ -24,6 +24,9 @@ void RigidbodyComponent::Notify(int type, void* msg){
 	case MSG_SET_OBJECT_POSITION:
 			m_rigidbody->getWorldTransform().setOrigin(BtOgre::Convert::toBullet(*static_cast<Ogre::Vector3*>(msg)));
 		break;
+	case MSG_SET_OBJECT_ORIENTATION:
+		m_rigidbody->getWorldTransform().setRotation(BtOgre::Convert::toBullet(*static_cast<Ogre::Quaternion*>(msg)));
+		break;
 	case MSG_RIGIDBODY_GRAVITY_SET:
 		m_rigidbody->setGravity(BtOgre::Convert::toBullet(*static_cast<Ogre::Vector3*>(msg)));
 		break;
@@ -112,6 +115,7 @@ void RigidbodyComponent::Shut(){
 	m_messenger->Unregister(MSG_RIGIDBODY_GET_BODY, this);
 	m_messenger->Unregister(MSG_INCREASE_SCALE_BY_VALUE, this);
 	m_messenger->Unregister(MSG_SET_OBJECT_POSITION, this);
+	m_messenger->Unregister(MSG_SET_OBJECT_ORIENTATION, this);
 	m_messenger->Unregister(MSG_RIGIDBODY_GRAVITY_SET, this);
 	m_messenger->Unregister(MSG_RIGIDBODY_POSITION_SET, this);
 	m_messenger->Unregister(MSG_RIGIDBODY_APPLY_IMPULSE, this);
@@ -124,6 +128,7 @@ void RigidbodyComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_RIGIDBODY_GET_BODY, this);
 	m_messenger->Register(MSG_INCREASE_SCALE_BY_VALUE, this);
 	m_messenger->Register(MSG_SET_OBJECT_POSITION, this);
+	m_messenger->Register(MSG_SET_OBJECT_ORIENTATION, this);
 	m_messenger->Register(MSG_RIGIDBODY_GRAVITY_SET, this);
 	m_messenger->Register(MSG_RIGIDBODY_POSITION_SET, this);
 	m_messenger->Register(MSG_RIGIDBODY_APPLY_IMPULSE, this);
