@@ -168,6 +168,7 @@ public:
 
 struct AnimationMsg{
 	bool blend;
+	int index;
 	Ogre::String id;
 	Ogre::String bottom_anim;
 	Ogre::String top_anim;

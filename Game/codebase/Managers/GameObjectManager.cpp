@@ -35,7 +35,7 @@ void GameObjectManager::Init(PhysicsEngine* physics_engine, Ogre::SceneManager* 
 	m_create_fptr[GAME_OBJECT_GUI]		   =	&GameObjectManager::CreateGUI;
 	m_create_fptr[GAME_OBJECT_LEAF]		   =	&GameObjectManager::CreateLeaf;
 	m_create_fptr[GAME_OBJECT_TRIGGER_TEST]=	&GameObjectManager::CreateTestTrigger;
-	m_create_fptr[GAME_OBJECT_COMPANION]   =	&GameObjectManager::CreateCompanion;
+	//m_create_fptr[GAME_OBJECT_COMPANION]   =	&GameObjectManager::CreateCompanion;
 	m_create_fptr[GAME_OBJECT_TERRAIN]	   =	&GameObjectManager::CreateTerrain;
 	m_create_fptr[GAME_OBJECT_GATE]		   =	&GameObjectManager::CreateGate;
 }
@@ -440,7 +440,7 @@ GameObject* GameObjectManager::CreateTestTrigger(const Ogre::Vector3& position, 
 	return go;
 }
 
-GameObject* GameObjectManager::CreateCompanion(const Ogre::Vector3& position, void* data, const Ogre::String& id){
+/*GameObject* GameObjectManager::CreateCompanion(const Ogre::Vector3& position, void* data, const Ogre::String& id){
 	CharacterControllerDef& def = *static_cast<CharacterControllerDef*>(data);
 	GameObject* go = new GameObject(GAME_OBJECT_COMPANION);
 	TimerComponent* timer = new TimerComponent;
@@ -478,7 +478,7 @@ GameObject* GameObjectManager::CreateCompanion(const Ogre::Vector3& position, vo
 	//way_point->AddWayPoint(static_cast<NodeComponent*>(GetGameObject("GameObject1")->GetComponent(EComponentType::COMPONENT_NODE))->GetSceneNode());
 	node_comp->GetSceneNode()->setPosition(Ogre::Vector3(position));
 	return go;
-}
+}*/
 
 GameObject* GameObjectManager::CreateTerrain(const Ogre::Vector3& position, void* data, const Ogre::String& id){
 	GameObject* go = new GameObject(GAME_OBJECT_TERRAIN);

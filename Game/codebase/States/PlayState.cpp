@@ -62,128 +62,128 @@ void PlayState::Enter(){
 	m_level_manager->AddLevel(level3);
 	m_level_manager->LoadLevel("Dayarea");*/
 
-	float x = 180.0f;
-	float y = 90.0f;
-	float z = 230.0f;
-
-	CharacterControllerDef tott_def;
-	tott_def.friction = 1.0f;
-	tott_def.velocity = 500.0f;
-	tott_def.jump_power = 200.0f;
-	tott_def.restitution = 0.0f;
-	tott_def.step_height = 2.35f;
-	tott_def.turn_speed = 1000.0f;
-	tott_def.max_jump_height = 10.0f;
-
+	//float x = 180.0f;
+	//float y = 90.0f;
+	//float z = 230.0f;
+	//
+	//CharacterControllerDef tott_def;
+	//tott_def.friction = 1.0f;
+	//tott_def.velocity = 500.0f;
+	//tott_def.jump_power = 200.0f;
+	//tott_def.restitution = 0.0f;
+	//tott_def.step_height = 2.35f;
+	//tott_def.turn_speed = 1000.0f;
+	//tott_def.max_jump_height = 10.0f;
+	//
+	//
+	//
+	//CharacterControllerDef player_def;
+	//player_def.friction = 1.0f;
+	//player_def.velocity = m_variable_manager->GetValue("Player_Speed");
+	//player_def.max_speed = m_variable_manager->GetValue("Player_Max_Speed");
+	//player_def.deceleration = m_variable_manager->GetValue("Player_Deceleration");
+	//player_def.jump_power = m_variable_manager->GetValue("Player_Jump_Power");
+	//player_def.restitution = 0.0f;
+	//player_def.step_height = 0.35f;
+	//player_def.turn_speed = 1000.0f;
+	//player_def.max_jump_height = m_variable_manager->GetValue("Player_Max_Jump_Height");
+	//player_def.mass = 1.0f;
+	//player_def.radius = 0.3f;
+	//player_def.height = 0.4f;
+	//player_def.collision_filter.filter = COL_PLAYER;
+	//player_def.collision_filter.mask = COL_BUBBLE | COL_BUBBLE_TRIG | COL_TOTT | COL_WORLD_STATIC | COL_WORLD_TRIGGER;
+	//player_def.offset.y = 0.5f;
+	//
+	///*CharacterControllerDef companion_def;
+	//companion_def.friction = 0.1f;
+	//companion_def.velocity = 2.0f;
+	//companion_def.max_speed = 4.0f;
+	//companion_def.deceleration = 10.0f;
+	//companion_def.jump_power = 250.0f;
+	//companion_def.restitution = 0.0f;
+	//companion_def.step_height = 0.35f;
+	//companion_def.turn_speed = 1000.0f;
+	//companion_def.max_jump_height = 0.6f;
+	//companion_def.mass = 1.0f;
+	//companion_def.radius = 0.3f;
+	//companion_def.height = 0.4f;
+	//companion_def.collision_filter.filter = COL_COMPANION;
+	//companion_def.collision_filter.mask = COL_BUBBLE | COL_BUBBLE_TRIG | COL_TOTT | COL_WORLD_STATIC | COL_WORLD_TRIGGER;
+	//companion_def.offset.y = 0.5f;*/  
+	//
+	//Ogre::Vector3 player_pos = Ogre::Vector3::ZERO;
+	///*Ogre::String terrain = "Dayarea";
+	////m_game_object_manager->CreateGameObject(GAME_OBJECT_TERRAIN, Ogre::Vector3(0,0,0), &terrain);
+	//if (terrain == "NightArea"){
+	//	player_pos = Ogre::Vector3(230, 72, 298);
+	//}
+	//else if (terrain == "Dayarea"){
+	//	player_pos = Ogre::Vector3(170, 75, 173);
+	//	
+	//	ParticleDef particleDef;
+	//	particleDef.particle_name = "Particle/Smoke";
+	//	m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(168,75,175), &particleDef);
+	//}
+	//else if (terrain == "try"){
+	//	player_pos = Ogre::Vector3(230, 72, 298);
+	//}*/
+	//
+	//Ogre::Light* light = m_scene_manager->createLight("light1");
+	//light->setType(Ogre::Light::LT_POINT);
+	//light->setPosition(player_pos);
+	//light->setSpecularColour(Ogre::ColourValue::Blue);
+	//light->setDiffuseColour(Ogre::ColourValue::White);
+	//light->setAttenuation(75.0f, 0.0f, 0.1f, 0.012f);
+	//light->setPowerScale(0.01f);
+	//
+	//m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(player_pos.x,player_pos.y+1.0f,player_pos.z), &player_def, "Player");
+	////m_game_object_manager->CreateGameObject(GAME_OBJECT_COMPANION, Ogre::Vector3(player_pos.x+15.0f, player_pos.y+1.0f, player_pos.z), &companion_def);
+	////m_game_object_manager->CreateGameObject(GAME_OBJECT_GATE, player_pos, NULL);
+	//PlaneDef plane_def;
+	//plane_def.material_name = "Examples/BeachStones";
+	//plane_def.plane_name = "plane";
+	//plane_def.friction = 1.0f;
+	//plane_def.restitution = 0.8f;
+	//plane_def.collision_filter.filter = COL_WORLD_STATIC;
+	//plane_def.collision_filter.mask = COL_BUBBLE | COL_PLAYER | COL_TOTT | COL_COMPANION;
+	////m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(player_pos.x,player_pos.y - 2.0f,player_pos.z), &plane_def);
+	//
+	////plane_def.collision_filter.mask = COL_BUBBLE | COL_PLAYER | COL_TOTT;
+	//m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(player_pos.x,player_pos.y + 8.0f,player_pos.z), &plane_def);
+	//m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
+	//m_scene_manager->setShadowUseInfiniteFarPlane(false);
+	//m_scene_manager->setShadowTextureSelfShadow(true);
+	//m_scene_manager->setShadowTextureCount(1);
+	//m_scene_manager->setShadowTextureSize(2048);
+	//m_scene_manager->setShadowColour(Ogre::ColourValue(0.6f,0.6f,0.6f,1.0f));
+	//m_scene_manager->setShadowFarDistance(30.0f);
+	//m_camera->setNearClipDistance(1.0f);
 	
-
-	CharacterControllerDef player_def;
-	player_def.friction = 1.0f;
-	player_def.velocity = m_variable_manager->GetValue("Player_Speed");
-	player_def.max_speed = m_variable_manager->GetValue("Player_Max_Speed");
-	player_def.deceleration = m_variable_manager->GetValue("Player_Deceleration");
-	player_def.jump_power = m_variable_manager->GetValue("Player_Jump_Power");
-	player_def.restitution = 0.0f;
-	player_def.step_height = 0.35f;
-	player_def.turn_speed = 1000.0f;
-	player_def.max_jump_height = m_variable_manager->GetValue("Player_Max_Jump_Height");
-	player_def.mass = 1.0f;
-	player_def.radius = 0.3f;
-	player_def.height = 0.4f;
-	player_def.collision_filter.filter = COL_PLAYER;
-	player_def.collision_filter.mask = COL_BUBBLE | COL_BUBBLE_TRIG | COL_TOTT | COL_WORLD_STATIC | COL_WORLD_TRIGGER;
-	player_def.offset.y = 0.5f;
-
-	CharacterControllerDef companion_def;
-	companion_def.friction = 0.1f;
-	companion_def.velocity = 2.0f;
-	companion_def.max_speed = 4.0f;
-	companion_def.deceleration = 10.0f;
-	companion_def.jump_power = 250.0f;
-	companion_def.restitution = 0.0f;
-	companion_def.step_height = 0.35f;
-	companion_def.turn_speed = 1000.0f;
-	companion_def.max_jump_height = 0.6f;
-	companion_def.mass = 1.0f;
-	companion_def.radius = 0.3f;
-	companion_def.height = 0.4f;
-	companion_def.collision_filter.filter = COL_COMPANION;
-	companion_def.collision_filter.mask = COL_BUBBLE | COL_BUBBLE_TRIG | COL_TOTT | COL_WORLD_STATIC | COL_WORLD_TRIGGER;
-	companion_def.offset.y = 0.5f;			  
-
-	Ogre::Vector3 player_pos = Ogre::Vector3::ZERO;
-	Ogre::String terrain = "Dayarea";
-	//m_game_object_manager->CreateGameObject(GAME_OBJECT_TERRAIN, Ogre::Vector3(0,0,0), &terrain);
-	if (terrain == "NightArea"){
-		player_pos = Ogre::Vector3(230, 72, 298);
-	}
-	else if (terrain == "Dayarea"){
-		player_pos = Ogre::Vector3(170, 75, 173);
-		
-		ParticleDef particleDef;
-		particleDef.particle_name = "Particle/Smoke";
-		m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(168,75,175), &particleDef);
-	}
-	else if (terrain == "try"){
-		player_pos = Ogre::Vector3(230, 72, 298);
-	}
-
-	Ogre::Light* light = m_scene_manager->createLight("light1");
-	light->setType(Ogre::Light::LT_POINT);
-	light->setPosition(player_pos);
-	light->setSpecularColour(Ogre::ColourValue::Blue);
-	light->setDiffuseColour(Ogre::ColourValue::White);
-	light->setAttenuation(75.0f, 0.0f, 0.1f, 0.012f);
-	light->setPowerScale(0.01f);
-
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(player_pos.x,player_pos.y+1.0f,player_pos.z), &player_def, "Player");
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_COMPANION, Ogre::Vector3(player_pos.x+15.0f, player_pos.y+1.0f, player_pos.z), &companion_def);
-	//m_game_object_manager->CreateGameObject(GAME_OBJECT_GATE, player_pos, NULL);
-	PlaneDef plane_def;
-	plane_def.material_name = "Examples/BeachStones";
-	plane_def.plane_name = "plane";
-	plane_def.friction = 1.0f;
-	plane_def.restitution = 0.8f;
-	plane_def.collision_filter.filter = COL_WORLD_STATIC;
-	plane_def.collision_filter.mask = COL_BUBBLE | COL_PLAYER | COL_TOTT | COL_COMPANION;
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(player_pos.x,player_pos.y - 2.0f,player_pos.z), &plane_def);
-
-	plane_def.collision_filter.mask = COL_BUBBLE | COL_PLAYER | COL_TOTT;
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(player_pos.x,player_pos.y + 8.0f,player_pos.z), &plane_def);
-	m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
-	m_scene_manager->setShadowUseInfiniteFarPlane(false);
-	m_scene_manager->setShadowTextureSelfShadow(true);
-	m_scene_manager->setShadowTextureCount(1);
-	m_scene_manager->setShadowTextureSize(2048);
-	m_scene_manager->setShadowColour(Ogre::ColourValue(0.6f,0.6f,0.6f,1.0f));
-	m_scene_manager->setShadowFarDistance(30.0f);
-	m_camera->setNearClipDistance(1.0f);
-	
-	if(MaterialManager::getSingleton().getByName("Ogre/TextureShadowCaster").isNull())
+	//if(MaterialManager::getSingleton().getByName("Ogre/TextureShadowCaster").isNull())
     // Render a frame to get the shadow materials created
-		Ogre::Root::getSingleton().renderOneFrame();
+		//Ogre::Root::getSingleton().renderOneFrame();
 
    // Get all shadow materials
-	std::vector<MaterialPtr> tmpMaterials;
-   TexturePtr tmpTexturePtr = m_scene_manager->getShadowTexture(0);
-   String tmpMaterialName = tmpTexturePtr->getName() + "Mat" + m_scene_manager->getName();
-   tmpMaterials.push_back(MaterialManager::getSingleton().getByName(tmpMaterialName));
-   tmpMaterials.push_back(MaterialManager::getSingleton().getByName("Ogre/TextureShadowCaster"));
-   tmpMaterials.push_back(MaterialManager::getSingleton().getByName("Ogre/TextureShadowReceiver"));
+	//std::vector<MaterialPtr> tmpMaterials;
+   //TexturePtr tmpTexturePtr = m_scene_manager->getShadowTexture(0);
+   //String tmpMaterialName = tmpTexturePtr->getName() + "Mat" + m_scene_manager->getName();
+   //tmpMaterials.push_back(MaterialManager::getSingleton().getByName(tmpMaterialName));
+   //tmpMaterials.push_back(MaterialManager::getSingleton().getByName("Ogre/TextureShadowCaster"));
+   //tmpMaterials.push_back(MaterialManager::getSingleton().getByName("Ogre/TextureShadowReceiver"));
 
    // Loop through the list of shadow materials
-   unsigned int i = 0;
-   for( ; i < tmpMaterials.size(); i++ )
-   {
-    // Check if the current shadow material exists
-    if( !tmpMaterials[i].isNull() )
-     // Set the depth bias of the shadow material
-     tmpMaterials[i]->getTechnique(0)->getPass(0)->setDepthBias(5.0f);
-   }
-
-   // Clear the temporary list of shadow materials
-   tmpMaterials.clear();
-
+   //	unsigned int i = 0;
+   //	for( ; i < tmpMaterials.size(); i++ )
+   //	{
+   //	 // Check if the current shadow material exists
+   //	 if( !tmpMaterials[i].isNull() )
+   //	  // Set the depth bias of the shadow material
+   //	  tmpMaterials[i]->getTechnique(0)->getPass(0)->setDepthBias(5.0f);
+   //	}
+   //	
+   //	// Clear the temporary list of shadow materials
+   //	tmpMaterials.clear();
+	
 }
 
 
