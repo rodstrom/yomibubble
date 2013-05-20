@@ -18,6 +18,7 @@
 #include "nSystem.h"
 #include "Convert.h"
 #include "nSystemPrereq.h"
+#include "Functor.h"
 
 // C++ Generic includes
 #include <vector>

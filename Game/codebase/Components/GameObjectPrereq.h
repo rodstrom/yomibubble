@@ -17,6 +17,8 @@ enum EGameObject{
 	GAME_OBJECT_GATE,
 	GAME_OBJECT_LOADING_SCREEN,
 	GAME_OBJECT_NEXT_LEVEL,
+	GAME_OBJECT_CAMERA,
+	GAME_OBJECT_PARTICLE,
 	GAME_OBJECT_SIZE
 };
 
@@ -60,9 +62,8 @@ struct CollisionDef {
 };
 
 enum ECollisionTypes{
-	COLLISION_FLAG_NONE = 0,
-	COLLISION_FLAG_STATIC,
-	COLLISION_FLAG_GAME_OBJECT,
+	COLLISION_FLAG_STATIC = 0,
+	COLLISION_FLAG_GAME_OBJECT
 };
 
 struct CharacterControllerDef{
@@ -82,6 +83,8 @@ struct CharacterControllerDef{
 	float height;
 	float mass;
 	Ogre::String mesh;
+	float fall_acceleration;
+	float max_fall_speed;
 	Ogre::Vector3 offset;
 	CollisionFilter collision_filter;
 };
@@ -93,20 +96,14 @@ struct PlayerDef{
 };
 
 struct RigidBodyDef{
-	RigidBodyDef(void) : collider_type(0.0f), mass(0.0f), body_type(0), restitution(0.0f), friction(0.0f), rolling_friction(0.0f), 
-		radius(0.0f), x(0.0f), y(0.0f), z(0.0f), collision_flag(COLLISION_FLAG_GAME_OBJECT) {}
+	RigidBodyDef(void) : collider_type(0.0f), mass(0.0f), body_type(0), restitution(0.0f), friction(0.0f), rolling_friction(0.0f) {}
 	RigidBodyDef(int p_collider_type, float p_mass) : collider_type(p_collider_type), mass(p_mass) {} 
 	int body_type;
 	int collider_type;
-	int collision_flag;
 	float mass;
 	float restitution;
 	float friction;
 	float rolling_friction;
-	float radius;
-	float x;
-	float y;
-	float z;
 	CollisionFilter collision_filter;
 };
 

@@ -7,14 +7,15 @@ class GameObjectManager;
 class GameObject
 {
 public:
-	GameObject(int type, const Ogre::String& id = Ogre::StringUtil::BLANK);
+	GameObject(int type);
+	GameObject(int type, const Ogre::String& id);
 	~GameObject(void);
 
 	void Update(float dt);
 	Component* GetComponent(int type);
 	void GetComponents(int type, std::vector<Component*>& list);	// get a list of all components of selected type, should there be more than one of the same type
-	void AddComponent(Component* component);			// Adds the component to the back of the component list.
-	void AddComponentToFront(Component* component);		// Adds the component to the front instead of the back. This is useful when having constraints and rigid body components because you need to remove the constraint before removing the rigid body.
+	void AddComponent(Component* component);
+	void AddComponentToFront(Component* component);
 	void AddUpdateable(IComponentUpdateable* updateable);
 	void Shut();
 	bool DoUpdate();		// check if the game object has any components that requires updating with delta time
@@ -23,10 +24,10 @@ public:
 	void RemoveComponent(Component* component);
 	void RemoveComponent(int type, bool all = false);
 	int GetType() { return m_type; }	// Returns the type of game object (eg: Player, Tott, Leaf etc)
-	const Ogre::String& GetId() const { return m_id; }		// Returns the unique ID of the game object.
+	const Ogre::String& GetId() const { return m_id; }
 	void SetGameObjectManager(GameObjectManager* game_object_manager) { m_game_object_manager = game_object_manager; }
 	void SetId(const Ogre::String& id) { m_id = id; }
-	Component* CreateComponent(int type, const Ogre::Vector3& pos, void* data);		// Creates and adds a component of specified type (Still work in progress)
+	Component* CreateComponent(int type, const Ogre::Vector3& pos, void* data);		// Creates and adds a component of specified type
 	GameObject* GetGameObject(const Ogre::String& id) const;
 
 private:

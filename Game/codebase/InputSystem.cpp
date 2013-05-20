@@ -304,10 +304,10 @@ bool InputSystem::axisMoved(const OIS::JoyStickEvent& e, int axis){
 	float camX = 0.0f; 
 	float camY = 0.0f;
 	if(e.state.mAxes[2].abs > 16384 || e.state.mAxes[2].abs < -16384) {
-		camY = e.state.mAxes[2].abs * 0.0005f;
+		camY = e.state.mAxes[2].abs * 0.0005f *(1);
 	}
 	if(e.state.mAxes[3].abs > 16384 || e.state.mAxes[3].abs < -16384) {
-		camX = e.state.mAxes[3].abs * 0.0005f;
+		camX = e.state.mAxes[3].abs * 0.0005f *(1);
 	}
 	//m_game->InjectRelativeCameraAxis(camX, camY, 0.0f);
 

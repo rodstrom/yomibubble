@@ -12,7 +12,6 @@ public:
 	virtual ~RigidbodyComponent(void){}
 	virtual void Notify(int type, void* message);
 	virtual void Init(const Ogre::Vector3& position, Ogre::Entity* entity, PhysicsEngine* physics_engine, const RigidBodyDef& def);
-	virtual void Init(const Ogre::Vector3& position, PhysicsEngine* physics_engine, const RigidBodyDef& def);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
 	btRigidBody* GetRigidbody() { return m_rigidbody; }
@@ -58,7 +57,7 @@ public:
 	CharacterController(void) : m_velocity(0.0), m_turn_speed(0.0f), 
 		m_has_follow_cam(false), m_is_jumping(false), m_on_ground(true), m_jump_timer(0.0f), m_y_bottom_offset(0.0f), m_compound_shape(NULL),
 		m_max_jump_height(0.0f), m_direction(btVector3(0,0,0)), m_deceleration(0.0f), m_max_speed(0.0f), m_step_height(0.0f),
-		m_actual_direction(Ogre::Vector3::ZERO)
+		m_actual_direction(Ogre::Vector3::ZERO), m_fall_acceleration(0.0f), m_max_fall_speed(0.0f)
 	{ m_type = COMPONENT_CHARACTER_CONTROLLER; m_update = true; }
 	virtual ~CharacterController(void){}
 	virtual void Notify(int type, void* msg);
@@ -84,6 +83,7 @@ protected:
 	btCompoundShape* m_compound_shape;
 
 	float		m_max_speed;
+	float		m_max_fall_speed;
 	float		m_velocity;
 	float		m_deceleration;
 	float		m_air_deceleration;
@@ -93,6 +93,7 @@ protected:
 	float		m_jump_timer;
 	float		m_step_height;
 	float		m_y_bottom_offset;
+	float		m_fall_acceleration;
 	bool		m_has_follow_cam;
 	bool		m_is_jumping;
 	bool		m_on_ground;
@@ -134,7 +135,7 @@ private:
 
 class HingeConstraintComponent : public Component, public IComponentObserver{
 public:
-	HingeConstraintComponent(void){}
+	HingeConstraintComponent(void){ m_type = COMPONENT_HINGE_CONSTRAINT; }
 	virtual ~HingeConstraintComponent(void){}
 
 	virtual void Notify(int type, void* msg);
@@ -176,24 +177,45 @@ public:
 	virtual void Notify(int type, void* msg){}
 	virtual void Shut(){}
 	virtual void SetMessenger(ComponentMessenger* messenger){}
-	virtual void Init(PhysicsEngine* physics_engin);
+	virtual void Init(PhysicsEngine* physics_engine);
 
 protected:
 	PhysicsEngine* m_physics_engine;
 };
 
-class PlayerRaycastCollisionComponent : public RaycastCollisionComponent {
+class CameraRaycastCollisionComponent : public RaycastCollisionComponent {
 public:
-	PlayerRaycastCollisionComponent(void){}
-	virtual ~PlayerRaycastCollisionComponent(void){}
+	CameraRaycastCollisionComponent(void){}
+	virtual ~CameraRaycastCollisionComponent(void){}
 
 	virtual void Shut();
 	virtual void Notify(int type, void* msg);
 	virtual void SetMessenger(ComponentMessenger* messenger);
 
 protected:
+};
+
+class PlayerRaycastCollisionComponent : public RaycastCollisionComponent {
+public:
+	PlayerRaycastCollisionComponent(void) : m_into_bubble_vel(0.0f), m_stand_on_vel(0.0f), m_bounce_vel(0.0f){}
+	virtual ~PlayerRaycastCollisionComponent(void){}
+
+	virtual void Shut();
+	virtual void Notify(int type, void* msg);
+	virtual void SetMessenger(ComponentMessenger* messenger);
+	virtual void Init(PhysicsEngine* physics_engine);
+
+	virtual void SetCustomVariables(float bounce_mod);
+
+protected:
+	float m_bounce_mod;
 	void PlayerBubble(GameObject*);
 	void PlayerLandscape();
+
+	float m_into_bubble_vel;
+	float m_stand_on_vel;
+	float m_bounce_vel;
+	float m_bounce_power;
 };
 
 class BobbingComponent : public Component, public IComponentUpdateable{

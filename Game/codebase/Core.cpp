@@ -5,6 +5,7 @@
 #include "MessageSystem.h"
 #include "Managers\SoundManager.h"
 #include "Managers\CollisionManager.h"
+#include "Managers\VariableManager.h"
 
 Core::Core(void) : m_root(NULL), m_game(NULL), m_message_system(NULL), m_input_system(NULL), m_run(true) {}
 Core::~Core(void){}
@@ -55,8 +56,9 @@ bool Core::Init(){
 	Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
 	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
-	/*Ogre::SceneManager* retardedBugfix = */m_root->createSceneManager(Ogre::ST_GENERIC);
-
+	/*Ogre::SceneManager* retardedBugfix = */m_root->createSceneManager(Ogre::ST_GENERIC); // Herman was here
+	if (!VariableManager::GetSingletonPtr()->Init())
+		return false;
 	m_sound_manager = new SoundManager();
 	m_sound_manager->LoadAudio();
 
@@ -98,13 +100,14 @@ void Core::Run(){
 		if (render){
 			m_game->UpdateInput();
 			m_input_system->Capture();
-			if (!m_game->Update((float)dt)){
+			if (!m_game->Update(dt)){
 				return;
 			}
 			if (!m_root->renderOneFrame((float)dt)){
 				return;
 			}
 		}
+		m_root->renderOneFrame();
 	}
 }
 

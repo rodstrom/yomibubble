@@ -7,17 +7,18 @@
 
 int GameObject::m_object_counter = 0;
 
+GameObject::GameObject(int type) : m_type(type){
+	m_messenger = new ComponentMessenger;
+	m_id = "GameObject" + NumberToString(m_object_counter);
+	m_object_counter++;
+	Init();
+}
+
 GameObject::GameObject(int type, const Ogre::String& id){
 	m_messenger = new ComponentMessenger;
 	Init();
-	if (id == Ogre::StringUtil::BLANK){
-		m_id = "GameObject" + NumberToString(m_object_counter);
-	}
-	else {
-		m_id = id;
-	}
+	m_id = id;
 	m_object_counter++;
-	m_type = type;
 }
 
 GameObject::~GameObject(void){}
@@ -51,6 +52,10 @@ void GameObject::Update(float dt){
 	}
 }
 
+GameObject* GameObject::GetGameObject(const Ogre::String& id) const{
+ return m_game_object_manager->GetGameObject(id);
+}
+
 Component* GameObject::GetComponent(int type){
 	if (!m_components.empty()){
 		for (unsigned int i = 0; i < m_components.size(); i++){
@@ -60,10 +65,6 @@ Component* GameObject::GetComponent(int type){
 		}
 	}
 	return NULL;
-}
-
-GameObject* GameObject::GetGameObject(const Ogre::String& id) const{
-	return m_game_object_manager->GetGameObject(id);
 }
 
 void GameObject::AddComponent(Component* component){
@@ -195,11 +196,19 @@ Component* GameObject::CreateFollowCameraComponent(const Ogre::Vector3& pos, voi
 }
 
 Component* GameObject::CreatePoint2PointConstraintComponent(const Ogre::Vector3& pos, void* data){
-	return NULL;
+	Point2PointConstraintDef& def = *static_cast<Point2PointConstraintDef*>(data);
+	Point2PointConstraintComponent* cons = new Point2PointConstraintComponent;
+	AddComponentToFront(cons);
+	cons->Init(GetGameObjectManager()->GetPhysicsEngine(), def.body_a, def.body_b, def.pivot_a, def.pivot_b);
+	return cons;
 }
 
 Component* GameObject::CreateHingeConstraintComponent(const Ogre::Vector3& pos, void* data){
-	return NULL;
+	HingeConstraintDef& def = *static_cast<HingeConstraintDef*>(data);
+	HingeConstraintComponent* hcc = new HingeConstraintComponent;
+	AddComponentToFront(hcc);
+	hcc->Init(GetGameObjectManager()->GetPhysicsEngine(), def.body_a, def.body_b, def.pivot_a, def.pivot_b, def.axis_a, def.axis_b);
+	return hcc;
 }
 
 Component* GameObject::CreateChildNode(const Ogre::Vector3& pos, void* data){

@@ -37,6 +37,7 @@ public:
 	void RemoveRaycastComponent(RaycastComponent* comp);
 	void AddObjectSimulationStep(IComponentSimulationStep* ob) { m_ob_simulation_steps.push_back(ob); }
 	void RemoveObjectSimulationStep(IComponentSimulationStep* ob);
+	void ResetPhysicsEngine();		// deletes and recreates the physics engine
 
 private:
 	void RaycastQuery();

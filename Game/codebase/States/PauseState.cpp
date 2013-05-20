@@ -25,7 +25,7 @@ void PauseState::Enter(){
 	m_viewport = FindByName("PlayState")->GetViewport();
 
 	m_game_object_manager = new GameObjectManager;
-	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager, m_message_system);
+	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager, m_message_system, NULL);
 
 	OverlayDef menuBackground;
 	menuBackground.overlay_name = "Pause";

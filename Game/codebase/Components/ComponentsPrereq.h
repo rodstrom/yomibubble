@@ -14,6 +14,7 @@ enum EComponentType{
 	COMPONENT_CHARACTER_CONTROLLER,
 	COMPONENT_AUDIO,
 	COMPONENT_CAMERA,
+	COMPONENT_CAMERA_COLLISION,
 	COMPONENT_POINT2POINT_CONSTRAINT,
 	COMPONENT_HINGE_CONSTRAINT,
 	COMPONENT_FOLLOW_CAMERA,
@@ -22,6 +23,8 @@ enum EComponentType{
 	COMPONENT_TRIGGER,
 	COMPONENT_SYNCED_TRIGGER,
 	COMPONENT_RAYCAST,
+	COMPONENT_TERRAIN,
+	COMPONENT_PLAYER_STAFF,
 	COMPONENT_SIZE
 };
 
@@ -33,17 +36,25 @@ enum EComponentMsg{
 	MSG_RIGIDBODY_GET_BODY,
 	MSG_RIGIDBODY_GRAVITY_SET,
 	MSG_RIGIDBODY_POSITION_SET,
+	MSG_RIGIDBODY_POSITION_GET,
 	MSG_RIGIDBODY_APPLY_IMPULSE,
 	MSG_RIGIDBODY_COLLISION_FLAG_SET,
 	MSG_RIGIDBODY_COLLISION_FLAG_REMOVE,
 	MSG_ANIMATION_PLAY,
 	MSG_ANIMATION_PAUSE,
 	MSG_ANIMATION_BLEND,
+	MSG_ANIMATION_LOOP,
+	MSG_ANIMATION_QUEUE,
+	MSG_ANIMATION_CLEAR_QUEUE,
+	MSG_ANIMATION_CLEAR_CALLBACK,
+	MSG_ANIMATION_CALLBACK,
+	MSG_ANIMATION_SET_WAIT,
 	MSG_CHARACTER_CONTROLLER_VELOCITY_SET,
 	MSG_CHARACTER_CONTROLLER_TURN_SPEED_SET,
 	MSG_CHARACTER_CONTROLLER_SET_DIRECTION,
 	MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_SET,
 	MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_GET,
+	MSG_SET_OBJECT_ORIENTATION,
 	MSG_CHARACTER_CONTROLLER_JUMP,
 	MSG_CHARACTER_CONTROLLER_GRAVITY_SET,
 	MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_SET,
@@ -52,6 +63,7 @@ enum EComponentMsg{
 	MSG_CAMERA_GET_CAMERA_NODE,
 	MSG_CAMERA_GET_CAMERA,
 	MSG_CAMERA_SET_ACTIVE,
+	MSG_CAMERA_COLL_UPDATE,
 	MSG_INPUT_MANAGER_GET,
 	MSG_GET_2D_OVERLAY_CONTAINER,
 	MSG_GET_OVERLAY_COLLISION_CALLBACK,
@@ -67,7 +79,6 @@ enum EComponentMsg{
 	MSG_DEFAULT_CAMERA_POS,
 	MSG_INCREASE_SCALE_BY_VALUE,
 	MSG_SET_OBJECT_POSITION,
-	MSG_SET_OBJECT_ORIENTATION,
 	MSG_OVERLAY_SHOW,
 	MSG_OVERLAY_HIDE,
 	MSG_OVERLAY_HOVER_ENTER,
@@ -87,7 +98,9 @@ enum EComponentMsg{
 	MSG_START_TIMER,
 	MSG_RAYCAST_COLLISION_GAME_OBJECT,
 	MSG_RAYCAST_COLLISION_STATIC_ENVIRONMENT,
-	MSG_SIZE
+	MSG_CAMERA_RAYCAST_COLLISION_STATIC_ENVIRONMENT,
+	MSG_CAMERA_ENV_COLLISION,
+	MSG_ON_GROUND,	MSG_SIZE
 };
 
 enum EColliderType{
@@ -104,10 +117,15 @@ enum EBodyType{
 };
 
 enum EPlayerState{
-	PLAYER_STATE_NORMAL = 0,
+	PLAYER_STATE_IDLE = 0,
+	PLAYER_STATE_MOVE,
+	PLAYER_STATE_BLOW_BUBBLE,
 	PLAYER_STATE_ON_BUBBLE,
 	PLAYER_STATE_INSIDE_BUBBLE,
-	PLAYER_STATE_BOUNCING,
+	PLAYER_STATE_JUMP,
+	PLAYER_STATE_FALLING,
+	PLAYER_STATE_LAND,
+	PLAYER_STATE_BOUNCE,
 	PLAYER_STATE_SIZE
 };
 
@@ -124,6 +142,7 @@ public:
 	virtual void SetMessenger(ComponentMessenger* messenger) = 0;
 	virtual void Shut() = 0;
 	virtual bool DoUpdate() const { return m_update; }
+	ComponentMessenger* GetMessenger() const { return m_messenger; }
 protected:
 	ComponentMessenger* m_messenger;
 	GameObject* m_owner;
@@ -165,15 +184,26 @@ public:
 };
 
 struct AnimationMsg{
+	AnimationMsg(void) : index(0), loop(true), full_body(false), blend(false), wait(false){}
+	int index;
 	bool blend;
+	bool loop;
+	bool full_body;
+	bool wait;
 	Ogre::String id;
-	Ogre::String bottom_anim;
-	Ogre::String top_anim;
 };
 
 struct AddForceMsg{
 	Ogre::Vector3 pwr;
 	Ogre::Vector3 dir;
+};
+
+struct AnimationData{
+	AnimationData(void) : anim_state(NULL), id(Ogre::StringUtil::BLANK), wait(false){}
+	AnimationData(Ogre::AnimationState* p_anim_state, const Ogre::String& p_id, bool p_wait) : anim_state(p_anim_state), id(p_id), wait(p_wait) {}
+	Ogre::AnimationState* anim_state;
+	Ogre::String id;
+	bool wait;
 };
 
 struct ButtonDef{
@@ -215,11 +245,35 @@ struct RaycastDef{
 	Ogre::String body_id;
 };
 
+struct AltRaycastDef{
+	Ogre::SceneNode* node;
+	btVector3 origin;
+	btVector3 length;
+};
+
 struct BubbleDef{
 	btRigidBody* connection_body;		// the static trigger body the joint will connect to while blowing.
 	float start_scale;
 	float restitution;
 	float friction;
+};
+
+struct HingeConstraintDef{
+	HingeConstraintDef(void) : body_a(NULL), body_b(NULL), pivot_a(btVector3(0,0,0)), pivot_b(btVector3(0,0,0)), axis_a(btVector3(0,0,0)), axis_b(btVector3(0,0,0)) {}
+	btRigidBody* body_a;
+	btRigidBody* body_b;
+	btVector3 pivot_a;
+	btVector3 pivot_b;
+	btVector3 axis_a;
+	btVector3 axis_b;
+};
+
+struct Point2PointConstraintDef{
+	Point2PointConstraintDef(void) : body_a(NULL), body_b(NULL), pivot_a(btVector3(0,0,0)), pivot_b(btVector3(0,0,0)) {}
+	btRigidBody* body_a;
+	btRigidBody* body_b;
+	btVector3 pivot_a;
+	btVector3 pivot_b;
 };
 
 #endif // _N_COMPONENTS_PREREQ_H_

@@ -64,21 +64,24 @@ protected:
 
 class AnimationComponent : public MeshRenderComponent, public IComponentUpdateable{
 public:
-	AnimationComponent(void){ m_type = COMPONENT_ANIMATION; m_update = true; }
+	AnimationComponent(void) : m_callback(NULL){ m_type = COMPONENT_ANIMATION; m_update = true; }
 	virtual ~AnimationComponent(void){}
 	virtual void Update(float dt);
 	virtual void Notify(int type, void* message);
-	virtual void Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager);
-	virtual void Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager, const Ogre::String& node_id);
+	virtual void Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager, bool remove_weights = false);
+	virtual void Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager, const Ogre::String& node_id, bool remove_weights = false);
 	virtual void AddAnimationStates(unsigned int value = 1);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
 
 	AnimationBlender* m_animation_blender;
-
 protected:
-	std::vector<Ogre::AnimationState*>	m_animation_states;
-	
+	void PlayQueued();
+	void FixPlayerWeights();	// Ugly hack for the player to fix animation weights because we didn't do enough research in the beginning
+	void RemoveWeights(std::vector<std::string>& list, Ogre::Animation* anim);
+	std::vector<AnimationData>	m_animation_states;
+	std::deque<AnimationMsg> m_queue;
+	std::function<void()> m_callback;
 };
 
 class Overlay2DComponent : public Component, public IComponentObserver {
@@ -118,6 +121,22 @@ protected:
 	Ogre::Viewport*			m_view_port;
 	OverlayCollisionState	m_ocs;
 	bool					m_show_overlay;
+};
+
+class PlayerStaffComponent : public Component, public IComponentUpdateable, public IComponentObserver{
+public:
+	PlayerStaffComponent(void){ m_type = COMPONENT_PLAYER_STAFF; }
+	virtual ~PlayerStaffComponent(void) {}
+	virtual void Notify(int type, void* msg);
+	virtual void Update(float dt);
+	virtual void Shut();
+	virtual void SetMessenger(ComponentMessenger* messenger);
+	virtual void Init(Ogre::SceneManager* scene_manager, Ogre::Entity* player_entity);
+protected:
+	Ogre::SceneManager* m_scene_manager;
+	Ogre::Entity* m_entity;
+	Ogre::SceneNode* m_node;
+	Ogre::Entity* m_player_entity;
 };
 
 class Overlay2DAnimatedComponent : public IComponentUpdateable, public Overlay2DComponent{
@@ -193,13 +212,15 @@ class PhysicsEngine;
 class TerrainComponent : public Component, public IComponentObserver{
 public:
 	TerrainComponent(void) : m_scene_manager(NULL), m_physics_engine(NULL), m_artifex_loader(NULL), m_terrain_shape(NULL), 
-		m_terrain_body(NULL), m_terrain_motion_state(NULL), m_data_converter(NULL){}
+		m_terrain_body(NULL), m_terrain_motion_state(NULL), m_data_converter(NULL){ m_type = COMPONENT_TERRAIN; }
 	virtual ~TerrainComponent(void){}
 
 	virtual void Notify(int type, void* message);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
 	void Init(Ogre::SceneManager* scene_manager, PhysicsEngine* physics_engine, GameObjectManager* game_object_manager, SoundManager* sound_manager, const Ogre::String& filename);
+
+	btRigidBody* GetRigidBody() { return m_terrain_body; }
 
 protected:
 	float*							m_data_converter;

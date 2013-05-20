@@ -13,7 +13,7 @@ void MenuState::Enter(){
 	//m_sound_manager->Init(m_scene_manager);
 
 	m_camera = m_scene_manager->createCamera("MenuCamera");
-	m_camera->setNearClipDistance(0.1);
+	m_camera->setNearClipDistance(0.1f);
 	m_viewport = m_render_window->addViewport(m_camera);
 	m_viewport->setBackgroundColour(Ogre::ColourValue(0.0,0.0,1.0));
 	m_camera->setAspectRatio(Ogre::Real(m_viewport->getActualWidth()) / Ogre::Real(m_viewport->getActualHeight()));
@@ -24,7 +24,7 @@ void MenuState::Enter(){
 	//m_sound_manager = new SoundManager(m_scene_manager, m_camera);
 	//m_sound_manager->LoadAudio();
 	m_game_object_manager = new GameObjectManager;
-	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager, m_message_system);
+	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager, m_message_system, NULL);
 
 	OverlayDef menuBackground;
 	menuBackground.overlay_name = "Menu";
