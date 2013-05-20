@@ -17,6 +17,7 @@ public:
 	virtual void ChangeState(State* state) = 0;
 	virtual bool PushState(State* state) = 0;
 	virtual void PopState() = 0;
+	virtual void Init(State* state) = 0;
 };
 
 //class State : public Ogre::FrameListener

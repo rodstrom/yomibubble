@@ -27,9 +27,10 @@ public:
 	bool PushState(State*);
 	void PopState();
 	void Shut();
+	
+	void Init(State* state);
 
 protected:
-	void Init(State* state);
 	void Cleanup(State* state);
 	
 	std::vector<State*>			m_state_stack;

@@ -9,7 +9,7 @@ LevelManager::LevelManager(GameObjectManager* game_object_manager, Ogre::SceneMa
 LevelManager::~LevelManager(void){}
 
 
-void LevelManager::ChangeLevel(){
+void LevelManager::ChangeLevel(){	
 	Ogre::String next_level = m_levels[m_current_level].next_level;
 	m_game_object_manager->ClearAllGameObjects();
 	// set loading screen game object here

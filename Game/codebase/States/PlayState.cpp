@@ -77,6 +77,7 @@ void PlayState::SecondLoading(){
 	m_level_manager->AddLevel(level2);
 	m_level_manager->AddLevel(level3);
 	m_level_manager->LoadLevel("try");
+	//m_level_manager->LoadLevel("Dayarea");
 	
 	/*float x = 180.0f;
 	float y = 90.0f;
@@ -191,8 +192,16 @@ void PlayState::Exit(){
 
 bool PlayState::Update(float dt){
 	if (m_change_level){
+				
+		State* loading = FindByName("LoadingState");
+		m_parent->Init(loading);
+		loading->Enter();
+		loading->Update(1.0f);
+
 		m_level_manager->ChangeLevel();
 		m_change_level = false;
+
+		loading->Exit();
 	}
 	m_game_object_manager->Update(dt);
 
