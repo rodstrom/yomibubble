@@ -130,7 +130,7 @@ void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewpo
 	m_camera_pivot->yaw(Ogre::Degree(240), Ogre::Node::TS_WORLD);
 
 	m_left_ray.origin = btVector3(m_bot_ray.node->getPosition().x, m_bot_ray.node->getPosition().y, m_bot_ray.node->getPosition().z);
-	m_left_ray.length = btVector3(-0.2, 0, 0);
+	m_left_ray.length = btVector3(-0.2f, 0, 0);
 	m_right_ray.origin = btVector3(m_bot_ray.node->getPosition().x, m_bot_ray.node->getPosition().y, m_bot_ray.node->getPosition().z);
 	m_right_ray.length = btVector3(1, 0, 0);
 	m_top_ray.origin = btVector3(m_bot_ray.node->getPosition().x, m_bot_ray.node->getPosition().y, m_bot_ray.node->getPosition().z); 
@@ -177,8 +177,8 @@ void FollowCameraComponent::Update(float dt){
 	//m_trigger->GetCollisionDef
 
 	//std::cout << "kiss " << m_camera->getDerivedPosition().x << std::endl;
-	m_camera->getDerivedRight(); //x-led
-	m_camera->getDerivedUp(); //y-led
+//	m_camera->getDerivedRight(); //x-led
+//	m_camera->getDerivedUp(); //y-led
 	/*
 	m_camera->getViewport()->getActualLeft();
 	m_camera->getViewport()->getActualTop();
@@ -189,7 +189,7 @@ void FollowCameraComponent::Update(float dt){
 	m_camera->getViewport()->getLeft();
 	m_camera->getViewport()->getTop();
 	*/
-
+	/*
 	int x_distance_from_cam = (m_camera->getViewport()->getWidth() * 0.5); //so this did not work then, fucktard values
 	int y_distance_from_cam = (m_camera->getViewport()->getHeight() * 0.5);
 
@@ -205,7 +205,7 @@ void FollowCameraComponent::Update(float dt){
 
 	m_bot_ray.origin = btVector3(m_camera->getDerivedPosition().x, m_camera->getDerivedPosition().y, m_camera->getDerivedPosition().z);
 	m_bot_ray.length = btVector3(m_camera->getDerivedPosition().x, m_camera->getDerivedPosition().y - 2.5, m_camera->getDerivedPosition().z);
-
+	*/
 	//std::cout << "Node Pos: " << m_node->convertLocalToWorldPosition(m_node->getPosition()) << std::endl;
 	//std::cout << "Node Pos: " << m_node->getPosition() << std::endl; //so this gives local space
 	//std::cout << "ViewPort left: " << m_camera->getFrustumPlane(0).normal.x << std::endl;
@@ -269,8 +269,8 @@ void FollowCameraComponent::SimulationStep(btScalar time_step){
 	//btCollisionObject* obA = static_cast<btCollisionObject*>(static_cast<TerrainComponent*>(m_owner->GetGameObject("Terrain")->GetComponent(COMPONENT_TERRAIN))->GetRigidBody());
 	//btCollisionObject* obB = static_cast<btCollisionObject*>(static_cast<CharacterController*>(m_owner->GetComponent(COMPONENT_CHARACTER_CONTROLLER))->GetRigidbody());
 	
-	btCollisionObject* obA = static_cast<btCollisionObject*>(static_cast<TerrainComponent*>(m_owner->GetGameObject("Terrain")->GetComponent(COMPONENT_TERRAIN))->GetRigidBody());
-	btCollisionObject* obB = static_cast<btCollisionObject*>(static_cast<TriggerComponent*>(m_owner->GetGameObject("CameraTrig")->GetComponent(COMPONENT_TRIGGER))->GetRigidbody());
+	//btCollisionObject* obA = static_cast<btCollisionObject*>(static_cast<TerrainComponent*>(m_owner->GetGameObject("Terrain")->GetComponent(COMPONENT_TERRAIN))->GetRigidBody());
+	//btCollisionObject* obB = static_cast<btCollisionObject*>(static_cast<TriggerComponent*>(m_owner->GetGameObject("CameraTrig")->GetComponent(COMPONENT_TRIGGER))->GetRigidbody());
 	/*
 	btManifoldPoint& pt = contactManifold->getContactPoint(0);
 			if (pt.getDistance()<0.f)
@@ -280,7 +280,7 @@ void FollowCameraComponent::SimulationStep(btScalar time_step){
 			*/
 	//std::cout << "Cam pos: " << BtOgre::Convert::toOgre(obB->getWorldTransform().getOrigin()) << std::endl;
 
-	bool bajsmacka = obB->checkCollideWith(obA); //this just checks IF they are supposed to collide with each other
+	//bool bajsmacka = obB->checkCollideWith(obA); //this just checks IF they are supposed to collide with each other
 
 	//btCollisionWorld::contactPairTest(
 	/*
@@ -297,16 +297,16 @@ void FollowCameraComponent::SimulationStep(btScalar time_step){
 
 	//bajsmacka = obA->
 
-	if (bajsmacka)
-	{
+	//if (bajsmacka)
+	//{
 		//std::cout << "Terrain coll\n";
 		//m_env_collision = true;
-	}
-	else
-	{
+	//}
+	//else
+	//{
 		//std::cout << "NOT Terrain coll\n";
 		//	m_env_collision = false;
-	}
+	//}
 	/*/
 	struct ContactSensorCallback : public btCollisionWorld::ContactResultCallback {
 	
@@ -371,7 +371,7 @@ void FollowCameraComponent::SetCustomVariables(int inverted_camera, float camera
 };
 
 void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real delta_pitch, Ogre::Real delta_zoom){
-	std::cout << "Pitch degrees: " << m_pivot_pitch << std::endl;
+	//std::cout << "Pitch degrees: " << m_pivot_pitch << std::endl;
 	
 	if (delta_yaw != 0.0f
 			|| delta_pitch != 0.0f
@@ -426,7 +426,7 @@ void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real de
 //	else { //if environment collision
 		
 		
-
+			/*
 		//magical repositioning goes here (check which ray that hits)
 		if (m_env_coll_down){
 			float pitch_change = 2.15;
@@ -444,7 +444,7 @@ void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real de
 		else if (m_env_coll_up){
 			//magic
 		}
-
+		*/
 //	}
 	
 	//std::cout << "Pitch degrees: " << m_camera_pivot->pitch(0) << std::endl;
@@ -550,9 +550,9 @@ void CameraCollisionComponent::Init(GameObject* player){
 };
 
 void CameraCollisionComponent::Update(float dt){
-	Ogre::Vector3 new_position = static_cast<FollowCameraComponent*>(m_player->GetComponent(COMPONENT_FOLLOW_CAMERA))->m_node->getPosition();
+	//Ogre::Vector3 new_position = static_cast<FollowCameraComponent*>(m_player->GetComponent(COMPONENT_FOLLOW_CAMERA))->m_node->getPosition();
 	//new_position;
-	m_messenger->Notify(MSG_RIGIDBODY_POSITION_SET, &new_position);
+	//m_messenger->Notify(MSG_RIGIDBODY_POSITION_SET, &new_position);
 
 	//m_player->GetComponentMessenger()->Notify(MSG_CAMERA_COLL_UPDATE, NULL); //så skickar man med en position typ
 

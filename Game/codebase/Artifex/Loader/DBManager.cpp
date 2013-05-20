@@ -9,6 +9,8 @@
 #include "..\..\Managers\SoundManager.h"
 #include "..\..\Components\AIComponents.h"
 #include "..\..\Managers\VariableManager.h"
+#include "WindBatchPage.h"
+#include "ImpostorPage.h"
 #include <map>
 
 DBManager::DBManager(ArtifexLoader *artifexloader, PhysicsEngine *physics_engine, GameObjectManager *game_object_manager, SoundManager *sound_manager) {
@@ -19,7 +21,7 @@ DBManager::DBManager(ArtifexLoader *artifexloader, PhysicsEngine *physics_engine
 	saving = false;
 	m_game_object_manager = game_object_manager;
 	m_sound_manager = sound_manager;
-
+	m_paged_geometry = NULL;
 };
 
 DBManager::~DBManager() {
@@ -34,7 +36,15 @@ int DBManager::Load() {
 	string meshFile="";
 	string entName="";
 	mArtifexLoader->mObjectFile.clear();
-	
+	/*m_paged_geometry = new Forests::PagedGeometry;
+	m_paged_geometry->setCamera(mArtifexLoader->mCamera);
+	m_paged_geometry->setPageSize(80);
+	m_paged_geometry->setInfinite();
+	m_paged_geometry->addDetailLevel<Forests::WindBatchPage>(150,50);
+	m_paged_geometry->addDetailLevel<Forests::ImpostorPage>(500, 50);
+
+	Forests::TreeLoader3D* tree_loader = new Forests::TreeLoader3D(m_paged_geometry, Forests::TBounds(0,0,1500,1500));
+	m_paged_geometry->setPageLoader(tree_loader);*/
 	//******** get objects from sqlite file *********
 	string query = "SELECT * FROM objects";
 	
@@ -202,6 +212,7 @@ int DBManager::Load() {
 				lCreateEntity:
 				try {
 					newModel = mArtifexLoader->mSceneMgr->createEntity((string) entName, (string) meshFile);
+					
 				} catch(Exception &e) {
 					if (e.getNumber() != 4) {
 						cout << "\n|= ArtifexTerra3D =| Zoneloader v1.0 RC1 OT beta: Error " << e.getNumber() << " creating Entity " << entName.c_str() << ": " << e.getFullDescription().c_str() << "\n";
@@ -236,7 +247,17 @@ int DBManager::Load() {
 						Ogre::String nocoll = meshFile.substr(0,6);
 						if (nocoll == "nocoll"){
 							collision = false;
+							//newModel->setRenderingDistance(20.0f);
 						}
+						/*else{
+							newModel->setRenderingDistance(60.0f);
+						}
+						newModel->_initialise();
+						Ogre::MeshManager::getSingleton().load(meshFile, Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+						for (int i = 0; i < newModel->getNumSubEntities(); i++){
+							newModel->getSubEntity(i)->getMaterial()->touch();
+						}*/
+						
 						// Create collision shape and set position if desired
 						if (collision){
 							BtOgre::StaticMeshToShapeConverter converter(newModel);
@@ -500,4 +521,8 @@ void DBManager::Shut(){
 	m_shapes.clear();
 	m_bodies.clear();
 	m_collision_defs.clear();
+}
+
+void DBManager::Update(){
+	m_paged_geometry->update();	// Update LOD from camera position each frame
 }

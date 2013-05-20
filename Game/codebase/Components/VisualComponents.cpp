@@ -84,11 +84,18 @@ void MeshRenderComponent::Init(const Ogre::String& filename, Ogre::SceneManager*
 }
 
 void MeshRenderComponent::Notify(int type, void* msg){
-
+	switch (type){
+	case MSG_MESH_SET_MATERIAL_NAME:
+		m_entity->setMaterialName(*static_cast<Ogre::String*>(msg));
+		break;
+	default:
+		break;
+	}
 }
 
 void MeshRenderComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger = messenger;
+	m_messenger->Register(MSG_MESH_SET_MATERIAL_NAME, this);
 }
 
 void MeshRenderComponent::Shut(){
@@ -96,6 +103,7 @@ void MeshRenderComponent::Shut(){
 		m_scene_manager->destroyEntity(m_entity);
 		m_entity = NULL;
 	}
+	m_messenger->Unregister(MSG_MESH_SET_MATERIAL_NAME, this);
 }
 
 void AnimationComponent::SetMessenger(ComponentMessenger* messenger){
@@ -731,6 +739,10 @@ void TerrainComponent::Init(Ogre::SceneManager* scene_manager, PhysicsEngine* ph
 	m_collision_def.flag = COLLISION_FLAG_STATIC;
 	m_collision_def.data = m_owner;
 	m_terrain_body->setUserPointer(&m_collision_def);
+}
+
+void TerrainComponent::Update(float dt){
+	m_artifex_loader->mDBManager->Update();
 }
 
 void PlayerStaffComponent::Notify(int type, void* msg){

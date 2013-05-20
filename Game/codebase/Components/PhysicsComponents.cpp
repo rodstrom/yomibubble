@@ -48,6 +48,9 @@ void RigidbodyComponent::Notify(int type, void* msg){
 	case MSG_RIGIDBODY_COLLISION_FLAG_REMOVE:
 		m_rigidbody->setCollisionFlags(m_rigidbody->getCollisionFlags() &~ *static_cast<int*>(msg));
 		break;
+	case MSG_RIGIDBODY_COMPOUND_SHAPE_GET:
+		*static_cast<btCompoundShape**>(msg) = m_compound_shape;
+		break;
 	default:
 		break;
 	}
@@ -75,6 +78,12 @@ void RigidbodyComponent::Init(const Ogre::Vector3& position, Ogre::Entity* entit
 	default:
 		break;
 	}
+	btTransform transform;
+	transform.setIdentity();
+	transform.setOrigin(btVector3(0,0,0));
+	m_compound_shape = new btCompoundShape;
+	m_compound_shape->addChildShape(transform, m_shape);
+
 	if (def.body_type == DYNAMIC_BODY){
 		btScalar mass = (btScalar)def.mass;
 		btVector3 inertia;
@@ -98,6 +107,14 @@ void RigidbodyComponent::Init(const Ogre::Vector3& position, Ogre::Entity* entit
 }
 
 void RigidbodyComponent::Shut(){
+	if (m_shape){
+		m_compound_shape->removeChildShape(m_shape);
+		delete m_shape;
+		m_shape = NULL;
+		delete m_compound_shape;
+		m_compound_shape = NULL;
+	}
+
 	if (m_rigidbody){
 		m_physics_engine->GetDynamicWorld()->removeRigidBody(m_rigidbody);
 		delete m_rigidbody;
@@ -106,10 +123,6 @@ void RigidbodyComponent::Shut(){
 	if (m_motion_state){
 		delete m_motion_state;
 		m_motion_state = NULL;
-	}
-	if (m_shape){
-		delete m_shape;
-		m_shape = NULL;
 	}
 
 	m_messenger->Unregister(MSG_RIGIDBODY_GET_BODY, this);
@@ -121,6 +134,7 @@ void RigidbodyComponent::Shut(){
 	m_messenger->Unregister(MSG_RIGIDBODY_APPLY_IMPULSE, this);
 	m_messenger->Unregister(MSG_RIGIDBODY_COLLISION_FLAG_REMOVE, this);
 	m_messenger->Unregister(MSG_RIGIDBODY_POSITION_GET, this);
+	m_messenger->Unregister(MSG_RIGIDBODY_COMPOUND_SHAPE_GET, this);
 }
 
 void RigidbodyComponent::SetMessenger(ComponentMessenger* messenger){
@@ -135,6 +149,46 @@ void RigidbodyComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_RIGIDBODY_COLLISION_FLAG_SET, this);
 	m_messenger->Register(MSG_RIGIDBODY_COLLISION_FLAG_REMOVE, this);
 	m_messenger->Register(MSG_RIGIDBODY_POSITION_GET, this);
+	m_messenger->Register(MSG_RIGIDBODY_COMPOUND_SHAPE_GET, this);
+}
+
+void ShapeComponent::Notify(int type, void* msg){
+
+}
+
+void ShapeComponent::Init(const ShapeDef& def){
+	m_messenger->Notify(MSG_RIGIDBODY_COMPOUND_SHAPE_GET, &m_compoound_shape, "body");
+	switch (def.collider_type){
+	case COLLIDER_BOX:
+		m_shape = new btBoxShape(btVector3(def.x, def.y, def.z));
+		break;
+	case COLLIDER_CAPSULE:
+		m_shape = new btCapsuleShape(def.radius, def.y);
+		break;
+	case COLLIDER_CYLINDER:
+		m_shape = new btCylinderShape(btVector3(def.x, def.y, def.z));
+		break;
+	case COLLIDER_SPHERE:
+		m_shape = new btSphereShape(def.radius);
+		break;
+	default:
+		break;
+	}
+	btTransform transform;
+	transform.setIdentity();
+	transform.setOrigin(def.position);
+	transform.setRotation(def.orientation);
+	m_compoound_shape->addChildShape(transform, m_shape);
+}
+
+void ShapeComponent::Shut(){
+	m_compoound_shape->removeChildShape(m_shape);
+	delete m_shape;
+	m_shape = NULL;
+}
+
+void ShapeComponent::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
 }
 
 class IgnoreBodyCast : public btCollisionWorld::ClosestRayResultCallback{
@@ -219,11 +273,29 @@ void CharacterController::Notify(int type, void* msg){
 			}
 		}
 		break;
+	case MSG_CHARACTER_CONTROLLER_GET_FALL_VELOCITY:
+		*static_cast<float*>(msg) = m_fall_velocity;
+		break;
 	case MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_SET:
 		m_on_ground = *static_cast<bool*>(msg);
 		break;
 	case MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_GET:
 		*static_cast<bool*>(msg) = m_on_ground;
+		break;
+	case MSG_CHARACTER_CONTROLLER_LIMIT_MAX_SPEED:
+		m_limit_max_speed = *static_cast<bool*>(msg);
+		break;
+	case MSG_CHARACTER_CONTROLLER_APPLY_IMPULSE:
+		{
+			DirDT& dirdt = *static_cast<DirDT*>(msg);
+			ApplyImpulse(dirdt.dir, dirdt.dt);
+		}
+		break;
+	case MSG_CHARACTER_CONTROLLER_APPLY_ROTATION:
+		{
+			DirDT& dirdt = *static_cast<DirDT*>(msg);
+			ApplyRotation(dirdt.dir, dirdt.dt);
+		}
 		break;
 	default:
 		break;
@@ -231,26 +303,26 @@ void CharacterController::Notify(int type, void* msg){
 }
 
 void CharacterController::Update(float dt){
+	btVector3 vel = m_rigidbody->getLinearVelocity();
 	btVector3 pos = m_rigidbody->getWorldTransform().getOrigin();
 	m_on_ground = false;
 	if (!m_is_jumping){
 		QueryRaycast();
 	}
 	m_messenger->Notify(MSG_ON_GROUND, &m_on_ground);
-	btVector3 vel = m_rigidbody->getLinearVelocity();
 	float speed = m_velocity * dt;
 	float jump_strength = 0.0f;
 	m_is_moving = false;
 	if (m_direction.x != 0.0f || m_direction.z != 0.0f){
 		m_is_moving = true;
 	}
-	
-	if (m_on_ground){
+	if (m_on_ground && m_can_move){
 		if (m_has_follow_cam){
-		Ogre::SceneNode* node = NULL;
-		m_messenger->Notify(MSG_NODE_GET_NODE, &node);
-			if (node){
-				Ogre::Vector3 goal_dir = m_direction;
+			Ogre::Vector3 goal_dir = m_direction;
+			m_messenger->Notify(MSG_FOLLOW_CAMERA_GET_ORIENTATION, &goal_dir);	// set direction from where the camera is looking
+			ApplyRotation(goal_dir, dt);
+			ApplyImpulse(goal_dir, dt);
+				/*Ogre::Vector3 goal_dir = m_direction;
 				m_messenger->Notify(MSG_FOLLOW_CAMERA_GET_ORIENTATION, &goal_dir);
 				Ogre::Quaternion goal = node->getOrientation().zAxis().getRotationTo(goal_dir);
 				Ogre::Real yaw_to_goal = goal.getYaw().valueDegrees();
@@ -258,11 +330,10 @@ void CharacterController::Update(float dt){
 
 				if (yaw_to_goal < 0) yaw_to_goal = std::min<Ogre::Real>(0, std::max<Ogre::Real>(yaw_to_goal, yaw_at_speed));
 				else if (yaw_to_goal > 0) yaw_to_goal = std::max<Ogre::Real>(0, std::min<Ogre::Real>(yaw_to_goal, yaw_at_speed));
-				node->yaw(Ogre::Degree(yaw_to_goal));
-				m_rigidbody->applyCentralImpulse(btVector3(goal_dir.x * speed, 0.0f, goal_dir.z * speed));
-			}
+				node->yaw(Ogre::Degree(yaw_to_goal));*/
+				//m_rigidbody->applyCentralImpulse(btVector3(goal_dir.x * speed, 0.0f, goal_dir.z * speed));
 		}
-		else{
+		else {
 			Ogre::SceneNode* node = NULL;
 			m_messenger->Notify(MSG_NODE_GET_NODE, &node);
 			if (node){
@@ -301,6 +372,23 @@ void CharacterController::Update(float dt){
 	}
 }
 
+void CharacterController::ApplyRotation(const Ogre::Vector3& dir, float dt){
+	Ogre::SceneNode* node = NULL;
+	m_messenger->Notify(MSG_NODE_GET_NODE, &node);
+	Ogre::Vector3 goal_dir = dir.normalisedCopy();
+	Ogre::Quaternion goal = node->getOrientation().zAxis().getRotationTo(goal_dir);
+	Ogre::Real yaw_to_goal = goal.getYaw().valueDegrees();
+	Ogre::Real yaw_at_speed = yaw_to_goal / Ogre::Math::Abs(yaw_to_goal) * dt * m_turn_speed;
+	if (yaw_to_goal < 0) yaw_to_goal = std::min<Ogre::Real>(0, std::max<Ogre::Real>(yaw_to_goal, yaw_at_speed));
+	else if (yaw_to_goal > 0) yaw_to_goal = std::max<Ogre::Real>(0, std::min<Ogre::Real>(yaw_to_goal, yaw_at_speed));
+	node->yaw(Ogre::Degree(yaw_to_goal));
+}
+
+void CharacterController::ApplyImpulse(const Ogre::Vector3& dir, float dt){
+	float speed = m_velocity * dt;
+	m_rigidbody->applyCentralImpulse(btVector3(dir.x * speed, 0.0f, dir.z * speed));
+}
+
 void CharacterController::Shut(){
 	m_compound_shape->removeChildShape(m_shape);
 	m_physics_engine->GetDynamicWorld()->removeRigidBody(m_rigidbody);
@@ -315,6 +403,10 @@ void CharacterController::Shut(){
 		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_JUMP, this);
 		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_SET, this);
 		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_GET, this);
+		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_LIMIT_MAX_SPEED, this);
+		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_GET_FALL_VELOCITY, this);
+		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_APPLY_ROTATION, this);
+		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_APPLY_IMPULSE, this);
 	}
 	m_physics_engine->RemoveObjectSimulationStep(this);
 }
@@ -327,6 +419,10 @@ void CharacterController::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_CHARACTER_CONTROLLER_JUMP, this);
 	m_messenger->Register(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_SET, this);
 	m_messenger->Register(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_GET, this);
+	m_messenger->Register(MSG_CHARACTER_CONTROLLER_LIMIT_MAX_SPEED, this);
+	m_messenger->Register(MSG_CHARACTER_CONTROLLER_GET_FALL_VELOCITY, this);
+	m_messenger->Register(MSG_CHARACTER_CONTROLLER_APPLY_ROTATION, this);
+	m_messenger->Register(MSG_CHARACTER_CONTROLLER_APPLY_IMPULSE, this);
 }
 
 void CharacterController::Init(const Ogre::Vector3& position, PhysicsEngine* physics_engine, const CharacterControllerDef& def){
@@ -375,11 +471,15 @@ void CharacterController::Init(const Ogre::Vector3& position, PhysicsEngine* phy
 void CharacterController::SimulationStep(btScalar time_step){
 	Ogre::Vector2 velXZ(m_rigidbody->getLinearVelocity().x(), m_rigidbody->getLinearVelocity().z());
 	btScalar speedXZ = velXZ.length();
-	btScalar dir_speed = m_actual_direction.length();
-	btScalar relative_max_speed = (m_max_speed * dir_speed);
-	if (speedXZ > relative_max_speed){
-		velXZ = velXZ / speedXZ * relative_max_speed;
-		m_rigidbody->setLinearVelocity(btVector3(velXZ.x, m_rigidbody->getLinearVelocity().y(), velXZ.y));
+	if (speedXZ > 0.0f){
+		btScalar dir_speed = m_actual_direction.length();
+		btScalar relative_max_speed = (m_max_speed * dir_speed);
+		if (m_limit_max_speed){
+			if (speedXZ > relative_max_speed){
+				velXZ = velXZ / speedXZ * relative_max_speed;
+				m_rigidbody->setLinearVelocity(btVector3(velXZ.x, m_rigidbody->getLinearVelocity().y(), velXZ.y));
+			}
+		}
 	}
 	if (m_is_jumping){
 		if (m_jump_timer >= m_max_jump_height){
@@ -397,6 +497,7 @@ void CharacterController::SimulationStep(btScalar time_step){
 		if (vel.y() < -m_max_fall_speed){
 			m_rigidbody->setLinearVelocity(btVector3(vel.x(), -m_max_fall_speed, vel.z()));
 		}
+		m_fall_velocity = vel.y();
 	}
 }
 
@@ -467,12 +568,16 @@ void TriggerComponent::Init(const Ogre::Vector3& pos, PhysicsEngine* physics_eng
 	default:
 		break;
 	}
-
+	m_compound_shape = new btCompoundShape;
+	btTransform transform;
+	transform.setIdentity();
+	transform.setOrigin(btVector3(0,0,0));
+	m_compound_shape->addChildShape(transform, m_shape);
 	if (def.body_type == DYNAMIC_BODY){
 		btVector3 inertia;
 		m_shape->calculateLocalInertia(def.mass, inertia);
 		m_motion_state = new btDefaultMotionState;
-		m_rigidbody = new btRigidBody(def.mass, m_motion_state, m_shape, inertia);
+		m_rigidbody = new btRigidBody(def.mass, m_motion_state, m_compound_shape, inertia);
 	}
 	else if (def.body_type == STATIC_BODY){
 		m_motion_state = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)));
@@ -514,16 +619,19 @@ void Generic6DofConstraintComponent::SetMessenger(ComponentMessenger* messenger)
 	m_messenger = messenger;
 }
 
-void Generic6DofConstraintComponent::Init(PhysicsEngine* physics_engine, btRigidBody* body_a, btRigidBody* body_b, const btVector3& pivot_a, const btVector3& pivot_b, bool linear_reference){
+void Generic6DofConstraintComponent::Init(PhysicsEngine* physics_engine, const Generic6DofDef& def){
 	m_physics_engine = physics_engine;
 	btTransform transform_a;
 	transform_a.setIdentity();
-	transform_a.setOrigin(pivot_a);
+	transform_a.setOrigin(def.pivot_a);
 	btTransform transform_b;
 	transform_b.setIdentity();
-	transform_b.setOrigin(pivot_b);
-	m_constraint = new btGeneric6DofConstraint(*body_a, *body_b, transform_a, transform_b, linear_reference);
-	m_physics_engine->GetDynamicWorld()->addConstraint(m_constraint, false);
+	transform_b.setOrigin(def.pivot_b);
+	m_constraint = new btGeneric6DofConstraint(*def.body_a, *def.body_b, transform_a, transform_b, def.linear_reference);
+	m_constraint->setLimit(0, 0, 0);
+	m_constraint->setLimit(1, 0, 0);
+	m_constraint->setLimit(2, 0, 0);
+	m_physics_engine->GetDynamicWorld()->addConstraint(m_constraint, true);
 }
 
 void RaycastComponent::Init(PhysicsEngine* physics_engine, btCollisionObject* obj, const Ogre::String& body_id){
@@ -640,9 +748,11 @@ void PlayerRaycastCollisionComponent::PlayerBubble(GameObject* go){
 	m_messenger->Notify(MSG_PLAYER_INPUT_STATE_GET, &player_state);
 	btRigidBody* body = NULL;
 	m_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &body, "body");
+	float y_vel = 0.0f;
+	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_GET_FALL_VELOCITY, &y_vel);
 	if (body){
-		float y_vel = body->getLinearVelocity().y();
-		if (y_vel < 0.0f && player_state == PLAYER_STATE_FALLING){
+		//float y_vel = body->getLinearVelocity().y();
+		if (player_state == PLAYER_STATE_FALLING){
 			if (y_vel < -m_bounce_vel && y_vel > -m_into_bubble_vel){   // bounce on bubble
 				player_state = PLAYER_STATE_BOUNCE;
 				m_messenger->Notify(MSG_PLAYER_INPUT_SET_BUBBLE, &go);
@@ -651,13 +761,12 @@ void PlayerRaycastCollisionComponent::PlayerBubble(GameObject* go){
 				m_messenger->Notify(MSG_RIGIDBODY_APPLY_IMPULSE, &impulse, "body");
 				m_messenger->Notify(MSG_RIGIDBODY_APPLY_IMPULSE, &impulse);
 				m_messenger->Notify(MSG_SFX2D_PLAY,  &static_cast<PlayerInputComponent*>(m_owner->GetComponent(COMPONENT_PLAYER_INPUT))->m_bounce_sound);
+				std::cout << y_vel << std::endl;
 			}
 			else if (y_vel < -m_into_bubble_vel){   // go inside bubble
 				player_state = PLAYER_STATE_INSIDE_BUBBLE;
 				Ogre::Vector3 gravity(0,0,0);
 				body->clearForces();
-				int coll = btCollisionObject::CF_NO_CONTACT_RESPONSE;
-				m_messenger->Notify(MSG_RIGIDBODY_COLLISION_FLAG_SET, &coll, "body");
 				m_messenger->Notify(MSG_PLAYER_INPUT_SET_BUBBLE, &go);
 				m_messenger->Notify(MSG_PLAYER_INPUT_SET_STATE, &player_state);
 				m_messenger->Notify(MSG_CHARACTER_CONTROLLER_GRAVITY_SET, &gravity);
@@ -667,9 +776,6 @@ void PlayerRaycastCollisionComponent::PlayerBubble(GameObject* go){
 				player_state = PLAYER_STATE_ON_BUBBLE;
 				Ogre::Vector3 gravity(0,0,0);
 				body->clearForces();
-				//body->setLinearFactor(btVector3(1,0,1));
-				int coll = btCollisionObject::CF_NO_CONTACT_RESPONSE;
-				m_messenger->Notify(MSG_RIGIDBODY_COLLISION_FLAG_SET, &coll, "body");
 				m_messenger->Notify(MSG_PLAYER_INPUT_SET_BUBBLE, &go);
 				m_messenger->Notify(MSG_PLAYER_INPUT_SET_STATE, &player_state);
 				m_messenger->Notify(MSG_CHARACTER_CONTROLLER_GRAVITY_SET, &gravity);
@@ -680,12 +786,7 @@ void PlayerRaycastCollisionComponent::PlayerBubble(GameObject* go){
 }
 
 void PlayerRaycastCollisionComponent::PlayerLandscape(){
-	/*int player_state = PLAYER_STATE_INSIDE_BUBBLE;
-	m_messenger->Notify(MSG_PLAYER_INPUT_STATE_GET, &player_state);
-	if (player_state != PLAYER_STATE_INSIDE_BUBBLE && player_state != PLAYER_STATE_NORMAL && player_state != PLAYER_STATE_ON_BUBBLE){
-		player_state = PLAYER_STATE_NORMAL;
-		m_messenger->Notify(MSG_PLAYER_INPUT_SET_STATE, &player_state);
-	}*/
+
 }
 
 void BobbingComponent::Shut(){
@@ -707,7 +808,6 @@ void BobbingComponent::Init(Ogre::SceneNode* node){
 
 void BobbingComponent::Update(float dt){
 	m_current_time += dt;
-
 	if (m_current_time >= m_bob_timer){
 		m_current_time = 0.0f;
 	if (m_up) { m_up = false; }
@@ -752,24 +852,6 @@ void CameraRaycastCollisionComponent::Notify(int type, void* msg){
 		default:
 			break;
 	};
-
-
-
-	/*
-	IgnoreBodyCast ray_callback_bottom(m_rigidbody);
-	m_physics_engine->GetDynamicWorld()->rayTest((m_rigidbody->getWorldTransform().getOrigin() + m_offset), (m_rigidbody->getWorldTransform().getOrigin() + m_offset) - btVector3(0,m_y_bottom_offset + m_step_height,0), ray_callback_bottom);
-	if (ray_callback_bottom.hasHit()){
-		CollisionDef& def = *static_cast<CollisionDef*>(ray_callback_bottom.m_collisionObject->getUserPointer());
-		if (def.flag == COLLISION_FLAG_STATIC){
-			m_messenger->Notify(MSG_RAYCAST_COLLISION_STATIC_ENVIRONMENT, NULL);
-		}
-		else if (def.flag == COLLISION_FLAG_GAME_OBJECT){
-			GameObject* go = static_cast<GameObject*>(def.data);
-			m_messenger->Notify(MSG_RAYCAST_COLLISION_GAME_OBJECT, &go);
-		}
-		m_on_ground = true;
-	}
-	*/
 };
 	
 void CameraRaycastCollisionComponent::SetMessenger(ComponentMessenger* messenger){

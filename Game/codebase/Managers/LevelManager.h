@@ -13,6 +13,7 @@ public:
 	void AddLevel(const LevelDef& level_def) { m_levels.push_back(level_def); }
 	void ChangeLevel();
 	void LoadLevel(const Ogre::String& level_id);
+	void LoadPlane();		// will load a plane and a player at position 0,0,0 and enable debug draw (For testing purposes)
 	Ogre::String GetCurrentLevel() { return m_str_current_level; }
 
 protected:

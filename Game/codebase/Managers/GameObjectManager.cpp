@@ -15,11 +15,12 @@
 #include "..\MessageSystem.h"
 #include "VariableManager.h"
 #include "..\Managers\AnimationManager.h"
-
 #include <sstream>
 
 GameObjectManager::GameObjectManager(void) : 
-	m_physics_engine(NULL), m_scene_manager(NULL), m_input_manager(NULL), m_viewport(NULL){}
+	m_physics_engine(NULL), m_scene_manager(NULL), m_input_manager(NULL), m_viewport(NULL){
+		m_max_bubbles = (unsigned int)VariableManager::GetSingletonPtr()->GetAsInt("MaxBubbles");
+}
 GameObjectManager::~GameObjectManager(void){}
 
 void GameObjectManager::Init(PhysicsEngine* physics_engine, Ogre::SceneManager* scene_manager, InputManager* input_manager, Ogre::Viewport* viewport, SoundManager* sound_manager, MessageSystem* message_system, VariableManager* variable_manager){	
@@ -51,6 +52,9 @@ void GameObjectManager::Init(PhysicsEngine* physics_engine, Ogre::SceneManager* 
 }
 
 void GameObjectManager::Update(float dt){
+	if (!m_remove_list.empty()){
+		this->ClearQueuedGameObjects();
+	}
 	if (!m_updateable_game_objects.empty()){
 		std::list<GameObject*>::iterator it;
 		GameObject* go = NULL;
@@ -62,13 +66,40 @@ void GameObjectManager::Update(float dt){
 }
 
 void GameObjectManager::RemoveGameObject(GameObject* gameobject){
-	if (gameobject->DoUpdate()){
-		m_updateable_game_objects.remove(gameobject);
+	m_remove_list.push_back(gameobject);
+}
+
+void GameObjectManager::ClearQueuedGameObjects(){
+	std::list<GameObject*>::iterator it;
+	GameObject* go = NULL;
+	for (it = m_remove_list.begin(); it != m_remove_list.end(); it++){
+		go = *it;
+		if (go->GetType() == GAME_OBJECT_BLUE_BUBBLE || go->GetType() == GAME_OBJECT_PINK_BUBBLE){
+			RemoveBubble(go);
+		}
+		if (go->DoUpdate()){
+			m_updateable_game_objects.remove(go);
+		}
+		go->Shut();
+		m_game_objects.remove(go);
+		delete go;
+		go = NULL;
 	}
-	gameobject->Shut();
-	m_game_objects.remove(gameobject);
-	delete gameobject;
-	gameobject = NULL;
+	m_remove_list.clear();
+}
+
+void GameObjectManager::CheckBubbleSize(){
+	if (m_bubbles.size() >= m_max_bubbles){
+		RemoveGameObject(m_bubbles.front());
+		m_bubbles.pop_front();
+	}
+}
+
+void GameObjectManager::RemoveBubble(GameObject* bubble){
+	std::deque<GameObject*>::iterator it = std::find(m_bubbles.begin(), m_bubbles.end(), bubble);
+	if (it != m_bubbles.end()){
+		m_bubbles.erase(it);
+	}
 }
 
 void GameObjectManager::AddGameObject(GameObject* gameobject){
@@ -125,15 +156,15 @@ void GameObjectManager::ClearAllGameObjects(){
 }
 
 GameObject* GameObjectManager::GetGameObject(const Ogre::String& id){
- GameObject* go = NULL;
- std::list<GameObject*>::iterator it;
- for (it = m_game_objects.begin(); it != m_game_objects.end(); it++){
-  go = *it;
-  if (go->GetId() == id){
-   return go;
-  }
- }
- return NULL;
+	GameObject* go = NULL;
+	std::list<GameObject*>::iterator it;
+	for (it = m_game_objects.begin(); it != m_game_objects.end(); it++){
+		go = *it;
+		if (go->GetId() == id){
+		return go;
+		}
+	}
+	return NULL;
 }
 
 GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void* data, const Ogre::String& id){
@@ -201,7 +232,7 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	contr->HasFollowCam(true);
 	contr->SetId("body");
 	contr->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
-	pccomp->Init(m_input_manager, m_sound_manager, m_physics_engine);
+	pccomp->Init(m_input_manager, m_sound_manager, m_physics_engine, m_message_system);
 	pccomp->SetCustomVariables(
 		VariableManager::GetSingletonPtr()->GetAsFloat("Bubble_Min_Size"),
 		VariableManager::GetSingletonPtr()->GetAsFloat("Bubble_Max_Size"), 
@@ -211,7 +242,6 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	sound3D->Init(m_sound_manager);
 	music2D->Init(m_sound_manager);
 	music3D->Init(m_sound_manager);
-	//gui->Init("Examples/Empty", "Examples/Filled", 6);
 	gui->Init(def.level_id);
 	csnc->Init(Ogre::Vector3(0.0f, char_def.offset.y, 1.0f), "CreateBubble", node_comp->GetSceneNode());
 	m_sound_manager->GetYomiNode(node_comp->GetSceneNode()->getName());
@@ -220,8 +250,6 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 
 	fcc->SetNode(node_comp->GetSceneNode());
 	fcc->Init(m_scene_manager, m_viewport, true);
-	//fcc->GetCamera()->setNearClipDistance(0.1f);
-	//fcc->SetTrigger(camera_tc);
 	fcc->SetMovementSpeed(2.5f);
 	
 	fcc->SetPhysEngine(m_physics_engine);
@@ -233,6 +261,8 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 		VariableManager::GetSingletonPtr()->GetAsFloat("Camera_Start_Distance"),
 		VariableManager::GetSingletonPtr()->GetAsFloat("Camera_Start_Pitch")
 		);
+	staff_mesh_comp->Init("Staff.mesh", m_scene_manager, Ogre::StringUtil::BLANK);
+	acomp->GetEntity()->attachObjectToBone("CATRigLArmDigit21", staff_mesh_comp->GetEntity(), Ogre::Quaternion(1.0f, 0.8f, 0.0f, -0.2f));
 	/*
 	TriggerDef trdef;
 	trdef.body_type = DYNAMIC_BODY;
@@ -247,8 +277,7 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	fcc->SetTrigger(camera_tc);
 	fcc->SetMovementSpeed(def.camera_speed);
 
-	staff_mesh_comp->Init("Staff.mesh", m_scene_manager, Ogre::StringUtil::BLANK);
-	acomp->GetEntity()->attachObjectToBone("CATRigLArmDigit21", staff_mesh_comp->GetEntity());
+
 
 	
 	//camera_rb->Init(
@@ -311,14 +340,12 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 	go->AddComponent(bc);
 	go->AddUpdateable(bc);
 
-	bc->Init(m_physics_engine, VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleImpulse"), VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleMaxVelocity"));
-	bc->SetCustomVariables(VariableManager::GetSingletonPtr()->GetAsFloat("Blue_Bubble_Life_Time"));
+	bc->Init(m_physics_engine, m_message_system, VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleImpulse"), VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleMaxVelocity"));
+	//bc->SetCustomVariables(VariableManager::GetSingletonPtr()->GetAsFloat("Blue_Bubble_Life_Time"));
 	node_comp->Init(position, m_scene_manager);
 	mrc->Init("BlueBubble.mesh", m_scene_manager);
-	//Ogre::Vector3 scale(def.start_scale);
 	Ogre::Vector3 scale(0.1f);
 	node_comp->GetSceneNode()->setScale(scale);
-	//mrc->GetEntity()->setMaterialName("BlueBubble");
 	RigidBodyDef body_def;
 	body_def.body_type = DYNAMIC_BODY;
 	body_def.collider_type = COLLIDER_SPHERE;
@@ -333,26 +360,29 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 	rc->GetRigidbody()->setActivationState(DISABLE_DEACTIVATION);
 	rc->GetRigidbody()->setDamping(VariableManager::GetSingletonPtr()->GetAsFloat("Bubble_Linear_Damping"), VariableManager::GetSingletonPtr()->GetAsFloat("Bubble_Angular_Damping"));
 	cons->Init(m_physics_engine,rc->GetRigidbody(), def.connection_body, btVector3(0,0,0), btVector3(0,0,0));
+	this->CheckBubbleSize();
+	m_bubbles.push_back(go);
 	return go;
 }
 
 GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, void* data, const Ogre::String& id){
 	BubbleDef& def = *static_cast<BubbleDef*>(data);
-	GameObject* go = new GameObject(GAME_OBJECT_BLUE_BUBBLE);
+	GameObject* go = new GameObject(GAME_OBJECT_PINK_BUBBLE);
 	NodeComponent* node_comp = new NodeComponent;
 	go->AddComponent(node_comp);
 	MeshRenderComponent* mrc = new MeshRenderComponent;
 	go->AddComponent(mrc);
 	Point2PointConstraintComponent* cons = new Point2PointConstraintComponent;
 	go->AddComponent(cons);
-	RigidbodyComponent* rc = new RigidbodyComponent;
-	go->AddComponent(rc);
 	BubbleController* bc = new BubbleController;
 	go->AddComponent(bc);
 	go->AddUpdateable(bc);
+	RigidbodyComponent* rc = new RigidbodyComponent;
+	go->AddComponent(rc);
 
-	bc->Init(m_physics_engine, VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleImpulse"), VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleMaxVelocity"));
-	bc->SetCustomVariables(VariableManager::GetSingletonPtr()->GetAsFloat("Pink_Bubble_Life_Time"));
+
+	bc->Init(m_physics_engine, m_message_system, VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleImpulse"), VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleMaxVelocity"));
+	//bc->SetCustomVariables(VariableManager::GetSingletonPtr()->GetAsFloat("Pink_Bubble_Life_Time"));
 	node_comp->Init(position, m_scene_manager);
 	mrc->Init("PinkBubble.mesh", m_scene_manager);
 	Ogre::Vector3 scale(def.start_scale);
@@ -367,11 +397,14 @@ GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, v
 	body_def.collision_filter.mask = COL_PLAYER | COL_TOTT | COL_BUBBLE | COL_WORLD_STATIC;
 	rc->Init(position,  mrc->GetEntity(), m_physics_engine, body_def);
 	rc->GetRigidbody()->setGravity(btVector3(0.0f, 0.0f, 0.0f));
+	rc->GetRigidbody()->setLinearFactor(btVector3(1,0,1));
 	rc->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
 	rc->GetRigidbody()->setActivationState(DISABLE_DEACTIVATION);
 	rc->GetRigidbody()->setDamping(VariableManager::GetSingletonPtr()->GetAsFloat("Bubble_Linear_Damping"), VariableManager::GetSingletonPtr()->GetAsFloat("Bubble_Angular_Damping"));
 	rc->SetId("body");
 	cons->Init(m_physics_engine,rc->GetRigidbody(), def.connection_body, btVector3(0,0,0), btVector3(0,0,0));
+	this->CheckBubbleSize();
+	m_bubbles.push_back(go);
 	return go;
 }
 
@@ -510,7 +543,7 @@ GameObject* GameObjectManager::CreateLeaf(const Ogre::Vector3& position, void* d
 	Ogre::String leaf_id = stream.str();
 
 	particle->Init(m_scene_manager, leaf_id, particleDef.particle_name);
-	particle->CreateParticle(node_comp->GetSceneNode(), node_comp->GetSceneNode()->getPosition(), Ogre::Vector3(0,-1.8,0));
+	particle->CreateParticle(node_comp->GetSceneNode(), node_comp->GetSceneNode()->getPosition(), Ogre::Vector3(0,-1.8f,0));
 
 	TriggerDef trdef;
 	trdef.body_type = STATIC_BODY;
@@ -621,7 +654,7 @@ GameObject* GameObjectManager::CreateParticleEffect(const Ogre::Vector3& positio
 	Ogre::String particle_id = stream.str();
 
 	particle->Init(m_scene_manager, particle_id, particleDef.particle_name);
-	particle->CreateParticle(node_comp->GetSceneNode(), node_comp->GetSceneNode()->getPosition(), Ogre::Vector3(0,-1.8,0));
+	particle->CreateParticle(node_comp->GetSceneNode(), node_comp->GetSceneNode()->getPosition(), Ogre::Vector3(0,-1.8f,0));
 
 	return go;
 };

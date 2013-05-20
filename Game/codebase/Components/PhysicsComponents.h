@@ -8,7 +8,7 @@
 class PhysicsEngine;
 class RigidbodyComponent : public Component, public IComponentObserver{
 public:
-	RigidbodyComponent(void) : m_rigidbody(NULL), m_shape(NULL), m_motion_state(NULL){ m_type = COMPONENT_RIGIDBODY; }
+	RigidbodyComponent(void) : m_rigidbody(NULL), m_shape(NULL), m_motion_state(NULL), m_compound_shape(NULL){ m_type = COMPONENT_RIGIDBODY; }
 	virtual ~RigidbodyComponent(void){}
 	virtual void Notify(int type, void* message);
 	virtual void Init(const Ogre::Vector3& position, Ogre::Entity* entity, PhysicsEngine* physics_engine, const RigidBodyDef& def);
@@ -19,10 +19,27 @@ public:
 
 protected:
 	btRigidBody*			m_rigidbody;
+	btCompoundShape*		m_compound_shape;
 	btCollisionShape*		m_shape;
 	btMotionState*			m_motion_state;
 	PhysicsEngine*			m_physics_engine;
 	CollisionDef			m_collision_def;
+};
+
+class ShapeComponent : public Component, public IComponentObserver {
+public:
+	ShapeComponent(void){ m_type = COMPONENT_SHAPE; }
+	virtual ~ShapeComponent(void){}
+
+	virtual void Notify(int type, void* msg);
+	virtual void Init(const ShapeDef& def);
+	virtual void Shut();
+	virtual void SetMessenger(ComponentMessenger* messenger);
+	btCollisionShape* GetShape() const { return m_shape; }
+
+protected:
+	btCompoundShape* m_compoound_shape;
+	btCollisionShape* m_shape;
 };
 
 class TriggerComponent : public RigidbodyComponent{
@@ -55,9 +72,9 @@ protected:
 class CharacterController : public RigidbodyComponent, public IComponentUpdateable, public IComponentSimulationStep{
 public:
 	CharacterController(void) : m_velocity(0.0), m_turn_speed(0.0f), 
-		m_has_follow_cam(false), m_is_jumping(false), m_on_ground(true), m_jump_timer(0.0f), m_y_bottom_offset(0.0f), m_compound_shape(NULL),
+		m_has_follow_cam(false), m_is_jumping(false), m_on_ground(true), m_jump_timer(0.0f), m_y_bottom_offset(0.0f),
 		m_max_jump_height(0.0f), m_direction(btVector3(0,0,0)), m_deceleration(0.0f), m_max_speed(0.0f), m_step_height(0.0f),
-		m_actual_direction(Ogre::Vector3::ZERO), m_fall_acceleration(0.0f), m_max_fall_speed(0.0f)
+		m_actual_direction(Ogre::Vector3::ZERO), m_fall_acceleration(0.0f), m_max_fall_speed(0.0f), m_limit_max_speed(true), m_can_move(true)
 	{ m_type = COMPONENT_CHARACTER_CONTROLLER; m_update = true; }
 	virtual ~CharacterController(void){}
 	virtual void Notify(int type, void* msg);
@@ -75,12 +92,14 @@ public:
 	void SetDeacceleration(float value) { m_deceleration = value; }
 
 protected:
+	void ApplyRotation(const Ogre::Vector3& dir, float dt);
+	void ApplyImpulse(const Ogre::Vector3& dir, float dt);
 	void QueryRaycast();
 
 	Ogre::Vector3	m_direction;
 	Ogre::Vector3	m_actual_direction;
 	btVector3 m_offset;
-	btCompoundShape* m_compound_shape;
+	Ogre::Timer m_air_timer;
 
 	float		m_max_speed;
 	float		m_max_fall_speed;
@@ -94,10 +113,13 @@ protected:
 	float		m_step_height;
 	float		m_y_bottom_offset;
 	float		m_fall_acceleration;
+	float		m_fall_velocity;
 	bool		m_has_follow_cam;
 	bool		m_is_jumping;
 	bool		m_on_ground;
 	bool		m_is_moving;
+	bool		m_limit_max_speed;
+	bool		m_can_move;
 };
 
 class Point2PointConstraintComponent : public Component, public IComponentObserver{
@@ -119,13 +141,13 @@ private:
 
 class Generic6DofConstraintComponent : public Component, public IComponentObserver{
 public:
-	Generic6DofConstraintComponent(void) : m_physics_engine(NULL), m_constraint(NULL){}
+	Generic6DofConstraintComponent(void) : m_physics_engine(NULL), m_constraint(NULL){ m_type = COMPONENT_GENERIC_6DOF_COMPONENT; }
 	virtual ~Generic6DofConstraintComponent(void){}
 
 	virtual void Notify(int type, void* msg);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
-	virtual void Init(PhysicsEngine* physics_engine, btRigidBody* body_a, btRigidBody* body_b, const btVector3& pivot_a, const btVector3& pivot_b, bool linear_reference);
+	virtual void Init(PhysicsEngine* physics_engine, const Generic6DofDef& def);
 	btGeneric6DofConstraint* GetConstraint() const { return m_constraint; }
 
 private:
