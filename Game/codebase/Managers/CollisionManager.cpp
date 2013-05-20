@@ -140,7 +140,7 @@ void CollisionManager::LeafPlayer(GameObject* leaf, GameObject* player){
 };
 
 void CollisionManager::PlayerTrigger(GameObject* player, GameObject* trigger){
-	std::cout << "trigger collisioin\n";
+	std::cout << "Trigger collision\n";
 }
 
 void CollisionManager::PlayerTerrain(GameObject* player, GameObject* terrain){
@@ -158,7 +158,7 @@ void CollisionManager::PlayerTerrain(GameObject* player, GameObject* terrain){
 void CollisionManager::CameraTerrain(GameObject* camera, GameObject* terrain){
 	//wizardry goes here
 	//send info to component (invert camera target?)
-	std::cout << "Camera Terrain collision!\n";
+	std::cout << "Camera : Terrain collided\n";
 };
 
 void CollisionManager::GatePlayer(GameObject* gate, GameObject* player){
