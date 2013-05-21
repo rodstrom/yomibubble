@@ -4,6 +4,7 @@
 #include "ComponentsPrereq.h"
 #include "..\Managers\SoundManager.h"
 
+class PhysicsEngine;
 struct IEvent;
 class MessageSystem;
 class GameObject;
@@ -143,6 +144,18 @@ public:
 	void Exit();
 	void Update(float dt);
 private:
+};
+
+class PlayerHoldObject : public PlayerState{
+public:
+	PlayerHoldObject(PhysicsEngine* physics_engine) : m_object(NULL), m_physics_engine(physics_engine){ m_type = PLAYER_STATE_HOLD_OBJECT; }
+	~PlayerHoldObject(void){}
+	void Enter();
+	void Exit();
+	void Update(float dt);
+private:
+	GameObject* m_object;		// the object we are holding
+	PhysicsEngine* m_physics_engine;
 };
 
 

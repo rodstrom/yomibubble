@@ -86,8 +86,8 @@ void PlayState::SecondLoading(){
 	Ogre::Light* light = m_scene_manager->createLight("light52");
 	light->setType(Ogre::Light::LT_POINT);
 	light->setPosition(Ogre::Vector3(170, 100, 252));
-	m_level_manager->LoadLevel("try");
-	//m_level_manager->LoadPlane();
+	//m_level_manager->LoadLevel("try");
+	m_level_manager->LoadPlane();
 }
 
 void PlayState::Exit(){

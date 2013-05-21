@@ -365,7 +365,7 @@ GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, v
 	body_def.collision_filter.mask = COL_PLAYER | COL_TOTT | COL_BUBBLE | COL_WORLD_STATIC;
 	rc->Init(position,  mrc->GetEntity(), m_physics_engine, body_def);
 	rc->GetRigidbody()->setGravity(btVector3(0.0f, 0.0f, 0.0f));
-	rc->GetRigidbody()->setLinearFactor(btVector3(1,0,1));
+	//rc->GetRigidbody()->setLinearFactor(btVector3(1,0,1));
 	rc->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
 	rc->GetRigidbody()->setActivationState(DISABLE_DEACTIVATION);
 	rc->GetRigidbody()->setDamping(VariableManager::GetSingletonPtr()->GetAsFloat("Bubble_Linear_Damping"), VariableManager::GetSingletonPtr()->GetAsFloat("Bubble_Angular_Damping"));
