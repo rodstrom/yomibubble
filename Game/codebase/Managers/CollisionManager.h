@@ -61,7 +61,6 @@ private:
 	
 	typedef void (CollisionManager::*DoubleDispatch)(GameObject*, GameObject*);
 	typedef std::map<std::pair<int, int>, DoubleDispatch> HitMap;
-	typedef std::list<std::pair<void*,void*>> BeginEndChache;
 	HitMap m_collision;
 	HitMap m_raycast_map;
 	MessageSystem* m_message_system;

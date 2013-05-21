@@ -68,7 +68,10 @@ void GameObjectManager::Update(float dt){
 }
 
 void GameObjectManager::RemoveGameObject(GameObject* gameobject){
-	m_remove_list.push_back(gameobject);
+	std::list<GameObject*>::iterator it = std::find(m_remove_list.begin(), m_remove_list.end(), gameobject);
+	if (it == m_remove_list.end()){
+		m_remove_list.push_back(gameobject);
+	}
 }
 
 void GameObjectManager::ClearQueuedGameObjects(){
@@ -227,6 +230,8 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	tdef.body_type = STATIC_BODY;
 	tdef.collider_type = COLLIDER_SPHERE;
 	tdef.radius = 0.1f;
+	tdef.collision_filter.filter = COL_NOTHING;
+	tdef.collision_filter.mask = COL_NOTHING;
 
 	tc->Init(position, m_physics_engine, tdef);
 	tc->SetId("btrig");
@@ -267,43 +272,6 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 		);
 	staff_mesh_comp->Init("Staff.mesh", m_scene_manager, Ogre::StringUtil::BLANK);
 	acomp->GetEntity()->attachObjectToBone("CATRigLArmDigit21", staff_mesh_comp->GetEntity(), Ogre::Quaternion(1.0f, 0.8f, 0.0f, -0.2f));
-	/*
-	TriggerDef trdef;
-	trdef.body_type = DYNAMIC_BODY;
-	trdef.collider_type = COLLIDER_SPHERE;
-	trdef.mass = 0.0f;
-	trdef.radius = 10.5f;
-	trdef.collision_filter.filter = COL_CAMERA;
-	trdef.collision_filter.mask = COL_WORLD_STATIC;
-	camera_tc->Init(position, m_physics_engine, trdef);
-
-	fcc->Init(m_scene_manager, m_viewport, true);
-	fcc->SetTrigger(camera_tc);
-	fcc->SetMovementSpeed(def.camera_speed);
-
-
-
-	
-	//camera_rb->Init(
-
-
-	*/
-	//camera_rc->Init(m_physics_engine, node_comp->GetSceneNode());
-	//camera_rc->SetLength(Ogre::Vector3(-2,0,0));
-
-	//camera_rcc->Init(m_physics_engine);
-
-	//stc->Init(position, m_physics_engine, &trdef);
-	/*
-	-  raycast->Init(m_physics_engine, contr->GetRigidbody(), "body");
--  raycast->SetLength(Ogre::Vector3(0.0f,-1.0f,0.0f));
--  raycast->SetAttached(true); 
-*/
-	//DEBUGGING GRAVITY
-	//contr->GetRigidbody()->setGravity(btVector3(0,0,0));
-	//CreatePlayerCamera(position, go);
-
-
 	return go;
 }
 

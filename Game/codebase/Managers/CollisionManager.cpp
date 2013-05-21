@@ -75,6 +75,8 @@ void CollisionManager::ProcessCollision(const btCollisionObject* ob_a, const btC
 		(cd_b->flag == COLLISION_FLAG_GAME_OBJECT)){
 			GameObject* go_a = static_cast<GameObject*>(cd_a->data);
 			GameObject* go_b = static_cast<GameObject*>(cd_b->data);
+			int type_a = go_a->GetType();
+			int type_b = go_b->GetType();
 			HitMap::iterator it = m_collision.find(MakeIntPair(go_a->GetType(), go_b->GetType()));
 		if (it != m_collision.end()){
 			(this->*it->second)(go_a, go_b);
