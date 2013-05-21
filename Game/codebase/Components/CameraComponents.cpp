@@ -371,7 +371,7 @@ void FollowCameraComponent::SetCustomVariables(int inverted_camera, float camera
 };
 
 void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real delta_pitch, Ogre::Real delta_zoom){
-	std::cout << "Pitch degrees: " << m_pivot_pitch << std::endl;
+	//std::cout << "Pitch degrees: " << m_pivot_pitch << std::endl;
 	
 	if (delta_yaw != 0.0f
 			|| delta_pitch != 0.0f

@@ -121,7 +121,7 @@ int DBManager::Load() {
 							char_def.max_fall_speed = VariableManager::GetSingletonPtr()->GetAsFloat("Player_Max_Fall_Speed");
 							char_def.fall_acceleration = VariableManager::GetSingletonPtr()->GetAsFloat("Player_Fall_Acceleration");
 							char_def.collision_filter.filter = COL_PLAYER;
-							char_def.collision_filter.mask = COL_BUBBLE | COL_BUBBLE_TRIG | COL_TOTT | COL_WORLD_STATIC | COL_WORLD_TRIGGER;
+							char_def.collision_filter.mask = COL_BUBBLE | COL_BUBBLE_TRIG | COL_TOTT | COL_WORLD_STATIC | COL_WORLD_TRIGGER | COL_QUESTITEM;
 							player_def.character_contr = &char_def;
 							player_def.level_id = mArtifexLoader->mZoneName;
 							player_def.camera_speed = 2.5f;
@@ -131,15 +131,26 @@ int DBManager::Load() {
 						else if (i->second == "tott") {
 							CharacterControllerDef tott_def;
 							tott_def.friction = 1.0f;
-							tott_def.velocity = 500.0f;
+							tott_def.velocity = 2.1f;
+							tott_def.max_speed = 10.0f;
 							tott_def.jump_power = 200.0f;
 							tott_def.restitution = 0.0f;
 							tott_def.step_height = 0.35f;
-							tott_def.turn_speed = 1000.0f;
+							tott_def.turn_speed = 10.0f;
 							tott_def.max_jump_height = 10.0f;
+							tott_def.mass = 1.0f;
+							tott_def.max_fall_speed = 0.1f;
+							tott_def.fall_acceleration = 0.1f;
+							tott_def.air_deceleration = 0.5f;
+							tott_def.deceleration = 0.5f;
 							tott_def.collision_filter.filter = COL_TOTT;
-							tott_def.collision_filter.mask = COL_PLAYER | COL_WORLD_STATIC | COL_BUBBLE | COL_TOTT;
-							//temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y,z), &tott_def);
+							tott_def.collision_filter.mask = COL_PLAYER | COL_WORLD_STATIC | COL_BUBBLE | COL_TOTT | COL_QUESTITEM;
+							tott_def.radius = 0.5f;
+							tott_def.height = 0.1f;
+							tott_def.offset.y = 0.1f;
+							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y,z), &tott_def);
+							m_game_object_manager->CreateGameObject(GAME_OBJECT_QUEST_ITEM, Ogre::Vector3(x+4,y,z), NULL);
+							m_game_object_manager->CreateGameObject(GAME_OBJECT_SPEECH_BUBBLE, Ogre::Vector3(x,y+2,z), NULL);
 						}
 						else if (i->second == "leaf") {
 							ParticleDef particleDef;
@@ -150,6 +161,10 @@ int DBManager::Load() {
 							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_GATE, Ogre::Vector3(x,y,z), NULL);
 							Ogre::Quaternion quat = Ogre::Quaternion ((Degree(spawn.rx)), Vector3::UNIT_X)*Quaternion ((Degree(spawn.ry)), Vector3::UNIT_Y)*Quaternion ((Degree(spawn.rz)), Vector3::UNIT_Z);
 							temp->GetComponentMessenger()->Notify(MSG_SET_OBJECT_ORIENTATION, &quat);
+							if (mArtifexLoader->mZoneName == "try"){
+								Ogre::Quaternion quat = Ogre::Quaternion ((Degree(spawn.rx + 180)), Vector3::UNIT_X)*Quaternion ((Degree(spawn.ry + 180)), Vector3::UNIT_Y)*Quaternion ((Degree(spawn.rz + 180)), Vector3::UNIT_Z);
+								temp->GetComponentMessenger()->Notify(MSG_SET_OBJECT_ORIENTATION, &quat);
+							}
 						}
 						else if (i->second == "particle"){
 							ParticleDef particleDef;

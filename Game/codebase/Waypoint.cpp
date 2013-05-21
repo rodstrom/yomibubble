@@ -16,9 +16,9 @@ void WayPoint::Init(Ogre::SceneNode* node, float walk_speed){
 	m_destination = Ogre::Vector3::ZERO;
 
 	m_follow_node = NULL;
-	m_old_destination = Ogre::Vector3::ZERO;
+	m_old_destination = Ogre::Vector3::ZERO; //node->getPosition();
 	m_follow_node_moving = false;
-	m_loop_waypoints = false;
+	m_loop_waypoints = true;
 	m_current_waypoint = 0;
 
 	//AddWayPoint(Ogre::Vector3(25.0f, -10.0f, 0.0f));
@@ -35,6 +35,7 @@ bool WayPoint::NextLocation(){
 	m_walk_list.pop_front();             // this removes the front of the deque
  
 	m_direction = m_destination - m_node->getPosition();
+	//m_direction.normalise();
 
 	return true;
 };
@@ -44,7 +45,7 @@ void WayPoint::AddWayPoint(Ogre::Vector3 way_point){
 }
 
 void WayPoint::AddWayPoint(Ogre::SceneNode* scene_node){
-	m_follow_node = scene_node;
+	//m_follow_node = scene_node;
 	m_current_waypoint = -1;
 	//m_destination = m_follow_node->getPosition();
 	//m_direction = m_destination - m_node->getPosition();
@@ -82,12 +83,16 @@ bool WayPoint::withinDistance(float meters){
 }
 
 void WayPoint::Update(float dt){
+	//std::cout << "Tott pos: " << m_node->getPosition() << std::endl;
+
 	if(m_follow_node != NULL) {
 		m_destination = m_follow_node->getPosition();
 		m_direction = m_destination - m_node->getPosition();
 
 		m_follow_node_moving = (m_destination != m_old_destination);
 		m_old_destination = m_destination;
+	}
+	else{
 	}
 
 	if (m_direction == Ogre::Vector3::ZERO) {

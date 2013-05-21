@@ -19,7 +19,13 @@ void PlayerInputComponent::Update(float dt){
 	m_direction.z = m_input_manager->GetMovementAxis().z;
 	m_player_state_manager->Update(dt);
 	//(this->*m_states[m_player_state])(dt);
-	m_messenger->Notify(MSG_SFX2D_PLAY, &m_start_music);
+	
+	if (m_level == "try"){ m_messenger->Notify(MSG_SFX2D_PLAY, &m_start_music); }
+	else if (m_level == "Dayarea") { m_messenger->Notify(MSG_SFX2D_PLAY, &m_day_music); }
+	else if (m_level == "NightArea") { m_messenger->Notify(MSG_SFX2D_PLAY, &m_night_music); }
+	else { m_messenger->Notify(MSG_SFX2D_PLAY, &m_start_music); }
+	
+	//m_messenger->Notify(MSG_SFX2D_PLAY, &m_start_music);
 }
 
 inline void PlayerInputComponent::Jump(float dt){
@@ -33,11 +39,12 @@ inline void PlayerInputComponent::Jump(float dt){
 	}*/
 }
 
-void PlayerInputComponent::SetCustomVariables(float min_bubble_size, float max_bubble_size, float on_bubble_mod, float in_bubble_mod){
+void PlayerInputComponent::SetCustomVariables(float min_bubble_size, float max_bubble_size, float on_bubble_mod, float in_bubble_mod, Ogre::String level){
 	m_min_bubble_size = min_bubble_size;
 	m_max_bubble_size = max_bubble_size;
 	m_on_bubble_speed_mod = on_bubble_mod;
 	m_in_bubble_speed_mod = in_bubble_mod;
+	m_level = level;
 };
 
 void PlayerInputComponent::OntoBubbleTransition(float dt){
@@ -229,6 +236,9 @@ void PlayerInputComponent::Shut(){
 		m_animation_manager = NULL;
 	}
 	m_physics_engine->RemoveObjectSimulationStep(this);
+
+	if (m_level == "try"){ m_messenger->Notify(MSG_SFX2D_STOP, &m_start_music); }
+	else if (m_level == "Dayarea") { m_messenger->Notify(MSG_SFX2D_STOP, &m_day_music); }
 }
 
 void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound_manager, PhysicsEngine* physics_engine){
@@ -250,6 +260,11 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 	//m_bounce_sound = sound_manager->Create2DData("Bounce", false, false, false, false, 1.0f, 1.0f);
 	m_bubble_burst_sound = sound_manager->Create2DData("Bubble_Burst", false, false, false, false, 1.0f, 1.0f);
 	m_bubble_blow_sound = sound_manager->Create2DData("Blow_Bubble", false, false, false, false, 1.0f, 1.0f);
+
+	m_bounce_1 = sound_manager->Create2DData("Bounce_1", false, false, false, false, 1.0f, 1.0f);
+	m_bounce_2 = sound_manager->Create2DData("Bounce_2", false, false, false, false, 1.0f, 1.0f);
+	m_bounce_3 = sound_manager->Create2DData("Bounce_3", false, false, false, false, 1.0f, 1.0f);
+	m_bounce_4 = sound_manager->Create2DData("Bounce_4", false, false, false, false, 1.0f, 1.0f);
 
 	/*m_states[PLAYER_STATE_NORMAL] =					&PlayerInputComponent::Normal;
 	m_states[PLAYER_STATE_ON_BUBBLE] =				&PlayerInputComponent::OnBubble;
@@ -509,6 +524,9 @@ void BubbleController::Notify(int type, void* msg){
 }
 
 void BubbleController::Shut(){
+	SoundData2D pop_sound = m_owner->GetGameObjectManager()->GetSoundManager()->Create2DData("Bubble_Burst", false, false, false, false, 1.0, 1.0);
+	m_owner->GetGameObjectManager()->GetGameObject("Player")->GetComponentMessenger()->Notify(MSG_SFX2D_PLAY, &pop_sound);
+
 	m_messenger->Unregister(MSG_BUBBLE_CONTROLLER_APPLY_IMPULSE, this);
 	m_messenger->Unregister(MSG_BUBBLE_CONTROLLER_CAN_ATTACH_GET, this);
 	m_messenger->Unregister(MSG_BUBBLE_CONTROLLER_CAN_ATTACH_SET, this);

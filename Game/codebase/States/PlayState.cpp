@@ -59,7 +59,7 @@ void PlayState::SecondLoading(){
 	//m_game_object_manager->CreateGameObject(GAME_OBJECT_GATE, Ogre::Vector3(170, 75, 173), NULL);
 	
 	m_level_manager = new LevelManager(m_game_object_manager, m_scene_manager, m_physics_engine);
-
+	/*
 	m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
 	m_scene_manager->setShadowUseInfiniteFarPlane(false);
 	m_scene_manager->setShadowTextureSelfShadow(false);
@@ -67,7 +67,7 @@ void PlayState::SecondLoading(){
 	m_scene_manager->setShadowTextureSize(1024);
 	m_scene_manager->setShadowColour(Ogre::ColourValue(0.6f,0.6f,0.6f,1.0f));
 	m_scene_manager->setShadowFarDistance(25.0f);
-	
+	*/
 
 	
 	LevelDef level1;

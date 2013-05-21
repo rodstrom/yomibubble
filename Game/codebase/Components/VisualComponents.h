@@ -75,6 +75,7 @@ public:
 	virtual void SetMessenger(ComponentMessenger* messenger);
 
 	AnimationBlender* m_animation_blender;
+	Ogre::String m_current_animation;
 protected:
 	void PlayQueued();
 	void FixPlayerWeights();	// Ugly hack for the player to fix animation weights because we didn't do enough research in the beginning
@@ -231,6 +232,24 @@ protected:
 	btRigidBody*					m_terrain_body;
 	btDefaultMotionState*			m_terrain_motion_state;
 	CollisionDef					m_collision_def;
+};
+
+class SpeechBubbleComponent : public Component, public IComponentObserver, public IComponentUpdateable {
+public:
+	SpeechBubbleComponent(void){ m_type = COMPONENT_SPEECH_BUBBLE; };
+	virtual ~SpeechBubbleComponent(void){};
+
+	virtual void Notify(int type, void* message);
+	virtual void Shut();
+	virtual void SetMessenger(ComponentMessenger* messenger);
+	void Init(Ogre::SceneNode* node, SceneManager* scene_manager);
+	virtual void Update(float dt);
+
+	bool m_player_collide;
+
+protected:
+	MeshRenderComponent* m_mesh;
+	Ogre::SceneNode* m_node;
 };
 
 #endif // _N_VISUAL_COMPONENTS_H_

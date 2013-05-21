@@ -93,10 +93,11 @@ void PhysicsEngine::Step(float dt){
 		max_steps++;
 	}
 	m_dynamic_world->stepSimulation(dt, max_steps, fixed_time_step);
-	
+	/*
 	if (m_debug_drawer){
 		m_debug_drawer->step();
 	}
+	*/
 	//RaycastQuery();
 }
 

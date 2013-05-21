@@ -45,6 +45,9 @@ void RigidbodyComponent::Notify(int type, void* msg){
 	case MSG_RIGIDBODY_COLLISION_FLAG_REMOVE:
 		m_rigidbody->setCollisionFlags(m_rigidbody->getCollisionFlags() &~ *static_cast<int*>(msg));
 		break;
+	case MSG_SET_OBJECT_ORIENTATION:
+		m_rigidbody->getWorldTransform().setRotation(BtOgre::Convert::toBullet(*static_cast<Ogre::Quaternion*>(msg)));
+		break;
 	default:
 		break;
 	}
@@ -117,6 +120,7 @@ void RigidbodyComponent::Shut(){
 	m_messenger->Unregister(MSG_RIGIDBODY_APPLY_IMPULSE, this);
 	m_messenger->Unregister(MSG_RIGIDBODY_COLLISION_FLAG_REMOVE, this);
 	m_messenger->Unregister(MSG_RIGIDBODY_POSITION_GET, this);
+	m_messenger->Unregister(MSG_SET_OBJECT_ORIENTATION, this);
 }
 
 void RigidbodyComponent::SetMessenger(ComponentMessenger* messenger){
@@ -130,6 +134,7 @@ void RigidbodyComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_RIGIDBODY_COLLISION_FLAG_SET, this);
 	m_messenger->Register(MSG_RIGIDBODY_COLLISION_FLAG_REMOVE, this);
 	m_messenger->Register(MSG_RIGIDBODY_POSITION_GET, this);
+	m_messenger->Register(MSG_SET_OBJECT_ORIENTATION, this);
 }
 
 class IgnoreBodyCast : public btCollisionWorld::ClosestRayResultCallback{
@@ -154,9 +159,11 @@ void CharacterController::QueryRaycast(){
 	btVector3 from = (m_rigidbody->getWorldTransform().getOrigin() + m_offset);
 	btVector3 to = (m_rigidbody->getWorldTransform().getOrigin() + m_offset) - btVector3(0,m_y_bottom_offset + m_step_height,0);
 	m_physics_engine->GetDynamicWorld()->rayTest(from, to, ray_callback_bottom);
+	/*
 	if (m_physics_engine->GetDebugDraw() != NULL){
 		m_physics_engine->GetDebugDraw()->drawLine(from, to, btVector4(0,0,0,1));
 	}
+	*/
 	if (ray_callback_bottom.hasHit()){
 		CollisionDef& def = *static_cast<CollisionDef*>(ray_callback_bottom.m_collisionObject->getUserPointer());
 		if (def.flag == COLLISION_FLAG_STATIC){
@@ -310,12 +317,14 @@ void CharacterController::Shut(){
 		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_JUMP, this);
 		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_SET, this);
 		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_GET, this);
+		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_VELOCITY_SET, this);
 	}
 	m_physics_engine->RemoveObjectSimulationStep(this);
 }
 
 void CharacterController::SetMessenger(ComponentMessenger* messenger){
 	RigidbodyComponent::SetMessenger(messenger);
+	m_messenger->Register(MSG_CHARACTER_CONTROLLER_VELOCITY_SET, this);
 	m_messenger->Register(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, this);
 	m_messenger->Register(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_SET, this);
 	m_messenger->Register(MSG_CHARACTER_CONTROLLER_HAS_FOLLOW_CAM_GET, this);
@@ -628,6 +637,7 @@ void PlayerRaycastCollisionComponent::Init(PhysicsEngine* physics_engine){
 	m_bounce_vel = VariableManager::GetSingletonPtr()->GetAsFloat("BounceVel");
 	m_into_bubble_vel = VariableManager::GetSingletonPtr()->GetAsFloat("IntoBubbleVel");
 	m_bounce_power = VariableManager::GetSingletonPtr()->GetAsFloat("BouncePower");
+	m_num_bounces = 0;
 }
 
 void PlayerRaycastCollisionComponent::PlayerBubble(GameObject* go){
@@ -645,7 +655,29 @@ void PlayerRaycastCollisionComponent::PlayerBubble(GameObject* go){
 				Ogre::Vector3 impulse(0.0f, y_vel * -m_bounce_power, 0.0f);
 				m_messenger->Notify(MSG_RIGIDBODY_APPLY_IMPULSE, &impulse, "body");
 				m_messenger->Notify(MSG_RIGIDBODY_APPLY_IMPULSE, &impulse);
-				m_messenger->Notify(MSG_SFX2D_PLAY,  &static_cast<PlayerInputComponent*>(m_owner->GetComponent(COMPONENT_PLAYER_INPUT))->m_bounce_sound);
+
+				switch(m_num_bounces){
+				case 0:
+					m_messenger->Notify(MSG_SFX2D_PLAY,  &static_cast<PlayerInputComponent*>(m_owner->GetComponent(COMPONENT_PLAYER_INPUT))->m_bounce_1);
+					break;
+				case 1:
+					m_messenger->Notify(MSG_SFX2D_PLAY,  &static_cast<PlayerInputComponent*>(m_owner->GetComponent(COMPONENT_PLAYER_INPUT))->m_bounce_2);
+					break;
+				case 2:
+					m_messenger->Notify(MSG_SFX2D_PLAY,  &static_cast<PlayerInputComponent*>(m_owner->GetComponent(COMPONENT_PLAYER_INPUT))->m_bounce_3);
+					break;
+				case 3:
+					m_messenger->Notify(MSG_SFX2D_PLAY,  &static_cast<PlayerInputComponent*>(m_owner->GetComponent(COMPONENT_PLAYER_INPUT))->m_bounce_4);
+					break;
+				default:
+					std::cout << "Something went wrong with number of bounces in PlayerRaycastCollisionComponent\n";
+					break;
+				}
+
+				//m_messenger->Notify(MSG_SFX2D_PLAY,  &static_cast<PlayerInputComponent*>(m_owner->GetComponent(COMPONENT_PLAYER_INPUT))->m_bounce_sound);
+				if (m_num_bounces < 3){
+					m_num_bounces++;
+				}
 			}
 			else if (y_vel < -m_into_bubble_vel){   // go inside bubble
 				player_state = PLAYER_STATE_INSIDE_BUBBLE;
@@ -670,6 +702,9 @@ void PlayerRaycastCollisionComponent::PlayerBubble(GameObject* go){
 				m_messenger->Notify(MSG_CHARACTER_CONTROLLER_GRAVITY_SET, &gravity);
 				m_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &gravity);
 			}
+		}
+		else{
+			m_num_bounces = 0;
 		}
 	}
 }
@@ -710,10 +745,10 @@ void BobbingComponent::Update(float dt){
 	}
 	else{
 	if (m_up){
-		m_node->setPosition(m_node->getPosition().x, m_node->getPosition().y + 0.02, m_node->getPosition().z);
+		m_node->setPosition(m_node->getPosition().x, m_node->getPosition().y + 0.01, m_node->getPosition().z);
 	}
 	else{
-			m_node->setPosition(m_node->getPosition().x, m_node->getPosition().y - 0.02, m_node->getPosition().z);
+			m_node->setPosition(m_node->getPosition().x, m_node->getPosition().y - 0.01, m_node->getPosition().z);
 		}
 	}
 };
@@ -770,4 +805,37 @@ void CameraRaycastCollisionComponent::Notify(int type, void* msg){
 void CameraRaycastCollisionComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger = messenger;
 	m_messenger->Register(MSG_CAMERA_RAYCAST_COLLISION_STATIC_ENVIRONMENT, this);
+};
+
+
+void TottController::Notify(int type, void* msg){
+	CharacterController::Notify(type, msg);
+};
+
+void TottController::Shut(){
+	CharacterController::Shut();
+};
+
+void TottController::SetMessenger(ComponentMessenger* messenger){
+	CharacterController::SetMessenger(messenger);
+};
+
+void TottController::Init(const Ogre::Vector3& position, PhysicsEngine* physics_engine, const CharacterControllerDef& def){
+	CharacterController::Init(position, physics_engine, def);
+	m_anim_msg.blend = false;
+	m_anim_msg.full_body = true;
+	m_anim_msg.id = "Idle";
+	m_anim_msg.index = 0;
+	m_anim_msg.loop = true;
+	m_anim_msg.wait = false;
+};
+
+void TottController::Update(float dt){
+	CharacterController::Update(dt);
+
+	m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
+};
+
+void TottController::SimulationStep(btScalar time_step){
+	CharacterController::SimulationStep(time_step);
 };
