@@ -614,6 +614,7 @@ void CountableResourceGUI::Notify(int type, void* message){
 	
 	if (type == MSG_LEAF_PICKUP)
 	{
+		if (!m_can_pick_up){
 		if (m_current_number < m_total_number)
 		{
 			Ogre::Overlay::Overlay2DElementsIterator it = m_overlay->get2DElementsIterator();
@@ -631,6 +632,11 @@ void CountableResourceGUI::Notify(int type, void* message){
 			container->setMaterialName("HUD/Leaf/FilledMiddle"); }
 			m_current_number++;
 		}
+		m_can_pick_up = true;
+		}
+		else{
+			m_can_pick_up = false;
+		}
 	}
 };
 
@@ -645,6 +651,7 @@ void CountableResourceGUI::SetMessenger(ComponentMessenger* messenger){
 };
 
 void CountableResourceGUI::Init(const Ogre::String& level_id){
+	m_can_pick_up = false;
 	m_overlay = Ogre::OverlayManager::getSingleton().getByName(level_id);
 	Ogre::Overlay::Overlay2DElementsIterator it = m_overlay->get2DElementsIterator();
 	while (it.hasMoreElements()){

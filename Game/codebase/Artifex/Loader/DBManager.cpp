@@ -137,6 +137,30 @@ int DBManager::Load() {
 							player_def.camera_speed = 2.5f;
 							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(x,y,z), &player_def);
 							//m_game_object_manager->CreateGameObject(GAME_OBJECT_CAMERA, Ogre::Vector3(x,y,z), m_game_object_manager->GetGameObject("Player"));
+
+							////////////////////////////TOTT TEST AREA//////////////////////////
+							CharacterControllerDef tott_def;
+							tott_def.friction = 1.0f;
+							tott_def.velocity = 2.1f;
+							tott_def.max_speed = 10.0f;
+							tott_def.jump_power = 200.0f;
+							tott_def.restitution = 0.0f;
+							tott_def.step_height = 0.35f;
+							tott_def.turn_speed = 10.0f;
+							tott_def.max_jump_height = 10.0f;
+							tott_def.mass = 1.0f;
+							tott_def.max_fall_speed = 0.1f;
+							tott_def.fall_acceleration = 0.1f;
+							tott_def.air_deceleration = 0.5f;
+							tott_def.deceleration = 0.5f;
+							tott_def.collision_filter.filter = COL_TOTT;
+							tott_def.collision_filter.mask = COL_PLAYER | COL_WORLD_STATIC | COL_BUBBLE | COL_TOTT | COL_QUESTITEM;
+							tott_def.radius = 0.5f;
+							tott_def.height = 0.1f;
+							tott_def.offset.y = 0.1f;
+							//m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y,z), &tott_def);
+							//m_game_object_manager->CreateGameObject(GAME_OBJECT_QUEST_ITEM, Ogre::Vector3(x+4,y,z), NULL);
+							//m_game_object_manager->CreateGameObject(GAME_OBJECT_SPEECH_BUBBLE, Ogre::Vector3(x,y+2,z), NULL);
 						}
 						else if (i->second == "tott") {
 							CharacterControllerDef tott_def;

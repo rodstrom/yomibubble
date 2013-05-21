@@ -171,6 +171,8 @@ public:
 protected:
 	int						m_total_number;
 	int						m_current_number;
+	
+	bool					m_can_pick_up;
 
 	Ogre::String			m_material_name_active;
 	Ogre::String			m_material_name_inactive;
