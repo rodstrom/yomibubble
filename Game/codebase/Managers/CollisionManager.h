@@ -42,6 +42,13 @@ private:
 	void PlayerLeaf(GameObject* player, GameObject* leaf) { LeafPlayer(leaf, player); }
 	void PlayerTrigger(GameObject* player, GameObject* trigger);
 
+	void PlayerQuestItem(GameObject* player, GameObject* quest_item);
+	void QuestItemPlayer(GameObject* quest_item, GameObject* player) { PlayerQuestItem(player, quest_item); }
+	void TottQuestItem(GameObject* tott, GameObject* quest_item);
+	void QuestItemTott(GameObject* quest_item, GameObject* tott) { TottQuestItem(tott, quest_item); }
+	void PlayerSpeechBubble(GameObject* player, GameObject* speech_bubble);
+	void SpeechBubblePlayer(GameObject* speech_bubble, GameObject* player) { PlayerSpeechBubble(player, speech_bubble); }
+
 	void CameraTerrain(GameObject* camera, GameObject* terrain);
 	void TerrainCamera(GameObject* terrain, GameObject* camera) { CameraTerrain(camera, terrain); }
 

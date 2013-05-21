@@ -56,10 +56,12 @@ bool Core::Init(){
 	Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(3);
 	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
-	/*Ogre::SceneManager* retardedBugfix = */m_root->createSceneManager(Ogre::ST_GENERIC); // Herman was here
+	/*Ogre::SceneManager* retardedBugfix = */
+	m_root->createSceneManager(Ogre::ST_GENERIC); // Herman was here
 	if (!VariableManager::GetSingletonPtr()->Init())
 		return false;
 	m_sound_manager = new SoundManager();
+	//m_sound_manager->Init(m_root->createSceneManager(Ogre::ST_GENERIC));
 	m_sound_manager->LoadAudio();
 
 	//delete retardedBugfix;

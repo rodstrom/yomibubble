@@ -19,6 +19,7 @@ void NodeComponent::Notify(int type, void* msg){
 	switch (type){
 	case MSG_NODE_GET_NODE:
 		*static_cast<Ogre::SceneNode**>(msg) = m_node;
+		//if (m_owner->GetId() == "TestTott") { std::cout << "Tott pos " << m_node->getPosition() << std::endl; }
 		break;
 	case MSG_INCREASE_SCALE_BY_VALUE:
 		{
@@ -137,6 +138,7 @@ void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* 
 	if (remove_weights){
 		FixPlayerWeights();
 	}
+	m_current_animation = "";
 }
 
 void AnimationComponent::FixPlayerWeights(){
@@ -738,7 +740,7 @@ void TerrainComponent::Init(Ogre::SceneManager* scene_manager, PhysicsEngine* ph
 	m_terrain_body->setRollingFriction(1.0f);
 	m_terrain_body->setFriction(1.0f);
 	int filter = COL_WORLD_STATIC;
-	int mask = COL_PLAYER | COL_TOTT | COL_BUBBLE | COL_CAMERA;
+	int mask = COL_PLAYER | COL_TOTT | COL_BUBBLE | COL_CAMERA | COL_QUESTITEM;
 	m_physics_engine->GetDynamicWorld()->addRigidBody(m_terrain_body, filter, mask);
 	m_collision_def.flag = COLLISION_FLAG_STATIC;
 	m_collision_def.data = m_owner;
@@ -774,3 +776,72 @@ void PlayerStaffComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Entity*
 	m_node = m_scene_manager->getRootSceneNode()->createChildSceneNode();
 	m_node->attachObject(m_entity);
 }
+
+void SpeechBubbleComponent::Notify(int type, void* message){
+	AnimationMsg msg;
+		msg.blend = false;
+		msg.full_body = true;
+		msg.id = "walk";
+		msg.index = 0;
+		msg.loop = true;
+		msg.wait = false;
+	
+	switch(type){
+	case MSG_SP_BUBBLE_SHOW:
+		if (static_cast<AnimationComponent*>(m_owner->GetGameObjectManager()->GetGameObject("TestTott")->GetComponent(COMPONENT_ANIMATION))->m_current_animation != "walk"){
+			m_owner->GetGameObjectManager()->GetGameObject("TestTott")->GetComponentMessenger()->Notify(MSG_ANIMATION_PLAY, &msg);
+		}
+		m_player_collide = true;
+		break;
+	default:
+		break;
+	}
+};
+
+void SpeechBubbleComponent::Shut(){
+	m_messenger->Unregister(MSG_SP_BUBBLE_SHOW, this);
+};
+
+void SpeechBubbleComponent::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
+	m_messenger->Register(MSG_SP_BUBBLE_SHOW, this);
+};
+
+void SpeechBubbleComponent::Update(float dt){
+	
+	if (m_player_collide){
+		static_cast<MeshRenderComponent*>(m_owner->GetComponent(COMPONENT_MESH_RENDER))->GetEntity()->setMaterialName("SolidColor/Blue");
+	}
+	else {
+		static_cast<MeshRenderComponent*>(m_owner->GetComponent(COMPONENT_MESH_RENDER))->GetEntity()->setMaterialName("SolidColor/Green");
+	}
+
+	m_player_collide = false;
+
+};
+
+void SpeechBubbleComponent::Init(Ogre::SceneNode* node, SceneManager* scene_manager){
+	m_node = node;
+	m_player_collide = false;
+	//static_cast<MeshRenderComponent*>(speech_bubble->GetComponent(COMPONENT_MESH_RENDER))->GetEntity()->setMaterialName("SolidColor/Blue");
+	//m_mesh = new MeshRenderComponent;
+	//m_owner->AddComponent(m_mesh);
+	//m_mesh->Init("PratBubbla.mesh", scene_manager, "TottNode");
+	
+
+	/*
+	Ogre::OverlayManager& overlayManager = Ogre::OverlayManager::getSingleton();
+	Ogre::Overlay* overlay = overlayManager.create( "OverlayNameBajs" ); 
+
+	Ogre::String panel_name = "BajsPanel";
+
+	Ogre::OverlayContainer* element;
+	*/
+	/*
+	element = (static_cast<Ogre::OverlayContainer*>( overlayManager.createOverlayElement( "Panel", panel_name ) ));
+	element->SetPosition
+	element->setDimensions( 0.15f, 0.15f );
+	element->setMaterialName("Speech_Bubble.png");
+	overlay->add3D(element);
+	*/
+};

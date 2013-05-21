@@ -10,6 +10,7 @@
 #include "..\Components\CameraComponents.h"
 #include "OgreAxisAlignedBox.h"
 #include "..\MessageSystem.h"
+#include "..\Components\VisualComponents.h"
 
 CollisionManager* CollisionManager::m_instance = NULL;
 
@@ -50,6 +51,12 @@ void CollisionManager::Init(){
 	m_collision[MakeIntPair(GAME_OBJECT_TERRAIN, GAME_OBJECT_CAMERA)] = &CollisionManager::TerrainCamera;
 	m_collision[MakeIntPair(GAME_OBJECT_GATE, GAME_OBJECT_PLAYER)] = &CollisionManager::GatePlayer;
 	m_collision[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_GATE)] = &CollisionManager::PlayerGate;
+	m_collision[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_QUEST_ITEM)] = &CollisionManager::PlayerQuestItem;
+	m_collision[MakeIntPair(GAME_OBJECT_QUEST_ITEM, GAME_OBJECT_PLAYER)] = &CollisionManager::QuestItemPlayer;
+	m_collision[MakeIntPair(GAME_OBJECT_TOTT, GAME_OBJECT_QUEST_ITEM)] = &CollisionManager::TottQuestItem;
+	m_collision[MakeIntPair(GAME_OBJECT_QUEST_ITEM, GAME_OBJECT_TOTT)] = &CollisionManager::QuestItemTott;
+	m_collision[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_SPEECH_BUBBLE)] = &CollisionManager::PlayerSpeechBubble;
+	m_collision[MakeIntPair(GAME_OBJECT_SPEECH_BUBBLE, GAME_OBJECT_PLAYER)] = &CollisionManager::SpeechBubblePlayer;
 
 	m_raycast_map[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_BLUE_BUBBLE)] = &CollisionManager::PlayerBlueBubble;
 	m_raycast_map[MakeIntPair(GAME_OBJECT_BLUE_BUBBLE, GAME_OBJECT_PLAYER)] = &CollisionManager::BlueBubblePlayer;
@@ -168,3 +175,30 @@ void CollisionManager::GatePlayer(GameObject* gate, GameObject* player){
 	evt.m_type = EVT_CHANGE_LEVEL;
 	m_message_system->Notify(&evt);
 }
+
+void CollisionManager::PlayerQuestItem(GameObject* player, GameObject* quest_item){
+	std::cout << "Player vs QuestItem\n";
+};
+
+void CollisionManager::TottQuestItem(GameObject* tott, GameObject* quest_item){
+	std::cout << "Tott vs QuestItem\n";
+};
+
+void CollisionManager::PlayerSpeechBubble(GameObject* player, GameObject* speech_bubble){
+	//	std::cout << "Player vs SpeechBubble\n";
+	//static_cast<SpeechBubbleComponent*>(speech_bubble->GetComponent(COMPONENT_SPEECH_BUBBLE))->m_player_collide = true;
+	/*
+	if (static_cast<SpeechBubbleComponent*>(speech_bubble->GetComponent(COMPONENT_SPEECH_BUBBLE))->m_player_collide == false){
+		AnimationMsg msg;
+		msg.blend = false;
+		msg.full_body = true;
+		msg.id = "Excited";
+		msg.index = 0;
+		msg.loop = true;
+		msg.wait = false;
+
+		speech_bubble->GetGameObjectManager()->GetGameObject("TestTott")->GetComponentMessenger()->Notify(MSG_ANIMATION_PLAY, &msg);
+	}
+	*/
+	speech_bubble->GetComponentMessenger()->Notify(MSG_SP_BUBBLE_SHOW, NULL);
+};
