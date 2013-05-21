@@ -5,6 +5,7 @@
 #include "GameObjectPrereq.h"
 #include "..\Managers\SoundManager.h"
 
+class MessageSystem;
 class PlayerStateManager;
 class AnimationManager;
 class PhysicsEngine;
@@ -18,7 +19,7 @@ public:
 	virtual void Update(float dt);
 	virtual void Notify(int type, void* message);
 	virtual void Shut();
-	virtual void Init(InputManager* input_manager, SoundManager* sound_manager, PhysicsEngine* physics_engine);
+	virtual void Init(InputManager* input_manager, SoundManager* sound_manager, PhysicsEngine* physics_engine, MessageSystem* message_system);
 	virtual void SetMessenger(ComponentMessenger* messenger);
 	virtual void SimulationStep(btScalar time_step);
 	int GetPlayerState() { return m_player_state; }
@@ -98,32 +99,31 @@ protected:
 
 class BubbleController : public Component, public IComponentObserver, public IComponentSimulationStep, public IComponentUpdateable{
 public:
-	BubbleController(void) :  m_velocity(0.0f), m_max_velocity(0.0f), m_impulse(Ogre::Vector3::ZERO), m_apply_impulse(false), m_can_be_attached(false)
+	BubbleController(void) :  m_velocity(0.0f), m_max_velocity(0.0f), m_impulse(Ogre::Vector3::ZERO), m_apply_impulse(false), m_can_be_attached(false),
+		m_run_timer(false), m_life_timer(0.0f)
 	{ m_type = COMPONENT_BUBBLE_CONTROL; m_update = true; }
 	virtual ~BubbleController(void){}
 
 	virtual void Notify(int type, void* message);
 	virtual void Shut();
-	virtual void Init(PhysicsEngine* physics_engine, float velocity, float max_velocity);
+	virtual void Init(PhysicsEngine* physics_engine, MessageSystem* message_system, float velocity, float max_velocity);
 	virtual void SetMessenger(ComponentMessenger* messenger);
 	virtual void Update(float dt);
 	virtual void SimulationStep(btScalar time_step);
 	void SetVelocity(float value) { m_velocity = value; }
 	void SetMaxVelocity(float value) { m_max_velocity = value; }
 
-	void SetCustomVariables(float life_time) { m_life_time = life_time; }
-	float m_time_counter;
-	float m_life_time;
-
 protected:
-	//void ApplyImpulse(const btVector3& dir);
+	MessageSystem* m_message_system;
 	PhysicsEngine* m_physics_engine;
 	bool m_apply_impulse;
 	Ogre::Vector3 m_impulse;
 	float m_velocity;
 	float m_max_velocity;
+	float m_life_timer;
+	float m_max_life_time;
+	bool m_run_timer;
 	bool m_can_be_attached;
-	
 };
 
 #endif // _N_PLAYER_CONTROLLER_H_

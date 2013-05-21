@@ -89,16 +89,12 @@ void InputSystem::Capture(){
 		if (mouse_state.X.rel + mouse_state.Y.rel + mouse_state.Z.rel + m_delta_zoom != 0) { mouse_change = true; }
 		//m_delta_zoom = 0.0f;
 	}
-	/*
-	if (m_delta_zoom != 0.0f)
-	{ m_game->InjectRelativeCameraAxis(mouse_state.X.reö  m_delta_zoom); mouse_change = true; }
-	*/
+
 	bool changeXmove = false;
 	bool changeZmove = false;
 	if (m_keyboard){
 		m_keyboard->capture();
 		if (m_keyboard->isKeyDown(OIS::KC_W)){
-			//m_game->InjectRelativeMovementZ(-0.002f);
 			m_game->InjectRelativeMovementZ(-1.0f);
 			changeZmove = true;
 		}
@@ -118,7 +114,8 @@ void InputSystem::Capture(){
 	if (m_joysticks.size() > 0){
 		for (auto it = m_joysticks.begin(); it != m_joysticks.end(); it++){
 			(*it)->capture();
-			
+		
+			// 32767.0f is the maximum value (positive and negative) the axis can reach. We wan't to convert this value into a float from -1.0f to 1.0f
 			float move_x = (float)(*it)->getJoyStickState().mAxes[1].abs / 32767.0f;
 			float move_z = (float)(*it)->getJoyStickState().mAxes[0].abs / 32767.0f;
 			float camera_x = -(float)(*it)->getJoyStickState().mAxes[3].abs / 32767.0f;
@@ -183,7 +180,7 @@ bool InputSystem::keyPressed(const OIS::KeyEvent& e){
 	case OIS::KC_D:
 		break;
 	case OIS::KC_SPACE:
-		m_game->InjectPressedButton(BTN_START);
+		m_game->InjectPressedButton(BTN_A);
 		break;
 	case OIS::KC_ESCAPE:
 		m_game->InjectPressedButton(BTN_BACK);
@@ -209,19 +206,19 @@ bool InputSystem::keyReleased(const OIS::KeyEvent& e){
 		m_game->InjectReleasedButton(BTN_ARROW_LEFT);
 		break;
 	case OIS::KC_W:
-		m_game->InjectRelativeMovementZ(0.0f);
+		//m_game->InjectRelativeMovementZ(0.0f);
 		break;
 	case OIS::KC_S:
-		m_game->InjectRelativeMovementZ(0.0f);
+		//m_game->InjectRelativeMovementZ(0.0f);
 		break;
 	case OIS::KC_A:
-		m_game->InjectRelativeMovementX(0.0f);
+		//m_game->InjectRelativeMovementX(0.0f);
 		break;
 	case OIS::KC_D:
-		m_game->InjectRelativeMovementX(0.0f);
+		//m_game->InjectRelativeMovementX(0.0f);
 		break;
 	case OIS::KC_SPACE:
-		m_game->InjectReleasedButton(BTN_START);
+		m_game->InjectReleasedButton(BTN_A);
 		break;
 	case OIS::KC_ESCAPE:
 		m_game->InjectReleasedButton(BTN_BACK);
@@ -374,7 +371,7 @@ bool InputSystem::buttonPressed(const OIS::JoyStickEvent& e, int button){
 		
 		break;
 	case 2: //X button
-		
+		m_game->InjectPressedButton(BTN_X);
 		break;
 	case 1: //OIS::MouseButtonID::MB_Right: //or GamePad B
 		m_game->InjectPressedButton(BTN_B);
@@ -424,7 +421,7 @@ bool InputSystem::buttonReleased(const OIS::JoyStickEvent& e, int button){
 		
 		break;
 	case 2: //X button
-		
+		m_game->InjectReleasedButton(BTN_X);
 		break;
 	case 1: //OIS::MouseButtonID::MB_Right: //or GamePad B
 		m_game->InjectReleasedButton(BTN_B);

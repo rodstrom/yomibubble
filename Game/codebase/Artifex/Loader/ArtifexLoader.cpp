@@ -273,3 +273,7 @@ loadGrassSettings();
 loadWaterSettings();
 loadSkyeSettings();
 };
+
+void ArtifexLoader::Update(){
+	mDBManager->Update();
+}

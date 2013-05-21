@@ -30,6 +30,9 @@ void NodeComponent::Notify(int type, void* msg){
 	case MSG_SET_OBJECT_POSITION:
 		m_node->setPosition(*static_cast<Ogre::Vector3*>(msg));
 		break;
+	case MSG_SET_OBJECT_ORIENTATION:
+		m_node->setOrientation(*static_cast<Ogre::Quaternion*>(msg));
+		break;
 	case MSG_NODE_ATTACH_ENTITY:
 		{
 			if (!m_has_attached_entity){
@@ -49,6 +52,7 @@ void NodeComponent::Shut(){
 		m_messenger->Unregister(MSG_INCREASE_SCALE_BY_VALUE, this);
 		m_messenger->Unregister(MSG_SET_OBJECT_POSITION, this);
 		m_messenger->Unregister(MSG_NODE_ATTACH_ENTITY, this);
+		m_messenger->Unregister(MSG_SET_OBJECT_ORIENTATION, this);
 	}
 	if (m_node){
 		m_scene_manager->destroySceneNode(m_node);
@@ -62,6 +66,7 @@ void NodeComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_INCREASE_SCALE_BY_VALUE, this);
 	m_messenger->Register(MSG_SET_OBJECT_POSITION, this);
 	m_messenger->Register(MSG_NODE_ATTACH_ENTITY, this);
+	m_messenger->Register(MSG_SET_OBJECT_ORIENTATION, this);
 }
 
 void MeshRenderComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager){
@@ -79,11 +84,18 @@ void MeshRenderComponent::Init(const Ogre::String& filename, Ogre::SceneManager*
 }
 
 void MeshRenderComponent::Notify(int type, void* msg){
-
+	switch (type){
+	case MSG_MESH_SET_MATERIAL_NAME:
+		m_entity->setMaterialName(*static_cast<Ogre::String*>(msg));
+		break;
+	default:
+		break;
+	}
 }
 
 void MeshRenderComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger = messenger;
+	m_messenger->Register(MSG_MESH_SET_MATERIAL_NAME, this);
 }
 
 void MeshRenderComponent::Shut(){
@@ -91,6 +103,7 @@ void MeshRenderComponent::Shut(){
 		m_scene_manager->destroyEntity(m_entity);
 		m_entity = NULL;
 	}
+	m_messenger->Unregister(MSG_MESH_SET_MATERIAL_NAME, this);
 }
 
 void AnimationComponent::SetMessenger(ComponentMessenger* messenger){
@@ -726,6 +739,10 @@ void TerrainComponent::Init(Ogre::SceneManager* scene_manager, PhysicsEngine* ph
 	m_collision_def.flag = COLLISION_FLAG_STATIC;
 	m_collision_def.data = m_owner;
 	m_terrain_body->setUserPointer(&m_collision_def);
+}
+
+void TerrainComponent::Update(float dt){
+	m_artifex_loader->mDBManager->Update();
 }
 
 void PlayerStaffComponent::Notify(int type, void* msg){

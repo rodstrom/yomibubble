@@ -58,18 +58,17 @@ void PlayState::SecondLoading(){
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(170, 85, 173), &plane_def);*/
 	//m_game_object_manager->CreateGameObject(GAME_OBJECT_GATE, Ogre::Vector3(170, 75, 173), NULL);
 	
-	m_level_manager = new LevelManager(m_game_object_manager, m_scene_manager, m_physics_engine);
+	
 
-	m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
+	/*m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
 	m_scene_manager->setShadowUseInfiniteFarPlane(false);
 	m_scene_manager->setShadowTextureSelfShadow(false);
 	m_scene_manager->setShadowTextureCount(1);
 	m_scene_manager->setShadowTextureSize(1024);
 	m_scene_manager->setShadowColour(Ogre::ColourValue(0.6f,0.6f,0.6f,1.0f));
-	m_scene_manager->setShadowFarDistance(25.0f);
-	
+	m_scene_manager->setShadowFarDistance(25.0f);*/
 
-	
+	m_level_manager = new LevelManager(m_game_object_manager, m_scene_manager, m_physics_engine);
 	LevelDef level1;
 	level1.filepath = "try";
 	level1.next_level = "Dayarea";
@@ -83,124 +82,13 @@ void PlayState::SecondLoading(){
 	m_level_manager->AddLevel(level2);
 	m_level_manager->AddLevel(level3);
 	
-	m_level_manager->LoadLevel("try");
 	//m_level_manager->LoadLevel("Dayarea");
 	
-	/*float x = 180.0f;
-	float y = 90.0f;
-	float z = 230.0f;
-	/*
-	CharacterControllerDef tott_def;
-	tott_def.friction = 1.0f;
-	tott_def.velocity = 500.0f;
-	tott_def.jump_power = 200.0f;
-	tott_def.restitution = 0.0f;
-	tott_def.step_height = 2.35f;
-	tott_def.turn_speed = 1000.0f;
-	tott_def.max_jump_height = 10.0f;
-	*/
-	/*
-	Ogre::String terrain = "Dayarea";
-	
-	float terrain_choice = m_variable_manager->GetValue("Level_Choice");
-
-	if (terrain_choice == 0.0f){
-		terrain = "try";
-	}
-	else if(terrain_choice == 1.0f){
-		terrain = "Dayarea";
-	} 
-	else if(terrain_choice == 2.0f){
-		terrain = "NightArea";
-	} 
-	else{
-		terrain = "Dayarea";
-	}
-	
-	//m_game_object_manager->CreateGameObject(GAME_OBJECT_TERRAIN, Ogre::Vector3(0,0,0), &terrain);
-
-	CharacterControllerDef char_def;
-	char_def.friction = 1.0f;
-	char_def.velocity = m_variable_manager->GetValue("Player_Speed");
-	char_def.max_speed = m_variable_manager->GetValue("Player_Max_Speed");
-	char_def.deceleration = m_variable_manager->GetValue("Player_Deceleration");
-	char_def.jump_power = m_variable_manager->GetValue("Player_Jump_Power");
-	char_def.restitution = 0.0f;
-	char_def.step_height = 0.25f;
-	char_def.turn_speed = 1000.0f;
-	char_def.max_jump_height = m_variable_manager->GetValue("Player_Max_Jump_Height");
-	char_def.mass = 1.0f;
-	char_def.radius = 0.3f;
-	char_def.height = 0.4f;
-	char_def.collision_filter.filter = COL_PLAYER;
-	char_def.collision_filter.mask = COL_BUBBLE | COL_BUBBLE_TRIG | COL_TOTT | COL_WORLD_STATIC | COL_WORLD_TRIGGER;
-	char_def.offset.y = 0.5f;
-	char_def.fall_acceleration = 20.0f;
-	char_def.max_fall_speed = 10.0f;
-	PlayerDef player_def;
-	player_def.character_contr = &char_def;
-	player_def.camera_speed = 2.5f;
-	player_def.level_id = "try";
-
-	Ogre::Vector3 player_pos = Ogre::Vector3::ZERO;
-	if (terrain == "NightArea"){
-		player_pos = Ogre::Vector3(230, 72, 298);
-	}
-	else if (terrain == "Dayarea"){
-		player_pos = Ogre::Vector3(170, 75, 173);
-		
-		ParticleDef particleDef;
-		particleDef.particle_name = "Particle/Smoke";
-		m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(168,75,175), &particleDef);
-	}
-	else if (terrain == "try"){
-		player_pos = Ogre::Vector3(230, 72, 298);
-	}
-
-	//m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(player_pos.x,player_pos.y+8.5f,player_pos.z), &player_def, "Player");
-	PlaneDef plane_def;
-	plane_def.material_name = "Examples/BeachStones";
-	plane_def.plane_name = "plane";
-	plane_def.friction = 1.0f;
-	plane_def.restitution = 0.8f;
-	plane_def.collision_filter.filter = COL_WORLD_STATIC;
-	plane_def.collision_filter.mask = COL_BUBBLE | COL_PLAYER | COL_TOTT;
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(player_pos.x,player_pos.y,player_pos.z), &plane_def);
-	//*/
-	/*
-	m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
-	m_scene_manager->setShadowUseInfiniteFarPlane(false);
-	m_scene_manager->setShadowTextureSelfShadow(true);
-	m_scene_manager->setShadowTextureCount(1);
-	m_scene_manager->setShadowTextureSize(2048);
-	m_scene_manager->setShadowColour(Ogre::ColourValue(0.6f,0.6f,0.6f,1.0f));
-	m_scene_manager->setShadowFarDistance(30.0f);
-	m_camera->setNearClipDistance(1.0f);
-	
-	if(MaterialManager::getSingleton().getByName("Ogre/TextureShadowCaster").isNull())
-	// Render a frame to get the shadow materials created
-		Ogre::Root::getSingleton().renderOneFrame();
-
-	// Get all shadow materials
-	std::vector<MaterialPtr> tmpMaterials;
-	TexturePtr tmpTexturePtr = m_scene_manager->getShadowTexture(0);
-	String tmpMaterialName = tmpTexturePtr->getName() + "Mat" + m_scene_manager->getName();
-	tmpMaterials.push_back(MaterialManager::getSingleton().getByName(tmpMaterialName));
-	tmpMaterials.push_back(MaterialManager::getSingleton().getByName("Ogre/TextureShadowCaster"));
-	tmpMaterials.push_back(MaterialManager::getSingleton().getByName("Ogre/TextureShadowReceiver"));
-
-	// Loop through the list of shadow materials
-	unsigned int i = 0;
-	for( ; i < tmpMaterials.size(); i++ )
-	{
-	// Check if the current shadow material exists
-	if( !tmpMaterials[i].isNull() )
-		// Set the depth bias of the shadow material
-		tmpMaterials[i]->getTechnique(0)->getPass(0)->setDepthBias(5.0f);
-	}
-
-	// Clear the temporary list of shadow materials
-	tmpMaterials.clear();//*/
+	Ogre::Light* light = m_scene_manager->createLight("light52");
+	light->setType(Ogre::Light::LT_POINT);
+	light->setPosition(Ogre::Vector3(170, 100, 252));
+	m_level_manager->LoadLevel("try");
+	//m_level_manager->LoadPlane();
 }
 
 void PlayState::Exit(){
