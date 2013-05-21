@@ -158,9 +158,9 @@ int DBManager::Load() {
 							tott_def.radius = 0.5f;
 							tott_def.height = 0.1f;
 							tott_def.offset.y = 0.1f;
-							//m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y,z), &tott_def);
-							//m_game_object_manager->CreateGameObject(GAME_OBJECT_QUEST_ITEM, Ogre::Vector3(x+4,y,z), NULL);
-							//m_game_object_manager->CreateGameObject(GAME_OBJECT_SPEECH_BUBBLE, Ogre::Vector3(x,y+2,z), NULL);
+							m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y,z), &tott_def);
+							m_game_object_manager->CreateGameObject(GAME_OBJECT_QUEST_ITEM, Ogre::Vector3(x+4,y,z), NULL);
+							m_game_object_manager->CreateGameObject(GAME_OBJECT_SPEECH_BUBBLE, Ogre::Vector3(x,y+2,z), NULL);
 						}
 						else if (i->second == "tott") {
 							CharacterControllerDef tott_def;
