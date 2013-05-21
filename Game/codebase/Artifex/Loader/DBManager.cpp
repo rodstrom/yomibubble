@@ -136,7 +136,7 @@ int DBManager::Load() {
 							player_def.level_id = mArtifexLoader->mZoneName;
 							player_def.camera_speed = 2.5f;
 							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(x,y,z), &player_def);
-							m_game_object_manager->CreateGameObject(GAME_OBJECT_CAMERA, Ogre::Vector3(x,y,z), m_game_object_manager->GetGameObject("Player"));
+							//m_game_object_manager->CreateGameObject(GAME_OBJECT_CAMERA, Ogre::Vector3(x,y,z), m_game_object_manager->GetGameObject("Player"));
 						}
 						else if (i->second == "tott") {
 							CharacterControllerDef tott_def;

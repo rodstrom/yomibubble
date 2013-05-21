@@ -97,7 +97,6 @@ void PhysicsEngine::Step(float dt){
 	if (m_debug_drawer){
 		m_debug_drawer->step();
 	}
-	//RaycastQuery();
 }
 
 void PhysicsEngine::CreateTerrainCollision(Ogre::Terrain* terrain){

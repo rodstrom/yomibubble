@@ -16,6 +16,7 @@ GameObject::GameObject(int type) : m_type(type){
 
 GameObject::GameObject(int type, const Ogre::String& id){
 	m_messenger = new ComponentMessenger;
+	m_type = type;
 	Init();
 	m_id = id;
 	m_object_counter++;
