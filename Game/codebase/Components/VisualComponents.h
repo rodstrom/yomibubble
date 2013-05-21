@@ -70,7 +70,7 @@ public:
 	virtual void Notify(int type, void* message);
 	virtual void Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager, bool remove_weights = false);
 	virtual void Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager, const Ogre::String& node_id, bool remove_weights = false);
-	virtual void AddAnimationStates(unsigned int value = 1);
+	virtual void AddAnimationState(const Ogre::String& anim_name, bool loop = true);	// add an animation state and initialize the animation with the animation name
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
 

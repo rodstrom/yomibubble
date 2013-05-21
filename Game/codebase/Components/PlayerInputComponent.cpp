@@ -155,6 +155,7 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 	m_player_state_manager->AddPlayerState(new PlayerBounce);
 	m_player_state_manager->AddPlayerState(new PlayerOnBubble(message_system));
 	m_player_state_manager->AddPlayerState(new PlayerInsideBubble(message_system));
+	m_player_state_manager->AddPlayerState(new PlayerHoldObject(physics_engine));
 	m_player_state_manager->Init();
 	m_player_state_manager->SetPlayerState(m_player_state_manager->GetPlayerState(PLAYER_STATE_FALLING));
 
@@ -216,7 +217,7 @@ void BubbleController::Notify(int type, void* msg){
 
 void BubbleController::Shut(){
 	SoundData2D pop_sound = m_owner->GetGameObjectManager()->GetSoundManager()->Create2DData("Bubble_Burst", false, false, false, false, 1.0, 1.0);
-	m_owner->GetGameObjectManager()->GetGameObject("Player")->GetComponentMessenger()->Notify(MSG_SFX2D_PLAY, &pop_sound);
+	//m_owner->GetGameObjectManager()->GetGameObject("Player")->GetComponentMessenger()->Notify(MSG_SFX2D_PLAY, &pop_sound);
 
 	BubbleEvent evt;
 	evt.m_type = EVT_BUBBLE_REMOVE;

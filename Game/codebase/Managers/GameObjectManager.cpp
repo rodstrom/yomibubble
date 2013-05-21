@@ -223,7 +223,8 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	node_comp->SetId("player_node");
 
 	acomp->Init("Yomi.mesh", m_scene_manager, node_comp->GetId(), true);
-	acomp->AddAnimationStates(2);
+	acomp->AddAnimationState("Base_Idle");
+	acomp->AddAnimationState("Top_Idle");
 	//acomp->GetEntity()->setMaterialName("_YomiFBXASC039sFBXASC032staffMaterial__191");
 
 	TriggerDef tdef;
@@ -369,7 +370,7 @@ GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, v
 	body_def.collision_filter.mask = COL_PLAYER | COL_TOTT | COL_BUBBLE | COL_WORLD_STATIC | COL_QUESTITEM;
 	rc->Init(position,  mrc->GetEntity(), m_physics_engine, body_def);
 	rc->GetRigidbody()->setGravity(btVector3(0.0f, 0.0f, 0.0f));
-	rc->GetRigidbody()->setLinearFactor(btVector3(1,0,1));
+	//rc->GetRigidbody()->setLinearFactor(btVector3(1,0,1));
 	rc->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
 	rc->GetRigidbody()->setActivationState(DISABLE_DEACTIVATION);
 	rc->GetRigidbody()->setDamping(0.5, 0.5);
@@ -386,7 +387,7 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 	NodeComponent* node_comp = new NodeComponent;
 	go->AddComponent(node_comp);
 	AnimationComponent* acomp = new AnimationComponent;
-	acomp->AddAnimationStates(1);
+	
 	go->AddComponent(acomp);
 	go->AddUpdateable(acomp);
 	//CharacterController* contr = new CharacterController;
@@ -401,7 +402,7 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 	
 	node_comp->Init(position, m_scene_manager);
 	acomp->Init("Hidehog.mesh", m_scene_manager);
-
+	acomp->AddAnimationState("Idle");
 	//child_node->Init(position, "TottNode", node_comp->GetSceneNode());
 
 	//acomp->GetEntity()->setMaterialName("SolidColor/Green");
