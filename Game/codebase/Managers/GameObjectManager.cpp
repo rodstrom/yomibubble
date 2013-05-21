@@ -122,6 +122,9 @@ GameObject* GameObjectManager::CreateGameObject(int type, const Ogre::Vector3& p
 }
 
 void GameObjectManager::Shut(){
+	if (!m_bubbles.empty()){
+		m_bubbles.clear();
+	}
 	if (!m_updateable_game_objects.empty()){
 		m_updateable_game_objects.clear();
 	}
@@ -144,6 +147,9 @@ void GameObjectManager::Shut(){
 }
 
 void GameObjectManager::ClearAllGameObjects(){
+	if (!m_bubbles.empty()){
+		m_bubbles.clear();
+	}
 	if (!m_updateable_game_objects.empty()){
 		m_updateable_game_objects.clear();
 	}
