@@ -134,7 +134,7 @@ void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* 
 void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager, const Ogre::String& node_id, bool remove_weights){
 	MeshRenderComponent::Init(filename, scene_manager, node_id);
 	m_entity->getSkeleton()->setBlendMode(ANIMBLEND_CUMULATIVE);
-	m_animation_blender = new AnimationBlender(GetEntity());
+	//m_animation_blender = new AnimationBlender(GetEntity());
 	if (remove_weights){
 		FixPlayerWeights();
 	}
@@ -229,15 +229,10 @@ void AnimationComponent::RemoveWeights(std::vector<std::string>& list, Ogre::Ani
 	}
 }
 
-void AnimationComponent::AddAnimationStates(unsigned int value){
-	for (unsigned int i = 0; i < value; i++){
-		Ogre::AnimationState* a = NULL;
-		m_animation_states.push_back(AnimationData(NULL, Ogre::StringUtil::BLANK, false, new AnimationBlender(m_entity)));
-	}
-	m_animation_states[0].animation_blender->init("Base_Idle", true);
-	m_animation_states[0].id = "Base_Idle";
-	m_animation_states[1].animation_blender->init("Top_Idle", true);
-	m_animation_states[1].id = "Top_Idle";
+void AnimationComponent::AddAnimationState(const Ogre::String& anim_name, bool loop){
+	m_animation_states.push_back(AnimationData(NULL, Ogre::StringUtil::BLANK, false, new AnimationBlender(m_entity)));
+	m_animation_states.back().animation_blender->init(anim_name, loop);
+	m_animation_states.back().id = anim_name;
 }
 
 void AnimationComponent::Update(float dt){
