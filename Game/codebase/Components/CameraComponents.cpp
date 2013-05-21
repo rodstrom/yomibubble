@@ -123,6 +123,8 @@ void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewpo
 	m_env_collision = false;
 	m_player_direction = Ogre::Vector3::ZERO;
 	
+	m_camera_node->setPosition(153.471573,74.3579636,249.871216);
+	m_camera_pivot->setPosition(158.070892,72.4587402,252.214386);
 
 	//m_camera->lookAt(Ogre::Vector3(145.872f,73.6166f,244.42f));
 	//m_camera->rotate(Ogre::Vector3(0.0491129,0.92081,0.123328), Ogre::Degree(-0.366698));
@@ -148,7 +150,7 @@ void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewpo
 }
 
 void FollowCameraComponent::Update(float dt){
-	//QueryRaycast();
+	QueryRaycast();
 
 	//m_camera->lookAt(Ogre::Vector3(150.872f,75.6166f,244.42f));
 	//m_camera->rotate(Ogre::Vector3(0.0491129,0.92081,0.123328), Ogre::Radian(-0.366698));
@@ -175,186 +177,19 @@ void FollowCameraComponent::Update(float dt){
 	}
 
 	//m_trigger->GetCollisionDef
-
-	//std::cout << "kiss " << m_camera->getDerivedPosition().x << std::endl;
-//	m_camera->getDerivedRight(); //x-led
-//	m_camera->getDerivedUp(); //y-led
-	/*
-	m_camera->getViewport()->getActualLeft();
-	m_camera->getViewport()->getActualTop();
-	m_camera->getViewport()->getActualHeight();
-	m_camera->getViewport()->getActualWidth();
-	*/
-	/*
-	m_camera->getViewport()->getLeft();
-	m_camera->getViewport()->getTop();
-	*/
-	/*
-	int x_distance_from_cam = (m_camera->getViewport()->getWidth() * 0.5); //so this did not work then, fucktard values
-	int y_distance_from_cam = (m_camera->getViewport()->getHeight() * 0.5);
-
-	int testbajs = m_camera->getViewport()->getHeight();
-	testbajs;
-
-	m_node->setPosition(m_camera->getDerivedPosition().x, m_camera->getDerivedPosition().y, m_camera->getDerivedPosition().z);
-	m_left_ray.origin = btVector3(m_camera->getDerivedPosition().x, m_camera->getDerivedPosition().y, m_camera->getDerivedPosition().z);
-	m_left_ray.length = btVector3(m_camera->getDerivedPosition().x - 1.0, m_camera->getDerivedPosition().y, m_camera->getDerivedPosition().z);
-
-	m_right_ray.origin = btVector3(m_camera->getDerivedPosition().x, m_camera->getDerivedPosition().y, m_camera->getDerivedPosition().z);
-	m_right_ray.length = btVector3(m_camera->getDerivedPosition().x + 1.0, m_camera->getDerivedPosition().y, m_camera->getDerivedPosition().z);
-
-	m_bot_ray.origin = btVector3(m_camera->getDerivedPosition().x, m_camera->getDerivedPosition().y, m_camera->getDerivedPosition().z);
-	m_bot_ray.length = btVector3(m_camera->getDerivedPosition().x, m_camera->getDerivedPosition().y - 2.5, m_camera->getDerivedPosition().z);
-	*/
-	//std::cout << "Node Pos: " << m_node->convertLocalToWorldPosition(m_node->getPosition()) << std::endl;
-	//std::cout << "Node Pos: " << m_node->getPosition() << std::endl; //so this gives local space
-	//std::cout << "ViewPort left: " << m_camera->getFrustumPlane(0).normal.x << std::endl;
-	
-	//std::cout << "ViewPort up: " << m_camera->getViewport()->getTop() << std::endl;
-	//std::cout << "Viewport derived pos: " << m_camera->getDerivedPosition() << std::endl;
-
-	//std::cout << "bajs" << m_camera->getBoundingBox().getCorner(Ogre::AxisAlignedBox::CornerEnum::NEAR_LEFT_TOP).x << std::endl;
-
-
-	
-	//Assume world->stepSimulation or world->performDiscreteCollisionDetection has been called
-	
-
-			
-	/*
-	int numManifolds = world->getDispatcher()->getNumManifolds();
-	for (int i=0;i<numManifolds;i++)
-	{
-		btPersistentManifold* contactManifold =  world->getDispatcher()->getManifoldByIndexInternal(i);
-		btCollisionObject* obA = static_cast<btCollisionObject*>(contactManifold->getBody0());
-		btCollisionObject* obB = static_cast<btCollisionObject*>(contactManifold->getBody1());
-	
-		int numContacts = contactManifold->getNumContacts();
-		for (int j=0;j<numContacts;j++)
-		{
-			btManifoldPoint& pt = contactManifold->getContactPoint(j);
-			if (pt.getDistance()<0.f)
-			{
-				const btVector3& ptA = pt.getPositionWorldOnA();
-				const btVector3& ptB = pt.getPositionWorldOnB();
-				const btVector3& normalOnB = pt.m_normalWorldOnB;
-			}
-		}
-	}
-	*/
-
-	
-	
-	//m_camera->setPosition(0,0,12);
-	
-	/*
-	std::cout << "Camera pos: " << m_camera->getDerivedPosition() << std::endl;
-	std::cout << "Camera Orientation: " << m_camera->getRealOrientation().x << "," << m_camera->getRealOrientation().y << "," << m_camera->getRealOrientation().z << "," << m_camera->getRealOrientation().w << std::endl;
-	std::cout << "Camera goal pos: " << m_camera_goal->getPosition().x << "," << m_camera_goal->getPosition().y << "," << m_camera_goal->getPosition().z << std::endl;
-	*/
-	//std::cout << "Camera Left: " << m_camera->getViewport()->getActualLeft() << std::endl;
 }
 
-class BajsCallBack : btCollisionWorld::ContactResultCallback {
-public:
-	BajsCallBack() : btCollisionWorld::ContactResultCallback() {}
-	~BajsCallBack(){}
-
-private:
-
-};
+//class BajsCallBack : btCollisionWorld::ContactResultCallback {
+//public:
+//	BajsCallBack() : btCollisionWorld::ContactResultCallback() {}
+//	~BajsCallBack(){}
+//
+//private:
+//
+//};
 
 void FollowCameraComponent::SimulationStep(btScalar time_step){
-	//btPersistentManifold* contactManifold = m_physics_engine->GetDynamicWorld()->getDispatcher()->getManifoldByIndexInternal(0);
-	//btCollisionObject* obA = static_cast<btCollisionObject*>(static_cast<TerrainComponent*>(m_owner->GetGameObject("Terrain")->GetComponent(COMPONENT_TERRAIN))->GetRigidBody());
-	//btCollisionObject* obB = static_cast<btCollisionObject*>(static_cast<CharacterController*>(m_owner->GetComponent(COMPONENT_CHARACTER_CONTROLLER))->GetRigidbody());
-	
-	//btCollisionObject* obA = static_cast<btCollisionObject*>(static_cast<TerrainComponent*>(m_owner->GetGameObject("Terrain")->GetComponent(COMPONENT_TERRAIN))->GetRigidBody());
-	//btCollisionObject* obB = static_cast<btCollisionObject*>(static_cast<TriggerComponent*>(m_owner->GetGameObject("CameraTrig")->GetComponent(COMPONENT_TRIGGER))->GetRigidbody());
-	/*
-	btManifoldPoint& pt = contactManifold->getContactPoint(0);
-			if (pt.getDistance()<0.f)
-			{
-				std::cout << "Collision!!\n";
-			}
-			*/
-	//std::cout << "Cam pos: " << BtOgre::Convert::toOgre(obB->getWorldTransform().getOrigin()) << std::endl;
 
-	//bool bajsmacka = obB->checkCollideWith(obA); //this just checks IF they are supposed to collide with each other
-
-	//btCollisionWorld::contactPairTest(
-	/*
-	BajsCallBack test = BajsCallBack();
-	btCollisionWorld::ContactResultCallback;
-	m_physics_engine->GetDynamicWorld()->contactPairTest(obA, obB, test);
-	*/
-//	static_cast<TerrainComponent*>(m_owner->GetGameObject("Terrain")->GetComponent(COMPONENT_TERRAIN))->
-
-	//btCollisionWorld::contactPairTest(obA, obB, test);
-
-	
-
-
-	//bajsmacka = obA->
-
-	//if (bajsmacka)
-	//{
-		//std::cout << "Terrain coll\n";
-		//m_env_collision = true;
-	//}
-	//else
-	//{
-		//std::cout << "NOT Terrain coll\n";
-		//	m_env_collision = false;
-	//}
-	/*/
-	struct ContactSensorCallback : public btCollisionWorld::ContactResultCallback {
-	
-	//! Constructor, pass whatever context you want to have available when processing contacts
-	/*! You may also want to set m_collisionFilterGroup and m_collisionFilterMask
-	 *  (supplied by the superclass) for needsCollision() */
-	/*
-	ContactSensorCallback(btRigidBody& tgtBody , YourContext& context /*, ... *//*)
-		: btCollisionWorld::ContactResultCallback(), body(tgtBody), ctxt(context) { }
-	
-	btRigidBody& body; //!< The body the sensor is monitoring
-	YourContext& ctxt; //!< External information for contact processing
-	
-	//! If you don't want to consider collisions where the bodies are joined by a constraint, override needsCollision:
-	/*! However, if you use a btCollisionObject for #body instead of a btRigidBody,
-	 *  then this is unnecessary—checkCollideWithOverride isn't available */
-	/*virtual bool needsCollision(btBroadphaseProxy* proxy) const {
-		// superclass will check m_collisionFilterGroup and m_collisionFilterMask
-		if(!btCollisionWorld::ContactResultCallback::needsCollision(proxy))
-			return false;
-		// if passed filters, may also want to avoid contacts between constraints
-		return body.checkCollideWithOverride(static_cast<btCollisionObject*>(proxy->m_clientObject));
-	}
-	
-	//! Called with each contact for your own processing (e.g. test if contacts fall in within sensor parameters)
-	virtual btScalar addSingleResult(btManifoldPoint& cp,
-		const btCollisionObject* colObj0,int partId0,int index0,
-		const btCollisionObject* colObj1,int partId1,int index1)
-	{
-		btVector3 pt; // will be set to point of collision relative to body
-		if(colObj0==&body) {
-			pt = cp.m_localPointA;
-		} else {
-			assert(colObj1==&body && "body does not match either collision object");
-			pt = cp.m_localPointB;
-		}
-		// do stuff with the collision point
-		return 0; // not actually sure if return value is used for anything...?
-	}
-};
-
-// USAGE:
-btRigidBody* tgtBody /* = ... *//*;
-YourContext foo;
-ContactSensorCallback callback(*tgtBody, foo);
-world->contactTest(tgtBody,callback);
-
-*/
 };
 
 void FollowCameraComponent::SetCustomVariables(int inverted_camera, float camera_zoom_speed, float stick_rotation_acceleration, float change_angle_after_player, float default_distance, float default_pitch){
@@ -421,116 +256,101 @@ void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real de
 					m_camera_goal->translate(0,0, dist_change, Ogre::Node::TS_LOCAL);
 				}
 			}
-		//}
-	//}
-//	else { //if environment collision
-		
-		
-			/*
-		//magical repositioning goes here (check which ray that hits)
-		if (m_env_coll_down){
-			float pitch_change = 2.15;
-			m_camera_pivot->pitch(Ogre::Degree(pitch_change), Ogre::Node::TS_WORLD);
-			m_pivot_pitch += pitch_change;
-			m_default_pitch = m_pivot_pitch;
-			return;
-		}	
-		else if (m_env_coll_left){
-			m_camera_pivot->yaw(Ogre::Degree(2.15), Ogre::Node::TS_WORLD);
-		}
-		else if (m_env_coll_right){
-			m_camera_pivot->yaw(Ogre::Degree(-2.15), Ogre::Node::TS_WORLD);
-		}
-		else if (m_env_coll_up){
-			//magic
-		}
-		*/
-//	}
 	
-	//std::cout << "Pitch degrees: " << m_camera_pivot->pitch(0) << std::endl;
-	//std::cout << "Camera goal: " << m_camera_goal->getPosition() << std::endl; //0,0,12
 }
 
 void FollowCameraComponent::QueryRaycast(){
 	if (!m_check_cam) { return; }
 
-	////////////////////  LEFT RAY  ////////////////////////
-
-	btCollisionWorld::ClosestRayResultCallback call_back = btCollisionWorld::ClosestRayResultCallback(m_left_ray.origin, m_left_ray.length);
-	m_physics_engine->GetDynamicWorld()->rayTest(m_left_ray.origin, m_left_ray.length, call_back);
-	
-	if (call_back.hasHit()){
-		CollisionDef& def = *static_cast<CollisionDef*>(call_back.m_collisionObject->getUserPointer());
-
-		if (def.flag == COLLISION_FLAG_STATIC){
-			//std::cout << "Hit terrain left lol!\n";
-			m_env_coll_left = true;
-		}
-	}
-	else{
-		m_env_coll_left = false;
+	Ogre::Vector3 cam_pos = m_camera_pivot->getPosition();
+	Ogre::Ray camera_ray(Ogre::Vector3(cam_pos.x, cam_pos.y, cam_pos.z), Ogre::Vector3::UNIT_Z);
+	GameObject* terrain = static_cast<GameObject*>(m_owner->GetGameObject("Terrain"));
+	TerrainComponent* terrain_component = static_cast<TerrainComponent*>(terrain->GetComponent(EComponentType::COMPONENT_TERRAIN));
+	ArtifexLoader* terrain_artifex = terrain_component->GetArtifex();
+	Ogre::TerrainGroup* terrain_group = terrain_artifex->mTerrainGroup;
+	Ogre::TerrainGroup::RayResult collision = terrain_group->rayIntersects(camera_ray);
+	if(collision.hit){
+		std::cout << Ogre::Math::SymmetricRandom() << " Camera hit terrain LOL!\n";
 	}
 
-	////////////////////  RIGHT RAY  ////////////////////////
 
-	call_back = btCollisionWorld::ClosestRayResultCallback(m_right_ray.origin, m_right_ray.length);
-	m_physics_engine->GetDynamicWorld()->rayTest(m_right_ray.origin, m_right_ray.length, call_back);
-	
-	if (call_back.hasHit()){
-		CollisionDef& def = *static_cast<CollisionDef*>(call_back.m_collisionObject->getUserPointer());
+	//////////////////////  LEFT RAY  ////////////////////////
 
-		if (def.flag == COLLISION_FLAG_STATIC){
-			//std::cout << "Hit terrain right lol!\n";
-			m_env_coll_right = true;
-		}
-	}
-	else{
-		m_env_coll_right = false;
-	}
+	//btCollisionWorld::ClosestRayResultCallback call_back = btCollisionWorld::ClosestRayResultCallback(m_left_ray.origin, m_left_ray.length);
+	//m_physics_engine->GetDynamicWorld()->rayTest(m_left_ray.origin, m_left_ray.length, call_back);
+	//
+	//if (call_back.hasHit()){
+	//	CollisionDef& def = *static_cast<CollisionDef*>(call_back.m_collisionObject->getUserPointer());
 
-	////////////////////  UP RAY  ////////////////////////
+	//	if (def.flag == COLLISION_FLAG_STATIC){
+	//		std::cout << "Hit terrain left lol!\n";
+	//		m_env_coll_left = true;
+	//	}
+	//}
+	//else{
+	//	m_env_coll_left = false;
+	//}
 
-	//meh, kinda don't use it
+	//////////////////////  RIGHT RAY  ////////////////////////
 
-	////////////////////  BOT RAY  ////////////////////////
+	//call_back = btCollisionWorld::ClosestRayResultCallback(m_right_ray.origin, m_right_ray.length);
+	//m_physics_engine->GetDynamicWorld()->rayTest(m_right_ray.origin, m_right_ray.length, call_back);
+	//
+	//if (call_back.hasHit()){
+	//	CollisionDef& def = *static_cast<CollisionDef*>(call_back.m_collisionObject->getUserPointer());
 
-	call_back = btCollisionWorld::ClosestRayResultCallback(m_bot_ray.origin, m_bot_ray.length);
-	m_physics_engine->GetDynamicWorld()->rayTest(m_bot_ray.origin, m_bot_ray.length, call_back);
-	
-	if (call_back.hasHit()){
-		CollisionDef& def = *static_cast<CollisionDef*>(call_back.m_collisionObject->getUserPointer());
+	//	if (def.flag == COLLISION_FLAG_STATIC){
+	//		std::cout << "Hit terrain right lol!\n";
+	//		m_env_coll_right = true;
+	//	}
+	//}
+	//else{
+	//	m_env_coll_right = false;
+	//}
 
-		if (def.flag == COLLISION_FLAG_STATIC){
-			//std::cout << "Hit terrain bottom lol!\n";
-			m_env_coll_down = true;
-		}
-	}
-	else{
-		m_env_coll_down = false;
-	}
+	//////////////////////  UP RAY  ////////////////////////
 
-	if (m_env_coll_down
-		|| m_env_coll_left
-		|| m_env_coll_right){
-			m_env_collision = true;
-	}
-	else{
-		m_env_collision = false;
-	}
+	////meh, kinda don't use it
 
-	/*
-	if (call_back.hasHit()){
-		CollisionDef& def = *static_cast<CollisionDef*>(call_back.m_collisionObject->getUserPointer());
+	//////////////////////  BOT RAY  ////////////////////////
 
-		if (def.flag == COLLISION_FLAG_STATIC){
-			std::cout << "Hit terrain left lol!\n";
-			m_env_collision = true;
-		}
-	}
-	else{
-		m_env_collision = false;
-	}	
-	*/
+	//call_back = btCollisionWorld::ClosestRayResultCallback(m_bot_ray.origin, m_bot_ray.length);
+	//m_physics_engine->GetDynamicWorld()->rayTest(m_bot_ray.origin, m_bot_ray.length, call_back);
+	//
+	//if (call_back.hasHit()){
+	//	CollisionDef& def = *static_cast<CollisionDef*>(call_back.m_collisionObject->getUserPointer());
+
+	//	if (def.flag == COLLISION_FLAG_STATIC){
+	//		std::cout << "Hit terrain bottom lol!\n";
+	//		m_env_coll_down = true;
+	//	}
+	//}
+	//else{
+	//	m_env_coll_down = false;
+	//}
+
+	//if (m_env_coll_down
+	//	|| m_env_coll_left
+	//	|| m_env_coll_right){
+	//		m_env_collision = true;
+	//}
+	//else{
+	//	m_env_collision = false;
+	//}
+
+	///*
+	//if (call_back.hasHit()){
+	//	CollisionDef& def = *static_cast<CollisionDef*>(call_back.m_collisionObject->getUserPointer());
+
+	//	if (def.flag == COLLISION_FLAG_STATIC){
+	//		std::cout << "Hit terrain left lol!\n";
+	//		m_env_collision = true;
+	//	}
+	//}
+	//else{
+	//	m_env_collision = false;
+	//}	
+	//*/
 }
 
 void CameraCollisionComponent::Notify(int type, void* msg){

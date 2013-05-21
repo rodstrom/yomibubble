@@ -745,6 +745,10 @@ void TerrainComponent::Update(float dt){
 	m_artifex_loader->mDBManager->Update();
 }
 
+ArtifexLoader* TerrainComponent::GetArtifex(){
+	return m_artifex_loader;
+}
+
 void PlayerStaffComponent::Notify(int type, void* msg){
 
 }

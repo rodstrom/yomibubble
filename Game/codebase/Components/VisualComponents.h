@@ -223,6 +223,8 @@ public:
 
 	btRigidBody* GetRigidBody() { return m_terrain_body; }
 
+	ArtifexLoader* TerrainComponent::GetArtifex();
+
 protected:
 	float*							m_data_converter;
 	Ogre::SceneManager*				m_scene_manager;
