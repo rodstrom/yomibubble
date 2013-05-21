@@ -11,6 +11,7 @@
 #include "..\Managers\VariableManager.h"
 #include "..\PhysicsPrereq.h"
 #include "..\BtOgreGP.h"
+#include "..\AnimationBlender.h"
 
 ComponentMessenger* PlayerState::s_messenger = NULL;
 AnimationManager* PlayerState::s_animation = NULL;
@@ -27,7 +28,7 @@ void PlayerIdle::Enter(){
 }
 
 void PlayerIdle::Exit(){
-
+	
 }
 
 void PlayerIdle::PlayTopIdle(){
@@ -110,8 +111,8 @@ void PlayerStateMove::Update(float dt){
 	s_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &dir);
 }
 
-PlayerBlowBubble::PlayerBlowBubble(void) : m_bubble(NULL), m_current_scale(0.0f) { 
-	m_type = PLAYER_STATE_BLOW_BUBBLE; 
+PlayerBlowBubble::PlayerBlowBubble(void) : m_bubble(NULL), m_current_scale(0.0f) {
+	m_type = PLAYER_STATE_BLOW_BUBBLE;
 	m_bubble_blow_sound = s_sound_manager->Create2DData("Blow_Bubble", false, false, false, false, 1.0f, 1.0f);
 	m_min_bubble_size = 0.805f;
 	m_max_bubble_size = 1.907f;
@@ -139,20 +140,31 @@ void PlayerBlowBubble::Enter(){
 	}
 	s_messenger->Notify(MSG_RIGIDBODY_POSITION_SET, &pos, "btrig");
 	s_messenger->Notify(MSG_SFX2D_PLAY, &m_bubble_blow_sound);
-	std::cout << "Enter BlowBubble State\n";
-	s_animation->PlayAnimation("Blow_Start", false);
-	s_animation->QueueAnimation("Blow_Loop");
+	s_animation->PlayAnimation("Top_Blow_Start", false);
 }
 
 void PlayerBlowBubble::Exit(){
-	s_animation->PlayAnimation("Blow_End", false);
-	int index = 1;
-	s_messenger->Notify(MSG_ANIMATION_SET_WAIT, &index);
+	s_animation->PlayAnimation("Top_Blow_End", false);
+	//int index = 1;
+	//s_messenger->Notify(MSG_ANIMATION_SET_WAIT, &index);
 	s_messenger->Notify(MSG_SFX2D_STOP, &m_bubble_blow_sound);
 	s_messenger->Notify(MSG_ANIMATION_CLEAR_QUEUE, NULL);
 }
 
 void PlayerBlowBubble::Update(float dt){
+	s_animation->PlayAnimation("Top_Blow_Loop", true, AnimationBlender::BlendThenAnimate);
+	/*s_animation->PlayAnimation("Blow_Loop");
+	AnimNameMsg anim_name_msg;
+	anim_name_msg.index = 1;
+	s_messenger->Notify(MSG_ANIMATION_GET_CURRENT_NAME, &anim_name_msg);
+	if (anim_name_msg.id != "Blow_Loop"){
+		AnimIsDoneMsg is_done;
+		is_done.index = 1;
+		s_messenger->Notify(MSG_ANIMATION_IS_DONE, &is_done);
+		if(is_done.is_done){
+			s_animation->PlayAnimation("Blow_Loop");
+		}
+	}*/
 		const float SCALE = 0.91f * dt;
 		Ogre::Vector3 scale_inc;//(SCALE);
 		if (m_current_scale < m_min_bubble_size){
@@ -256,8 +268,10 @@ PlayerJump::PlayerJump(void){
 }
 
 void PlayerJump::Enter(){
-	s_animation->PlayAnimation("Jump_Start", false);
-	s_animation->QueueAnimation("Jump_Loop");
+	int p = 1;
+	s_messenger->Notify(MSG_ANIMATION_PAUSE, &p);
+	s_animation->PlayAnimation("Base_Jump_Start", false);
+	s_animation->PlayAnimation("Base_Jump_Loop", true);
 	bool jump = true;
 	s_messenger->Notify(MSG_CHARACTER_CONTROLLER_JUMP, &jump);
 }
@@ -289,8 +303,7 @@ void PlayerJump::Update(float dt){
 }
 
 void PlayerFalling::Enter(){
-	s_animation->PlayAnimation("Jump_Loop");
-	s_messenger->Notify(MSG_ANIMATION_CLEAR_QUEUE, NULL);
+	s_animation->PlayAnimation("Base_Jump_Loop");
 }
 
 void PlayerFalling::Exit(){
@@ -307,10 +320,10 @@ void PlayerFalling::Update(float dt){
 }
 
 void PlayerLand::Enter(){
-	s_messenger->Notify(MSG_ANIMATION_CLEAR_QUEUE, NULL);
-	s_animation->PlayAnimation("Jump_End", false);
-	std::function<void()> func = [this] { Proceed(); };
-	s_messenger->Notify(MSG_ANIMATION_CALLBACK, &func);
+	//s_messenger->Notify(MSG_ANIMATION_CLEAR_QUEUE, NULL);
+	s_animation->PlayAnimation("Base_Jump_End", false);
+	//std::function<void()> func = [this] { Proceed(); };
+	//s_messenger->Notify(MSG_ANIMATION_CALLBACK, &func);
 }
 
 void PlayerLand::Exit(){
@@ -320,10 +333,18 @@ void PlayerLand::Exit(){
 void PlayerLand::Update(float dt){
 	Ogre::Vector3 dir = s_input_component->GetDirection();
 	if (dir != Ogre::Vector3::ZERO){
-		s_messenger->Notify(MSG_ANIMATION_CLEAR_CALLBACK, NULL);
-		int p = 1;
-		s_messenger->Notify(MSG_ANIMATION_PAUSE, &p);
+		//s_messenger->Notify(MSG_ANIMATION_CLEAR_CALLBACK, NULL);
+		int p = 0;
 		s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_MOVE));
+	}
+	else {
+		s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_IDLE));
+	}
+	AnimIsDoneMsg anim_msg(0, false);
+	s_messenger->Notify(MSG_ANIMATION_IS_DONE, &anim_msg);
+	if (anim_msg.is_done){
+		int p = 0;
+		s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_IDLE));
 	}
 	s_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &dir);
 }
@@ -399,11 +420,11 @@ void PlayerOnBubble::Update(float dt){
 	Ogre::String move_base = Ogre::StringUtil::BLANK;
 	Ogre::String move_top = Ogre::StringUtil::BLANK;
 	if (dir == Ogre::Vector3::ZERO){
-		move_base = "Full_Idle_On_Bubble";
+		move_base = "Base_Idle_On_Bubble";
 		move_top = "Top_Idle";
 	}
 	else {
-		move_base = "Full_Walk_On_Bubble";
+		move_base = "Base_Walk_On_Bubble";
 		move_top = "Top_Walk";
 	}
 	s_animation->PlayAnimation(move_base);
@@ -585,8 +606,8 @@ void PlayerInsideBubble::BubbleRemoved(IEvent* evt){
 }
 
 void PlayerBounce::Enter(){
-	s_animation->PlayAnimation("Jump_Start", false);
-	s_animation->QueueAnimation("Jump_Loop");
+	s_animation->PlayAnimation("Base_Jump_Start", false);
+	s_animation->PlayAnimation("Base_Jump_Loop");
 }
 
 void PlayerBounce::Exit(){

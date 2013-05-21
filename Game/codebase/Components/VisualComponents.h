@@ -74,7 +74,7 @@ public:
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
 
-	AnimationBlender* m_animation_blender;
+	
 protected:
 	void PlayQueued();
 	void FixPlayerWeights();	// Ugly hack for the player to fix animation weights because we didn't do enough research in the beginning
@@ -82,6 +82,7 @@ protected:
 	std::vector<AnimationData>	m_animation_states;
 	std::deque<AnimationMsg> m_queue;
 	std::function<void()> m_callback;
+	AnimationBlender* m_animation_blender;
 };
 
 class Overlay2DComponent : public Component, public IComponentObserver {

@@ -11,8 +11,7 @@ public:
 
 	void RegisterCallback(Functor<AnimationManager>* callback);
 	void AddAnimation(const AnimationDef& anim_def);
-	void PlayAnimation(const Ogre::String& anim_id, bool loop = true, bool wait = false);
-	void QueueAnimation(const Ogre::String& anim_id, bool loop = true);	// will queue the animation and play it after the current has ended (will not work if the current animation is looping)
+	void PlayAnimation(const Ogre::String& anim_id, bool loop = true, int blending_transition = 1);
 
 private:
 	std::vector<AnimationDef> m_animations;

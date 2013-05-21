@@ -49,6 +49,8 @@ enum EComponentMsg{
 	MSG_ANIMATION_BLEND,
 	MSG_ANIMATION_LOOP,
 	MSG_ANIMATION_QUEUE,
+	MSG_ANIMATION_GET_CURRENT_NAME,
+	MSG_ANIMATION_IS_DONE,
 	MSG_ANIMATION_CLEAR_QUEUE,
 	MSG_ANIMATION_CLEAR_CALLBACK,
 	MSG_ANIMATION_CALLBACK,
@@ -194,12 +196,14 @@ public:
 };
 
 struct AnimationMsg{
-	AnimationMsg(void) : index(0), loop(true), full_body(false), blend(false), wait(false){}
+	AnimationMsg(void) : index(0), loop(true), full_body(false), blend(false), wait(false), duration(0.0f), blending_transition(0){}
 	int index;
+	int blending_transition;
 	bool blend;
 	bool loop;
 	bool full_body;
 	bool wait;
+	float duration;
 	Ogre::String id;
 };
 
@@ -208,12 +212,15 @@ struct AddForceMsg{
 	Ogre::Vector3 dir;
 };
 
+class AnimationBlender;
 struct AnimationData{
-	AnimationData(void) : anim_state(NULL), id(Ogre::StringUtil::BLANK), wait(false){}
-	AnimationData(Ogre::AnimationState* p_anim_state, const Ogre::String& p_id, bool p_wait) : anim_state(p_anim_state), id(p_id), wait(p_wait) {}
+	AnimationData(void) : anim_state(NULL), id(Ogre::StringUtil::BLANK), wait(false), animation_blender(NULL), active(true){}
+	AnimationData(Ogre::AnimationState* p_anim_state, const Ogre::String& p_id, bool p_wait, AnimationBlender* p_animation_blender) : anim_state(p_anim_state), id(p_id), wait(p_wait), animation_blender(p_animation_blender), active(true) {}
 	Ogre::AnimationState* anim_state;
 	Ogre::String id;
+	AnimationBlender* animation_blender;
 	bool wait;
+	bool active;
 };
 
 struct ButtonDef{
@@ -304,6 +311,19 @@ struct Generic6DofDef{
 	btVector3 pivot_a;
 	btVector3 pivot_b;
 	bool linear_reference;
+};
+
+struct AnimNameMsg{
+	AnimNameMsg(void) : id(Ogre::StringUtil::BLANK), index(0) {}
+	AnimNameMsg(const Ogre::String& p_name, int p_index) : id(p_name), index(p_index){}
+	Ogre::String id;
+	int index;
+};
+struct AnimIsDoneMsg{
+	AnimIsDoneMsg(void) : index(0), is_done(false){}
+	AnimIsDoneMsg(int p_index, bool p_is_done) : index(p_index), is_done(p_is_done) {}
+	int index;
+	bool is_done;
 };
 
 struct DirDT{

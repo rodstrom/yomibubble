@@ -113,21 +113,21 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 
 	m_player_action = 0;
 	m_animation_manager = new AnimationManager(m_messenger);
-	m_animation_manager->AddAnimation(AnimationDef("Base_Idle", 0, false));
-	m_animation_manager->AddAnimation(AnimationDef("Base_Run", 0, false));
-	m_animation_manager->AddAnimation(AnimationDef("Base_Walk", 0, false));
-	m_animation_manager->AddAnimation(AnimationDef("Blow_End", 1, false));
-	m_animation_manager->AddAnimation(AnimationDef("Blow_Loop", 1, false));
-	m_animation_manager->AddAnimation(AnimationDef("Blow_Start", 1, false));
-	m_animation_manager->AddAnimation(AnimationDef("Jump_End", 0, true));
-	m_animation_manager->AddAnimation(AnimationDef("Jump_Loop", 0, true));
-	m_animation_manager->AddAnimation(AnimationDef("Jump_Start", 0, true));
-	m_animation_manager->AddAnimation(AnimationDef("PickUpLeaf_State", 0, true));
-	m_animation_manager->AddAnimation(AnimationDef("Top_Idle", 1, false));
-	m_animation_manager->AddAnimation(AnimationDef("Top_Run", 1, false));
-	m_animation_manager->AddAnimation(AnimationDef("Top_Walk", 1, false));
-	m_animation_manager->AddAnimation(AnimationDef("Full_Walk_On_Bubble", 0, true));
-	m_animation_manager->AddAnimation(AnimationDef("Full_Idle_On_Bubble", 0, true));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Idle", 0, 0.2f));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Run", 0, 0.2f));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Walk", 0, 0.2f));
+	m_animation_manager->AddAnimation(AnimationDef("Top_Blow_End", 1, 0.1f));
+	m_animation_manager->AddAnimation(AnimationDef("Top_Blow_Loop", 1, 0.1f));
+	m_animation_manager->AddAnimation(AnimationDef("Top_Blow_Start", 1, 0.1f));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Jump_End", 0, 0.2f, "Top_Jump_End"));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Jump_Loop", 0, 0.2f, "Top_Jump_Loop"));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Jump_Start", 0, 0.2f, "Top_Jump_Start"));
+	m_animation_manager->AddAnimation(AnimationDef("Base_PickUpLeaf_State", 0, 0.2f));
+	m_animation_manager->AddAnimation(AnimationDef("Top_Idle", 1, 0.2f));
+	m_animation_manager->AddAnimation(AnimationDef("Top_Run", 1, 0.2f));
+	m_animation_manager->AddAnimation(AnimationDef("Top_Walk", 1, 0.2f));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Walk_On_Bubble", 0, 0.2f, "Top_Walk_On_Bubble"));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Idle_On_Bubble", 0, 0.2f, "Top_Idle_On_Bubble"));
 	m_player_state_manager = new PlayerStateManager;
 
 	PlayerState::Init(m_owner->GetComponentMessenger(), m_animation_manager, this, m_player_state_manager, sound_manager);

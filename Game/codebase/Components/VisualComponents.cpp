@@ -117,11 +117,13 @@ void AnimationComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_ANIMATION_CLEAR_QUEUE, this);
 	m_messenger->Register(MSG_ANIMATION_CLEAR_CALLBACK, this);
 	m_messenger->Register(MSG_ANIMATION_SET_WAIT, this);
+	m_messenger->Register(MSG_ANIMATION_GET_CURRENT_NAME, this);
+	m_messenger->Register(MSG_ANIMATION_IS_DONE, this);
 }
 
 void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager, bool remove_weights){
 	MeshRenderComponent::Init(filename, scene_manager);
-	
+	m_entity->getSkeleton()->setBlendMode(ANIMBLEND_CUMULATIVE);
 	m_animation_blender = new AnimationBlender(GetEntity());
 	if (remove_weights){
 		FixPlayerWeights();
@@ -228,16 +230,23 @@ void AnimationComponent::RemoveWeights(std::vector<std::string>& list, Ogre::Ani
 void AnimationComponent::AddAnimationStates(unsigned int value){
 	for (unsigned int i = 0; i < value; i++){
 		Ogre::AnimationState* a = NULL;
-		m_animation_states.push_back(AnimationData(NULL, Ogre::StringUtil::BLANK, false));
+		m_animation_states.push_back(AnimationData(NULL, Ogre::StringUtil::BLANK, false, new AnimationBlender(m_entity)));
 	}
+	m_animation_states[0].animation_blender->init("Base_Idle", true);
+	m_animation_states[0].id = "Base_Idle";
+	m_animation_states[1].animation_blender->init("Top_Idle", true);
+	m_animation_states[1].id = "Top_Idle";
 }
 
 void AnimationComponent::Update(float dt){
 	for (unsigned int i = 0; i < m_animation_states.size(); i++){
-		if (m_animation_states[i].anim_state != NULL){
-			if (m_animation_states[i].anim_state->getEnabled()){
-				m_animation_states[i].anim_state->addTime(dt);
-				if (!m_animation_states[i].anim_state->getLoop() && m_animation_states[i].anim_state->hasEnded()){
+		//if (m_animation_states[i].anim_state != NULL){
+			//if (m_animation_states[i].anim_state->getEnabled()){
+				//m_animation_states[i].anim_state->addTime(dt);
+			if (m_animation_states[i].active){
+				m_animation_states[i].animation_blender->addTime(dt);
+			}
+				/*if (!m_animation_states[i].anim_state->getLoop() && m_animation_states[i].anim_state->hasEnded()){
 					if (m_animation_states[i].wait){
 						m_animation_states[i].wait = false;
 					}
@@ -246,14 +255,14 @@ void AnimationComponent::Update(float dt){
 						m_callback = NULL;
 					}
 					PlayQueued();
-				}
-			}
-		}
+				}*/
+			//}
+		//}
 	}
 }
 
 void AnimationComponent::PlayQueued(){
-	if (!m_queue.empty()){
+	/*if (!m_queue.empty()){
 		if (m_animation_states[m_queue.front().index].anim_state != NULL){
 			if (m_animation_states[m_queue.front().index].anim_state->getEnabled()){
 				m_animation_states[m_queue.front().index].anim_state->setTimePosition(0);
@@ -276,7 +285,7 @@ void AnimationComponent::PlayQueued(){
 		m_animation_states[m_queue.front().index].anim_state->setTimePosition(0);
 		m_animation_states[m_queue.front().index].id = m_queue.front().id;
 		m_queue.pop_front();
-	}
+	}*/
 }
 
 void AnimationComponent::Notify(int type, void* msg){
@@ -285,41 +294,22 @@ void AnimationComponent::Notify(int type, void* msg){
 	case MSG_ANIMATION_PLAY:
 		{
 			AnimationMsg& anim_msg = *static_cast<AnimationMsg*>(msg);
-			if (!m_animation_states[anim_msg.index].wait){
-				if (m_animation_states[anim_msg.index].anim_state != NULL){
-					if (m_animation_states[anim_msg.index].id != anim_msg.id){
-						if (m_animation_states[anim_msg.index].anim_state->getEnabled()){
-							m_animation_states[anim_msg.index].anim_state->setTimePosition(0);
-							m_animation_states[anim_msg.index].anim_state->setEnabled(false);
-						}
-						m_animation_states[anim_msg.index].anim_state = m_entity->getAnimationState(anim_msg.id);
-						m_animation_states[anim_msg.index].anim_state->setEnabled(true);
-						m_animation_states[anim_msg.index].anim_state->setLoop(anim_msg.loop);
-						m_animation_states[anim_msg.index].anim_state->setTimePosition(0);
-						m_animation_states[anim_msg.index].id = anim_msg.id;
-					}
+			if (m_animation_states[anim_msg.index].id != anim_msg.id){
+				if (!m_animation_states[anim_msg.index].active){
+					m_animation_states[anim_msg.index].active = true;
 				}
-				else {
-					m_animation_states[anim_msg.index].anim_state = m_entity->getAnimationState(anim_msg.id);
-					m_animation_states[anim_msg.index].anim_state->setEnabled(true);
-					m_animation_states[anim_msg.index].anim_state->setLoop(anim_msg.loop);
-					m_animation_states[anim_msg.index].id = anim_msg.id;
-				}
+				m_animation_states[anim_msg.index].animation_blender->blend(anim_msg.id, (AnimationBlender::BlendingTransition)anim_msg.blending_transition, anim_msg.duration, anim_msg.loop);
+				m_animation_states[anim_msg.index].id = anim_msg.id;
 			}
 		}
 		break;
 	case MSG_ANIMATION_PAUSE:
 		{
 			int index = *static_cast<int*>(msg);
-			if (m_animation_states[index].anim_state != NULL){
-				if (m_animation_states[index].anim_state->getLoop()){
-					m_animation_states[index].anim_state->setLoop(false);
-				}
-				m_animation_states[index].anim_state->setTimePosition(0);
-				m_animation_states[index].anim_state->setEnabled(false);
-				m_animation_states[index].id = Ogre::StringUtil::BLANK;
-				m_animation_states[index].wait = false;
-			}
+			//m_animation_states[index].animation_blender->getSource()->setWeight(0);
+			//m_animation_states[index].active = false;
+			//m_animation_states[index].animation_blender->getSource()->setTimePosition(0);
+			//m_animation_states[index].animation_blender->getSource()->setEnabled(false);
 		}
 		break;
 	case MSG_ANIMATION_LOOP:
@@ -351,6 +341,18 @@ void AnimationComponent::Notify(int type, void* msg){
 			m_animation_states[index].wait = true;
 		}
 		break;
+	case MSG_ANIMATION_GET_CURRENT_NAME:
+		{
+			AnimNameMsg& anim_msg = *static_cast<AnimNameMsg*>(msg);
+			anim_msg.id = m_animation_states[anim_msg.index].animation_blender->getSource()->getAnimationName();
+		}
+		break;
+	case MSG_ANIMATION_IS_DONE:
+		{
+			AnimIsDoneMsg& anim_msg = *static_cast<AnimIsDoneMsg*>(msg);
+			anim_msg.is_done = m_animation_states[anim_msg.index].animation_blender->complete;
+		}
+		break;
 	default:
 		break;
 	}
@@ -374,6 +376,8 @@ void AnimationComponent::Shut(){
 	m_messenger->Unregister(MSG_ANIMATION_CLEAR_QUEUE, this);
 	m_messenger->Unregister(MSG_ANIMATION_CLEAR_CALLBACK, this);
 	m_messenger->Unregister(MSG_ANIMATION_SET_WAIT, this);
+	m_messenger->Unregister(MSG_ANIMATION_GET_CURRENT_NAME, this);
+	m_messenger->Unregister(MSG_ANIMATION_IS_DONE, this);
 	MeshRenderComponent::Shut();
 }
 

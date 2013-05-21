@@ -161,7 +161,7 @@ GameObject* GameObjectManager::GetGameObject(const Ogre::String& id){
 	for (it = m_game_objects.begin(); it != m_game_objects.end(); it++){
 		go = *it;
 		if (go->GetId() == id){
-		return go;
+			return go;
 		}
 	}
 	return NULL;
@@ -174,7 +174,6 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	NodeComponent* node_comp = new NodeComponent;
 	go->AddComponent(node_comp);
 	AnimationComponent* acomp = new AnimationComponent;
-	acomp->AddAnimationStates(2);
 	go->AddComponent(acomp);
 	go->AddUpdateable(acomp);
 	MeshRenderComponent* staff_mesh_comp = new MeshRenderComponent;
@@ -219,6 +218,7 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	node_comp->SetId("player_node");
 
 	acomp->Init("Yomi.mesh", m_scene_manager, node_comp->GetId(), true);
+	acomp->AddAnimationStates(2);
 	//acomp->GetEntity()->setMaterialName("_YomiFBXASC039sFBXASC032staffMaterial__191");
 
 	TriggerDef tdef;
