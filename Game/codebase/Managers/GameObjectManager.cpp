@@ -537,6 +537,8 @@ GameObject* GameObjectManager::Create2DOverlay(const Ogre::Vector3& position, vo
  coll_comp->Init(m_input_manager, m_viewport);
  overlayComp->Init(overlayDef.overlay_name, overlayDef.cont_name);
 
+ go->SetGameObjectManager(this);
+
  return go;
 }
 
