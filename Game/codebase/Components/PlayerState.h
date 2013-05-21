@@ -4,6 +4,8 @@
 #include "ComponentsPrereq.h"
 #include "..\Managers\SoundManager.h"
 
+struct IEvent;
+class MessageSystem;
 class GameObject;
 class PlayerStateManager;
 class PlayerInputComponent;
@@ -71,6 +73,7 @@ private:
 	float m_min_bubble_size;
 	float m_max_bubble_size;
 	float m_current_scale;
+	float m_bubble_gravity;
 };
 
 class PlayerJump : public PlayerState{
@@ -104,27 +107,31 @@ private:
 
 class PlayerOnBubble : public PlayerState{
 public:
-	PlayerOnBubble(void) { m_type = PLAYER_STATE_ON_BUBBLE; }
-	~PlayerOnBubble(void){}
+	PlayerOnBubble(MessageSystem* message_system);
+	~PlayerOnBubble(void);
 	void Enter();
 	void Exit();
 	void Update(float dt);
 private:
-	bool m_transition;
-	Ogre::String m_current_top;
-	Ogre::String m_current_base;
+	void BubbleRemoved(IEvent* evt);
+	MessageSystem* m_message_system;
+	float m_on_bubble_y_offset;
 	GameObject* m_bubble;
 };
 
 class PlayerInsideBubble : public PlayerState{
 public:
-	PlayerInsideBubble(void){ m_type = PLAYER_STATE_INSIDE_BUBBLE; }
-	~PlayerInsideBubble(void){}
+	PlayerInsideBubble(MessageSystem* message_system);
+	~PlayerInsideBubble(void);
 	void Enter();
 	void Exit();
 	void Update(float dt);
 private:
-	bool m_transition;
+	void ChangeBubbleType();
+	void BubbleRemoved(IEvent* evt);
+	MessageSystem* m_message_system;
+	float m_on_bubble_y_offset;
+	float m_bubble_gravity;
 	GameObject* m_bubble;
 };
 

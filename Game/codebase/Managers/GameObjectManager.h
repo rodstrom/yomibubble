@@ -20,7 +20,7 @@ public:
 	void RemoveGameObject(GameObject* gameobject);
 	GameObject* CreateGameObject(int type, const Ogre::Vector3& position, void* data, const Ogre::String& id = Ogre::StringUtil::BLANK);
 	void Shut();	// Closes the Game Object Manager, removes all objects and relations to method pointers. Only call this when you want to delete the instance.
-	void ClearAllGameObjects();		// Removes all game objects from the instance, call when you want to change level.
+	void ClearAllGameObjects();		// Removes all game objects from the instance, call when you want to reuse the instance.
 
 	GameObject* GetGameObject(const Ogre::String& id);
 
@@ -31,6 +31,9 @@ public:
 	MessageSystem* GetMessageSystem() const { return m_message_system; }
 
 private:
+	void ClearQueuedGameObjects();	// removes and deletes game objects saved in teh remove list. This is called if the remove list is not empty on each update cycle
+	void RemoveBubble(GameObject* bubble);
+	void CheckBubbleSize();
 	void AddGameObject(GameObject* gameobject);
 	GameObject* CreatePlayer(const Ogre::Vector3& position, void* data, const Ogre::String& id = Ogre::StringUtil::BLANK);
 	GameObject* CreateBlueBubble(const Ogre::Vector3& position, void* data, const Ogre::String& id = Ogre::StringUtil::BLANK);
@@ -55,8 +58,11 @@ private:
 	typedef GameObject* (GameObjectManager::*CreateObjectFptr)(const Ogre::Vector3&, void* data, const Ogre::String& id);
 	
 	CreateObjectFptr		m_create_fptr[GAME_OBJECT_SIZE];
+	std::list<GameObject*>	m_remove_list;
 	std::list<GameObject*>	m_game_objects;
 	std::list<GameObject*>	m_updateable_game_objects;
+	std::deque<GameObject*> m_bubbles;
+
 	PhysicsEngine*			m_physics_engine;
 	Ogre::SceneManager*		m_scene_manager;
 	InputManager*			m_input_manager;
@@ -68,6 +74,7 @@ private:
 
 	int m_leaf_iterations;
 	int m_particle_iterations;
+	unsigned int m_max_bubbles;
 };
 
 #endif // _N_GAME_OBJECT_MANAGER_H_

@@ -74,7 +74,7 @@ public:
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
 
-	AnimationBlender* m_animation_blender;
+	
 	Ogre::String m_current_animation;
 protected:
 	void PlayQueued();
@@ -83,6 +83,7 @@ protected:
 	std::vector<AnimationData>	m_animation_states;
 	std::deque<AnimationMsg> m_queue;
 	std::function<void()> m_callback;
+	AnimationBlender* m_animation_blender;
 };
 
 class Overlay2DComponent : public Component, public IComponentObserver {
@@ -210,12 +211,13 @@ protected:
 };
 
 class PhysicsEngine;
-class TerrainComponent : public Component, public IComponentObserver{
+class TerrainComponent : public Component, public IComponentObserver, public IComponentUpdateable{
 public:
 	TerrainComponent(void) : m_scene_manager(NULL), m_physics_engine(NULL), m_artifex_loader(NULL), m_terrain_shape(NULL), 
 		m_terrain_body(NULL), m_terrain_motion_state(NULL), m_data_converter(NULL){ m_type = COMPONENT_TERRAIN; }
 	virtual ~TerrainComponent(void){}
 
+	virtual void Update(float dt);
 	virtual void Notify(int type, void* message);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);

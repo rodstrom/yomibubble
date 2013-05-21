@@ -105,7 +105,7 @@ void CollisionManager::PlayerTott(GameObject* player, GameObject* tott){
 }
 
 void CollisionManager::BlueBubbleBlueBubble(GameObject* blue_bubble_a, GameObject* blue_bubble_b){
-	Component* comp_a = blue_bubble_a->GetComponent(COMPONENT_HINGE_CONSTRAINT);
+	/*Component* comp_a = blue_bubble_a->GetComponent(COMPONENT_HINGE_CONSTRAINT);
 	Component* comp_b = blue_bubble_b->GetComponent(COMPONENT_HINGE_CONSTRAINT);
 	if (!comp_a && !comp_b){
 		RigidbodyComponent* rc_a = static_cast<RigidbodyComponent*>(blue_bubble_a->GetComponent(COMPONENT_RIGIDBODY));
@@ -121,7 +121,7 @@ void CollisionManager::BlueBubbleBlueBubble(GameObject* blue_bubble_a, GameObjec
 		btVector3 pivot_b = rc_a->GetRigidbody()->getWorldTransform().getOrigin() - rc_b->GetRigidbody()->getWorldTransform().getOrigin();
 		PhysicsEngine* pe = blue_bubble_a->GetGameObjectManager()->GetPhysicsEngine();
 		constraint->Init(pe, rc_a->GetRigidbody(), rc_b->GetRigidbody(), pivot_a, btVector3(0,0,0), pivot_a, pivot_a);
-	}
+	}*/
 }
 
 void CollisionManager::PlayerBlueBubble(GameObject* player, GameObject* blue_bubble){

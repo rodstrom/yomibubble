@@ -12,6 +12,7 @@ enum EEventType {
 	EVT_CHARACTER,
 	EVT_KEYBOARD,
 	EVT_CHANGE_LEVEL,
+	EVT_BUBBLE_REMOVE,
 
 	EVT_MAX
 };
@@ -136,6 +137,12 @@ enum EKeyCode {
 
 struct IEvent {
 	EEventType m_type;
+};
+
+class GameObject;
+struct BubbleEvent : IEvent{
+	BubbleEvent() { m_type = EVT_BUBBLE_REMOVE; }
+	GameObject* bubble;
 };
 
 struct ResizeEvent : IEvent {
