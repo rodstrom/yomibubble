@@ -262,15 +262,18 @@ void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real de
 void FollowCameraComponent::QueryRaycast(){
 	if (!m_check_cam) { return; }
 
-	Ogre::Vector3 cam_pos = m_camera_pivot->getPosition();
-	Ogre::Ray camera_ray(Ogre::Vector3(cam_pos.x, cam_pos.y, cam_pos.z), Ogre::Vector3::UNIT_Z);
+	Ogre::Vector3 cam_pos = m_camera_node->getPosition();
+		std::cout << "cam_pos: " << cam_pos << "\n";
+	Ogre::Ray camera_ray(Ogre::Vector3(cam_pos.x, cam_pos.y, cam_pos.z), Ogre::Vector3::UNIT_Y);
+		std::cout << "camera_ray: " << camera_ray.getOrigin() << camera_ray.getDirection() << "\n";
 	GameObject* terrain = static_cast<GameObject*>(m_owner->GetGameObject("Terrain"));
 	TerrainComponent* terrain_component = static_cast<TerrainComponent*>(terrain->GetComponent(EComponentType::COMPONENT_TERRAIN));
 	ArtifexLoader* terrain_artifex = terrain_component->GetArtifex();
 	Ogre::TerrainGroup* terrain_group = terrain_artifex->mTerrainGroup;
 	Ogre::TerrainGroup::RayResult collision = terrain_group->rayIntersects(camera_ray);
+		std::cout << "collision: " << collision.hit << " - " << collision.position << "\n";
 	if(collision.hit){
-		std::cout << Ogre::Math::SymmetricRandom() << " Camera hit terrain LOL!\n";
+		//std::cout << "collision: " << collision.hit << " - " << collision.position << "\n";
 	}
 
 
