@@ -113,7 +113,7 @@ void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewpo
 	m_camera_pivot = m_camera->getSceneManager()->getRootSceneNode()->createChildSceneNode();
 	m_camera_goal = m_camera_pivot->createChildSceneNode(Ogre::Vector3(0,0,2));
 	m_camera_node = m_camera->getSceneManager()->getRootSceneNode()->createChildSceneNode();
-	m_camera_node->setPosition(m_camera_pivot->getPosition() + m_camera_goal->getPosition());
+	m_camera_node->setPosition(m_camera_goal->_getDerivedPosition());
 	m_camera_pivot->setFixedYawAxis(true);
 	m_camera_goal->setFixedYawAxis(true);
 	m_camera_node->setFixedYawAxis(true);
@@ -123,7 +123,6 @@ void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewpo
 	m_env_collision = false;
 	m_player_direction = Ogre::Vector3::ZERO;
 	
-	m_camera_node->setPosition(153.471573,74.3579636,249.871216);
 	m_camera_pivot->setPosition(158.070892,72.4587402,252.214386);
 
 	//m_camera->lookAt(Ogre::Vector3(145.872f,73.6166f,244.42f));
@@ -140,17 +139,25 @@ void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewpo
 	m_bot_ray.origin = btVector3(m_bot_ray.node->getPosition().x, m_bot_ray.node->getPosition().y, m_bot_ray.node->getPosition().z);
 	m_bot_ray.length = btVector3(0, -1, 0);
 
-	m_env_coll_left = false;
-	m_env_coll_right = false;
-	m_env_coll_up = false;
-	m_env_coll_down = false;
+	m_env_coll_Xp = false;
+	m_env_coll_Xn = false;
+	m_env_coll_Yp = false;
+	m_env_coll_Yn = false;
+	m_env_coll_Zp = false;
+	m_env_coll_Zn = false;
 
 	m_min_pitch_angle = 140;
 	m_max_pitch_angle = 160;
+
+	m_terrain_group = NULL;
+	//GameObject* terrain = static_cast<GameObject*>(m_owner->GetGameObject("Terrain"));
+	//TerrainComponent* terrain_component = static_cast<TerrainComponent*>(terrain->GetComponent(EComponentType::COMPONENT_TERRAIN));
+	//ArtifexLoader* terrain_artifex = terrain_component->GetArtifex();
+	//m_terrain_group = terrain_artifex->mTerrainGroup;
+
 }
 
 void FollowCameraComponent::Update(float dt){
-	QueryRaycast();
 
 	//m_camera->lookAt(Ogre::Vector3(150.872f,75.6166f,244.42f));
 	//m_camera->rotate(Ogre::Vector3(0.0491129,0.92081,0.123328), Ogre::Radian(-0.366698));
@@ -163,30 +170,42 @@ void FollowCameraComponent::Update(float dt){
 		CameraAxis axis = input->GetCameraAxis();
 		//UpdateCameraGoal(-0.1f * axis.x, -0.1f * axis.y, -0.0005f * axis.z);
 		
-		UpdateCameraGoal(axis.x * m_movement_speed, axis.y * m_movement_speed, -0.0005f * axis.z);
+		QueryRaycast();
+
+		UpdateCameraGoal(axis.x * m_movement_speed * dt * 5, axis.y * m_movement_speed * dt * 5, -0.0005f * axis.z * dt * 5);
 	}
+
 	Ogre::SceneNode* node = NULL;
 	m_messenger->Notify(MSG_NODE_GET_NODE, &node);
 	if (node){
-		m_camera_pivot->setPosition(node->getPosition() + Ogre::Vector3::UNIT_Y * 0.2f);
+		//Ogre::Vector3 old_position = m_camera_node->getPosition();
+
+		m_camera_pivot->setPosition(node->getPosition() + Ogre::Vector3::UNIT_Y);
 		Ogre::Vector3 goal_offset = m_camera_goal->_getDerivedPosition() - m_camera_node->getPosition();
 		m_camera_node->translate(goal_offset * dt * 2.0f);
 		m_camera_node->lookAt(m_camera_pivot->_getDerivedPosition(), Ogre::Node::TS_WORLD);
+		
+		//Ogre::Vector3 new_position = m_camera_node->getPosition();
+		
+		//QueryRaycast();
+
+		//if(!m_env_coll_Xp) new_position.x = old_position.x;
+		//if(!m_env_coll_Xn) new_position.x = old_position.x;
+		//if(m_env_coll_Yp) new_position.y = old_position.y;
+		////if(!m_env_coll_Yn) new_position.y = old_position.y;
+		//if(!m_env_coll_Zp) new_position.z = old_position.z;
+		//if(!m_env_coll_Zn) new_position.z = old_position.z;
+		//m_camera_node->setPosition(new_position);
+		
+		//if(m_env_coll_Yp) old_position.y += 0.1;
+		//if(m_env_coll_Yp) m_camera_node->setPosition(old_position);
+
 		//m_default_position = Ogre::Vector3(node->getPosition().x + 0.002, node->getPosition().y + 0.002, node->getPosition().z + 0.002);
 		//m_camera_goal->setPosition(m_default_position);
 	}
 
 	//m_trigger->GetCollisionDef
 }
-
-//class BajsCallBack : btCollisionWorld::ContactResultCallback {
-//public:
-//	BajsCallBack() : btCollisionWorld::ContactResultCallback() {}
-//	~BajsCallBack(){}
-//
-//private:
-//
-//};
 
 void FollowCameraComponent::SimulationStep(btScalar time_step){
 
@@ -211,149 +230,86 @@ void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real de
 	if (delta_yaw != 0.0f
 			|| delta_pitch != 0.0f
 			|| delta_zoom != 0.0f){
-				m_getting_input = true;
-				m_check_cam = false;
-		}
-		else{
-			m_getting_input = false;
-			m_check_cam = true;
-		}
+		m_getting_input = true;
+		m_check_cam = false;
+	}
+	else{
+		m_getting_input = false;
+		m_check_cam = true;
+	}
 	
-		if (!m_env_collision && !m_getting_input){
-			return;
-		}
+	if (!m_env_collision && !m_getting_input){
+		return;
+	}
 
-//	if (!m_env_collision){
-		
+//if (!m_env_collision){
 
-	//if (!m_env_collision){
-
-		if (!m_getting_input){
-			m_camera_goal->setPosition(0, 0, m_default_distance);
-			m_pivot_pitch = m_default_pitch;
-			m_camera_pivot->yaw(Ogre::Degree(m_player_direction.x * -2.15 * m_camera_change_angle_after_player), Ogre::Node::TS_WORLD);
-		}
+	if (!m_getting_input){
+		m_camera_goal->setPosition(0, 0, m_default_distance);
+		m_pivot_pitch = m_default_pitch;
+		m_camera_pivot->yaw(Ogre::Degree(m_player_direction.x * -2.15 * m_camera_change_angle_after_player), Ogre::Node::TS_WORLD);
+	}
 	
-			if (m_getting_input){
-				if (!m_inverted_controller) { m_camera_pivot->yaw(Ogre::Degree(-delta_yaw * m_camera_stick_rotation_acceleration), Ogre::Node::TS_WORLD); }
-				else { m_camera_pivot->yaw(Ogre::Degree(delta_yaw* m_camera_stick_rotation_acceleration), Ogre::Node::TS_WORLD); }
-			}
-			if (!(m_pivot_pitch + delta_pitch > 15 && delta_pitch > 0) && 
-				!(m_pivot_pitch + delta_pitch < -60 && delta_pitch < 0)
-				&& m_getting_input){
-					if (!m_inverted_controller) { m_camera_pivot->pitch(Ogre::Degree(delta_pitch * m_camera_stick_rotation_acceleration), Ogre::Node::TS_LOCAL); }
-					else { m_camera_pivot->pitch(Ogre::Degree(-delta_pitch * m_camera_stick_rotation_acceleration), Ogre::Node::TS_LOCAL); }
-					m_pivot_pitch += delta_pitch;
-					m_default_pitch = m_pivot_pitch;
-			}
-			if (m_getting_input){
-				Ogre::Real dist = m_camera_goal->_getDerivedPosition().distance(m_camera_pivot->_getDerivedPosition());
-				Ogre::Real dist_change = (delta_zoom * dist * m_camera_zoom_speed);
-				m_default_distance += (delta_zoom * dist * m_camera_zoom_speed);
+	if (m_getting_input){
+		if (!m_inverted_controller) { m_camera_pivot->yaw(Ogre::Degree(-delta_yaw * m_camera_stick_rotation_acceleration), Ogre::Node::TS_WORLD); }
+		else { m_camera_pivot->yaw(Ogre::Degree(delta_yaw* m_camera_stick_rotation_acceleration), Ogre::Node::TS_WORLD); }
+	}
+	if (!(m_pivot_pitch + delta_pitch > 15 && delta_pitch > 0) && 
+		!(m_pivot_pitch + delta_pitch < -60 && delta_pitch < 0)
+		&& m_getting_input){
+			if (!m_inverted_controller) { m_camera_pivot->pitch(Ogre::Degree(delta_pitch * m_camera_stick_rotation_acceleration), Ogre::Node::TS_LOCAL); }
+			else { m_camera_pivot->pitch(Ogre::Degree(-delta_pitch * m_camera_stick_rotation_acceleration), Ogre::Node::TS_LOCAL); }
+			m_pivot_pitch += delta_pitch;
+			m_default_pitch = m_pivot_pitch;
+	}
+	if (m_getting_input){
+		Ogre::Real dist = m_camera_goal->_getDerivedPosition().distance(m_camera_pivot->_getDerivedPosition());
+		Ogre::Real dist_change = (delta_zoom * dist * m_camera_zoom_speed);
+		m_default_distance += (delta_zoom * dist * m_camera_zoom_speed);
 
-				if (!(dist + dist_change < 2 && dist_change < 0) &&
-				!(dist + dist_change > 25 && dist_change > 0)){
-					m_camera_goal->translate(0,0, dist_change, Ogre::Node::TS_LOCAL);
-				}
-			}
+		if (!(dist + dist_change < 2 && dist_change < 0) &&
+		!(dist + dist_change > 25 && dist_change > 0)){
+			m_camera_goal->translate(0,0, dist_change, Ogre::Node::TS_LOCAL);
+		}
+	}
 	
 }
 
 void FollowCameraComponent::QueryRaycast(){
 	if (!m_check_cam) { return; }
 
+	if(m_terrain_group == NULL){
+		GameObject* terrain = static_cast<GameObject*>(m_owner->GetGameObject("Terrain"));
+		TerrainComponent* terrain_component = static_cast<TerrainComponent*>(terrain->GetComponent(EComponentType::COMPONENT_TERRAIN));
+		ArtifexLoader* terrain_artifex = terrain_component->GetArtifex();
+		m_terrain_group = terrain_artifex->mTerrainGroup;
+	}
+	
 	Ogre::Vector3 cam_pos = m_camera_node->getPosition();
-		std::cout << "cam_pos: " << cam_pos << "\n";
-	Ogre::Ray camera_ray(Ogre::Vector3(cam_pos.x, cam_pos.y, cam_pos.z), Ogre::Vector3::UNIT_Y);
-		std::cout << "camera_ray: " << camera_ray.getOrigin() << camera_ray.getDirection() << "\n";
-	GameObject* terrain = static_cast<GameObject*>(m_owner->GetGameObject("Terrain"));
-	TerrainComponent* terrain_component = static_cast<TerrainComponent*>(terrain->GetComponent(EComponentType::COMPONENT_TERRAIN));
-	ArtifexLoader* terrain_artifex = terrain_component->GetArtifex();
-	Ogre::TerrainGroup* terrain_group = terrain_artifex->mTerrainGroup;
-	Ogre::TerrainGroup::RayResult collision = terrain_group->rayIntersects(camera_ray);
-		std::cout << "collision: " << collision.hit << " - " << collision.position << "\n";
+	Ogre::Vector3 goal_pos = m_camera_pivot->getPosition();
+	goal_pos.y -= 0.5;
+	cam_pos.y -= 1;
+		//std::cout << "cam_pos: " << cam_pos << "\n";
+	
+	//Ogre::Ray camera_ray(goal_pos, cam_pos - goal_pos);
+	Ogre::Ray camera_ray(goal_pos, cam_pos - goal_pos);
+	Ogre::TerrainGroup::RayResult collision = m_terrain_group->rayIntersects(camera_ray);
 	if(collision.hit){
-		//std::cout << "collision: " << collision.hit << " - " << collision.position << "\n";
+		if(collision.position.squaredDistance(goal_pos) < goal_pos.squaredDistance(cam_pos) * 0.75){
+			m_env_collision = true;
+			std::cout << "Collision: " << collision.position << "\n" << "Ray direction: " << camera_ray.getDirection() << "\n" << "Distance (sq): " << collision.position.squaredDistance(goal_pos) << "\n";
+			m_camera_goal->setPosition(0, 0, collision.position.distance(goal_pos));
+			//m_camera_node->setPosition(collision.position);
+		}
+		else { 
+			m_env_collision = false;
+			m_camera_goal->setPosition(0, 0, m_default_distance);
+		}
+	}
+	else {
+		m_env_collision = false;
 	}
 
-
-	//////////////////////  LEFT RAY  ////////////////////////
-
-	//btCollisionWorld::ClosestRayResultCallback call_back = btCollisionWorld::ClosestRayResultCallback(m_left_ray.origin, m_left_ray.length);
-	//m_physics_engine->GetDynamicWorld()->rayTest(m_left_ray.origin, m_left_ray.length, call_back);
-	//
-	//if (call_back.hasHit()){
-	//	CollisionDef& def = *static_cast<CollisionDef*>(call_back.m_collisionObject->getUserPointer());
-
-	//	if (def.flag == COLLISION_FLAG_STATIC){
-	//		std::cout << "Hit terrain left lol!\n";
-	//		m_env_coll_left = true;
-	//	}
-	//}
-	//else{
-	//	m_env_coll_left = false;
-	//}
-
-	//////////////////////  RIGHT RAY  ////////////////////////
-
-	//call_back = btCollisionWorld::ClosestRayResultCallback(m_right_ray.origin, m_right_ray.length);
-	//m_physics_engine->GetDynamicWorld()->rayTest(m_right_ray.origin, m_right_ray.length, call_back);
-	//
-	//if (call_back.hasHit()){
-	//	CollisionDef& def = *static_cast<CollisionDef*>(call_back.m_collisionObject->getUserPointer());
-
-	//	if (def.flag == COLLISION_FLAG_STATIC){
-	//		std::cout << "Hit terrain right lol!\n";
-	//		m_env_coll_right = true;
-	//	}
-	//}
-	//else{
-	//	m_env_coll_right = false;
-	//}
-
-	//////////////////////  UP RAY  ////////////////////////
-
-	////meh, kinda don't use it
-
-	//////////////////////  BOT RAY  ////////////////////////
-
-	//call_back = btCollisionWorld::ClosestRayResultCallback(m_bot_ray.origin, m_bot_ray.length);
-	//m_physics_engine->GetDynamicWorld()->rayTest(m_bot_ray.origin, m_bot_ray.length, call_back);
-	//
-	//if (call_back.hasHit()){
-	//	CollisionDef& def = *static_cast<CollisionDef*>(call_back.m_collisionObject->getUserPointer());
-
-	//	if (def.flag == COLLISION_FLAG_STATIC){
-	//		std::cout << "Hit terrain bottom lol!\n";
-	//		m_env_coll_down = true;
-	//	}
-	//}
-	//else{
-	//	m_env_coll_down = false;
-	//}
-
-	//if (m_env_coll_down
-	//	|| m_env_coll_left
-	//	|| m_env_coll_right){
-	//		m_env_collision = true;
-	//}
-	//else{
-	//	m_env_collision = false;
-	//}
-
-	///*
-	//if (call_back.hasHit()){
-	//	CollisionDef& def = *static_cast<CollisionDef*>(call_back.m_collisionObject->getUserPointer());
-
-	//	if (def.flag == COLLISION_FLAG_STATIC){
-	//		std::cout << "Hit terrain left lol!\n";
-	//		m_env_collision = true;
-	//	}
-	//}
-	//else{
-	//	m_env_collision = false;
-	//}	
-	//*/
 }
 
 void CameraCollisionComponent::Notify(int type, void* msg){

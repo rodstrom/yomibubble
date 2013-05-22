@@ -77,11 +77,13 @@ protected:
 	PhysicsEngine*		m_physics_engine;
 	float				m_movement_speed;
 	InputSystem*		m_input_system;
-
-	bool				m_env_coll_left;
-	bool				m_env_coll_right;
-	bool				m_env_coll_up;
-	bool				m_env_coll_down;
+	
+	bool				m_env_coll_Xp;
+	bool				m_env_coll_Xn;
+	bool				m_env_coll_Yp;
+	bool				m_env_coll_Yn;
+	bool				m_env_coll_Zp;
+	bool				m_env_coll_Zn;
 
 	bool				m_inverted_controller;
 
@@ -91,6 +93,8 @@ protected:
 
 	float				m_min_pitch_angle;
 	float				m_max_pitch_angle;
+
+	Ogre::TerrainGroup*	m_terrain_group;
 
 //	TriggerComponent*	m_trigger;
 };
