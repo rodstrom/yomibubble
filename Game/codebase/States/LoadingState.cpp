@@ -33,26 +33,25 @@ void LoadingState::Enter(){
 		&& m_level != "Dayarea"
 		&& m_level != "NightArea")
 	{ 
-		menuBackground.overlay_name = "LoadingScreenFirstArea";
-		menuBackground.cont_name = "LoadingScreenFirstArea"; 
+		menuBackground.overlay_name = "LoadingFirst";
+		menuBackground.cont_name = "Loading/Background1"; 
 	}
 
 	
 	
 	if (m_level == "try") { 
-		menuBackground.overlay_name = "LoadingScreenDayArea";
-		menuBackground.cont_name = "LoadingScreenDayArea"; 
+		menuBackground.overlay_name = "LoadingFirst";
+		menuBackground.cont_name = "Loading/Background1"; 
 	}
 	else if (m_level == "Dayarea") { 
-		menuBackground.overlay_name = "LoadingScreenNightArea";
-		menuBackground.cont_name = "LoadingScreenNightArea"; 
+		menuBackground.overlay_name = "LoadingDay";
+		menuBackground.cont_name = "Loading/Background2"; 
 	}
 	else if (m_level == "NightArea") { //so this is like the "end graphics"
-		menuBackground.overlay_name = "LoadingScreenNightArea";
-		menuBackground.cont_name = "LoadingScreenNightArea"; 
+		menuBackground.overlay_name = "LoadingNight";
+		menuBackground.cont_name = "Loading/Background3"; 
 	}
-	//menuBackground.cont_name = "Loading/Background"; //+1,2,3
-	//m_game_object_manager->CreateGameObject(GAME_OBJECT_OVERLAY, Ogre::Vector3(0,0,0), &menuBackground);
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_OVERLAY, Ogre::Vector3(0,0,0), &menuBackground);
 }
 
 void LoadingState::Exit(){
