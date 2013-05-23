@@ -769,7 +769,7 @@ void PlayerRaycastCollisionComponent::PlayerBubble(GameObject* go){
 					m_messenger->Notify(MSG_SFX2D_PLAY,  &static_cast<PlayerInputComponent*>(m_owner->GetComponent(COMPONENT_PLAYER_INPUT))->m_bounce_4);
 					break;
 				default:
-					std::cout << "Something went wrong with number of bounces in PlayerRaycastCollisionComponent\n";
+					//std::cout << "Something went wrong with number of bounces in PlayerRaycastCollisionComponent\n";
 					break;
 				}
 

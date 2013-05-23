@@ -710,7 +710,7 @@ void PlayerHoldObject::Enter(){
 		if (coll_def->flag == COLLISION_FLAG_GAME_OBJECT){
 			GameObject* ob = static_cast<GameObject*>(coll_def->data);
 			if (ob->GetType() == GAME_OBJECT_BLUE_BUBBLE){
-				std::cout << "collision with blue bubble\n";
+				//std::cout << "collision with blue bubble\n";
 				m_object = ob;
 			}
 		}
