@@ -109,7 +109,6 @@ void Core::Run(){
 				return;
 			}
 		}
-		m_root->renderOneFrame();
 	}
 }
 
