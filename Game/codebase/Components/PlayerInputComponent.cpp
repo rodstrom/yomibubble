@@ -129,6 +129,7 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 	m_player_action = 0;
 	m_animation_manager = new AnimationManager(m_messenger);
 	m_animation_manager->AddAnimation(AnimationDef("Base_Idle", 0, 0.2f));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Idle2", 0, 0.2f));
 	m_animation_manager->AddAnimation(AnimationDef("Base_Run", 0, 0.2f));
 	m_animation_manager->AddAnimation(AnimationDef("Base_Walk", 0, 0.2f));
 	m_animation_manager->AddAnimation(AnimationDef("Top_Blow_End", 1, 0.1f));
@@ -139,10 +140,14 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 	m_animation_manager->AddAnimation(AnimationDef("Base_Jump_Start", 0, 0.2f, "Top_Jump_Start"));
 	m_animation_manager->AddAnimation(AnimationDef("Base_PickUpLeaf_State", 0, 0.2f));
 	m_animation_manager->AddAnimation(AnimationDef("Top_Idle", 1, 0.2f));
+	m_animation_manager->AddAnimation(AnimationDef("Top_Idle2", 1, 0.2f));
 	m_animation_manager->AddAnimation(AnimationDef("Top_Run", 1, 0.2f));
 	m_animation_manager->AddAnimation(AnimationDef("Top_Walk", 1, 0.2f));
 	m_animation_manager->AddAnimation(AnimationDef("Base_Walk_On_Bubble", 0, 0.2f, "Top_Walk_On_Bubble"));
 	m_animation_manager->AddAnimation(AnimationDef("Base_Idle_On_Bubble", 0, 0.2f, "Top_Idle_On_Bubble"));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Idle_On_Bubble2", 0, 0.2f, "Top_Idle_On_Bubble2"));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Walk_On_Bubble2", 0, 0.2f, "Top_Walk_On_Bubble2"));
+	
 	m_player_state_manager = new PlayerStateManager;
 
 	PlayerState::Init(m_owner->GetComponentMessenger(), m_animation_manager, this, m_player_state_manager, sound_manager);
@@ -201,14 +206,23 @@ void BubbleController::Notify(int type, void* msg){
 			m_apply_impulse = true;
 			m_impulse = *static_cast<Ogre::Vector3*>(msg);
 			break;
-		case MSG_BUBBLE_CONTROLLER_CAN_ATTACH_GET:
-			*static_cast<bool*>(msg) = m_can_be_attached;
-			break;
-		case MSG_BUBBLE_CONTROLLER_CAN_ATTACH_SET:
-			m_can_be_attached = *static_cast<bool*>(msg);
-			break;
 		case MSG_BUBBLE_CONTROLLER_TIMER_RUN:
 			m_run_timer = *static_cast<bool*>(msg);
+			break;
+		case MSG_BUBBLE_CONTROLLER_ACTIVATE:
+			{
+				if (m_ready){
+					btRigidBody* body = NULL;
+					m_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &body, "body");
+					if (body){
+						body->setLinearFactor(btVector3(1,1,1));
+						m_messenger->Unregister(MSG_BUBBLE_CONTROLLER_ACTIVATE, this);
+					}
+				}
+			}
+			break;
+		case MSG_BUBBLE_CONTROLLER_READY:
+			m_ready = true;
 			break;
 	default:
 		break;
@@ -224,9 +238,9 @@ void BubbleController::Shut(){
 	evt.bubble = m_owner;
 	m_message_system->Notify(&evt);
 	m_messenger->Unregister(MSG_BUBBLE_CONTROLLER_APPLY_IMPULSE, this);
-	m_messenger->Unregister(MSG_BUBBLE_CONTROLLER_CAN_ATTACH_GET, this);
-	m_messenger->Unregister(MSG_BUBBLE_CONTROLLER_CAN_ATTACH_SET, this);
+	m_messenger->Unregister(MSG_BUBBLE_CONTROLLER_ACTIVATE, this);
 	m_messenger->Unregister(MSG_BUBBLE_CONTROLLER_TIMER_RUN, this);
+	m_messenger->Unregister(MSG_BUBBLE_CONTROLLER_READY, this);
 	m_physics_engine->RemoveObjectSimulationStep(this);
 }
 
@@ -242,9 +256,9 @@ void BubbleController::Init(PhysicsEngine* physics_engine, MessageSystem* messag
 void BubbleController::SetMessenger(ComponentMessenger* messenger){
 	m_messenger = messenger;
 	m_messenger->Register(MSG_BUBBLE_CONTROLLER_APPLY_IMPULSE, this);
-	m_messenger->Register(MSG_BUBBLE_CONTROLLER_CAN_ATTACH_GET, this);
-	m_messenger->Register(MSG_BUBBLE_CONTROLLER_CAN_ATTACH_SET, this);
 	m_messenger->Register(MSG_BUBBLE_CONTROLLER_TIMER_RUN, this);
+	m_messenger->Register(MSG_BUBBLE_CONTROLLER_ACTIVATE, this);
+	m_messenger->Register(MSG_BUBBLE_CONTROLLER_READY, this);
 }
 
 void BubbleController::Update(float dt){

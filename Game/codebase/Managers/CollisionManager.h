@@ -29,7 +29,7 @@ private:
 	void PlayerTott(GameObject* player, GameObject* tott);
 	void TottPlayer(GameObject* tott, GameObject* player) { PlayerTott(player, tott); }
 	void BlueBubbleBlueBubble(GameObject* blue_bubble_a, GameObject* blue_bubble_b);
-	void PinkBubblePinkBubble(GameObject* pink_bubble_a, GameObject* pink_bubble_b) { BlueBubbleBlueBubble(pink_bubble_b, pink_bubble_a); }
+	void PinkBubblePinkBubble(GameObject* pink_bubble_a, GameObject* pink_bubble_b) {  }
 	void BlueBubblePinkBubble(GameObject* blue_bubble, GameObject* pink_bubble) { BlueBubbleBlueBubble(pink_bubble, blue_bubble); }
 	void PinkBubbleBlueBubble(GameObject* pink_bubble, GameObject* blue_bubble) { BlueBubbleBlueBubble(blue_bubble, pink_bubble); }
 	void PlayerBlueBubble(GameObject* player, GameObject* blue_bubble);
@@ -41,6 +41,8 @@ private:
 	void LeafPlayer(GameObject* leaf, GameObject* player);
 	void PlayerLeaf(GameObject* player, GameObject* leaf) { LeafPlayer(leaf, player); }
 	void PlayerTrigger(GameObject* player, GameObject* trigger);
+	void TottBlueBubble(GameObject* tott, GameObject* blue_bubble);
+	void BlueBubbleTott(GameObject* blue_bubble, GameObject* tott) { TottBlueBubble(tott, blue_bubble); }
 
 	void PlayerQuestItem(GameObject* player, GameObject* quest_item);
 	void QuestItemPlayer(GameObject* quest_item, GameObject* player) { PlayerQuestItem(player, quest_item); }

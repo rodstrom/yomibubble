@@ -286,7 +286,7 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 		VariableManager::GetSingletonPtr()->GetAsFloat("Camera_Start_Pitch")
 		);
 	staff_mesh_comp->Init("Staff.mesh", m_scene_manager, Ogre::StringUtil::BLANK);
-	acomp->GetEntity()->attachObjectToBone("CATRigLArmDigit21", staff_mesh_comp->GetEntity(), Ogre::Quaternion(1.0f, 0.8f, 0.0f, -0.2f));
+	acomp->GetEntity()->attachObjectToBone("CATRigLArmDigit21", staff_mesh_comp->GetEntity(), Ogre::Quaternion(1.0f, 1.0f, 0.7f, 0.0f), Ogre::Vector3(0.01f, -0.02f, 0.0f));
 	return go;
 }
 
@@ -693,11 +693,8 @@ GameObject* GameObjectManager::CreateTerrain(const Ogre::Vector3& position, void
 	GameObject* go = new GameObject(GAME_OBJECT_TERRAIN, "Terrain");
 	TerrainComponent* tc = new TerrainComponent;
 	go->AddComponent(tc);
-
+	go->AddUpdateable(tc);
 	tc->Init(m_scene_manager, m_physics_engine, this, m_sound_manager, *static_cast<Ogre::String*>(data));
-
-	//go->SetId("Terrain");
-
 	return go;
 }
 

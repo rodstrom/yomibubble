@@ -35,10 +35,14 @@ class PlayerIdle : public PlayerState{
 public:
 	PlayerIdle(void);
 	~PlayerIdle(void){}
-	void PlayTopIdle();
 	void Enter();
 	void Exit();
 	void Update(float dt);
+private:
+	Ogre::String m_current_idle_base;
+	Ogre::String m_current_idle_top;
+	float m_timer;
+	float m_target_time;
 };
 
 class PlayerStateMove : public PlayerState{
@@ -115,9 +119,14 @@ public:
 	void Update(float dt);
 private:
 	void BubbleRemoved(IEvent* evt);
+	void ChangeTargetTime(float low, float high);
 	MessageSystem* m_message_system;
 	float m_on_bubble_y_offset;
 	GameObject* m_bubble;
+	Ogre::String m_current_idle;
+	Ogre::String m_current_walk;
+	float m_timer;			// when to change animation
+	float m_target_time;
 };
 
 class PlayerInsideBubble : public PlayerState{

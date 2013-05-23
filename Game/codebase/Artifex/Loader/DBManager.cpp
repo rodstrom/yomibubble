@@ -9,6 +9,7 @@
 #include "..\..\Managers\SoundManager.h"
 #include "..\..\Components\AIComponents.h"
 #include "..\..\Managers\VariableManager.h"
+#include "TreeLoader3D.h"
 #include "WindBatchPage.h"
 #include "ImpostorPage.h"
 #include <map>
@@ -37,15 +38,15 @@ int DBManager::Load() {
 	string meshFile="";
 	string entName="";
 	mArtifexLoader->mObjectFile.clear();
-	/*m_paged_geometry = new Forests::PagedGeometry;
+	m_paged_geometry = new Forests::PagedGeometry;
 	m_paged_geometry->setCamera(mArtifexLoader->mCamera);
-	m_paged_geometry->setPageSize(80);
+	m_paged_geometry->setPageSize(10);
 	m_paged_geometry->setInfinite();
-	m_paged_geometry->addDetailLevel<Forests::WindBatchPage>(150,50);
-	m_paged_geometry->addDetailLevel<Forests::ImpostorPage>(500, 50);
+	m_paged_geometry->addDetailLevel<Forests::WindBatchPage>(40,10);
+	m_paged_geometry->addDetailLevel<Forests::ImpostorPage>(100, 10);
 
-	Forests::TreeLoader3D* tree_loader = new Forests::TreeLoader3D(m_paged_geometry, Forests::TBounds(0,0,1500,1500));
-	m_paged_geometry->setPageLoader(tree_loader);*/
+	Forests::TreeLoader3D* tree_loader = new Forests::TreeLoader3D(m_paged_geometry, Forests::TBounds(0,0,500,500));
+	m_paged_geometry->setPageLoader(tree_loader);
 	//******** get objects from sqlite file *********
 	string query = "SELECT * FROM objects";
 	
@@ -276,13 +277,39 @@ int DBManager::Load() {
 			}
 
 			if(!interactive) {
+				bool collision = true;
+				Ogre::String nocoll = meshFile.substr(0,6);
+				if (nocoll == "nocoll"){
+					collision = false;
+				}
 				//****************************		
 				
 				//***************************
 				Entity *newModel = NULL;
 				lCreateEntity:
 				try {
-					newModel = mArtifexLoader->mSceneMgr->createEntity((string) entName, (string) meshFile);
+					if (collision){
+						newModel = mArtifexLoader->mSceneMgr->createEntity((string) entName, (string) meshFile);
+					}
+					else {
+						MeshList::iterator it = m_vegetation.find(meshFile);
+						if (it == m_vegetation.end()){
+							newModel = mArtifexLoader->mSceneMgr->createEntity((string) entName, (string) meshFile);
+							//newModel = mArtifexLoader->mSceneMgr->createEntity((string) entName, "nocoll_TestMedDayGrass1.mesh");
+							newModel->setCastShadows(false);
+							m_vegetation[meshFile] = newModel;
+							m_paged_geometry->setCustomParam(newModel->getName(), "windFactorX", 0.4f);
+							m_paged_geometry->setCustomParam(newModel->getName(), "windFactorY", 0.01f);
+							Ogre::MeshPtr mesh = newModel->getMesh();
+							if (mesh->sharedVertexData != NULL){
+								int p = 0;
+							}
+						}
+						else {
+							newModel = it->second;
+						}
+						tree_loader->addTree(newModel, Ogre::Vector3(spawn.x, spawn.y, spawn.z), Ogre::Degree(spawn.ry), spawn.sx);
+					}
 					
 				} catch(Exception &e) {
 					if (e.getNumber() != 4) {
@@ -307,53 +334,40 @@ int DBManager::Load() {
 				{
 					SceneNode *mNode = NULL;
 					try {
+					if (collision){
 						mArtifexLoader->mObjectFile.push_back(spawn);
-						bool collision = true;
+
 						mNode = mArtifexLoader->mSceneMgr->getRootSceneNode()->createChildSceneNode(entName+"Node",Ogre::Vector3(spawn.x,spawn.y,spawn.z),Quaternion ((Degree(spawn.ry)), Vector3::UNIT_Y));
 						mNode->attachObject(newModel);
 						mNode->setScale(spawn.sx,spawn.sy,spawn.sz);
 						Ogre::Quaternion quat = Ogre::Quaternion ((Degree(spawn.rx)), Vector3::UNIT_X)*Quaternion ((Degree(spawn.ry)), Vector3::UNIT_Y)*Quaternion ((Degree(spawn.rz)), Vector3::UNIT_Z);
 						mNode->setOrientation(quat);
 						
-						Ogre::String nocoll = meshFile.substr(0,6);
-						if (nocoll == "nocoll"){
-							collision = false;
-							//newModel->setRenderingDistance(20.0f);
-						}
-						/*else{
-							newModel->setRenderingDistance(60.0f);
-						}
-						newModel->_initialise();
-						Ogre::MeshManager::getSingleton().load(meshFile, Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-						for (int i = 0; i < newModel->getNumSubEntities(); i++){
-							newModel->getSubEntity(i)->getMaterial()->touch();
-						}*/
-						
 						// Create collision shape and set position if desired
-						if (collision){
-							BtOgre::StaticMeshToShapeConverter converter(newModel);
-							btCollisionShape* shape = converter.createTrimesh();
-							m_shapes.push_back(shape);
-							btMotionState* motion_state = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)));
-							m_motion_states.push_back(motion_state);
-							btRigidBody* body = new btRigidBody(0, motion_state, shape, btVector3(0,0,0));
-							m_bodies.push_back(body);
+						newModel->setRenderingDistance(80.0f);
+						BtOgre::StaticMeshToShapeConverter converter(newModel);
+						btCollisionShape* shape = converter.createTrimesh();
+						m_shapes.push_back(shape);
+						btMotionState* motion_state = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)));
+						m_motion_states.push_back(motion_state);
+						btRigidBody* body = new btRigidBody(0, motion_state, shape, btVector3(0,0,0));
+						m_bodies.push_back(body);
 
-							btTransform transform;
-							transform.setIdentity();
-							transform.setOrigin(btVector3(spawn.x, spawn.y, spawn.z));
-							transform.setRotation(BtOgre::Convert::toBullet(quat));
-							body->setWorldTransform(transform);
-							CollisionDef* collision_def = new CollisionDef;
-							collision_def->data = NULL;
-							collision_def->flag = COLLISION_FLAG_STATIC;
-							body->setUserPointer(collision_def);
-							body->setRestitution(1.0f);
-							body->setFriction(1.0f);
-							m_collision_defs.push_back(collision_def);
-							int mask = COL_TOTT | COL_BUBBLE | COL_PLAYER;
-							m_physics_engine->GetDynamicWorld()->addRigidBody(body, COL_WORLD_STATIC, mask);
-						}
+						btTransform transform;
+						transform.setIdentity();
+						transform.setOrigin(btVector3(spawn.x, spawn.y, spawn.z));
+						transform.setRotation(BtOgre::Convert::toBullet(quat));
+						body->setWorldTransform(transform);
+						CollisionDef* collision_def = new CollisionDef;
+						collision_def->data = NULL;
+						collision_def->flag = COLLISION_FLAG_STATIC;
+						body->setUserPointer(collision_def);
+						body->setRestitution(1.0f);
+						body->setFriction(1.0f);
+						m_collision_defs.push_back(collision_def);
+						int mask = COL_TOTT | COL_BUBBLE | COL_PLAYER;
+						m_physics_engine->GetDynamicWorld()->addRigidBody(body, COL_WORLD_STATIC, mask);
+					}
 
 				} catch (Exception &e) {
 					cout << "\n|= ArtifexTerra3D =| Zoneloader v1.0 RC1 OT beta SQLite: spawnloader error - problems creating " << spawn.name.c_str() << ":" << e.what() << "\n";
@@ -592,6 +606,10 @@ void DBManager::Shut(){
 	m_shapes.clear();
 	m_bodies.clear();
 	m_collision_defs.clear();
+	m_vegetation.clear();
+	delete m_paged_geometry->getPageLoader();
+	delete m_paged_geometry;
+	m_paged_geometry = NULL;
 }
 
 void DBManager::Update(){
