@@ -53,7 +53,7 @@ bool Core::Init(){
 	rs->setConfigOption("VSync", "No");
 	
 	m_render_window = m_root->initialise(true, "Yomi's Bubble Adventure");
-	Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(3);
+	Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
 	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
 	/*Ogre::SceneManager* retardedBugfix = */

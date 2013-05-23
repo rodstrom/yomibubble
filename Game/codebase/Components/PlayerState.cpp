@@ -26,23 +26,40 @@ PlayerIdle::PlayerIdle(void){
 }
 
 void PlayerIdle::Enter(){
-	s_animation->PlayAnimation("Base_Idle");
+	m_timer = 0.0f;
+	m_target_time = (float)Ogre::Math::RangeRandom(Ogre::Real(1.0f), Ogre::Real(3.0f));
+	m_current_idle_base = "Base_Idle";
+	m_current_idle_top = "Top_Idle";
+	s_animation->PlayAnimation(m_current_idle_base);
 }
 
 void PlayerIdle::Exit(){
 	
 }
 
-void PlayerIdle::PlayTopIdle(){
-}
-
 void PlayerIdle::Update(float dt){
 	if (!s_manager->IsBlowingBubbles()){
-		s_animation->PlayAnimation("Top_Idle");
+		s_animation->PlayAnimation(m_current_idle_top);
 		if (s_input_component->GetInputManager()->IsButtonPressed(BTN_LEFT_MOUSE) || s_input_component->GetInputManager()->IsButtonPressed(BTN_RIGHT_MOUSE)){
 			if (!s_manager->IsHoldingObject()){
 				s_manager->BlowBubble(true);
 			}
+		}
+	}
+	s_animation->PlayAnimation(m_current_idle_base);
+	m_timer += dt;
+	if (m_timer >= m_target_time){
+		if (m_current_idle_base == "Base_Idle"){
+			m_current_idle_base = "Base_Idle2";
+			m_current_idle_top = "Top_Idle2";
+			m_timer = 0.0f;
+			m_target_time = 6.6f;
+		}
+		else {
+			m_current_idle_base = "Base_Idle";
+			m_current_idle_top = "Top_Idle";
+			m_timer = 0.0f;
+			m_target_time = (float)Ogre::Math::RangeRandom(Ogre::Real(2.0f), Ogre::Real(4.0f));
 		}
 	}
 
@@ -196,6 +213,8 @@ void PlayerBlowBubble::Update(float dt){
 			btRigidBody* bubble_body = NULL;
 			m_bubble->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GET_BODY, &bubble_body, "body");
 			bubble_body->setLinearVelocity(btVector3(0,0,0));
+			bubble_body->setLinearFactor(btVector3(0,1,0));
+			m_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_READY, NULL);
 			this->CreateTriggerForBubble();
 			Ogre::Vector3 gravity(0,-m_bubble_gravity,0);
 			m_bubble->RemoveComponent(COMPONENT_POINT2POINT_CONSTRAINT);
@@ -369,7 +388,8 @@ void PlayerLand::Proceed(){
 	}
 }
 
-PlayerOnBubble::PlayerOnBubble(MessageSystem* message_system) : m_on_bubble_y_offset(0.0f), m_message_system(message_system) { 
+PlayerOnBubble::PlayerOnBubble(MessageSystem* message_system) : m_on_bubble_y_offset(0.0f), m_message_system(message_system),
+	m_timer(0.0f), m_target_time(0.0f) { 
 	m_on_bubble_y_offset = VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleY");
 	m_type = PLAYER_STATE_ON_BUBBLE; 
 	m_message_system->Register(EVT_BUBBLE_REMOVE, this, &PlayerOnBubble::BubbleRemoved);
@@ -380,13 +400,9 @@ PlayerOnBubble::~PlayerOnBubble(void){
 }
 
 void PlayerOnBubble::Enter(){
-	int index = 1;
-	//s_messenger->Notify(MSG_ANIMATION_PAUSE, &index);
-	//s_animation->PlayAnimation("Jump_End", false);
-	//s_animation->QueueAnimation("Full_Idle_On_Bubble");
-	//s_animation->QueueAnimation("Top_Idle");
+	m_timer = 0.0f;
+	m_target_time = (float)Ogre::Math::RangeRandom(Ogre::Real(1.0f), Ogre::Real(3.0f));
 	m_bubble = s_input_component->GetBubble();
-
 	Ogre::SceneNode* bubble_node = NULL;
 	btRigidBody* player_body = NULL;
 	btRigidBody* bubble_body = NULL;
@@ -410,6 +426,8 @@ void PlayerOnBubble::Enter(){
 		bool start = true;
 		m_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_TIMER_RUN, &start);
 	}
+	m_current_idle = "Base_Idle_On_Bubble";
+	m_current_walk = "Base_Walk_On_Bubble";
 }
 
 void PlayerOnBubble::Exit(){
@@ -430,15 +448,40 @@ void PlayerOnBubble::Update(float dt){
 	Ogre::Vector3 dir = s_input_component->GetDirection();
 	Ogre::String move_base = Ogre::StringUtil::BLANK;
 	Ogre::String move_top = Ogre::StringUtil::BLANK;
-	if (dir == Ogre::Vector3::ZERO){
-		move_base = "Base_Idle_On_Bubble";
-		move_top = "Top_Idle";
+	bool is_moving = false;
+	if (dir == Ogre::Vector3::ZERO) {
+		move_base = m_current_idle;
 	}
 	else {
-		move_base = "Base_Walk_On_Bubble";
-		move_top = "Top_Walk";
+		is_moving = true;
+		move_base = m_current_walk;
 	}
 	s_animation->PlayAnimation(move_base);
+	m_timer += dt;
+	if (m_timer >= m_target_time){
+		if (is_moving){
+			if (m_current_walk == "Base_Walk_On_Bubble"){
+				m_current_walk = "Base_Walk_On_Bubble2";
+				m_timer = 0.0f;
+				m_target_time = 3.2f;
+			}
+			else {
+				m_current_walk = "Base_Walk_On_Bubble";
+				this->ChangeTargetTime(3.0f, 6.0f);
+			}
+		}
+		else {
+			if (m_current_idle == "Base_Idle_On_Bubble"){
+				m_current_idle = "Base_Idle_On_Bubble2";
+				m_timer = 0.0f;
+				m_target_time = 3.2f;
+			}
+			else {
+				m_current_idle = "Base_Idle_On_Bubble";
+				this->ChangeTargetTime(3.0f, 6.0f);
+			}
+		}
+	}
 
 	Ogre::SceneNode* bubble_node = NULL;
 	m_bubble->GetComponentMessenger()->Notify(MSG_NODE_GET_NODE, &bubble_node);
@@ -478,6 +521,11 @@ void PlayerOnBubble::BubbleRemoved(IEvent* evt){
 			s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_FALLING));
 		}
 	}
+}
+
+void PlayerOnBubble::ChangeTargetTime(float low, float high){
+	m_target_time = static_cast<float>(Ogre::Math::RangeRandom(Ogre::Real(low), Ogre::Real(high)));
+	m_timer = 0.0f;
 }
 
 PlayerInsideBubble::PlayerInsideBubble(MessageSystem* message_system) : m_on_bubble_y_offset(0.0f), m_message_system(message_system) { 

@@ -22,7 +22,6 @@ class ArtifexLoader;
 #include "CppSQLite3.h"
 
 #include "PagedGeometry.h"
-#include "TreeLoader3D.h"
 
 #include "..\..\Managers\GameObjectManager.h"
 #include "..\..\Managers\SoundManager.h"
@@ -75,6 +74,6 @@ public:
 	std::vector<btCollisionShape*> m_shapes;
 	std::vector<struct CollisionDef*> m_collision_defs;
 	typedef std::map<std::string, Ogre::Entity*> MeshList;
-	MeshList m_mesh_list;
+	MeshList m_vegetation;		// we will page vegetation like grass, bushes and shrooms.
 };
 #endif

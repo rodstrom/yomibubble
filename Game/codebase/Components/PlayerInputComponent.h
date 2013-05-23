@@ -105,8 +105,8 @@ protected:
 
 class BubbleController : public Component, public IComponentObserver, public IComponentSimulationStep, public IComponentUpdateable{
 public:
-	BubbleController(void) :  m_velocity(0.0f), m_max_velocity(0.0f), m_impulse(Ogre::Vector3::ZERO), m_apply_impulse(false), m_can_be_attached(false),
-		m_run_timer(false), m_life_timer(0.0f)
+	BubbleController(void) :  m_velocity(0.0f), m_max_velocity(0.0f), m_impulse(Ogre::Vector3::ZERO), m_apply_impulse(false),
+		m_run_timer(false), m_life_timer(0.0f), m_ready(false)
 	{ m_type = COMPONENT_BUBBLE_CONTROL; m_update = true; }
 	virtual ~BubbleController(void){}
 
@@ -129,7 +129,7 @@ protected:
 	float m_life_timer;
 	float m_max_life_time;
 	bool m_run_timer;
-	bool m_can_be_attached;
+	bool m_ready;
 };
 
 #endif // _N_PLAYER_CONTROLLER_H_
