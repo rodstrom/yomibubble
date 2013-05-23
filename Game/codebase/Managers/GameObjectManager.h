@@ -52,6 +52,8 @@ private:
 	GameObject* CreateNextLevelTrigger(const Ogre::Vector3& position, void* data, const Ogre::String& id = Ogre::StringUtil::BLANK);
 	GameObject* CreatePlayerCamera(const Ogre::Vector3& position, void* data, const Ogre::String& id = Ogre::StringUtil::BLANK);
 	GameObject* CreateParticleEffect(const Ogre::Vector3& position, void* data, const Ogre::String& id = Ogre::StringUtil::BLANK);
+	GameObject* CreateQuestItem(const Ogre::Vector3& position, void* data, const Ogre::String& id = Ogre::StringUtil::BLANK);
+	GameObject* CreateSpeechBubble(const Ogre::Vector3& position, void* data, const Ogre::String& id = Ogre::StringUtil::BLANK);
 
 	typedef GameObject* (GameObjectManager::*CreateObjectFptr)(const Ogre::Vector3&, void* data, const Ogre::String& id);
 	
@@ -69,6 +71,8 @@ private:
 	MessageSystem*			m_message_system;
 	Ogre::SceneNode*		m_node;
 	VariableManager*		m_variable_manager;
+
+	Ogre::SceneNode*		m_temp_node;
 
 	int m_leaf_iterations;
 	int m_particle_iterations;

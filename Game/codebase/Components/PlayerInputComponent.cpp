@@ -20,18 +20,25 @@ void PlayerInputComponent::Update(float dt){
 	m_direction.x = m_input_manager->GetMovementAxis().x;
 	m_direction.z = m_input_manager->GetMovementAxis().z;
 	m_player_state_manager->Update(dt);
-	m_messenger->Notify(MSG_SFX2D_PLAY, &m_start_music);
+	
+	if (m_level == "try"){ m_messenger->Notify(MSG_SFX2D_PLAY, &m_start_music); }
+	else if (m_level == "Dayarea") { m_messenger->Notify(MSG_SFX2D_PLAY, &m_day_music); }
+	else if (m_level == "NightArea") { m_messenger->Notify(MSG_SFX2D_PLAY, &m_night_music); }
+	else { m_messenger->Notify(MSG_SFX2D_PLAY, &m_start_music); }
+	
+	//m_messenger->Notify(MSG_SFX2D_PLAY, &m_start_music);
 }
 
 inline void PlayerInputComponent::Jump(float dt){
 
 }
 
-void PlayerInputComponent::SetCustomVariables(float min_bubble_size, float max_bubble_size, float on_bubble_mod, float in_bubble_mod){
+void PlayerInputComponent::SetCustomVariables(float min_bubble_size, float max_bubble_size, float on_bubble_mod, float in_bubble_mod, Ogre::String level){
 	m_min_bubble_size = min_bubble_size;
 	m_max_bubble_size = max_bubble_size;
 	m_on_bubble_speed_mod = on_bubble_mod;
 	m_in_bubble_speed_mod = in_bubble_mod;
+	m_level = level;
 };
 
 void PlayerInputComponent::OntoBubbleTransition(float dt){
@@ -79,6 +86,9 @@ void PlayerInputComponent::Shut(){
 		m_animation_manager = NULL;
 	}
 	m_physics_engine->RemoveObjectSimulationStep(this);
+
+	if (m_level == "try"){ m_messenger->Notify(MSG_SFX2D_STOP, &m_start_music); }
+	else if (m_level == "Dayarea") { m_messenger->Notify(MSG_SFX2D_STOP, &m_day_music); }
 }
 
 void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound_manager, PhysicsEngine* physics_engine, MessageSystem* message_system){
@@ -101,6 +111,11 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 	m_bubble_burst_sound = sound_manager->Create2DData("Bubble_Burst", false, false, false, false, 1.0f, 1.0f);
 	m_bubble_blow_sound = sound_manager->Create2DData("Blow_Bubble", false, false, false, false, 1.0f, 1.0f);
 
+	m_bounce_1 = sound_manager->Create2DData("Bounce_1", false, false, false, false, 1.0f, 1.0f);
+	m_bounce_2 = sound_manager->Create2DData("Bounce_2", false, false, false, false, 1.0f, 1.0f);
+	m_bounce_3 = sound_manager->Create2DData("Bounce_3", false, false, false, false, 1.0f, 1.0f);
+	m_bounce_4 = sound_manager->Create2DData("Bounce_4", false, false, false, false, 1.0f, 1.0f);
+
 	/*m_states[PLAYER_STATE_NORMAL] =					&PlayerInputComponent::Normal;
 	m_states[PLAYER_STATE_ON_BUBBLE] =				&PlayerInputComponent::OnBubble;
 	m_states[PLAYER_STATE_INSIDE_BUBBLE] =			&PlayerInputComponent::InsideBubble;
@@ -113,21 +128,26 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 
 	m_player_action = 0;
 	m_animation_manager = new AnimationManager(m_messenger);
-	m_animation_manager->AddAnimation(AnimationDef("Base_Idle", 0, false));
-	m_animation_manager->AddAnimation(AnimationDef("Base_Run", 0, false));
-	m_animation_manager->AddAnimation(AnimationDef("Base_Walk", 0, false));
-	m_animation_manager->AddAnimation(AnimationDef("Blow_End", 1, false));
-	m_animation_manager->AddAnimation(AnimationDef("Blow_Loop", 1, false));
-	m_animation_manager->AddAnimation(AnimationDef("Blow_Start", 1, false));
-	m_animation_manager->AddAnimation(AnimationDef("Jump_End", 0, true));
-	m_animation_manager->AddAnimation(AnimationDef("Jump_Loop", 0, true));
-	m_animation_manager->AddAnimation(AnimationDef("Jump_Start", 0, true));
-	m_animation_manager->AddAnimation(AnimationDef("PickUpLeaf_State", 0, true));
-	m_animation_manager->AddAnimation(AnimationDef("Top_Idle", 1, false));
-	m_animation_manager->AddAnimation(AnimationDef("Top_Run", 1, false));
-	m_animation_manager->AddAnimation(AnimationDef("Top_Walk", 1, false));
-	m_animation_manager->AddAnimation(AnimationDef("Full_Walk_On_Bubble", 0, true));
-	m_animation_manager->AddAnimation(AnimationDef("Full_Idle_On_Bubble", 0, true));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Idle", 0, 0.2f));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Idle2", 0, 0.2f));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Run", 0, 0.2f));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Walk", 0, 0.2f));
+	m_animation_manager->AddAnimation(AnimationDef("Top_Blow_End", 1, 0.1f));
+	m_animation_manager->AddAnimation(AnimationDef("Top_Blow_Loop", 1, 0.1f));
+	m_animation_manager->AddAnimation(AnimationDef("Top_Blow_Start", 1, 0.1f));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Jump_End", 0, 0.2f, "Top_Jump_End"));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Jump_Loop", 0, 0.2f, "Top_Jump_Loop"));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Jump_Start", 0, 0.2f, "Top_Jump_Start"));
+	m_animation_manager->AddAnimation(AnimationDef("Base_PickUpLeaf_State", 0, 0.2f));
+	m_animation_manager->AddAnimation(AnimationDef("Top_Idle", 1, 0.2f));
+	m_animation_manager->AddAnimation(AnimationDef("Top_Idle2", 1, 0.2f));
+	m_animation_manager->AddAnimation(AnimationDef("Top_Run", 1, 0.2f));
+	m_animation_manager->AddAnimation(AnimationDef("Top_Walk", 1, 0.2f));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Walk_On_Bubble", 0, 0.2f, "Top_Walk_On_Bubble"));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Idle_On_Bubble", 0, 0.2f, "Top_Idle_On_Bubble"));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Idle_On_Bubble2", 0, 0.2f, "Top_Idle_On_Bubble2"));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Walk_On_Bubble2", 0, 0.2f, "Top_Walk_On_Bubble2"));
+	
 	m_player_state_manager = new PlayerStateManager;
 
 	PlayerState::Init(m_owner->GetComponentMessenger(), m_animation_manager, this, m_player_state_manager, sound_manager);
@@ -140,6 +160,7 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 	m_player_state_manager->AddPlayerState(new PlayerBounce);
 	m_player_state_manager->AddPlayerState(new PlayerOnBubble(message_system));
 	m_player_state_manager->AddPlayerState(new PlayerInsideBubble(message_system));
+	m_player_state_manager->AddPlayerState(new PlayerHoldObject(physics_engine));
 	m_player_state_manager->Init();
 	m_player_state_manager->SetPlayerState(m_player_state_manager->GetPlayerState(PLAYER_STATE_FALLING));
 
@@ -185,14 +206,23 @@ void BubbleController::Notify(int type, void* msg){
 			m_apply_impulse = true;
 			m_impulse = *static_cast<Ogre::Vector3*>(msg);
 			break;
-		case MSG_BUBBLE_CONTROLLER_CAN_ATTACH_GET:
-			*static_cast<bool*>(msg) = m_can_be_attached;
-			break;
-		case MSG_BUBBLE_CONTROLLER_CAN_ATTACH_SET:
-			m_can_be_attached = *static_cast<bool*>(msg);
-			break;
 		case MSG_BUBBLE_CONTROLLER_TIMER_RUN:
 			m_run_timer = *static_cast<bool*>(msg);
+			break;
+		case MSG_BUBBLE_CONTROLLER_ACTIVATE:
+			{
+				if (m_ready){
+					btRigidBody* body = NULL;
+					m_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &body, "body");
+					if (body){
+						body->setLinearFactor(btVector3(1,1,1));
+						m_messenger->Unregister(MSG_BUBBLE_CONTROLLER_ACTIVATE, this);
+					}
+				}
+			}
+			break;
+		case MSG_BUBBLE_CONTROLLER_READY:
+			m_ready = true;
 			break;
 	default:
 		break;
@@ -200,14 +230,17 @@ void BubbleController::Notify(int type, void* msg){
 }
 
 void BubbleController::Shut(){
+	SoundData2D pop_sound = m_owner->GetGameObjectManager()->GetSoundManager()->Create2DData("Bubble_Burst", false, false, false, false, 1.0, 1.0);
+	//m_owner->GetGameObjectManager()->GetGameObject("Player")->GetComponentMessenger()->Notify(MSG_SFX2D_PLAY, &pop_sound);
+
 	BubbleEvent evt;
 	evt.m_type = EVT_BUBBLE_REMOVE;
 	evt.bubble = m_owner;
 	m_message_system->Notify(&evt);
 	m_messenger->Unregister(MSG_BUBBLE_CONTROLLER_APPLY_IMPULSE, this);
-	m_messenger->Unregister(MSG_BUBBLE_CONTROLLER_CAN_ATTACH_GET, this);
-	m_messenger->Unregister(MSG_BUBBLE_CONTROLLER_CAN_ATTACH_SET, this);
+	m_messenger->Unregister(MSG_BUBBLE_CONTROLLER_ACTIVATE, this);
 	m_messenger->Unregister(MSG_BUBBLE_CONTROLLER_TIMER_RUN, this);
+	m_messenger->Unregister(MSG_BUBBLE_CONTROLLER_READY, this);
 	m_physics_engine->RemoveObjectSimulationStep(this);
 }
 
@@ -223,9 +256,9 @@ void BubbleController::Init(PhysicsEngine* physics_engine, MessageSystem* messag
 void BubbleController::SetMessenger(ComponentMessenger* messenger){
 	m_messenger = messenger;
 	m_messenger->Register(MSG_BUBBLE_CONTROLLER_APPLY_IMPULSE, this);
-	m_messenger->Register(MSG_BUBBLE_CONTROLLER_CAN_ATTACH_GET, this);
-	m_messenger->Register(MSG_BUBBLE_CONTROLLER_CAN_ATTACH_SET, this);
 	m_messenger->Register(MSG_BUBBLE_CONTROLLER_TIMER_RUN, this);
+	m_messenger->Register(MSG_BUBBLE_CONTROLLER_ACTIVATE, this);
+	m_messenger->Register(MSG_BUBBLE_CONTROLLER_READY, this);
 }
 
 void BubbleController::Update(float dt){

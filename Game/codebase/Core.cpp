@@ -53,13 +53,15 @@ bool Core::Init(){
 	rs->setConfigOption("VSync", "No");
 	
 	m_render_window = m_root->initialise(true, "Yomi's Bubble Adventure");
-	Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(3);
+	Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
 	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
-	/*Ogre::SceneManager* retardedBugfix = */m_root->createSceneManager(Ogre::ST_GENERIC); // Herman was here
+	/*Ogre::SceneManager* retardedBugfix = */
+	m_root->createSceneManager(Ogre::ST_GENERIC); // Herman was here
 	if (!VariableManager::GetSingletonPtr()->Init())
 		return false;
 	m_sound_manager = new SoundManager();
+	//m_sound_manager->Init(m_root->createSceneManager(Ogre::ST_GENERIC));
 	m_sound_manager->LoadAudio();
 
 	//delete retardedBugfix;

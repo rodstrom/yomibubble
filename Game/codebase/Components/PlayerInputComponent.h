@@ -28,7 +28,7 @@ public:
 	//AnimationMsg m_anim_msg;
 	SoundData2D m_bounce_sound;
 
-	void SetCustomVariables(float min_bubble_size, float max_bubble_size, float on_bubble_mod, float in_bubble_mod);
+	void SetCustomVariables(float min_bubble_size, float max_bubble_size, float on_bubble_mod, float in_bubble_mod, Ogre::String level);
 
 	float m_min_bubble_size;
 	float m_max_bubble_size;
@@ -40,6 +40,11 @@ public:
 	const Ogre::Vector3& GetDirection() const { return m_direction; }
 	bool IsOnGround() const { return m_on_ground; }
 	GameObject* GetBubble() const { return m_current_bubble; }
+
+	SoundData2D m_bounce_1;
+	SoundData2D m_bounce_2;
+	SoundData2D m_bounce_3;
+	SoundData2D m_bounce_4;
 
 protected:
 	Ogre::Vector3 m_direction;
@@ -75,9 +80,9 @@ protected:
 	bool m_is_creating_bubble;
 	float m_max_scale;
 	float m_current_scale;
+
 	SoundData2D m_walk_sound;
 	SoundData2D m_jump_sound;
-	
 	SoundData2D m_bubble_burst_sound;
 	SoundData2D m_bubble_blow_sound;
 
@@ -93,14 +98,15 @@ protected:
 	bool m_on_ground;
 
 	int m_current_level;
+	Ogre::String m_level;
 
 	CameraDataDef m_camera_data_def;
 };
 
 class BubbleController : public Component, public IComponentObserver, public IComponentSimulationStep, public IComponentUpdateable{
 public:
-	BubbleController(void) :  m_velocity(0.0f), m_max_velocity(0.0f), m_impulse(Ogre::Vector3::ZERO), m_apply_impulse(false), m_can_be_attached(false),
-		m_run_timer(false), m_life_timer(0.0f)
+	BubbleController(void) :  m_velocity(0.0f), m_max_velocity(0.0f), m_impulse(Ogre::Vector3::ZERO), m_apply_impulse(false),
+		m_run_timer(false), m_life_timer(0.0f), m_ready(false)
 	{ m_type = COMPONENT_BUBBLE_CONTROL; m_update = true; }
 	virtual ~BubbleController(void){}
 
@@ -123,7 +129,7 @@ protected:
 	float m_life_timer;
 	float m_max_life_time;
 	bool m_run_timer;
-	bool m_can_be_attached;
+	bool m_ready;
 };
 
 #endif // _N_PLAYER_CONTROLLER_H_

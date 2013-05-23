@@ -15,10 +15,18 @@ void NodeComponent::Init(const Ogre::Vector3& pos, Ogre::SceneManager* scene_man
 	m_node->setPosition(pos);
 }
 
+void NodeComponent::Init(Ogre::SceneNode* node, Ogre::SceneManager* scene_manager){
+	m_scene_manager = scene_manager;
+	m_node = node->createChildSceneNode();
+	m_node->setPosition(0, 1, 0); 
+};
+
 void NodeComponent::Notify(int type, void* msg){
 	switch (type){
 	case MSG_NODE_GET_NODE:
 		*static_cast<Ogre::SceneNode**>(msg) = m_node;
+		//if (m_owner->GetId() == "TestTott") { std::cout << "Tott pos " << m_node->getPosition() << std::endl; }
+	//	if (m_owner->GetId() == "TestSpeechBubble") { std::cout << "Speech Bubble at " << m_node->getPosition() << std::endl; }
 		break;
 	case MSG_INCREASE_SCALE_BY_VALUE:
 		{
@@ -117,11 +125,13 @@ void AnimationComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_ANIMATION_CLEAR_QUEUE, this);
 	m_messenger->Register(MSG_ANIMATION_CLEAR_CALLBACK, this);
 	m_messenger->Register(MSG_ANIMATION_SET_WAIT, this);
+	m_messenger->Register(MSG_ANIMATION_GET_CURRENT_NAME, this);
+	m_messenger->Register(MSG_ANIMATION_IS_DONE, this);
 }
 
 void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager, bool remove_weights){
 	MeshRenderComponent::Init(filename, scene_manager);
-	
+	m_entity->getSkeleton()->setBlendMode(ANIMBLEND_CUMULATIVE);
 	m_animation_blender = new AnimationBlender(GetEntity());
 	if (remove_weights){
 		FixPlayerWeights();
@@ -131,10 +141,11 @@ void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* 
 void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager, const Ogre::String& node_id, bool remove_weights){
 	MeshRenderComponent::Init(filename, scene_manager, node_id);
 	m_entity->getSkeleton()->setBlendMode(ANIMBLEND_CUMULATIVE);
-	m_animation_blender = new AnimationBlender(GetEntity());
+	//m_animation_blender = new AnimationBlender(GetEntity());
 	if (remove_weights){
 		FixPlayerWeights();
 	}
+	m_current_animation = "";
 }
 
 void AnimationComponent::FixPlayerWeights(){
@@ -225,19 +236,21 @@ void AnimationComponent::RemoveWeights(std::vector<std::string>& list, Ogre::Ani
 	}
 }
 
-void AnimationComponent::AddAnimationStates(unsigned int value){
-	for (unsigned int i = 0; i < value; i++){
-		Ogre::AnimationState* a = NULL;
-		m_animation_states.push_back(AnimationData(NULL, Ogre::StringUtil::BLANK, false));
-	}
+void AnimationComponent::AddAnimationState(const Ogre::String& anim_name, bool loop){
+	m_animation_states.push_back(AnimationData(NULL, Ogre::StringUtil::BLANK, false, new AnimationBlender(m_entity)));
+	m_animation_states.back().animation_blender->init(anim_name, loop);
+	m_animation_states.back().id = anim_name;
 }
 
 void AnimationComponent::Update(float dt){
 	for (unsigned int i = 0; i < m_animation_states.size(); i++){
-		if (m_animation_states[i].anim_state != NULL){
-			if (m_animation_states[i].anim_state->getEnabled()){
-				m_animation_states[i].anim_state->addTime(dt);
-				if (!m_animation_states[i].anim_state->getLoop() && m_animation_states[i].anim_state->hasEnded()){
+		//if (m_animation_states[i].anim_state != NULL){
+			//if (m_animation_states[i].anim_state->getEnabled()){
+				//m_animation_states[i].anim_state->addTime(dt);
+			if (m_animation_states[i].active){
+				m_animation_states[i].animation_blender->addTime(dt);
+			}
+				/*if (!m_animation_states[i].anim_state->getLoop() && m_animation_states[i].anim_state->hasEnded()){
 					if (m_animation_states[i].wait){
 						m_animation_states[i].wait = false;
 					}
@@ -246,14 +259,14 @@ void AnimationComponent::Update(float dt){
 						m_callback = NULL;
 					}
 					PlayQueued();
-				}
-			}
-		}
+				}*/
+			//}
+		//}
 	}
 }
 
 void AnimationComponent::PlayQueued(){
-	if (!m_queue.empty()){
+	/*if (!m_queue.empty()){
 		if (m_animation_states[m_queue.front().index].anim_state != NULL){
 			if (m_animation_states[m_queue.front().index].anim_state->getEnabled()){
 				m_animation_states[m_queue.front().index].anim_state->setTimePosition(0);
@@ -276,7 +289,7 @@ void AnimationComponent::PlayQueued(){
 		m_animation_states[m_queue.front().index].anim_state->setTimePosition(0);
 		m_animation_states[m_queue.front().index].id = m_queue.front().id;
 		m_queue.pop_front();
-	}
+	}*/
 }
 
 void AnimationComponent::Notify(int type, void* msg){
@@ -285,41 +298,22 @@ void AnimationComponent::Notify(int type, void* msg){
 	case MSG_ANIMATION_PLAY:
 		{
 			AnimationMsg& anim_msg = *static_cast<AnimationMsg*>(msg);
-			if (!m_animation_states[anim_msg.index].wait){
-				if (m_animation_states[anim_msg.index].anim_state != NULL){
-					if (m_animation_states[anim_msg.index].id != anim_msg.id){
-						if (m_animation_states[anim_msg.index].anim_state->getEnabled()){
-							m_animation_states[anim_msg.index].anim_state->setTimePosition(0);
-							m_animation_states[anim_msg.index].anim_state->setEnabled(false);
-						}
-						m_animation_states[anim_msg.index].anim_state = m_entity->getAnimationState(anim_msg.id);
-						m_animation_states[anim_msg.index].anim_state->setEnabled(true);
-						m_animation_states[anim_msg.index].anim_state->setLoop(anim_msg.loop);
-						m_animation_states[anim_msg.index].anim_state->setTimePosition(0);
-						m_animation_states[anim_msg.index].id = anim_msg.id;
-					}
+			if (m_animation_states[anim_msg.index].id != anim_msg.id){
+				if (!m_animation_states[anim_msg.index].active){
+					m_animation_states[anim_msg.index].active = true;
 				}
-				else {
-					m_animation_states[anim_msg.index].anim_state = m_entity->getAnimationState(anim_msg.id);
-					m_animation_states[anim_msg.index].anim_state->setEnabled(true);
-					m_animation_states[anim_msg.index].anim_state->setLoop(anim_msg.loop);
-					m_animation_states[anim_msg.index].id = anim_msg.id;
-				}
+				m_animation_states[anim_msg.index].animation_blender->blend(anim_msg.id, (AnimationBlender::BlendingTransition)anim_msg.blending_transition, anim_msg.duration, anim_msg.loop);
+				m_animation_states[anim_msg.index].id = anim_msg.id;
 			}
 		}
 		break;
 	case MSG_ANIMATION_PAUSE:
 		{
 			int index = *static_cast<int*>(msg);
-			if (m_animation_states[index].anim_state != NULL){
-				if (m_animation_states[index].anim_state->getLoop()){
-					m_animation_states[index].anim_state->setLoop(false);
-				}
-				m_animation_states[index].anim_state->setTimePosition(0);
-				m_animation_states[index].anim_state->setEnabled(false);
-				m_animation_states[index].id = Ogre::StringUtil::BLANK;
-				m_animation_states[index].wait = false;
-			}
+			//m_animation_states[index].animation_blender->getSource()->setWeight(0);
+			//m_animation_states[index].active = false;
+			//m_animation_states[index].animation_blender->getSource()->setTimePosition(0);
+			//m_animation_states[index].animation_blender->getSource()->setEnabled(false);
 		}
 		break;
 	case MSG_ANIMATION_LOOP:
@@ -351,6 +345,18 @@ void AnimationComponent::Notify(int type, void* msg){
 			m_animation_states[index].wait = true;
 		}
 		break;
+	case MSG_ANIMATION_GET_CURRENT_NAME:
+		{
+			AnimNameMsg& anim_msg = *static_cast<AnimNameMsg*>(msg);
+			anim_msg.id = m_animation_states[anim_msg.index].animation_blender->getSource()->getAnimationName();
+		}
+		break;
+	case MSG_ANIMATION_IS_DONE:
+		{
+			AnimIsDoneMsg& anim_msg = *static_cast<AnimIsDoneMsg*>(msg);
+			anim_msg.is_done = m_animation_states[anim_msg.index].animation_blender->complete;
+		}
+		break;
 	default:
 		break;
 	}
@@ -374,6 +380,8 @@ void AnimationComponent::Shut(){
 	m_messenger->Unregister(MSG_ANIMATION_CLEAR_QUEUE, this);
 	m_messenger->Unregister(MSG_ANIMATION_CLEAR_CALLBACK, this);
 	m_messenger->Unregister(MSG_ANIMATION_SET_WAIT, this);
+	m_messenger->Unregister(MSG_ANIMATION_GET_CURRENT_NAME, this);
+	m_messenger->Unregister(MSG_ANIMATION_IS_DONE, this);
 	MeshRenderComponent::Shut();
 }
 
@@ -608,6 +616,9 @@ void CountableResourceGUI::Notify(int type, void* message){
 	
 	if (type == MSG_LEAF_PICKUP)
 	{
+		if (m_can_pick_up){
+			m_timer_counter = 0.0f;
+			m_can_pick_up = false;
 		if (m_current_number < m_total_number)
 		{
 			Ogre::Overlay::Overlay2DElementsIterator it = m_overlay->get2DElementsIterator();
@@ -625,6 +636,7 @@ void CountableResourceGUI::Notify(int type, void* message){
 			container->setMaterialName("HUD/Leaf/FilledMiddle"); }
 			m_current_number++;
 		}
+		}
 	}
 };
 
@@ -633,12 +645,23 @@ void CountableResourceGUI::Shut(){
 	m_overlay->hide();
 };
 
+void CountableResourceGUI::Update(float dt){
+	if (m_timer_counter < m_pickup_timer){
+		m_timer_counter += dt;
+		m_can_pick_up = false;
+	}
+	else{
+		m_can_pick_up = true;
+	}
+};
+
 void CountableResourceGUI::SetMessenger(ComponentMessenger* messenger){
 	m_messenger = messenger;
 	m_messenger->Register(MSG_LEAF_PICKUP, this);
 };
 
 void CountableResourceGUI::Init(const Ogre::String& level_id){
+	m_can_pick_up = false;
 	m_overlay = Ogre::OverlayManager::getSingleton().getByName(level_id);
 	Ogre::Overlay::Overlay2DElementsIterator it = m_overlay->get2DElementsIterator();
 	while (it.hasMoreElements()){
@@ -646,6 +669,9 @@ void CountableResourceGUI::Init(const Ogre::String& level_id){
 		it.moveNext();
 	}
 	m_overlay->show();
+
+	m_timer_counter = 0.0f;
+	m_pickup_timer = 3.0f;
 }
 
 void TerrainComponent::Notify(int type, void* message){
@@ -734,7 +760,7 @@ void TerrainComponent::Init(Ogre::SceneManager* scene_manager, PhysicsEngine* ph
 	m_terrain_body->setRollingFriction(1.0f);
 	m_terrain_body->setFriction(1.0f);
 	int filter = COL_WORLD_STATIC;
-	int mask = COL_PLAYER | COL_TOTT | COL_BUBBLE | COL_CAMERA;
+	int mask = COL_PLAYER | COL_TOTT | COL_BUBBLE | COL_CAMERA | COL_QUESTITEM;
 	m_physics_engine->GetDynamicWorld()->addRigidBody(m_terrain_body, filter, mask);
 	m_collision_def.flag = COLLISION_FLAG_STATIC;
 	m_collision_def.data = m_owner;
@@ -774,3 +800,179 @@ void PlayerStaffComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Entity*
 	m_node = m_scene_manager->getRootSceneNode()->createChildSceneNode();
 	m_node->attachObject(m_entity);
 }
+
+void SpeechBubbleComponent::Notify(int type, void* message){
+	AnimationMsg msg;
+		msg.blend = false;
+		msg.full_body = true;
+		msg.id = "walk";
+		msg.index = 0;
+		msg.loop = true;
+		msg.wait = false;
+	
+	switch(type){
+	case MSG_SP_BUBBLE_SHOW:
+		if (static_cast<AnimationComponent*>(m_owner->GetGameObjectManager()->GetGameObject("TestTott")->GetComponent(COMPONENT_ANIMATION))->m_current_animation != "walk"){
+			m_owner->GetGameObjectManager()->GetGameObject("TestTott")->GetComponentMessenger()->Notify(MSG_ANIMATION_PLAY, &msg);
+		}
+		m_player_collide = true;
+		break;
+	default:
+		break;
+	}
+};
+
+void SpeechBubbleComponent::Shut(){
+	m_messenger->Unregister(MSG_SP_BUBBLE_SHOW, this);
+};
+
+void SpeechBubbleComponent::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
+	m_messenger->Register(MSG_SP_BUBBLE_SHOW, this);
+};
+
+void SpeechBubbleComponent::ScaleUp(){
+	if (m_current_scale < 1.0f){
+		m_current_scale += 0.1f;
+		Ogre::Vector3 test(0.1f);
+		m_messenger->Notify(MSG_INCREASE_SCALE_BY_VALUE, &test);
+	}
+};
+	
+void SpeechBubbleComponent::ScaleDown(){
+	if (m_current_scale > 0.1f){
+		m_current_scale -= 0.1f;
+		Ogre::Vector3 test(-0.1f);
+		m_messenger->Notify(MSG_INCREASE_SCALE_BY_VALUE, &test);
+	}
+};
+
+void SpeechBubbleComponent::Update(float dt){
+	
+	if (m_player_collide){
+		//static_cast<MeshRenderComponent*>(m_owner->GetComponent(COMPONENT_MESH_RENDER))->GetEntity()->setMaterialName("SolidColor/Blue");
+		m_messenger->Notify(MSG_MESH_SET_MATERIAL_NAME, &Ogre::String("SolidColor/Blue"));
+		ScaleUp();
+	}
+	else {
+		//static_cast<MeshRenderComponent*>(m_owner->GetComponent(COMPONENT_MESH_RENDER))->GetEntity()->setMaterialName("SolidColor/Green");
+		m_messenger->Notify(MSG_MESH_SET_MATERIAL_NAME, &Ogre::String("SolidColor/Green"));
+		ScaleDown();
+	}
+
+	m_player_collide = false;
+	//m_node->setPosition(m_node->getPosition().x, m_node->getPosition().y, m_node->getPosition().z);
+
+	//static_cast<MeshRenderComponent*>(m_owner->GetComponent(COMPONENT_MESH_RENDER))->GetEntity()->set
+
+	//m_messenger->Notify(MSG_SET_OBJECT_POSITION, &Ogre::Vector3(m_node->getPosition().x, m_node->getPosition().y, m_node->getPosition().z));
+
+};
+
+void SpeechBubbleComponent::Init(Ogre::SceneNode* node, SceneManager* scene_manager, GameObject* tott){
+	m_node = node;
+	m_player_collide = false;
+	m_current_scale = 1.0f;
+
+	m_tott = tott;
+
+	//m_messenger->Notify(MSG_NODE_ATTACH_ENTITY, static_cast<MeshRenderComponent*>(m_owner->GetComponent(COMPONENT_MESH_RENDER))->GetEntity());
+
+	//static_cast<MeshRenderComponent*>(speech_bubble->GetComponent(COMPONENT_MESH_RENDER))->GetEntity()->setMaterialName("SolidColor/Blue");
+	//m_mesh = new MeshRenderComponent;
+	//m_owner->AddComponent(m_mesh);
+	//m_mesh->Init("PratBubbla.mesh", scene_manager, "TottNode");
+	
+
+	/*
+	Ogre::OverlayManager& overlayManager = Ogre::OverlayManager::getSingleton();
+	Ogre::Overlay* overlay = overlayManager.create( "OverlayNameBajs" ); 
+
+	Ogre::String panel_name = "BajsPanel";
+
+	Ogre::OverlayContainer* element;
+	*/
+	/*
+	element = (static_cast<Ogre::OverlayContainer*>( overlayManager.createOverlayElement( "Panel", panel_name ) ));
+	element->SetPosition
+	element->setDimensions( 0.15f, 0.15f );
+	element->setMaterialName("Speech_Bubble.png");
+	overlay->add3D(element);
+	*/
+};
+
+void TutorialGraphicsComponent::Notify(int type, void* message){
+	Ogre::String msg = *static_cast<Ogre::String*>(message);
+	
+	switch(type){
+	case MSG_TGRAPH_STOP:
+		if (msg == "Stick" && m_pic_one == "HUD/Tutorial/Stick_One"){
+			m_pic_one = "HUD/Tutorial/BlueBubble_One";
+			m_pic_two = "HUD/Tutorial/BlueBubble_Two";
+		}
+		else if (msg == "BlueBubble" && m_pic_one == "HUD/Tutorial/BlueBubble_One"){
+			m_pic_one = "HUD/Tutorial/Jump_One";
+			m_pic_two = "HUD/Tutorial/Jump_Two";
+		}
+		else if (msg == "Jump" && m_pic_one == "HUD/Tutorial/Jump_One"){
+			m_overlay->hide();
+		}
+		else if(msg == "PinkBubble" && m_pic_one == "HUD/Tutorial/PinkBubble_One"){
+			m_overlay->hide();
+		}
+		break;
+	default:
+		break;
+	};
+};
+
+void TutorialGraphicsComponent::Shut(){
+	m_messenger->Unregister(MSG_TGRAPH_STOP, this);
+};
+
+void TutorialGraphicsComponent::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
+	m_messenger->Register(MSG_TGRAPH_STOP, this);
+};
+
+void TutorialGraphicsComponent::Init(const Ogre::String& id, const Ogre::String& level){
+	m_timer = 1;
+	m_timer_counter = 0;
+	m_first_pic = true;
+
+	m_level = level;
+
+	m_overlay = Ogre::OverlayManager::getSingleton().getByName(id);
+	
+	if (level == "try" || level == "Dayarea") { m_overlay->show(); }
+
+	if (level == "try"){
+		m_pic_one = "HUD/Tutorial/Stick_One";
+		m_pic_two = "HUD/Tutorial/Stick_Two";
+	}
+	else{
+		m_pic_one = "HUD/Tutorial/PinkBubble_One";
+		m_pic_two = "HUD/Tutorial/PinkBubble_Two";
+	}
+};
+
+void TutorialGraphicsComponent::Update(float dt){
+	m_timer_counter += dt;
+	if (m_timer_counter >= m_timer){
+		m_timer_counter = 0;
+		if (m_first_pic) { m_first_pic = false; }
+		else { m_first_pic = true; }
+	}
+	if (m_overlay->isVisible()){
+		if (m_first_pic){
+			Ogre::Overlay::Overlay2DElementsIterator it = m_overlay->get2DElementsIterator();
+			Ogre::OverlayContainer* container = it.peekNext();		
+			container->setMaterialName(m_pic_one); 
+		}
+		else{
+			Ogre::Overlay::Overlay2DElementsIterator it = m_overlay->get2DElementsIterator();
+			Ogre::OverlayContainer* container = it.peekNext();		
+			container->setMaterialName(m_pic_two); 
+		}
+	}
+};

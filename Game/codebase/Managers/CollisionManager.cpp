@@ -10,6 +10,7 @@
 #include "..\Components\CameraComponents.h"
 #include "OgreAxisAlignedBox.h"
 #include "..\MessageSystem.h"
+#include "..\Components\VisualComponents.h"
 
 CollisionManager* CollisionManager::m_instance = NULL;
 
@@ -50,9 +51,17 @@ void CollisionManager::Init(){
 	m_collision[MakeIntPair(GAME_OBJECT_TERRAIN, GAME_OBJECT_CAMERA)] = &CollisionManager::TerrainCamera;
 	m_collision[MakeIntPair(GAME_OBJECT_GATE, GAME_OBJECT_PLAYER)] = &CollisionManager::GatePlayer;
 	m_collision[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_GATE)] = &CollisionManager::PlayerGate;
+	m_collision[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_QUEST_ITEM)] = &CollisionManager::PlayerQuestItem;
+	m_collision[MakeIntPair(GAME_OBJECT_QUEST_ITEM, GAME_OBJECT_PLAYER)] = &CollisionManager::QuestItemPlayer;
+	m_collision[MakeIntPair(GAME_OBJECT_TOTT, GAME_OBJECT_QUEST_ITEM)] = &CollisionManager::TottQuestItem;
+	m_collision[MakeIntPair(GAME_OBJECT_QUEST_ITEM, GAME_OBJECT_TOTT)] = &CollisionManager::QuestItemTott;
+	m_collision[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_SPEECH_BUBBLE)] = &CollisionManager::PlayerSpeechBubble;
+	m_collision[MakeIntPair(GAME_OBJECT_SPEECH_BUBBLE, GAME_OBJECT_PLAYER)] = &CollisionManager::SpeechBubblePlayer;
+	m_collision[MakeIntPair(GAME_OBJECT_BLUE_BUBBLE, GAME_OBJECT_TOTT)] = &CollisionManager::BlueBubbleTott;
+	m_collision[MakeIntPair(GAME_OBJECT_TOTT, GAME_OBJECT_BLUE_BUBBLE)] = &CollisionManager::TottBlueBubble;
+	m_collision[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_BLUE_BUBBLE)] = &CollisionManager::PlayerBlueBubble;
+	m_collision[MakeIntPair(GAME_OBJECT_BLUE_BUBBLE, GAME_OBJECT_PLAYER)] = &CollisionManager::BlueBubblePlayer;
 
-	m_raycast_map[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_BLUE_BUBBLE)] = &CollisionManager::PlayerBlueBubble;
-	m_raycast_map[MakeIntPair(GAME_OBJECT_BLUE_BUBBLE, GAME_OBJECT_PLAYER)] = &CollisionManager::BlueBubblePlayer;
 	m_raycast_map[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_PINK_BUBBLE)] = &CollisionManager::PlayerPinkBubble;
 	m_raycast_map[MakeIntPair(GAME_OBJECT_PINK_BUBBLE, GAME_OBJECT_PLAYER)] = &CollisionManager::PinkBubblePlayer;
 	m_raycast_map[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_PLANE)] = &CollisionManager::PlayerPlane;
@@ -68,6 +77,8 @@ void CollisionManager::ProcessCollision(const btCollisionObject* ob_a, const btC
 		(cd_b->flag == COLLISION_FLAG_GAME_OBJECT)){
 			GameObject* go_a = static_cast<GameObject*>(cd_a->data);
 			GameObject* go_b = static_cast<GameObject*>(cd_b->data);
+			int type_a = go_a->GetType();
+			int type_b = go_b->GetType();
 			HitMap::iterator it = m_collision.find(MakeIntPair(go_a->GetType(), go_b->GetType()));
 		if (it != m_collision.end()){
 			(this->*it->second)(go_a, go_b);
@@ -98,45 +109,22 @@ void CollisionManager::PlayerTott(GameObject* player, GameObject* tott){
 }
 
 void CollisionManager::BlueBubbleBlueBubble(GameObject* blue_bubble_a, GameObject* blue_bubble_b){
-	/*Component* comp_a = blue_bubble_a->GetComponent(COMPONENT_HINGE_CONSTRAINT);
-	Component* comp_b = blue_bubble_b->GetComponent(COMPONENT_HINGE_CONSTRAINT);
-	if (!comp_a && !comp_b){
-		RigidbodyComponent* rc_a = static_cast<RigidbodyComponent*>(blue_bubble_a->GetComponent(COMPONENT_RIGIDBODY));
-		RigidbodyComponent* rc_b = static_cast<RigidbodyComponent*>(blue_bubble_b->GetComponent(COMPONENT_RIGIDBODY));
-		HingeConstraintComponent* constraint = new HingeConstraintComponent;
-		if (!comp_a){
-			blue_bubble_a->AddComponentToFront(constraint);
-		}
-		else{
-			blue_bubble_b->AddComponentToFront(constraint);
-		}
-		btVector3 pivot_a = rc_b->GetRigidbody()->getWorldTransform().getOrigin() - rc_a->GetRigidbody()->getWorldTransform().getOrigin();
-		btVector3 pivot_b = rc_a->GetRigidbody()->getWorldTransform().getOrigin() - rc_b->GetRigidbody()->getWorldTransform().getOrigin();
-		PhysicsEngine* pe = blue_bubble_a->GetGameObjectManager()->GetPhysicsEngine();
-		constraint->Init(pe, rc_a->GetRigidbody(), rc_b->GetRigidbody(), pivot_a, btVector3(0,0,0), pivot_a, pivot_a);
-	}*/
+	blue_bubble_a->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_ACTIVATE, NULL);	// make sure both of them gets activated
+	blue_bubble_b->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_ACTIVATE, NULL);
 }
 
 void CollisionManager::PlayerBlueBubble(GameObject* player, GameObject* blue_bubble){
-
+	blue_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_ACTIVATE, NULL);
 }
 
 void CollisionManager::PlayerPlane(GameObject* player, GameObject* plane){
-	/*bool on_ground = true;
-	int current_state = PLAYER_STATE_INSIDE_BUBBLE;
-	player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_STATE_GET, &current_state);
-	if (current_state != PLAYER_STATE_INSIDE_BUBBLE){
-		int player_state = PLAYER_STATE_NORMAL;
-		player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_SET_STATE, &player_state);
-		player->GetComponentMessenger()->Notify(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_SET, &on_ground);
-		CharacterController* cc = static_cast<CharacterController*>(player->GetComponent(COMPONENT_CHARACTER_CONTROLLER));
-	}*/
+
 }
 
 void CollisionManager::LeafPlayer(GameObject* leaf, GameObject* player){
+	leaf->GetGameObjectManager()->RemoveGameObject(leaf);
 	player->GetComponentMessenger()->Notify(MSG_LEAF_PICKUP, NULL);
 	player->GetComponentMessenger()->Notify(MSG_SFX2D_PLAY, &static_cast<PlayerInputComponent*>(player->GetComponent(COMPONENT_PLAYER_INPUT))->m_leaf_sfx);
-	leaf->GetGameObjectManager()->RemoveGameObject(leaf);
 };
 
 void CollisionManager::PlayerTrigger(GameObject* player, GameObject* trigger){
@@ -144,15 +132,7 @@ void CollisionManager::PlayerTrigger(GameObject* player, GameObject* trigger){
 }
 
 void CollisionManager::PlayerTerrain(GameObject* player, GameObject* terrain){
-	/*bool on_ground = true;
-	int current_state = PLAYER_STATE_INSIDE_BUBBLE;
-	player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_STATE_GET, &current_state);
-	if (current_state != PLAYER_STATE_INSIDE_BUBBLE){
-		int player_state = PLAYER_STATE_NORMAL;
-		player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_SET_STATE, &player_state);
-		player->GetComponentMessenger()->Notify(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_SET, &on_ground);
-		CharacterController* cc = static_cast<CharacterController*>(player->GetComponent(COMPONENT_CHARACTER_CONTROLLER));
-	}*/
+
 }
 
 void CollisionManager::CameraTerrain(GameObject* camera, GameObject* terrain){
@@ -165,4 +145,39 @@ void CollisionManager::GatePlayer(GameObject* gate, GameObject* player){
 	IEvent evt;
 	evt.m_type = EVT_CHANGE_LEVEL;
 	m_message_system->Notify(&evt);
+}
+
+void CollisionManager::PlayerQuestItem(GameObject* player, GameObject* quest_item){
+	std::cout << "Player vs QuestItem\n";
+};
+
+void CollisionManager::TottQuestItem(GameObject* tott, GameObject* quest_item){
+	std::cout << "Tott vs QuestItem\n";
+	TOTT_STATE ts = TOTT_STATE::HAPPY;
+	tott->GetComponentMessenger()->Notify(MSG_TOTT_STATE_CHANGE, &ts);
+};
+
+void CollisionManager::PlayerSpeechBubble(GameObject* player, GameObject* speech_bubble){
+	//	std::cout << "Player vs SpeechBubble\n";
+	//static_cast<SpeechBubbleComponent*>(speech_bubble->GetComponent(COMPONENT_SPEECH_BUBBLE))->m_player_collide = true;
+	/*
+	if (static_cast<SpeechBubbleComponent*>(speech_bubble->GetComponent(COMPONENT_SPEECH_BUBBLE))->m_player_collide == false){
+		AnimationMsg msg;
+		msg.blend = false;
+		msg.full_body = true;
+		msg.id = "Excited";
+		msg.index = 0;
+		msg.loop = true;
+		msg.wait = false;
+
+		speech_bubble->GetGameObjectManager()->GetGameObject("TestTott")->GetComponentMessenger()->Notify(MSG_ANIMATION_PLAY, &msg);
+	}
+	*/
+	speech_bubble->GetComponentMessenger()->Notify(MSG_SP_BUBBLE_SHOW, NULL);
+	TOTT_STATE ts = TOTT_STATE::CURIOUS;
+	static_cast<SpeechBubbleComponent*>(speech_bubble->GetComponent(COMPONENT_SPEECH_BUBBLE))->m_tott->GetComponentMessenger()->Notify(MSG_TOTT_STATE_CHANGE, &ts);
+};
+
+void CollisionManager::TottBlueBubble(GameObject* tott, GameObject* blue_bubble){
+	blue_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_ACTIVATE, NULL);
 }

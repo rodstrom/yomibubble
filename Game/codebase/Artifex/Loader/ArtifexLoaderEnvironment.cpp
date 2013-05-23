@@ -65,14 +65,13 @@ void ArtifexLoader::createWater()
 void ArtifexLoader::createLight() {
 	mSceneMgr->setAmbientLight(ColourValue(mAmbientR, mAmbientG, mAmbientB));
 
-	//mLight = mSceneMgr->createLight( "Light" );
+	mLight = mSceneMgr->createLight( "Light" );
 	//mLight->setType( Ogre::Light::LT_POINT );
-	//mLight->setType( Ogre::Light::LT_DIRECTIONAL );
-	//mLight->setDirection(Ogre::Vector3(0.1f, -1.0f, 0.4f).normalisedCopy());
-	//mLight->setPosition(mLightPosX, mLightPosY, mLightPosZ);
-
+	mLight->setType( Ogre::Light::LT_DIRECTIONAL );
+	mLight->setDirection(Ogre::Vector3(0.1f, -1.0f, 0.4f).normalisedCopy());
+	mLight->setPosition(mLightPosX, mLightPosY, mLightPosZ);
 	//mLight->setCastShadows(true);
-	//mLight->setPowerScale(0.5f);
+	mLight->setPowerScale(1.0f);
 };
 
 void ArtifexLoader::loadGrassSettings()

@@ -4,6 +4,7 @@
 #include "ComponentsPrereq.h"
 #include "..\Managers\SoundManager.h"
 
+class PhysicsEngine;
 struct IEvent;
 class MessageSystem;
 class GameObject;
@@ -34,10 +35,14 @@ class PlayerIdle : public PlayerState{
 public:
 	PlayerIdle(void);
 	~PlayerIdle(void){}
-	void PlayTopIdle();
 	void Enter();
 	void Exit();
 	void Update(float dt);
+private:
+	Ogre::String m_current_idle_base;
+	Ogre::String m_current_idle_top;
+	float m_timer;
+	float m_target_time;
 };
 
 class PlayerStateMove : public PlayerState{
@@ -114,9 +119,14 @@ public:
 	void Update(float dt);
 private:
 	void BubbleRemoved(IEvent* evt);
+	void ChangeTargetTime(float low, float high);
 	MessageSystem* m_message_system;
 	float m_on_bubble_y_offset;
 	GameObject* m_bubble;
+	Ogre::String m_current_idle;
+	Ogre::String m_current_walk;
+	float m_timer;			// when to change animation
+	float m_target_time;
 };
 
 class PlayerInsideBubble : public PlayerState{
@@ -143,6 +153,18 @@ public:
 	void Exit();
 	void Update(float dt);
 private:
+};
+
+class PlayerHoldObject : public PlayerState{
+public:
+	PlayerHoldObject(PhysicsEngine* physics_engine) : m_object(NULL), m_physics_engine(physics_engine){ m_type = PLAYER_STATE_HOLD_OBJECT; }
+	~PlayerHoldObject(void){}
+	void Enter();
+	void Exit();
+	void Update(float dt);
+private:
+	GameObject* m_object;		// the object we are holding
+	PhysicsEngine* m_physics_engine;
 };
 
 

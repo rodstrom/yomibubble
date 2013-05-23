@@ -22,6 +22,7 @@ public:
 private:
 	WayPoint* m_way_point;
 	AnimationMsg m_anim_msg;
+	bool m_pause;
 };
 
 #endif //AI_COMPONENTS_H

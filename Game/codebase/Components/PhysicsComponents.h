@@ -122,6 +122,41 @@ protected:
 	bool		m_can_move;
 };
 
+enum TOTT_STATE{
+	IDLING,
+	CURIOUS,
+	HAPPY
+};
+
+class TottController : public CharacterController {
+public:
+	TottController(void) { m_type = COMPONENT_CHARACTER_CONTROLLER; }
+	virtual ~TottController(void) {}
+	
+	virtual void Notify(int type, void* msg);
+	virtual void Shut();
+	virtual void SetMessenger(ComponentMessenger* messenger);
+	virtual void Init(const Ogre::Vector3& position, PhysicsEngine* physics_engine, const TottDef& def);
+	virtual void Update(float dt);
+	virtual void SimulationStep(btScalar time_step);
+
+	void Idling();
+	void Curious();
+	void Happy();
+	
+	TottDef m_def;
+	
+protected:
+	TOTT_STATE m_state;
+	AnimationMsg m_anim_msg;
+
+	Ogre::String m_idle_animation;
+	Ogre::String m_walk_animation;
+	Ogre::String m_run_animation;
+	Ogre::String m_react_animation;
+	Ogre::String m_happy_animation;
+};
+
 class Point2PointConstraintComponent : public Component, public IComponentObserver{
 public:
 	Point2PointConstraintComponent(void) : m_constraint(NULL){ m_type = COMPONENT_POINT2POINT_CONSTRAINT; }
@@ -231,6 +266,7 @@ public:
 	virtual void SetCustomVariables(float bounce_mod);
 
 protected:
+	int m_num_bounces;
 	float m_bounce_mod;
 	void PlayerBubble(GameObject*);
 	void PlayerLandscape();

@@ -9,10 +9,11 @@ SoundManager::SoundManager(){
     mSoundDeletesPending = new std::list<OgreOggISound*>;
 
 	m_sound_manager->init();
-
-	//m_ear_node = scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(0,0,0), Ogre::Quaternion::IDENTITY);
-//	m_ear_node->attachObject(m_sound_manager->getListener());
-	//m_scene_manager = scene_manager;
+	/*
+	m_ear_node = scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(0,0,0), Ogre::Quaternion::IDENTITY);
+	m_ear_node->attachObject(m_sound_manager->getListener());
+	m_scene_manager = scene_manager;
+	*/
 	m_sound_manager->setDistanceModel(AL_LINEAR_DISTANCE_CLAMPED);
 }
 
@@ -25,6 +26,8 @@ SoundManager::~SoundManager(){
 
 void SoundManager::Init(Ogre::SceneManager* scene_manager){
 	m_scene_manager = scene_manager;
+	m_ear_node = scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(0,0,0), Ogre::Quaternion::IDENTITY);
+	m_ear_node->attachObject(m_sound_manager->getListener());
 }
 
 void SoundManager::Exit(){
@@ -37,6 +40,12 @@ void SoundManager::LoadAudio(){
 	m_sound_manager->createSound("Blow_Bubble", "SFX/Yomi/Blow_Bubble.wav", false, false, true);
 	m_sound_manager->createSound("Bubble_Burst", "SFX/Yomi/Bubble_Burst.wav", false, false, true);
 	m_sound_manager->createSound("Jump", "SFX/Yomi/Jump.wav", false, false, true);
+	
+	m_sound_manager->createSound("Bounce_1", "SFX/Yomi/Bounce_1.wav", false, false, true);
+	m_sound_manager->createSound("Bounce_2", "SFX/Yomi/Bounce_2.wav", false, false, true);
+	m_sound_manager->createSound("Bounce_3", "SFX/Yomi/Bounce_3.wav", false, false, true);
+	m_sound_manager->createSound("Bounce_4", "SFX/Yomi/Bounce_4.wav", false, false, true);
+
 	m_sound_manager->createSound("Bounce", "SFX/Yomi/Bounce.wav", false, false, true);
 	ChangeVolume("Bounce", 0.5f);
 
@@ -47,7 +56,9 @@ void SoundManager::LoadAudio(){
 	//m_sound_manager->createSound("Main_Theme", "Music/Day_area_theme_mono.wav", false, true, true);
 	m_sound_manager->createSound("Tutorial_Theme", "Music/Menu_theme.wav", false, true, true);
 	m_sound_manager->createSound("Day_Theme", "Music/Day_area_theme.wav", false, true, true);
+	ChangeVolume("Day_Theme", 0.5f);
 	m_sound_manager->createSound("Night_Theme", "Music/Night_area_theme.wav", false, true, true);
+	ChangeVolume("Night_Theme", 0.2f);
 
 	//Init3D("Main_Theme", 10.0f, 10.0f, 150.0f);
 
@@ -143,15 +154,17 @@ void SoundManager::ChangePitch(Ogre::String name, float new_pitch){ //Around 0.0
 void SoundManager::Update(Ogre::SceneManager* scene_manager, float dt){
 	m_sound_manager->update(dt);
 
-	//m_ear_node->setPosition(scene_manager->getSceneNode(m_yomi_node_name)->getPosition());
-	//m_ear_node->setOrientation(scene_manager->getSceneNode(m_yomi_node_name)->getOrientation());
+//	m_ear_node->setPosition(scene_manager->getSceneNode(m_yomi_node_name)->getPosition());
+//	m_ear_node->setOrientation(scene_manager->getSceneNode(m_yomi_node_name)->getOrientation());
 
-	//std::cout << "Ear node pos : " << m_ear_node->getPosition() << std::endl;
+//	std::cout << "Ear node pos : " << m_ear_node->getPosition() << std::endl;
 	processSoundDeletesPending();
 }
 
 void SoundManager::Play2DSound(Ogre::String name){
-	m_sound_manager->getSound(name)->play();
+	if (!m_sound_manager->getSound(name)->isPlaying()){
+		m_sound_manager->getSound(name)->play();
+	}
 };
 
 void SoundManager::Stop2DSound(Ogre::String name){
