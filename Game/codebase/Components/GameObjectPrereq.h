@@ -90,6 +90,26 @@ struct CharacterControllerDef{
 	CollisionFilter collision_filter;
 };
 
+struct TottDef{
+	TottDef(void) : mesh_name(""), quest_object_mesh_name(""), type_name(""), sb_node_name(""), theme_music(""), play_music(false),
+					sfx_happy(""), sfx_curious(""), idle_animation(""), walk_animation(""), run_animation(""), react_animation(""),
+					happy_animation(""){}
+	CharacterControllerDef	character_controller;
+	Ogre::String			mesh_name;
+	Ogre::String			quest_object_mesh_name;
+	Ogre::String			type_name;
+	Ogre::String			sb_node_name;
+	Ogre::String			theme_music;
+	bool					play_music;
+	Ogre::String			sfx_happy;
+	Ogre::String			sfx_curious;
+	Ogre::String			idle_animation;
+	Ogre::String			walk_animation;
+	Ogre::String			run_animation;
+	Ogre::String			react_animation;
+	Ogre::String			happy_animation;
+};
+
 struct PlayerDef{
 	CharacterControllerDef* character_contr;
 	Ogre::String level_id;

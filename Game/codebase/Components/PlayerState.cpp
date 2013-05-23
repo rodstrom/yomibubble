@@ -71,6 +71,7 @@ PlayerStateMove::PlayerStateMove(void){
 void PlayerStateMove::Enter(){
 	s_animation->PlayAnimation("Base_Walk");
 	s_messenger->Notify(MSG_SFX2D_PLAY, &m_walk_sound);
+	s_messenger->Notify(MSG_TGRAPH_STOP, &Ogre::String("Stick"));
 }
 
 void PlayerStateMove::Exit(){
@@ -145,10 +146,12 @@ void PlayerBlowBubble::Enter(){
 	if (s_input_component->GetInputManager()->IsButtonDown(BTN_RIGHT_MOUSE)){
 		m_bubble = s_input_component->GetOwner()->GetGameObjectManager()->CreateGameObject(GAME_OBJECT_PINK_BUBBLE, pos, &bubble_def);
 		m_bubble_type = BUBBLE_TYPE_PINK;
+		s_messenger->Notify(MSG_TGRAPH_STOP, &Ogre::String("PinkBubble"));
 	}
 	else if (s_input_component->GetInputManager()->IsButtonDown(BTN_LEFT_MOUSE)){
 		m_bubble = s_input_component->GetOwner()->GetGameObjectManager()->CreateGameObject(GAME_OBJECT_BLUE_BUBBLE, pos, &bubble_def);
 		m_bubble_type = BUBBLE_TYPE_BLUE;
+		s_messenger->Notify(MSG_TGRAPH_STOP, &Ogre::String("BlueBubble"));
 	}
 	s_messenger->Notify(MSG_RIGIDBODY_POSITION_SET, &pos, "btrig");
 	s_messenger->Notify(MSG_SFX2D_PLAY, &m_bubble_blow_sound);
@@ -279,6 +282,7 @@ PlayerJump::PlayerJump(void){
 }
 
 void PlayerJump::Enter(){
+	s_messenger->Notify(MSG_TGRAPH_STOP, &Ogre::String("Jump"));
 	int p = 1;
 	s_messenger->Notify(MSG_ANIMATION_PAUSE, &p);
 	s_animation->PlayAnimation("Base_Jump_Start", false);

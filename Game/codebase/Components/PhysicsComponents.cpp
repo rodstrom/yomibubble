@@ -6,6 +6,9 @@
 #include "PlayerInputComponent.h"
 #include "..\Managers\VariableManager.h"
 #include "..\RaycastCollision.h"
+#include "GameObject.h"
+#include "..\Managers\GameObjectManager.h"
+#include "VisualComponents.h"
 
 void RigidbodyComponent::Notify(int type, void* msg){
 	switch (type){
@@ -878,30 +881,116 @@ void CameraRaycastCollisionComponent::SetMessenger(ComponentMessenger* messenger
 
 void TottController::Notify(int type, void* msg){
 	CharacterController::Notify(type, msg);
+	TOTT_STATE& new_state = *static_cast<TOTT_STATE*>(msg);
+
+	switch(type){
+	case MSG_TOTT_STATE_CHANGE:
+		//new_state = static_cast<TOTT_STATE*>(msg);
+		m_state = new_state;
+
+		switch(m_state){
+		case TOTT_STATE::IDLING:
+			m_messenger->Notify(MSG_WAYPOINT_START, NULL);
+			if (m_anim_msg.id != m_walk_animation){
+				m_anim_msg.id = m_walk_animation;
+				m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
+			}
+			break;
+		case TOTT_STATE::CURIOUS:
+			m_messenger->Notify(MSG_WAYPOINT_PAUSE, NULL);
+			if (m_anim_msg.id != m_react_animation){
+				m_anim_msg.id = m_react_animation;
+				m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
+			}
+			break;
+		case TOTT_STATE::HAPPY:
+			m_messenger->Notify(MSG_WAYPOINT_PAUSE, NULL);
+			if (m_anim_msg.id != m_happy_animation){
+				m_anim_msg.id = m_happy_animation;
+				m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
+			}
+			break;
+		default:
+			break;
+		};
+		break;
+	default:
+		break;
+	};
 };
 
 void TottController::Shut(){
 	CharacterController::Shut();
+	m_messenger->Register(MSG_TOTT_STATE_CHANGE, this);
 };
 
 void TottController::SetMessenger(ComponentMessenger* messenger){
 	CharacterController::SetMessenger(messenger);
+	m_messenger->Register(MSG_TOTT_STATE_CHANGE, this);
 };
 
-void TottController::Init(const Ogre::Vector3& position, PhysicsEngine* physics_engine, const CharacterControllerDef& def){
-	CharacterController::Init(position, physics_engine, def);
+void TottController::Init(const Ogre::Vector3& position, PhysicsEngine* physics_engine, const TottDef& def){
+	CharacterController::Init(position, physics_engine, def.character_controller);
+	
+	m_def = def;
+
+	m_idle_animation = def.idle_animation;
+	m_walk_animation = def.walk_animation;
+	m_run_animation = def.run_animation;
+	m_react_animation = def.react_animation;
+	m_happy_animation = def.happy_animation;
+	
 	m_anim_msg.blend = false;
 	m_anim_msg.full_body = true;
 	m_anim_msg.id = "Idle";
 	m_anim_msg.index = 0;
 	m_anim_msg.loop = true;
 	m_anim_msg.wait = false;
+
+	m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
+	m_state = TOTT_STATE::IDLING;
+};
+
+void TottController::Idling(){
+};
+	
+void TottController::Curious(){
+};
+	
+void TottController::Happy(){
 };
 
 void TottController::Update(float dt){
 	CharacterController::Update(dt);
 
-	m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
+	switch(m_state){
+	case TOTT_STATE::IDLING:
+		Idling();
+		break;
+	case TOTT_STATE::CURIOUS:
+		Curious();
+		break;
+	case TOTT_STATE::HAPPY:
+		Happy();
+		break;
+	default:
+		break;
+	};
+	
+
+	//Ogre::SceneNode* test = static_cast<NodeComponent*>(m_owner->GetComponent(COMPONENT_NODE))->GetSceneNode();
+
+	//std::cout << "SB node at " << test->getPosition() << std::endl;
+
+		//if (m_owner->GetId() == "TestSpeechBubble") { std::cout << "Speech Bubble at " << m_node->getPosition() << std::endl; }
+
+	//Ogre::Vector3 bajs = test->getPosition();
+
+	//m_messenger->Notify(MSG_RIGIDBODY_POSITION_SET, &bajs);
+
+	//static_cast<NodeComponent*>(m_owner->GetGameObjectManager()->GetGameObject("TestSpeechBubble")->GetComponent(COMPONENT_NODE))->GetSceneNode()->setPosition(static_cast<NodeComponent*>(m_owner->GetComponent(COMPONENT_NODE))->GetSceneNode()->getPosition());
+	//static_cast<TriggerComponent*>(m_owner->GetGameObjectManager()->GetGameObject("TestSpeechBubble")->GetComponent(COMPONENT_TRIGGER))->
+	//m_owner->GetGameObjectManager()->GetGameObject("TestSpeechBubble")->GetComponentMessenger()->Notify(MSG_SET_OBJECT_POSITION, &static_cast<NodeComponent*>(m_owner->GetComponent(COMPONENT_NODE))->GetSceneNode()->getPosition());
 };
 
 void TottController::SimulationStep(btScalar time_step){

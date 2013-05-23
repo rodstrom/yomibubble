@@ -72,6 +72,8 @@ private:
 	Ogre::SceneNode*		m_node;
 	VariableManager*		m_variable_manager;
 
+	Ogre::SceneNode*		m_temp_node;
+
 	int m_leaf_iterations;
 	int m_particle_iterations;
 	unsigned int m_max_bubbles;

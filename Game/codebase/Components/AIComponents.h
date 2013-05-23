@@ -21,6 +21,7 @@ public:
 
 private:
 	WayPoint* m_way_point;
+	bool m_pause;
 };
 
 #endif //AI_COMPONENTS_H

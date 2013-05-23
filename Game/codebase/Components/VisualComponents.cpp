@@ -15,11 +15,18 @@ void NodeComponent::Init(const Ogre::Vector3& pos, Ogre::SceneManager* scene_man
 	m_node->setPosition(pos);
 }
 
+void NodeComponent::Init(Ogre::SceneNode* node, Ogre::SceneManager* scene_manager){
+	m_scene_manager = scene_manager;
+	m_node = node->createChildSceneNode();
+	m_node->setPosition(0, 1, 0); 
+};
+
 void NodeComponent::Notify(int type, void* msg){
 	switch (type){
 	case MSG_NODE_GET_NODE:
 		*static_cast<Ogre::SceneNode**>(msg) = m_node;
 		//if (m_owner->GetId() == "TestTott") { std::cout << "Tott pos " << m_node->getPosition() << std::endl; }
+	//	if (m_owner->GetId() == "TestSpeechBubble") { std::cout << "Speech Bubble at " << m_node->getPosition() << std::endl; }
 		break;
 	case MSG_INCREASE_SCALE_BY_VALUE:
 		{
@@ -609,7 +616,9 @@ void CountableResourceGUI::Notify(int type, void* message){
 	
 	if (type == MSG_LEAF_PICKUP)
 	{
-		if (!m_can_pick_up){
+		if (m_can_pick_up){
+			m_timer_counter = 0.0f;
+			m_can_pick_up = false;
 		if (m_current_number < m_total_number)
 		{
 			Ogre::Overlay::Overlay2DElementsIterator it = m_overlay->get2DElementsIterator();
@@ -627,10 +636,6 @@ void CountableResourceGUI::Notify(int type, void* message){
 			container->setMaterialName("HUD/Leaf/FilledMiddle"); }
 			m_current_number++;
 		}
-		m_can_pick_up = true;
-		}
-		else{
-			m_can_pick_up = false;
 		}
 	}
 };
@@ -638,6 +643,16 @@ void CountableResourceGUI::Notify(int type, void* message){
 void CountableResourceGUI::Shut(){
 	m_messenger->Unregister(MSG_LEAF_PICKUP, this);
 	m_overlay->hide();
+};
+
+void CountableResourceGUI::Update(float dt){
+	if (m_timer_counter < m_pickup_timer){
+		m_timer_counter += dt;
+		m_can_pick_up = false;
+	}
+	else{
+		m_can_pick_up = true;
+	}
 };
 
 void CountableResourceGUI::SetMessenger(ComponentMessenger* messenger){
@@ -654,6 +669,9 @@ void CountableResourceGUI::Init(const Ogre::String& level_id){
 		it.moveNext();
 	}
 	m_overlay->show();
+
+	m_timer_counter = 0.0f;
+	m_pickup_timer = 3.0f;
 }
 
 void TerrainComponent::Notify(int type, void* message){
@@ -809,22 +827,53 @@ void SpeechBubbleComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_SP_BUBBLE_SHOW, this);
 };
 
+void SpeechBubbleComponent::ScaleUp(){
+	if (m_current_scale < 1.0f){
+		m_current_scale += 0.1f;
+		Ogre::Vector3 test(0.1f);
+		m_messenger->Notify(MSG_INCREASE_SCALE_BY_VALUE, &test);
+	}
+};
+	
+void SpeechBubbleComponent::ScaleDown(){
+	if (m_current_scale > 0.1f){
+		m_current_scale -= 0.1f;
+		Ogre::Vector3 test(-0.1f);
+		m_messenger->Notify(MSG_INCREASE_SCALE_BY_VALUE, &test);
+	}
+};
+
 void SpeechBubbleComponent::Update(float dt){
 	
 	if (m_player_collide){
-		static_cast<MeshRenderComponent*>(m_owner->GetComponent(COMPONENT_MESH_RENDER))->GetEntity()->setMaterialName("SolidColor/Blue");
+		//static_cast<MeshRenderComponent*>(m_owner->GetComponent(COMPONENT_MESH_RENDER))->GetEntity()->setMaterialName("SolidColor/Blue");
+		m_messenger->Notify(MSG_MESH_SET_MATERIAL_NAME, &Ogre::String("SolidColor/Blue"));
+		ScaleUp();
 	}
 	else {
-		static_cast<MeshRenderComponent*>(m_owner->GetComponent(COMPONENT_MESH_RENDER))->GetEntity()->setMaterialName("SolidColor/Green");
+		//static_cast<MeshRenderComponent*>(m_owner->GetComponent(COMPONENT_MESH_RENDER))->GetEntity()->setMaterialName("SolidColor/Green");
+		m_messenger->Notify(MSG_MESH_SET_MATERIAL_NAME, &Ogre::String("SolidColor/Green"));
+		ScaleDown();
 	}
 
 	m_player_collide = false;
+	//m_node->setPosition(m_node->getPosition().x, m_node->getPosition().y, m_node->getPosition().z);
+
+	//static_cast<MeshRenderComponent*>(m_owner->GetComponent(COMPONENT_MESH_RENDER))->GetEntity()->set
+
+	//m_messenger->Notify(MSG_SET_OBJECT_POSITION, &Ogre::Vector3(m_node->getPosition().x, m_node->getPosition().y, m_node->getPosition().z));
 
 };
 
-void SpeechBubbleComponent::Init(Ogre::SceneNode* node, SceneManager* scene_manager){
+void SpeechBubbleComponent::Init(Ogre::SceneNode* node, SceneManager* scene_manager, GameObject* tott){
 	m_node = node;
 	m_player_collide = false;
+	m_current_scale = 1.0f;
+
+	m_tott = tott;
+
+	//m_messenger->Notify(MSG_NODE_ATTACH_ENTITY, static_cast<MeshRenderComponent*>(m_owner->GetComponent(COMPONENT_MESH_RENDER))->GetEntity());
+
 	//static_cast<MeshRenderComponent*>(speech_bubble->GetComponent(COMPONENT_MESH_RENDER))->GetEntity()->setMaterialName("SolidColor/Blue");
 	//m_mesh = new MeshRenderComponent;
 	//m_owner->AddComponent(m_mesh);
@@ -846,4 +895,80 @@ void SpeechBubbleComponent::Init(Ogre::SceneNode* node, SceneManager* scene_mana
 	element->setMaterialName("Speech_Bubble.png");
 	overlay->add3D(element);
 	*/
+};
+
+void TutorialGraphicsComponent::Notify(int type, void* message){
+	Ogre::String msg = *static_cast<Ogre::String*>(message);
+	
+	switch(type){
+	case MSG_TGRAPH_STOP:
+		if (msg == "Stick" && m_pic_one == "HUD/Tutorial/Stick_One"){
+			m_pic_one = "HUD/Tutorial/BlueBubble_One";
+			m_pic_two = "HUD/Tutorial/BlueBubble_Two";
+		}
+		else if (msg == "BlueBubble" && m_pic_one == "HUD/Tutorial/BlueBubble_One"){
+			m_pic_one = "HUD/Tutorial/Jump_One";
+			m_pic_two = "HUD/Tutorial/Jump_Two";
+		}
+		else if (msg == "Jump" && m_pic_one == "HUD/Tutorial/Jump_One"){
+			m_overlay->hide();
+		}
+		else if(msg == "PinkBubble" && m_pic_one == "HUD/Tutorial/PinkBubble_One"){
+			m_overlay->hide();
+		}
+		break;
+	default:
+		break;
+	};
+};
+
+void TutorialGraphicsComponent::Shut(){
+	m_messenger->Unregister(MSG_TGRAPH_STOP, this);
+};
+
+void TutorialGraphicsComponent::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
+	m_messenger->Register(MSG_TGRAPH_STOP, this);
+};
+
+void TutorialGraphicsComponent::Init(const Ogre::String& id, const Ogre::String& level){
+	m_timer = 1;
+	m_timer_counter = 0;
+	m_first_pic = true;
+
+	m_level = level;
+
+	m_overlay = Ogre::OverlayManager::getSingleton().getByName(id);
+	
+	if (level == "try" || level == "Dayarea") { m_overlay->show(); }
+
+	if (level == "try"){
+		m_pic_one = "HUD/Tutorial/Stick_One";
+		m_pic_two = "HUD/Tutorial/Stick_Two";
+	}
+	else{
+		m_pic_one = "HUD/Tutorial/PinkBubble_One";
+		m_pic_two = "HUD/Tutorial/PinkBubble_Two";
+	}
+};
+
+void TutorialGraphicsComponent::Update(float dt){
+	m_timer_counter += dt;
+	if (m_timer_counter >= m_timer){
+		m_timer_counter = 0;
+		if (m_first_pic) { m_first_pic = false; }
+		else { m_first_pic = true; }
+	}
+	if (m_overlay->isVisible()){
+		if (m_first_pic){
+			Ogre::Overlay::Overlay2DElementsIterator it = m_overlay->get2DElementsIterator();
+			Ogre::OverlayContainer* container = it.peekNext();		
+			container->setMaterialName(m_pic_one); 
+		}
+		else{
+			Ogre::Overlay::Overlay2DElementsIterator it = m_overlay->get2DElementsIterator();
+			Ogre::OverlayContainer* container = it.peekNext();		
+			container->setMaterialName(m_pic_two); 
+		}
+	}
 };

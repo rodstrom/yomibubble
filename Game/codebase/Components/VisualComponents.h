@@ -16,6 +16,7 @@ public:
 	virtual ~NodeComponent(void){}
 
 	virtual void Init(const Ogre::Vector3& pos, Ogre::SceneManager* scene_manager);
+	virtual void Init(Ogre::SceneNode* node, Ogre::SceneManager* scene_manager); 
 	virtual void Notify(int type, void* message);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
@@ -159,7 +160,7 @@ protected:
 	Ogre::String			m_material_start_button;
 };
 
-class CountableResourceGUI : public Component, public IComponentObserver{
+class CountableResourceGUI : public Component, public IComponentObserver, public IComponentUpdateable{
 public:
 	CountableResourceGUI(void) : m_total_number(0), m_current_number(0){}
 	virtual ~CountableResourceGUI(void){}
@@ -167,11 +168,15 @@ public:
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
 	void Init(const Ogre::String& level_id);
+	virtual void Update(float dt);
 
 protected:
 	int						m_total_number;
 	int						m_current_number;
 	
+	float					m_pickup_timer;
+	float					m_timer_counter;
+
 	bool					m_can_pick_up;
 
 	Ogre::String			m_material_name_active;
@@ -246,14 +251,44 @@ public:
 	virtual void Notify(int type, void* message);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
-	void Init(Ogre::SceneNode* node, SceneManager* scene_manager);
+	void Init(Ogre::SceneNode* node, SceneManager* scene_manager, GameObject* tott);
 	virtual void Update(float dt);
 
 	bool m_player_collide;
 
+	void ScaleUp();
+	void ScaleDown();
+
+	GameObject* m_tott;
+
 protected:
 	MeshRenderComponent* m_mesh;
 	Ogre::SceneNode* m_node;
+	float m_current_scale;
+};
+
+class TutorialGraphicsComponent : public Component, public IComponentObserver, public IComponentUpdateable {
+public:
+	TutorialGraphicsComponent(void){}
+	virtual ~TutorialGraphicsComponent(void){}
+	
+	virtual void Notify(int type, void* message);
+	virtual void Shut();
+	virtual void SetMessenger(ComponentMessenger* messenger);
+	void Init(const Ogre::String& id, const Ogre::String& level);
+	virtual void Update(float dt);
+
+protected:
+	float m_timer;
+	float m_timer_counter;
+	bool m_first_pic;
+
+	Ogre::String m_pic_one;
+	Ogre::String m_pic_two;
+	Ogre::String m_level;
+
+	Ogre::Overlay* m_overlay;
+
 };
 
 #endif // _N_VISUAL_COMPONENTS_H_
