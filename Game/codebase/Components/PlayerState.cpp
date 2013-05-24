@@ -146,8 +146,8 @@ void PlayerStateMove::Update(float dt){
 PlayerBlowBubble::PlayerBlowBubble(void) : m_bubble(NULL), m_current_scale(0.0f) {
 	m_type = PLAYER_STATE_BLOW_BUBBLE;
 	m_bubble_blow_sound = s_sound_manager->Create2DData("Blow_Bubble", false, false, false, false, 1.0f, 1.0f);
-	m_min_bubble_size = 1.205f;
-	m_max_bubble_size = 4.907f;
+	m_min_bubble_size = VariableManager::GetSingletonPtr()->GetAsFloat("Bubble_Min_Size");
+	m_max_bubble_size = VariableManager::GetSingletonPtr()->GetAsFloat("Bubble_Max_Size");
 	m_bubble_gravity = VariableManager::GetSingletonPtr()->GetAsFloat("BlueBubbleGravity");
 }
 

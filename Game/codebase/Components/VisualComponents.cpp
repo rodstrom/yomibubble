@@ -852,12 +852,12 @@ void SpeechBubbleComponent::Update(float dt){
 	if (m_player_collide){
 		//static_cast<MeshRenderComponent*>(m_owner->GetComponent(COMPONENT_MESH_RENDER))->GetEntity()->setMaterialName("SolidColor/Blue");
 		m_messenger->Notify(MSG_MESH_SET_MATERIAL_NAME, &Ogre::String("SpeechCherry"));
-		ScaleUp();
+		//ScaleUp();
 	}
 	else {
 		//static_cast<MeshRenderComponent*>(m_owner->GetComponent(COMPONENT_MESH_RENDER))->GetEntity()->setMaterialName("SolidColor/Green");
-		m_messenger->Notify(MSG_MESH_SET_MATERIAL_NAME, &Ogre::String("SpeechCherry"));
-		ScaleDown();
+		m_messenger->Notify(MSG_MESH_SET_MATERIAL_NAME, &Ogre::String("SpeechCherryInvisible"));
+		//ScaleDown();
 	}
 
 	m_player_collide = false;
