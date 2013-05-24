@@ -247,9 +247,9 @@ void AnimationComponent::Update(float dt){
 		//if (m_animation_states[i].anim_state != NULL){
 			//if (m_animation_states[i].anim_state->getEnabled()){
 				//m_animation_states[i].anim_state->addTime(dt);
-			if (m_animation_states[i].active){
+			//if (m_animation_states[i].active){
 				m_animation_states[i].animation_blender->addTime(dt);
-			}
+			//}
 				/*if (!m_animation_states[i].anim_state->getLoop() && m_animation_states[i].anim_state->hasEnded()){
 					if (m_animation_states[i].wait){
 						m_animation_states[i].wait = false;

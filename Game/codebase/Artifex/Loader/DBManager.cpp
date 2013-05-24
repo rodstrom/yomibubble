@@ -40,7 +40,7 @@ int DBManager::Load() {
 	mArtifexLoader->mObjectFile.clear();
 	m_paged_geometry = new Forests::PagedGeometry;
 	m_paged_geometry->setCamera(mArtifexLoader->mCamera);
-	m_paged_geometry->setPageSize(10);
+	m_paged_geometry->setPageSize(20);
 	m_paged_geometry->setInfinite();
 	m_paged_geometry->addDetailLevel<Forests::WindBatchPage>(40,10);
 	m_paged_geometry->addDetailLevel<Forests::ImpostorPage>(100, 10);

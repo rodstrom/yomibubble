@@ -302,7 +302,7 @@ void FollowCameraComponent::QueryRaycast(){
 			Ogre::Real hit_distance = collision.position.distance(pivot_pos);
 			if(hit_distance < m_default_distance){
 				m_env_collision = true;
-				std::cout << "Collision: " << collision.position << "\n" << "Ray direction: " << camera_ray.getDirection() << "\n" << "Distance: " << hit_distance << "\n";
+				//std::cout << "Collision: " << collision.position << "\n" << "Ray direction: " << camera_ray.getDirection() << "\n" << "Distance: " << hit_distance << "\n";
 				m_camera_goal->setPosition(0, hit_distance * 0.8, hit_distance);
 				//m_camera_node->setPosition(collision.position);
 			}
