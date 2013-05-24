@@ -140,12 +140,12 @@ void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewpo
 	m_bot_ray.origin = btVector3(m_bot_ray.node->getPosition().x, m_bot_ray.node->getPosition().y, m_bot_ray.node->getPosition().z);
 	m_bot_ray.length = btVector3(0, -1, 0);
 
-	m_env_coll_Xp = false;
-	m_env_coll_Xn = false;
-	m_env_coll_Yp = false;
-	m_env_coll_Yn = false;
-	m_env_coll_Zp = false;
-	m_env_coll_Zn = false;
+	//m_env_coll_Xp = false;
+	//m_env_coll_Xn = false;
+	//m_env_coll_Yp = false;
+	//m_env_coll_Yn = false;
+	//m_env_coll_Zp = false;
+	//m_env_coll_Zn = false;
 
 	m_min_pitch_angle = 140;
 	m_max_pitch_angle = 160;
@@ -164,20 +164,21 @@ void FollowCameraComponent::Update(float dt){
 	//m_camera->rotate(Ogre::Vector3(0.0491129,0.92081,0.123328), Ogre::Radian(-0.366698));
 	//m_camera->setOrientation(Ogre::Quaternion(0.0491129,0.92081,0.123328,-0.366698));
 	//m_camera->setOrientationMode(Ogre::OrientationMode::OR_DEGREE_180); //this crashes :(
-	
-	QueryRaycast();
 
-	Ogre::Vector3 goal_pos = m_camera_goal->getPosition();
-	if(goal_pos.z < 2) m_camera_goal->setPosition(goal_pos.x, goal_pos.y, 2);
+	//QueryRaycast();
 
-	InputManager* input = NULL;
-	m_messenger->Notify(MSG_INPUT_MANAGER_GET, &input);
-	if (input){
-		CameraAxis axis = input->GetCameraAxis();
-		//UpdateCameraGoal(-0.1f * axis.x, -0.1f * axis.y, -0.0005f * axis.z);
-		Ogre::Real speed = 10;
-		UpdateCameraGoal(axis.x * m_movement_speed * dt * speed, axis.y * m_movement_speed * dt * speed, -0.0005f * axis.z * dt * speed);
-	}
+	//if(!QueryRaycast()){
+		InputManager* input = NULL;
+		m_messenger->Notify(MSG_INPUT_MANAGER_GET, &input);
+		if (input){
+			CameraAxis axis = input->GetCameraAxis();
+			//UpdateCameraGoal(-0.1f * axis.x, -0.1f * axis.y, -0.0005f * axis.z);
+			Ogre::Real speed = 20;
+			UpdateCameraGoal(axis.x * m_movement_speed * dt * speed, axis.y * m_movement_speed * dt * speed, -0.0005f * axis.z * dt * speed);
+		}
+	//}
+		
+	//QueryRaycast();
 
 	Ogre::SceneNode* node = NULL;
 	m_messenger->Notify(MSG_NODE_GET_NODE, &node);
@@ -209,6 +210,15 @@ void FollowCameraComponent::Update(float dt){
 	}
 
 	//m_trigger->GetCollisionDef
+	//QueryRaycast(); //bugfix?
+
+	QueryRaycast();
+
+	Ogre::Vector3 goal_pos = m_camera_goal->getPosition();
+	if(goal_pos.z < 2) m_camera_goal->setPosition(goal_pos.x, goal_pos.y, 2);
+
+	//std::cout << "Pitch: " << m_camera_pivot->getOrientation().getPitch() << "\n";
+
 }
 
 void FollowCameraComponent::SimulationStep(btScalar time_step){
@@ -242,9 +252,9 @@ void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real de
 		m_check_cam = true;
 	}
 	
-	if (!m_env_collision && !m_getting_input){
-		return;
-	}
+	//if (!m_env_collision && !m_getting_input){
+	//	return;
+	//}
 
 //if (!m_env_collision){
 
@@ -266,7 +276,7 @@ void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real de
 			m_pivot_pitch += delta_pitch;
 			m_default_pitch = m_pivot_pitch;
 	}
-	if (m_getting_input){
+	//if (m_getting_input){
 		Ogre::Real dist = m_camera_goal->_getDerivedPosition().distance(m_camera_pivot->_getDerivedPosition());
 		Ogre::Real dist_change = (delta_zoom * dist * m_camera_zoom_speed);
 		m_default_distance += (delta_zoom * dist * m_camera_zoom_speed);
@@ -275,12 +285,14 @@ void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real de
 		!(dist + dist_change > 25 && dist_change > 0)){
 			m_camera_goal->translate(0, dist_change * 0.2, dist_change, Ogre::Node::TS_LOCAL);
 		}
-	}
+	//}
 	
 }
 
-void FollowCameraComponent::QueryRaycast(){
-	if (!m_check_cam) { return; }
+bool FollowCameraComponent::QueryRaycast(){
+	if (!m_check_cam) { return false; }
+	
+	m_env_collision = false;
 
 	if(m_terrain_group == NULL){
 		GameObject* terrain = static_cast<GameObject*>(m_owner->GetGameObject("Terrain"));
@@ -291,14 +303,36 @@ void FollowCameraComponent::QueryRaycast(){
 	
 	//Ogre::Vector3 cam_pos = m_camera_node->getPosition();
 	Ogre::Vector3 cam_pos = m_camera_goal->_getDerivedPosition();
-	Ogre::Vector3 pivot_pos = m_camera_pivot->getPosition();
 	Ogre::Real min_distance = m_default_distance;
+	Ogre::Real max_y = m_camera_goal->getPosition().z * 0.2;
+	cam_pos.y -= 0.9;
+	Ogre::Ray camera_ray(cam_pos, Ogre::Vector3::UNIT_Y);
+	Ogre::TerrainGroup::RayResult collision = m_terrain_group->rayIntersects(camera_ray);
+	//Ogre::Real new_y = 0;
+	if(collision.hit){
+		m_env_collision = true;
+		m_camera_goal->_setDerivedPosition(collision.position + Ogre::Vector3::UNIT_Y * 0.9);
+	}
 
-	for(int i = -2; i < 3; i++){
+	Ogre::Vector3 pivot_pos = m_camera_pivot->getPosition();
+	pivot_pos.y += 0.5;
+	Ogre::Real hit_distance = collision.position.distance(cam_pos);
+	cam_pos = m_camera_goal->_getDerivedPosition();
+	cam_pos.y -= max_y;
+	camera_ray.setOrigin(cam_pos);
+	camera_ray.setDirection(Ogre::Vector3::NEGATIVE_UNIT_Y);
+	collision = m_terrain_group->rayIntersects(camera_ray);
+	if(hit_distance < max_y * 1.25){
+		m_env_collision = true;
+		m_camera_goal->_setDerivedPosition(collision.position + Ogre::Vector3::UNIT_Y * max_y * 0.8);
+	}
+
+	for(int i = -1; i < 2; i++){
 		cam_pos = m_camera_goal->_getDerivedPosition();
-		cam_pos.x += i;
-		cam_pos.y -= 0.9;
-		Ogre::Ray camera_ray(pivot_pos, cam_pos - pivot_pos);
+		cam_pos.x += i * 2.5;
+		cam_pos.y -= max_y;
+		camera_ray.setOrigin(pivot_pos);
+		camera_ray.setDirection(cam_pos - pivot_pos);
 		Ogre::TerrainGroup::RayResult collision = m_terrain_group->rayIntersects(camera_ray);
 		if(collision.hit){
 			Ogre::Real hit_distance = collision.position.distance(pivot_pos);
@@ -312,43 +346,34 @@ void FollowCameraComponent::QueryRaycast(){
 		}
 	}
 
-	cam_pos = m_camera_goal->_getDerivedPosition();
-	cam_pos.y -= 0.9;
-	Ogre::Ray camera_ray(cam_pos, Ogre::Vector3::NEGATIVE_UNIT_Y);
-	Ogre::TerrainGroup::RayResult collision = m_terrain_group->rayIntersects(camera_ray);
-	Ogre::Real hit_distance = collision.position.distance(cam_pos);
-	Ogre::Real new_y = 0;
-	if(hit_distance < 1.9 * 1.25){
-		m_env_collision = true;
-		m_camera_goal->_setDerivedPosition(collision.position + Ogre::Vector3::UNIT_Y * 1.9 * 0.8);
-	}
+	m_camera_goal->setPosition(0, 0, min_distance);
 
-	m_camera_goal->setPosition(0, new_y, min_distance);
 
+	return m_env_collision;
 }
 
-void CameraCollisionComponent::Notify(int type, void* msg){
-};
-
-void CameraCollisionComponent::Shut(){
-	m_messenger->Unregister(MSG_CAMERA_COLL_UPDATE, this);
-};
-
-void CameraCollisionComponent::SetMessenger(ComponentMessenger* messenger){
-	m_messenger = messenger;
-	m_messenger->Register(MSG_CAMERA_COLL_UPDATE, this);
-};
-
-void CameraCollisionComponent::Init(GameObject* player){
-	m_player = player;
-};
-
-void CameraCollisionComponent::Update(float dt){
-	//Ogre::Vector3 new_position = static_cast<FollowCameraComponent*>(m_player->GetComponent(COMPONENT_FOLLOW_CAMERA))->m_node->getPosition();
-	//new_position;
-	//m_messenger->Notify(MSG_RIGIDBODY_POSITION_SET, &new_position);
-
-	//m_player->GetComponentMessenger()->Notify(MSG_CAMERA_COLL_UPDATE, NULL); //så skickar man med en position typ
-
-	//trigger : MSG_SET_OBJECT_POSITION
-};
+//void CameraCollisionComponent::Notify(int type, void* msg){
+//};
+//
+//void CameraCollisionComponent::Shut(){
+//	m_messenger->Unregister(MSG_CAMERA_COLL_UPDATE, this);
+//};
+//
+//void CameraCollisionComponent::SetMessenger(ComponentMessenger* messenger){
+//	m_messenger = messenger;
+//	m_messenger->Register(MSG_CAMERA_COLL_UPDATE, this);
+//};
+//
+//void CameraCollisionComponent::Init(GameObject* player){
+//	m_player = player;
+//};
+//
+//void CameraCollisionComponent::Update(float dt){
+//	//Ogre::Vector3 new_position = static_cast<FollowCameraComponent*>(m_player->GetComponent(COMPONENT_FOLLOW_CAMERA))->m_node->getPosition();
+//	//new_position;
+//	//m_messenger->Notify(MSG_RIGIDBODY_POSITION_SET, &new_position);
+//
+//	//m_player->GetComponentMessenger()->Notify(MSG_CAMERA_COLL_UPDATE, NULL); //så skickar man med en position typ
+//
+//	//trigger : MSG_SET_OBJECT_POSITION
+//};

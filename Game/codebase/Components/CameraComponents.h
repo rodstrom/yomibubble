@@ -55,7 +55,7 @@ public:
 		m_top_ray.node = node;
 		m_bot_ray.node = node;
 	}
-	void QueryRaycast();
+	bool QueryRaycast();
 
 	Ogre::SceneNode*	m_node; //testing for env coll
 
@@ -77,13 +77,6 @@ protected:
 	PhysicsEngine*		m_physics_engine;
 	float				m_movement_speed;
 	InputSystem*		m_input_system;
-	
-	bool				m_env_coll_Xp;
-	bool				m_env_coll_Xn;
-	bool				m_env_coll_Yp;
-	bool				m_env_coll_Yn;
-	bool				m_env_coll_Zp;
-	bool				m_env_coll_Zn;
 
 	bool				m_inverted_controller;
 
@@ -98,20 +91,20 @@ protected:
 
 //	TriggerComponent*	m_trigger;
 };
-
-class CameraCollisionComponent : public Component, public IComponentObserver, public IComponentUpdateable{
-public:
-	CameraCollisionComponent(void) { m_type = COMPONENT_CAMERA_COLLISION; }
-	virtual ~CameraCollisionComponent(void){}
-
-	virtual void Notify(int type, void* msg);
-	virtual void Shut();
-	virtual void SetMessenger(ComponentMessenger* messenger);
-	virtual void Init(GameObject* player);
-	virtual void Update(float dt);
-
-protected:
-	GameObject* m_player;
-};
+//
+//class CameraCollisionComponent : public Component, public IComponentObserver, public IComponentUpdateable{
+//public:
+//	CameraCollisionComponent(void) { m_type = COMPONENT_CAMERA_COLLISION; }
+//	virtual ~CameraCollisionComponent(void){}
+//
+//	virtual void Notify(int type, void* msg);
+//	virtual void Shut();
+//	virtual void SetMessenger(ComponentMessenger* messenger);
+//	virtual void Init(GameObject* player);
+//	virtual void Update(float dt);
+//
+//protected:
+//	GameObject* m_player;
+//};
 
 #endif //_N_CAMERA_COMPONENTS_H_
