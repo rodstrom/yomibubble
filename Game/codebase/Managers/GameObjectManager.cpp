@@ -409,12 +409,7 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 	acomp->AddAnimationState("Idle");
 	//child_node->Init(position, "TottNode", node_comp->GetSceneNode());
 
-	node_comp->Init(position, m_scene_manager);
-
-	if(def.mesh == "" || def.mesh == "Yomi_2Yomi.mesh") def.mesh = "Yomi.mesh";
-	acomp->Init(def.mesh, m_scene_manager/*, node_comp->GetId()*/);
-	acomp->GetEntity()->setMaterialName("_YomiFBXASC039sFBXASC032staffMaterial__191");
-
+	//acomp->GetEntity()->setMaterialName("SolidColor/Green");
 	m_sound_manager->GetTottNode(node_comp->GetSceneNode()->getName());
 	way_point->Init(node_comp->GetSceneNode(), 2.140005f);
 	//way_point->AddWayPoint(Ogre::Vector3(161, 72, 252));
@@ -478,7 +473,7 @@ GameObject* GameObjectManager::CreateSpeechBubble(const Ogre::Vector3& position,
 	
 	node_comp->Init(node, m_scene_manager);
 	node_comp->SetId("node_main");
-	mrc->Init("PratBubbla.mesh", m_scene_manager, "node_main");//, node->getName());
+	mrc->Init("PratBubblaCherry.mesh", m_scene_manager, "node_main");//, node->getName());
 	sbcomp->Init(node, m_scene_manager, tott);
 	
 	/*
@@ -491,7 +486,7 @@ GameObject* GameObjectManager::CreateSpeechBubble(const Ogre::Vector3& position,
 	trdef.body_type = DYNAMIC_BODY;
 	trdef.collider_type = COLLIDER_SPHERE;
 	trdef.mass = 0.0f;
-	trdef.radius = 20.5f;
+	trdef.radius = 2.5f;
 	trdef.collision_filter.filter = COL_WORLD_TRIGGER;
 	trdef.collision_filter.mask = COL_PLAYER;
 	trc->Init(position, m_physics_engine, &trdef);

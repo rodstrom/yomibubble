@@ -189,7 +189,7 @@ int DBManager::Load() {
 							tott_def.character_controller.jump_power = 200.0f;
 							tott_def.character_controller.restitution = 0.0f;
 							tott_def.character_controller.step_height = 0.35f;
-							tott_def.character_controller.turn_speed = 80.0f;
+							tott_def.character_controller.turn_speed = 100.0f;
 							tott_def.character_controller.max_jump_height = 10.0f;
 							tott_def.character_controller.mass = 1.0f;
 							tott_def.character_controller.max_fall_speed = 0.1f;
@@ -200,12 +200,12 @@ int DBManager::Load() {
 							tott_def.character_controller.collision_filter.mask = COL_PLAYER | COL_WORLD_STATIC | COL_BUBBLE | COL_TOTT | COL_QUESTITEM;
 							tott_def.character_controller.radius = 0.5f;
 							tott_def.character_controller.height = 0.1f;
-							tott_def.character_controller.offset.y = 0.0f;
+							tott_def.character_controller.offset.y = 0.4f;
 							tott_def.happy_animation = "Excited";
 							tott_def.idle_animation = "Idle";
 							tott_def.mesh_name = "Hidehog.mesh";
 							tott_def.play_music = false;
-							tott_def.quest_object_mesh_name = "Questitem_Blueberry.mesh";
+							tott_def.quest_object_mesh_name = "Questitem_Cherry.mesh";
 							tott_def.react_animation = "Respond";
 							tott_def.run_animation = "Run";
 							tott_def.sb_node_name = "node_main";
@@ -213,13 +213,15 @@ int DBManager::Load() {
 							tott_def.sfx_happy = "";
 							tott_def.theme_music = "";
 							tott_def.type_name = "Hidehog";
-							tott_def.walk_animation = "walk";/*
+							tott_def.walk_animation = "walk";
 							GameObject* tott = m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y,z), &tott_def);
-							static_cast<WayPointComponent*>(m_game_object_manager->GetGameObject("TestTott")->GetComponent(COMPONENT_AI))->AddWayPoint(Ogre::Vector3(x+4,y,z));
-							static_cast<WayPointComponent*>(m_game_object_manager->GetGameObject("TestTott")->GetComponent(COMPONENT_AI))->AddWayPoint(Ogre::Vector3(x+2,y,z+2));
-							static_cast<WayPointComponent*>(m_game_object_manager->GetGameObject("TestTott")->GetComponent(COMPONENT_AI))->AddWayPoint(Ogre::Vector3(x,y,z+4));
+							static_cast<WayPointComponent*>(m_game_object_manager->GetGameObject("TestTott")->GetComponent(COMPONENT_AI))->AddWayPoint(Ogre::Vector3(x+4,y,z+5));
+							static_cast<WayPointComponent*>(m_game_object_manager->GetGameObject("TestTott")->GetComponent(COMPONENT_AI))->AddWayPoint(Ogre::Vector3(x+3,y,z+7));
+							static_cast<WayPointComponent*>(m_game_object_manager->GetGameObject("TestTott")->GetComponent(COMPONENT_AI))->AddWayPoint(Ogre::Vector3(x+2,y,z+10));
+							static_cast<WayPointComponent*>(m_game_object_manager->GetGameObject("TestTott")->GetComponent(COMPONENT_AI))->AddWayPoint(Ogre::Vector3(x+3,y,z+1));
+							static_cast<WayPointComponent*>(m_game_object_manager->GetGameObject("TestTott")->GetComponent(COMPONENT_AI))->AddWayPoint(Ogre::Vector3(x+1,y,z+4));
 							m_game_object_manager->CreateGameObject(GAME_OBJECT_QUEST_ITEM, Ogre::Vector3(x+4,y,z), &tott);
-							m_game_object_manager->CreateGameObject(GAME_OBJECT_SPEECH_BUBBLE, Ogre::Vector3(x,y+2,z), &tott);*/
+							m_game_object_manager->CreateGameObject(GAME_OBJECT_SPEECH_BUBBLE, Ogre::Vector3(x,y+2,z), &tott);
 						}
 						else if (i->second == "leaf") {
 							ParticleDef particleDef;

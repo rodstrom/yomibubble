@@ -14,6 +14,8 @@
 #include "..\AnimationBlender.h"
 #include "..\PhysicsEngine.h"
 #include "..\RaycastCollision.h"
+#include "GameObject.h"
+#include "..\Managers\GameObjectManager.h"
 
 ComponentMessenger* PlayerState::s_messenger = NULL;
 AnimationManager* PlayerState::s_animation = NULL;
@@ -144,8 +146,8 @@ void PlayerStateMove::Update(float dt){
 PlayerBlowBubble::PlayerBlowBubble(void) : m_bubble(NULL), m_current_scale(0.0f) {
 	m_type = PLAYER_STATE_BLOW_BUBBLE;
 	m_bubble_blow_sound = s_sound_manager->Create2DData("Blow_Bubble", false, false, false, false, 1.0f, 1.0f);
-	m_min_bubble_size = 0.805f;
-	m_max_bubble_size = 1.907f;
+	m_min_bubble_size = 1.205f;
+	m_max_bubble_size = 4.907f;
 	m_bubble_gravity = VariableManager::GetSingletonPtr()->GetAsFloat("BlueBubbleGravity");
 }
 
@@ -203,6 +205,8 @@ void PlayerBlowBubble::Update(float dt){
 				s_input_component->GetOwner()->GetGameObjectManager()->RemoveGameObject(m_bubble);
 				m_bubble = NULL;
 				//insert pop sound here
+				SoundData2D pop_sound = s_sound_manager->Create2DData("Bubble_Burst", false, false, false, false, 1.0, 1.0);
+				s_messenger->Notify(MSG_SFX2D_PLAY, &pop_sound);
 				m_current_scale = 0.0f;
 				s_manager->BlowBubble(false);
 			}

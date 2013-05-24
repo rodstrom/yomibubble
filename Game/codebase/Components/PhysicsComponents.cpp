@@ -887,8 +887,8 @@ void TottController::Notify(int type, void* msg){
 	CharacterController::Notify(type, msg);
 	TOTT_STATE& new_state = *static_cast<TOTT_STATE*>(msg);
 
-	switch(type){
-	case MSG_TOTT_STATE_CHANGE:
+	//switch(type){
+	//case MSG_TOTT_STATE_CHANGE:
 		//new_state = static_cast<TOTT_STATE*>(msg);
 		m_state = new_state;
 
@@ -916,11 +916,11 @@ void TottController::Notify(int type, void* msg){
 			break;
 		default:
 			break;
-		};
+		};/*
 		break;
 	default:
 		break;
-	};
+	};*/
 };
 
 void TottController::Shut(){
