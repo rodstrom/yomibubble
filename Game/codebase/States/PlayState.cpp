@@ -62,13 +62,13 @@ void PlayState::SecondLoading(){
 	
 	
 	
-	/*m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
+	m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
 	m_scene_manager->setShadowUseInfiniteFarPlane(false);
 	m_scene_manager->setShadowTextureSelfShadow(false);
 	m_scene_manager->setShadowTextureCount(1);
-	m_scene_manager->setShadowTextureSize(2048);
-	m_scene_manager->setShadowColour(Ogre::ColourValue(0.5f,0.5f,0.6f,1.0f));
-	m_scene_manager->setShadowFarDistance(25.0f);*/
+	m_scene_manager->setShadowTextureSize(1024);
+	m_scene_manager->setShadowColour(Ogre::ColourValue(0.5f,0.5f,0.7f,1.0f));
+	m_scene_manager->setShadowFarDistance(25.0f);
 	
 	m_level_manager = new LevelManager(m_game_object_manager, m_scene_manager, m_physics_engine);
 	LevelDef level1;
