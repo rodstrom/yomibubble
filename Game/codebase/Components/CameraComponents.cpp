@@ -230,6 +230,7 @@ void FollowCameraComponent::Update(float dt){
 	//}
 	//
 	//std::cout << "Pitch: " << m_camera_pivot->getOrientation().getPitch() << "\n";
+	//std::cout << " Roll: " << m_camera_pivot->getOrientation().getRoll() << "\n";
 	//std::cout << "  Yaw: " << m_camera_pivot->getOrientation().getYaw() << "\n";
 
 	if(m_camera_pivot->getPosition().distance(m_camera_goal->_getDerivedPosition()) < Ogre::Real(2)) {
@@ -263,7 +264,7 @@ void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real de
 			|| delta_pitch != 0.0f
 			|| delta_zoom != 0.0f){
 		m_getting_input = true;
-		m_check_cam = false;
+		//m_check_cam = false;
 	}
 	else{
 		m_getting_input = false;
@@ -309,8 +310,8 @@ void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real de
 }
 
 bool FollowCameraComponent::QueryRaycast(){
-	if(!m_check_cam) return false;
-	
+	//if(!m_check_cam) return false;
+	//cout << "QueryRaycast() - " << m_camera_goal->_getDerivedPosition() << "\n";
 	m_env_collision = false;
 
 	if(m_terrain_group == NULL){
@@ -348,17 +349,17 @@ bool FollowCameraComponent::QueryRaycast(){
 
 	for(int i = -1; i < 2; i++){
 		cam_pos = m_camera_goal->_getDerivedPosition();
-		cam_pos.x += i * 2.5;
+		cam_pos.x += i * 2;
 		cam_pos.y -= max_y;
 		camera_ray.setOrigin(pivot_pos);
 		camera_ray.setDirection(cam_pos - pivot_pos);
 		Ogre::TerrainGroup::RayResult collision = m_terrain_group->rayIntersects(camera_ray);
 		if(collision.hit){
 			Ogre::Real hit_distance = collision.position.distance(pivot_pos);
-			if(hit_distance < m_default_distance * 1.25){
+			if(hit_distance < m_default_distance * 1.5){
 				m_env_collision = true;
 				//std::cout << "Collision: " << collision.position << "\n" << "Ray direction: " << camera_ray.getDirection() << "\n" << "Distance: " << hit_distance << "\n";
-				if(hit_distance * 0.8 < min_distance) min_distance = hit_distance * 0.8;
+				if(hit_distance * 0.66666666 < min_distance) min_distance = hit_distance * 0.66666666;
 				//m_camera_goal->setPosition(0, 0 /*hit_distance * 0.8*/, hit_distance * 0.8);
 				//m_camera_node->setPosition(collision.position);
 			}
