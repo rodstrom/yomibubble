@@ -229,8 +229,13 @@ void FollowCameraComponent::Update(float dt){
 	//	m_camera_goal->_setDerivedPosition(Ogre::Vector3(goal_pos.x, new_y, goal_pos.z));
 	//}
 	//
-	//std::cout << "Pitch: " << m_camera_pivot->getOrientation().g	etPitch() << "\n";
+	//std::cout << "Pitch: " << m_camera_pivot->getOrientation().getPitch() << "\n";
 	//std::cout << "  Yaw: " << m_camera_pivot->getOrientation().getYaw() << "\n";
+
+	if(m_camera_pivot->getPosition().distance(m_camera_goal->_getDerivedPosition()) < Ogre::Real(2)) {
+		Ogre::Ray distance(m_camera_pivot->getPosition(), m_camera_goal->_getDerivedPosition() - m_camera_pivot->getPosition());
+		m_camera_goal->_setDerivedPosition(distance.getPoint(Ogre::Real(2)));
+	}
 
 }
 
