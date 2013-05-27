@@ -383,7 +383,7 @@ bool InputSystem::buttonPressed(const OIS::JoyStickEvent& e, int button){
 		
 		break;
 	case 2: //X button
-		
+		m_game->InjectPressedButton(BTN_X);
 		break;
 	case 1: //OIS::MouseButtonID::MB_Right: //or GamePad B
 		m_game->InjectPressedButton(BTN_B);
@@ -433,7 +433,7 @@ bool InputSystem::buttonReleased(const OIS::JoyStickEvent& e, int button){
 		
 		break;
 	case 2: //X button
-		
+		m_game->InjectReleasedButton(BTN_X);
 		break;
 	case 1: //OIS::MouseButtonID::MB_Right: //or GamePad B
 		m_game->InjectReleasedButton(BTN_B);

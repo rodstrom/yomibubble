@@ -590,20 +590,20 @@ GameObject* GameObjectManager::CreateButton(const Ogre::Vector3& position, void*
 }
 
 GameObject* GameObjectManager::Create2DOverlay(const Ogre::Vector3& position, void* data, const Ogre::String& id) {
- OverlayDef& overlayDef = *static_cast<OverlayDef*>(data);
- GameObject* go = new GameObject(GAME_OBJECT_OVERLAY);
- Overlay2DComponent* overlayComp = new Overlay2DComponent;
- go->AddComponent(overlayComp);
- OverlayCollisionCallbackComponent* coll_comp = new OverlayCollisionCallbackComponent;
- go->AddComponent(coll_comp);
- go->AddUpdateable(coll_comp);
-
- coll_comp->Init(m_input_manager, m_viewport);
- overlayComp->Init(overlayDef.overlay_name, overlayDef.cont_name);
-
- go->SetGameObjectManager(this);
-
- return go;
+	OverlayDef& overlayDef = *static_cast<OverlayDef*>(data);
+	GameObject* go = new GameObject(GAME_OBJECT_OVERLAY);
+	Overlay2DComponent* overlayComp = new Overlay2DComponent;
+	go->AddComponent(overlayComp);
+	OverlayCollisionCallbackComponent* coll_comp = new OverlayCollisionCallbackComponent;
+	go->AddComponent(coll_comp);
+	go->AddUpdateable(coll_comp);
+	
+	coll_comp->Init(m_input_manager, m_viewport);
+	overlayComp->Init(overlayDef.overlay_name, overlayDef.cont_name);
+	
+	go->SetGameObjectManager(this);
+	
+	return go;
 }
 
 GameObject* GameObjectManager::CreateGUI(const Ogre::Vector3& position, void* data, const Ogre::String& id){

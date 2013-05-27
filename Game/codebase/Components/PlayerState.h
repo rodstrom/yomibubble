@@ -157,7 +157,7 @@ private:
 
 class PlayerHoldObject : public PlayerState{
 public:
-	PlayerHoldObject(PhysicsEngine* physics_engine) : m_object(NULL), m_physics_engine(physics_engine){ m_type = PLAYER_STATE_HOLD_OBJECT; }
+	PlayerHoldObject(PhysicsEngine* physics_engine);
 	~PlayerHoldObject(void){}
 	void Enter();
 	void Exit();
@@ -165,6 +165,7 @@ public:
 private:
 	GameObject* m_object;		// the object we are holding
 	PhysicsEngine* m_physics_engine;
+	float m_bubble_gravity;
 };
 
 

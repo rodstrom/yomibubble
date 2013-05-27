@@ -39,6 +39,12 @@ void PlayerInputComponent::SetCustomVariables(float min_bubble_size, float max_b
 	m_on_bubble_speed_mod = on_bubble_mod;
 	m_in_bubble_speed_mod = in_bubble_mod;
 	m_level = level;
+	if (m_level == "try"){
+		m_can_blow_pink = false;
+	}
+	else {
+		m_can_blow_pink = true;
+	}
 };
 
 void PlayerInputComponent::OntoBubbleTransition(float dt){

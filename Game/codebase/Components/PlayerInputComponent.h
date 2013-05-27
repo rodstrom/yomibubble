@@ -13,7 +13,7 @@ class InputManager;
 class PlayerInputComponent : public Component, public IComponentUpdateable, public IComponentObserver, public IComponentSimulationStep{
 public:
 	PlayerInputComponent(void) : m_input_manager(NULL), m_current_bubble(NULL), m_is_creating_bubble(false), m_bubble_type(0), m_bubble_create_position(Ogre::Vector3::ZERO),
-		m_max_scale(2.0f), m_current_scale(0.0f), m_player_state(0), m_physics_engine(NULL), m_animation_manager(NULL), m_direction(Ogre::Vector3::ZERO)
+		m_max_scale(2.0f), m_current_scale(0.0f), m_player_state(0), m_physics_engine(NULL), m_animation_manager(NULL), m_direction(Ogre::Vector3::ZERO), m_can_blow_pink(false)
 	{ m_type = COMPONENT_PLAYER_INPUT; m_update = true; }
 	virtual ~PlayerInputComponent(void){}
 	virtual void Update(float dt);
@@ -23,6 +23,7 @@ public:
 	virtual void SetMessenger(ComponentMessenger* messenger);
 	virtual void SimulationStep(btScalar time_step);
 	int GetPlayerState() { return m_player_state; }
+	bool CanBlowPink() const { return m_can_blow_pink; }
 
 	SoundData2D m_leaf_sfx;
 	//AnimationMsg m_anim_msg;
@@ -96,6 +97,7 @@ protected:
 	int m_player_state;
 	ControllerFptr m_states[PLAYER_STATE_SIZE];
 	bool m_on_ground;
+	bool m_can_blow_pink;
 
 	int m_current_level;
 	Ogre::String m_level;

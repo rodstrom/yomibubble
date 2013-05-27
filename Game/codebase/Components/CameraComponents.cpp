@@ -129,7 +129,7 @@ void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewpo
 	//m_camera->lookAt(Ogre::Vector3(145.872f,73.6166f,244.42f));
 	//m_camera->rotate(Ogre::Vector3(0.0491129,0.92081,0.123328), Ogre::Degree(-0.366698));
 
-	m_camera_pivot->yaw(Ogre::Degree(240), Ogre::Node::TS_WORLD);
+	m_camera_pivot->yaw(Ogre::Degree(200), Ogre::Node::TS_WORLD);
 
 	m_left_ray.origin = btVector3(m_bot_ray.node->getPosition().x, m_bot_ray.node->getPosition().y, m_bot_ray.node->getPosition().z);
 	m_left_ray.length = btVector3(-0.2f, 0, 0);
