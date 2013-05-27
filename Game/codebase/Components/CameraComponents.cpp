@@ -286,12 +286,13 @@ void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real de
 		if (!m_inverted_controller) { m_camera_pivot->yaw(Ogre::Degree(-delta_yaw * m_camera_stick_rotation_acceleration), Ogre::Node::TS_WORLD); }
 		else { m_camera_pivot->yaw(Ogre::Degree(delta_yaw* m_camera_stick_rotation_acceleration), Ogre::Node::TS_WORLD); }
 	}
-	if (!(m_pivot_pitch + delta_pitch > 15 && delta_pitch > 0) && 
-		!(m_pivot_pitch + delta_pitch < -60 && delta_pitch < 0)
+	if (!(m_pivot_pitch + delta_pitch > -15 && delta_pitch > 0) && 
+		!(m_pivot_pitch + delta_pitch < -35 && delta_pitch < 0)
 		&& m_getting_input){
 			if (!m_inverted_controller) { m_camera_pivot->pitch(Ogre::Degree(delta_pitch * m_camera_stick_rotation_acceleration), Ogre::Node::TS_LOCAL); }
 			else { m_camera_pivot->pitch(Ogre::Degree(-delta_pitch * m_camera_stick_rotation_acceleration), Ogre::Node::TS_LOCAL); }
 			m_pivot_pitch += delta_pitch;
+			//cout << m_pivot_pitch << "\n";
 			m_default_pitch = m_pivot_pitch;
 	}
 	//if (m_getting_input){
@@ -308,7 +309,7 @@ void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real de
 }
 
 bool FollowCameraComponent::QueryRaycast(){
-	if (!m_check_cam) { return false; }
+	if(!m_check_cam) return false;
 	
 	m_env_collision = false;
 

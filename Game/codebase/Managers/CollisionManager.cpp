@@ -105,7 +105,7 @@ inline std::pair<int,int> CollisionManager::MakeIntPair(int a, int b){
 }
 
 void CollisionManager::PlayerTott(GameObject* player, GameObject* tott){
-	std::cout << "Hi, I am a tott\n";
+	//std::cout << "Hi, I am a tott\n";
 }
 
 void CollisionManager::BlueBubbleBlueBubble(GameObject* blue_bubble_a, GameObject* blue_bubble_b){
@@ -128,7 +128,7 @@ void CollisionManager::LeafPlayer(GameObject* leaf, GameObject* player){
 };
 
 void CollisionManager::PlayerTrigger(GameObject* player, GameObject* trigger){
-	std::cout << "Trigger collision\n";
+	//std::cout << "Trigger collision\n";
 }
 
 void CollisionManager::PlayerTerrain(GameObject* player, GameObject* terrain){
@@ -138,7 +138,7 @@ void CollisionManager::PlayerTerrain(GameObject* player, GameObject* terrain){
 void CollisionManager::CameraTerrain(GameObject* camera, GameObject* terrain){
 	//wizardry goes here
 	//send info to component (invert camera target?)
-	std::cout << "Camera : Terrain collided\n";
+	//std::cout << "Camera : Terrain collided\n";
 };
 
 void CollisionManager::GatePlayer(GameObject* gate, GameObject* player){
@@ -148,13 +148,18 @@ void CollisionManager::GatePlayer(GameObject* gate, GameObject* player){
 }
 
 void CollisionManager::PlayerQuestItem(GameObject* player, GameObject* quest_item){
-	std::cout << "Player vs QuestItem\n";
+	//std::cout << "Player vs QuestItem\n";
 };
 
 void CollisionManager::TottQuestItem(GameObject* tott, GameObject* quest_item){
 	std::cout << "Tott vs QuestItem\n";
 	TOTT_STATE ts = HAPPY;
 	tott->GetComponentMessenger()->Notify(MSG_TOTT_STATE_CHANGE, &ts);
+	//typ ljudeffekt
+	ParticleDef particleDef;
+	particleDef.particle_name = "Particle/Smoke";
+	quest_item->GetGameObjectManager()->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(static_cast<NodeComponent*>(quest_item->GetComponent(COMPONENT_NODE))->GetSceneNode()->getPosition().x, static_cast<NodeComponent*>(quest_item->GetComponent(COMPONENT_NODE))->GetSceneNode()->getPosition().y + 2, static_cast<NodeComponent*>(quest_item->GetComponent(COMPONENT_NODE))->GetSceneNode()->getPosition().z), &particleDef);
+	quest_item->GetGameObjectManager()->RemoveGameObject(quest_item);
 };
 
 void CollisionManager::PlayerSpeechBubble(GameObject* player, GameObject* speech_bubble){

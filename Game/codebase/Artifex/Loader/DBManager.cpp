@@ -40,7 +40,7 @@ int DBManager::Load() {
 	mArtifexLoader->mObjectFile.clear();
 	m_paged_geometry = new Forests::PagedGeometry;
 	m_paged_geometry->setCamera(mArtifexLoader->mCamera);
-	m_paged_geometry->setPageSize(20);
+	m_paged_geometry->setPageSize(40);
 	m_paged_geometry->setInfinite();
 	m_paged_geometry->addDetailLevel<Forests::WindBatchPage>(40,10);
 	m_paged_geometry->addDetailLevel<Forests::ImpostorPage>(100, 10);
@@ -52,6 +52,9 @@ int DBManager::Load() {
 	
 	CppSQLite3Table t;
 	
+	std::vector<Ogre::String> shadow_map;
+	this->InitShadowList(shadow_map);
+
 	try {
 		t = mDB->getTable(query.c_str());	
 	} catch (CppSQLite3Exception& e) {
@@ -117,7 +120,7 @@ int DBManager::Load() {
 						if (i->second == "player") {
 							PlayerDef player_def;
 							CharacterControllerDef char_def;
-							char_def.friction = 1.0f;
+							char_def.friction = 0.5f;
 							char_def.velocity = VariableManager::GetSingletonPtr()->GetAsFloat("Player_Speed");
 							char_def.max_speed = VariableManager::GetSingletonPtr()->GetAsFloat("Player_Max_Speed");
 							char_def.deceleration = VariableManager::GetSingletonPtr()->GetAsFloat("Player_Deceleration");
@@ -173,13 +176,13 @@ int DBManager::Load() {
 							tott_def.sfx_happy = "";
 							tott_def.theme_music = "";
 							tott_def.type_name = "Hidehog";
-							tott_def.walk_animation = "walk";/*
+							tott_def.walk_animation = "walk";
 							GameObject* tott = m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y,z), &tott_def);
 							static_cast<WayPointComponent*>(m_game_object_manager->GetGameObject("TestTott")->GetComponent(COMPONENT_AI))->AddWayPoint(Ogre::Vector3(x+4,y,z));
 							static_cast<WayPointComponent*>(m_game_object_manager->GetGameObject("TestTott")->GetComponent(COMPONENT_AI))->AddWayPoint(Ogre::Vector3(x+2,y,z+2));
 							static_cast<WayPointComponent*>(m_game_object_manager->GetGameObject("TestTott")->GetComponent(COMPONENT_AI))->AddWayPoint(Ogre::Vector3(x,y,z+4));
 							m_game_object_manager->CreateGameObject(GAME_OBJECT_QUEST_ITEM, Ogre::Vector3(x+4,y,z), &tott);
-							m_game_object_manager->CreateGameObject(GAME_OBJECT_SPEECH_BUBBLE, Ogre::Vector3(x,y+2,z), &tott);*/
+							m_game_object_manager->CreateGameObject(GAME_OBJECT_SPEECH_BUBBLE, Ogre::Vector3(x,y+2,z), &tott);
 						}
 						else if (i->second == "tott") {
 							TottDef tott_def;
@@ -189,7 +192,7 @@ int DBManager::Load() {
 							tott_def.character_controller.jump_power = 200.0f;
 							tott_def.character_controller.restitution = 0.0f;
 							tott_def.character_controller.step_height = 0.35f;
-							tott_def.character_controller.turn_speed = 80.0f;
+							tott_def.character_controller.turn_speed = 100.0f;
 							tott_def.character_controller.max_jump_height = 10.0f;
 							tott_def.character_controller.mass = 1.0f;
 							tott_def.character_controller.max_fall_speed = 0.1f;
@@ -200,12 +203,12 @@ int DBManager::Load() {
 							tott_def.character_controller.collision_filter.mask = COL_PLAYER | COL_WORLD_STATIC | COL_BUBBLE | COL_TOTT | COL_QUESTITEM;
 							tott_def.character_controller.radius = 0.5f;
 							tott_def.character_controller.height = 0.1f;
-							tott_def.character_controller.offset.y = 0.0f;
+							tott_def.character_controller.offset.y = 0.4f;
 							tott_def.happy_animation = "Excited";
 							tott_def.idle_animation = "Idle";
 							tott_def.mesh_name = "Hidehog.mesh";
 							tott_def.play_music = false;
-							tott_def.quest_object_mesh_name = "Questitem_Blueberry.mesh";
+							tott_def.quest_object_mesh_name = "Questitem_Cherry.mesh";
 							tott_def.react_animation = "Respond";
 							tott_def.run_animation = "Run";
 							tott_def.sb_node_name = "node_main";
@@ -215,11 +218,14 @@ int DBManager::Load() {
 							tott_def.type_name = "Hidehog";
 							tott_def.walk_animation = "walk";
 							GameObject* tott = m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y,z), &tott_def);
-							static_cast<WayPointComponent*>(m_game_object_manager->GetGameObject("TestTott")->GetComponent(COMPONENT_AI))->AddWayPoint(Ogre::Vector3(x+4,y,z));
-							static_cast<WayPointComponent*>(m_game_object_manager->GetGameObject("TestTott")->GetComponent(COMPONENT_AI))->AddWayPoint(Ogre::Vector3(x+2,y,z+2));
-							static_cast<WayPointComponent*>(m_game_object_manager->GetGameObject("TestTott")->GetComponent(COMPONENT_AI))->AddWayPoint(Ogre::Vector3(x,y,z+4));
+							static_cast<WayPointComponent*>(m_game_object_manager->GetGameObject("TestTott")->GetComponent(COMPONENT_AI))->AddWayPoint(Ogre::Vector3(x+4,y,z+5));
+							static_cast<WayPointComponent*>(m_game_object_manager->GetGameObject("TestTott")->GetComponent(COMPONENT_AI))->AddWayPoint(Ogre::Vector3(x+3,y,z+7));
+							static_cast<WayPointComponent*>(m_game_object_manager->GetGameObject("TestTott")->GetComponent(COMPONENT_AI))->AddWayPoint(Ogre::Vector3(x+2,y,z+10));
+							static_cast<WayPointComponent*>(m_game_object_manager->GetGameObject("TestTott")->GetComponent(COMPONENT_AI))->AddWayPoint(Ogre::Vector3(x+3,y,z+1));
+							static_cast<WayPointComponent*>(m_game_object_manager->GetGameObject("TestTott")->GetComponent(COMPONENT_AI))->AddWayPoint(Ogre::Vector3(x+1,y,z+4));
 							m_game_object_manager->CreateGameObject(GAME_OBJECT_QUEST_ITEM, Ogre::Vector3(x+4,y,z), &tott);
-							m_game_object_manager->CreateGameObject(GAME_OBJECT_SPEECH_BUBBLE, Ogre::Vector3(x,y+2,z), &tott);						}
+							m_game_object_manager->CreateGameObject(GAME_OBJECT_SPEECH_BUBBLE, Ogre::Vector3(x,y+2,z), &tott);
+						}
 						else if (i->second == "leaf") {
 							ParticleDef particleDef;
 							particleDef.particle_name = "Particle/Smoke";
@@ -239,7 +245,11 @@ int DBManager::Load() {
 							particleDef.particle_name = "Particle/Smoke";
 							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_PARTICLE, Ogre::Vector3(x,y,z), &particleDef);
 						}
-						
+						else if (i->second == "rock_slide"){
+							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_GATE, Ogre::Vector3(x,y,z), NULL);
+							Ogre::Quaternion quat = Ogre::Quaternion ((Degree(spawn.rx)), Vector3::UNIT_X)*Quaternion ((Degree(spawn.ry)), Vector3::UNIT_Y)*Quaternion ((Degree(spawn.rz)), Vector3::UNIT_Z);
+							temp->GetComponentMessenger()->Notify(MSG_SET_OBJECT_ORIENTATION, &quat);
+						}
 						interactive = true;
 					}
 				}
@@ -291,6 +301,10 @@ int DBManager::Load() {
 				try {
 					if (collision){
 						newModel = mArtifexLoader->mSceneMgr->createEntity((string) entName, (string) meshFile);
+						std::vector<Ogre::String>::iterator it = std::find(shadow_map.begin(), shadow_map.end(), meshFile);
+						if (it != shadow_map.end()){
+							newModel->setCastShadows(false);
+						}
 					}
 					else {
 						MeshList::iterator it = m_vegetation.find(meshFile);
@@ -301,10 +315,6 @@ int DBManager::Load() {
 							m_vegetation[meshFile] = newModel;
 							m_paged_geometry->setCustomParam(newModel->getName(), "windFactorX", 0.4f);
 							m_paged_geometry->setCustomParam(newModel->getName(), "windFactorY", 0.01f);
-							Ogre::MeshPtr mesh = newModel->getMesh();
-							if (mesh->sharedVertexData != NULL){
-								int p = 0;
-							}
 						}
 						else {
 							newModel = it->second;
@@ -615,4 +625,16 @@ void DBManager::Shut(){
 
 void DBManager::Update(){
 	m_paged_geometry->update();	// Update LOD from camera position each frame
+}
+
+void DBManager::InitShadowList(std::vector<Ogre::String>& shadow_map){
+	shadow_map.push_back("RockPAth.mesh");
+	shadow_map.push_back("Rock_asset1.mesh");
+	shadow_map.push_back("RockPlatform_2.mesh");
+	shadow_map.push_back("RockPlatform_Low.mesh");
+	shadow_map.push_back("RockPlatform_Low.mesh");
+	shadow_map.push_back("Puzzle1.mesh");
+	shadow_map.push_back("Puzzle2.mesh");
+	shadow_map.push_back("Puzzle3.mesh");
+	shadow_map.push_back("RockSlide.mesh");
 }

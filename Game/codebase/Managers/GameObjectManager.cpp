@@ -48,6 +48,7 @@ void GameObjectManager::Init(PhysicsEngine* physics_engine, Ogre::SceneManager* 
 	m_create_fptr[GAME_OBJECT_PARTICLE]	   =    &GameObjectManager::CreateParticleEffect;
 	m_create_fptr[GAME_OBJECT_QUEST_ITEM]  =    &GameObjectManager::CreateQuestItem;
 	m_create_fptr[GAME_OBJECT_SPEECH_BUBBLE] =  &GameObjectManager::CreateSpeechBubble;
+	m_create_fptr[GAME_OBJECT_ROCK_SLIDE] =		&GameObjectManager::CreateRockSlide;
 
 	m_leaf_iterations = 0;
 	m_particle_iterations = 0;
@@ -409,12 +410,7 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 	acomp->AddAnimationState("Idle");
 	//child_node->Init(position, "TottNode", node_comp->GetSceneNode());
 
-	node_comp->Init(position, m_scene_manager);
-
-	if(def.mesh == "" || def.mesh == "Yomi_2Yomi.mesh") def.mesh = "Yomi.mesh";
-	acomp->Init(def.mesh, m_scene_manager/*, node_comp->GetId()*/);
-	acomp->GetEntity()->setMaterialName("_YomiFBXASC039sFBXASC032staffMaterial__191");
-
+	//acomp->GetEntity()->setMaterialName("SolidColor/Green");
 	m_sound_manager->GetTottNode(node_comp->GetSceneNode()->getName());
 	way_point->Init(node_comp->GetSceneNode(), 2.140005f);
 	//way_point->AddWayPoint(Ogre::Vector3(161, 72, 252));
@@ -478,7 +474,7 @@ GameObject* GameObjectManager::CreateSpeechBubble(const Ogre::Vector3& position,
 	
 	node_comp->Init(node, m_scene_manager);
 	node_comp->SetId("node_main");
-	mrc->Init("PratBubbla.mesh", m_scene_manager, "node_main");//, node->getName());
+	mrc->Init("PratBubblaCherry.mesh", m_scene_manager, "node_main");//, node->getName());
 	sbcomp->Init(node, m_scene_manager, tott);
 	
 	/*
@@ -491,7 +487,7 @@ GameObject* GameObjectManager::CreateSpeechBubble(const Ogre::Vector3& position,
 	trdef.body_type = DYNAMIC_BODY;
 	trdef.collider_type = COLLIDER_SPHERE;
 	trdef.mass = 0.0f;
-	trdef.radius = 20.5f;
+	trdef.radius = 2.5f;
 	trdef.collision_filter.filter = COL_WORLD_TRIGGER;
 	trdef.collision_filter.mask = COL_PLAYER;
 	trc->Init(position, m_physics_engine, &trdef);
@@ -760,3 +756,21 @@ GameObject* GameObjectManager::CreateParticleEffect(const Ogre::Vector3& positio
 	return go;
 };
 
+GameObject* GameObjectManager::CreateRockSlide(const Ogre::Vector3& position, void* data, const Ogre::String& id){
+	GameObject* go = new GameObject(GAME_OBJECT_ROCK_SLIDE, id);
+	NodeComponent* node_component = new NodeComponent;
+	go->AddComponent(node_component);
+	MeshRenderComponent* mesh = new MeshRenderComponent;
+	go->AddComponent(mesh);
+	RigidbodyComponent* body = new RigidbodyComponent;
+	go->AddComponent(body);
+	TriggerComponent* trigger = new TriggerComponent;
+	go->AddComponent(trigger);
+
+	RigidBodyDef body_def;
+	body_def.body_type = COLLIDER_TRIANGLE_MESH_SHAPE;
+	body_def.collision_filter.filter = COL_WORLD_STATIC;
+	body_def.collision_filter.mask = COL_BUBBLE | COL_PLAYER | COL_QUESTITEM | COL_TOTT;
+	
+	return go;
+}

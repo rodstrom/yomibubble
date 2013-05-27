@@ -236,7 +236,7 @@ void BubbleController::Notify(int type, void* msg){
 }
 
 void BubbleController::Shut(){
-	SoundData2D pop_sound = m_owner->GetGameObjectManager()->GetSoundManager()->Create2DData("Bubble_Burst", false, false, false, false, 1.0, 1.0);
+	//SoundData2D pop_sound = m_owner->GetGameObjectManager()->GetSoundManager()->Create2DData("Bubble_Burst", false, false, false, false, 1.0, 1.0);
 	//m_owner->GetGameObjectManager()->GetGameObject("Player")->GetComponentMessenger()->Notify(MSG_SFX2D_PLAY, &pop_sound);
 
 	BubbleEvent evt;
@@ -276,6 +276,8 @@ void BubbleController::Update(float dt){
 	if (m_run_timer){
 		m_life_timer = std::min(m_life_timer + dt, m_max_life_time);
 		if (m_life_timer >= m_max_life_time){
+			SoundData2D pop_sound = m_owner->GetGameObjectManager()->GetSoundManager()->Create2DData("Bubble_Burst", false, false, false, false, 1.0, 1.0);
+			m_owner->GetGameObjectManager()->GetGameObject("Player")->GetComponentMessenger()->Notify(MSG_SFX2D_PLAY, &pop_sound);
 			m_owner->RemoveGameObject(m_owner);
 		}
 	}
