@@ -30,6 +30,11 @@ private:
 	int							m_current_selected_button;
 	GameObject*					m_buttons[4];
 	OverlayDef					m_overlayDef;
+	Ogre::SceneNode*			m_house_node;
+	Ogre::SceneNode*			m_yomi_node;
+	Ogre::SceneNode*			m_mushroom_node;
+	Ogre::SceneNode*			m_tree_node;
+	Ogre::AnimationState*		m_animation_state;
 };
 
 
