@@ -753,11 +753,11 @@ void PlayerHoldObject::Exit(){
 	s_input_component->GetOwner()->RemoveComponent(COMPONENT_GENERIC_6DOF_COMPONENT);
 	if (m_object){
 		if (m_object->GetType() == GAME_OBJECT_BLUE_BUBBLE){
-			Ogre::Vector3 gravity(0,-m_bubble_gravity,0);
+			Ogre::Vector3 gravity(Ogre::Real(0),-m_bubble_gravity,Ogre::Real(0));
 			m_object->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GRAVITY_SET, &gravity);
 		}
 		else {
-			Ogre::Vector3 gravity(0,-9.8,0);
+			Ogre::Vector3 gravity(Ogre::Real(0),Ogre::Real(-9.8),Ogre::Real(0));
 			m_object->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GRAVITY_SET, &gravity);
 		}
 	}

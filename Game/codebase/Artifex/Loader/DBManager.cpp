@@ -176,13 +176,13 @@ int DBManager::Load() {
 							tott_def.sfx_happy = "";
 							tott_def.theme_music = "";
 							tott_def.type_name = "Hidehog";
-							tott_def.walk_animation = "walk";/*
+							tott_def.walk_animation = "walk";
 							GameObject* tott = m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y,z), &tott_def);
 							static_cast<WayPointComponent*>(m_game_object_manager->GetGameObject("TestTott")->GetComponent(COMPONENT_AI))->AddWayPoint(Ogre::Vector3(x+4,y,z));
 							static_cast<WayPointComponent*>(m_game_object_manager->GetGameObject("TestTott")->GetComponent(COMPONENT_AI))->AddWayPoint(Ogre::Vector3(x+2,y,z+2));
 							static_cast<WayPointComponent*>(m_game_object_manager->GetGameObject("TestTott")->GetComponent(COMPONENT_AI))->AddWayPoint(Ogre::Vector3(x,y,z+4));
 							m_game_object_manager->CreateGameObject(GAME_OBJECT_QUEST_ITEM, Ogre::Vector3(x+4,y,z), &tott);
-							m_game_object_manager->CreateGameObject(GAME_OBJECT_SPEECH_BUBBLE, Ogre::Vector3(x,y+2,z), &tott);*/
+							m_game_object_manager->CreateGameObject(GAME_OBJECT_SPEECH_BUBBLE, Ogre::Vector3(x,y+2,z), &tott);
 						}
 						else if (i->second == "tott") {
 							TottDef tott_def;
@@ -259,7 +259,7 @@ int DBManager::Load() {
 					if (i->first == "sound") {
 						SoundData3D m_3D_music_data;
 						m_3D_music_data = m_sound_manager->Create3DData(i->second, 
-							static_cast<NodeComponent*>(temp->GetComponent(EComponentType::COMPONENT_NODE))->GetSceneNode()->getName(), 
+							static_cast<NodeComponent*>(temp->GetComponent(COMPONENT_NODE))->GetSceneNode()->getName(), 
 							false, false, false, 1.0f, 1.0f);
 					} 
 					else if (i->first == "waypoints") {
@@ -390,7 +390,7 @@ int DBManager::Load() {
 
 	std::map<GameObject*, std::string>::iterator goIter;
 	for (goIter = followers.begin(); goIter != followers.end(); goIter++) {
-		static_cast<WayPointComponent*>(goIter->first->GetComponent(EComponentType::COMPONENT_AI))->AddWayPoint(followables[goIter->second]);
+		static_cast<WayPointComponent*>(goIter->first->GetComponent(COMPONENT_AI))->AddWayPoint(followables[goIter->second]);
 	}
 	followers.clear();
 	m_paged_geometry->preloadGeometry(Forests::TBounds(0,0,500,500));

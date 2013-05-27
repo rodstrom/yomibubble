@@ -67,6 +67,7 @@ void PlayState::SecondLoading(){
 
 	ParticleDef particle_def;
 	particle_def.particle_name = "Particle/Smoke";
+	//m_game_object_manager->CreateGameObject(GAME_OBJECT_PARTICLE, Ogre::Vector3(158.0f, 72.0f, 253.0f), &particle_def);
 
 }
 

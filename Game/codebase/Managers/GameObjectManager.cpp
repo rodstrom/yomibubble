@@ -44,7 +44,7 @@ void GameObjectManager::Init(PhysicsEngine* physics_engine, Ogre::SceneManager* 
 	m_create_fptr[GAME_OBJECT_COMPANION]   =	&GameObjectManager::CreateCompanion;
 	m_create_fptr[GAME_OBJECT_TERRAIN]	   =	&GameObjectManager::CreateTerrain;
 	m_create_fptr[GAME_OBJECT_GATE]		   =	&GameObjectManager::CreateGate;
-	m_create_fptr[GAME_OBJECT_CAMERA]	   =	&GameObjectManager::CreatePlayerCamera;
+	//m_create_fptr[GAME_OBJECT_CAMERA]	   =	&GameObjectManager::CreatePlayerCamera;
 	m_create_fptr[GAME_OBJECT_PARTICLE]	   =    &GameObjectManager::CreateParticleEffect;
 	m_create_fptr[GAME_OBJECT_QUEST_ITEM]  =    &GameObjectManager::CreateQuestItem;
 	m_create_fptr[GAME_OBJECT_SPEECH_BUBBLE] =  &GameObjectManager::CreateSpeechBubble;
@@ -292,16 +292,16 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	return go;
 }
 
-GameObject* GameObjectManager::CreatePlayerCamera(const Ogre::Vector3& position, void* data, const Ogre::String& id){
-	GameObject* go = new GameObject(GAME_OBJECT_CAMERA, "CameraTrig");
-
-	CameraCollisionComponent* ccc = new CameraCollisionComponent;
-	go->AddComponent(ccc);
-	go->AddUpdateable(ccc);
-	ccc->Init(static_cast<GameObject*>(data));
-
-	return go;
-};
+//GameObject* GameObjectManager::CreatePlayerCamera(const Ogre::Vector3& position, void* data, const Ogre::String& id){
+//	GameObject* go = new GameObject(GAME_OBJECT_CAMERA, "CameraTrig");
+//
+//	CameraCollisionComponent* ccc = new CameraCollisionComponent;
+//	go->AddComponent(ccc);
+//	go->AddUpdateable(ccc);
+//	ccc->Init(static_cast<GameObject*>(data));
+//
+//	return go;
+//};
 
 GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, void* data, const Ogre::String& id){
 	BubbleDef& def = *static_cast<BubbleDef*>(data);

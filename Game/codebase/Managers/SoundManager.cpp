@@ -196,7 +196,7 @@ SoundData2D SoundManager::Create2DData(Ogre::String name, bool fade_in, bool fad
 	data.m_volume = volume;
 
 	data.m_fade_time = 0.5f;
-	data.m_fade_amount = 0.01;
+	data.m_fade_amount = 0.01f;
 
 	return data;
 };
