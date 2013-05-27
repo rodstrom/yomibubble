@@ -765,6 +765,7 @@ void TerrainComponent::Init(Ogre::SceneManager* scene_manager, PhysicsEngine* ph
 	m_collision_def.flag = COLLISION_FLAG_STATIC;
 	m_collision_def.data = m_owner;
 	m_terrain_body->setUserPointer(&m_collision_def);
+	//m_artifex_loader->mTerrain->setPosition(Ogre::Vector3(20000, 0, 20000));
 }
 
 void TerrainComponent::Update(float dt){

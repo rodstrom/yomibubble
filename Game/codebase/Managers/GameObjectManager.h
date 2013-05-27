@@ -54,6 +54,7 @@ private:
 	GameObject* CreateParticleEffect(const Ogre::Vector3& position, void* data, const Ogre::String& id = Ogre::StringUtil::BLANK);
 	GameObject* CreateQuestItem(const Ogre::Vector3& position, void* data, const Ogre::String& id = Ogre::StringUtil::BLANK);
 	GameObject* CreateSpeechBubble(const Ogre::Vector3& position, void* data, const Ogre::String& id = Ogre::StringUtil::BLANK);
+	GameObject* CreateRockSlide(const Ogre::Vector3& position, void* data, const Ogre::String& id = Ogre::StringUtil::BLANK);
 
 	typedef GameObject* (GameObjectManager::*CreateObjectFptr)(const Ogre::Vector3&, void* data, const Ogre::String& id);
 	

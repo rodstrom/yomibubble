@@ -73,7 +73,7 @@ class CharacterController : public RigidbodyComponent, public IComponentUpdateab
 public:
 	CharacterController(void) : m_velocity(0.0), m_turn_speed(0.0f), 
 		m_has_follow_cam(false), m_is_jumping(false), m_on_ground(true), m_jump_timer(0.0f), m_y_bottom_offset(0.0f),
-		m_max_jump_height(0.0f), m_direction(btVector3(0,0,0)), m_deceleration(0.0f), m_max_speed(0.0f), m_step_height(0.0f),
+		m_max_jump_height(0.0f), m_direction(btVector3(0,0,0)), m_deceleration(0.0f), m_max_speed(0.0f), m_step_height(0.0f), m_current_friction(0.0f),
 		m_actual_direction(Ogre::Vector3::ZERO), m_fall_acceleration(0.0f), m_max_fall_speed(0.0f), m_limit_max_speed(true), m_can_move(true)
 	{ m_type = COMPONENT_CHARACTER_CONTROLLER; m_update = true; }
 	virtual ~CharacterController(void){}
@@ -105,6 +105,8 @@ protected:
 	float		m_max_fall_speed;
 	float		m_velocity;
 	float		m_deceleration;
+	float		m_friction;
+	float		m_current_friction;
 	float		m_air_deceleration;
 	float		m_turn_speed;
 	float		m_max_jump_height;

@@ -175,11 +175,11 @@ void PlayerBlowBubble::Enter(){
 	}
 	s_messenger->Notify(MSG_RIGIDBODY_POSITION_SET, &pos, "btrig");
 	s_messenger->Notify(MSG_SFX2D_PLAY, &m_bubble_blow_sound);
-	s_animation->PlayAnimation("Top_Blow_Start", false);
+	//s_animation->PlayAnimation("Top_Blow_Start");
 }
 
 void PlayerBlowBubble::Exit(){
-	s_animation->PlayAnimation("Top_Blow_End", false);
+	//s_animation->PlayAnimation("Top_Blow_End");
 	//int index = 1;
 	//s_messenger->Notify(MSG_ANIMATION_SET_WAIT, &index);
 	s_messenger->Notify(MSG_SFX2D_STOP, &m_bubble_blow_sound);
@@ -257,9 +257,6 @@ void PlayerBlowBubble::Update(float dt){
 			m_bubble->GetComponentMessenger()->Notify(MSG_NODE_GET_NODE, &bubble_node);
 			if (m_bubble != NULL) {
 				if (child_node && bubble_node && player_node){
-					//Ogre::Vector2 child_pos(child_node->_getDerivedPosition().x, child_node->_getDerivedPosition().z);
-					//Ogre::Vector2 player_pos(player_node->_getDerivedPosition().x, player_node->_getDerivedPosition().z);
-					//Ogre::Vector2 dir = child_pos - player_pos;
 					Ogre::Vector3 child_pos(child_node->_getDerivedPosition());
 					Ogre::Vector3 player_pos(player_node->_getDerivedPosition());
 					Ogre::Vector3 dir = child_pos - player_pos;
@@ -267,7 +264,6 @@ void PlayerBlowBubble::Update(float dt){
 					float scale_size = (bubble_node->getScale().length() * 0.3f);
 					child_pos += (dir*scale_size);
 					float y_pos = child_node->_getDerivedPosition().y;
-					//Ogre::Vector3 new_dir(child_pos.x, y_pos, child_pos.y);
 					Ogre::Vector3 new_dir(child_pos);
 					s_messenger->Notify(MSG_RIGIDBODY_POSITION_SET, &new_dir, "btrig");		// btrig is the ID for the TriggerCompoent
 					m_bubble->GetComponentMessenger()->Notify(MSG_INCREASE_SCALE_BY_VALUE, &scale_inc);
@@ -309,8 +305,8 @@ void PlayerJump::Enter(){
 	s_messenger->Notify(MSG_TGRAPH_STOP, &Ogre::String("Jump"));
 	int p = 1;
 	s_messenger->Notify(MSG_ANIMATION_PAUSE, &p);
-	s_animation->PlayAnimation("Base_Jump_Start", false);
-	s_animation->PlayAnimation("Base_Jump_Loop", true);
+	//s_animation->PlayAnimation("Base_Jump_Start");
+	s_animation->PlayAnimation("Base_Jump_Loop", true, AnimationBlender::BlendSwitch);
 	bool jump = true;
 	s_messenger->Notify(MSG_CHARACTER_CONTROLLER_JUMP, &jump);
 }
@@ -342,7 +338,7 @@ void PlayerJump::Update(float dt){
 }
 
 void PlayerFalling::Enter(){
-	s_animation->PlayAnimation("Base_Jump_Loop");
+	s_animation->PlayAnimation("Base_Jump_Loop", true, AnimationBlender::BlendSwitch);
 }
 
 void PlayerFalling::Exit(){
@@ -360,7 +356,7 @@ void PlayerFalling::Update(float dt){
 
 void PlayerLand::Enter(){
 	//s_messenger->Notify(MSG_ANIMATION_CLEAR_QUEUE, NULL);
-	s_animation->PlayAnimation("Base_Jump_End", false);
+	//s_animation->PlayAnimation("Base_Jump_End");
 	//std::function<void()> func = [this] { Proceed(); };
 	//s_messenger->Notify(MSG_ANIMATION_CALLBACK, &func);
 }
@@ -674,8 +670,8 @@ void PlayerInsideBubble::BubbleRemoved(IEvent* evt){
 }
 
 void PlayerBounce::Enter(){
-	s_animation->PlayAnimation("Base_Jump_Start", false);
-	s_animation->PlayAnimation("Base_Jump_Loop");
+	//s_animation->PlayAnimation("Base_Jump_Start");
+	s_animation->PlayAnimation("Base_Jump_Loop", true, AnimationBlender::BlendSwitch);
 }
 
 void PlayerBounce::Exit(){

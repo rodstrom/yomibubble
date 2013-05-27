@@ -217,7 +217,19 @@ void CharacterController::QueryRaycast(){
 			m_messenger->Notify(MSG_RAYCAST_COLLISION_GAME_OBJECT, &go);
 		}
 		m_on_ground = true;
-		m_rigidbody->setFriction(1.0f);
+		if (m_actual_direction == Ogre::Vector3::ZERO){
+			if (m_current_friction != m_deceleration){
+				m_current_friction = m_deceleration;
+				m_rigidbody->setFriction(m_current_friction);
+			}
+		}
+		else {
+			if (m_current_friction != m_friction){
+				m_current_friction = m_friction;
+				m_rigidbody->setFriction(m_current_friction);
+			}
+		}
+		
 	}
 }
 
@@ -297,12 +309,7 @@ void CharacterController::Notify(int type, void* msg){
 void CharacterController::Update(float dt){
 	btVector3 vel = m_rigidbody->getLinearVelocity();
 	btVector3 pos = m_rigidbody->getWorldTransform().getOrigin();
-	m_on_ground = false;
-	m_rigidbody->setFriction(0.0f);
-	if (!m_is_jumping){
-		QueryRaycast();
-	}
-	m_messenger->Notify(MSG_ON_GROUND, &m_on_ground);
+
 	float speed = m_velocity * dt;
 	float jump_strength = 0.0f;
 	m_is_moving = false;
@@ -422,6 +429,7 @@ void CharacterController::Init(const Ogre::Vector3& position, PhysicsEngine* phy
 	m_offset = BtOgre::Convert::toBullet(def.offset);
 	m_max_fall_speed = def.max_fall_speed;
 	m_fall_acceleration = def.fall_acceleration;
+	m_friction = def.friction;
 	m_compound_shape = new btCompoundShape;
 	btTransform offset;
 	offset.setIdentity();
@@ -451,15 +459,28 @@ void CharacterController::Init(const Ogre::Vector3& position, PhysicsEngine* phy
 }
 
 void CharacterController::SimulationStep(btScalar time_step){
+	m_on_ground = false;
+	if (!m_is_jumping){
+		QueryRaycast();
+	}
+	if (!m_on_ground){
+		if (m_current_friction != 0.0f){
+			m_current_friction = 0.0f;
+			m_rigidbody->setFriction(m_current_friction);
+		}
+	}
+	m_messenger->Notify(MSG_ON_GROUND, &m_on_ground);
 	Ogre::Vector2 velXZ(m_rigidbody->getLinearVelocity().x(), m_rigidbody->getLinearVelocity().z());
 	btScalar speedXZ = velXZ.length();
 	if (speedXZ > 0.0f){
-		btScalar dir_speed = m_actual_direction.length();
-		btScalar relative_max_speed = (m_max_speed * dir_speed);
-		if (m_limit_max_speed){
-			if (speedXZ > relative_max_speed){
-				velXZ = velXZ / speedXZ * relative_max_speed;
-				m_rigidbody->setLinearVelocity(btVector3(velXZ.x, m_rigidbody->getLinearVelocity().y(), velXZ.y));
+		if (m_actual_direction != Ogre::Vector3::ZERO){
+			btScalar dir_speed = m_actual_direction.length();
+			btScalar relative_max_speed = (m_max_speed * dir_speed);
+			if (m_limit_max_speed){
+				if (speedXZ > relative_max_speed){
+					velXZ = velXZ / speedXZ * relative_max_speed;
+					m_rigidbody->setLinearVelocity(btVector3(velXZ.x, m_rigidbody->getLinearVelocity().y(), velXZ.y));
+				}
 			}
 		}
 	}
@@ -472,7 +493,7 @@ void CharacterController::SimulationStep(btScalar time_step){
 		btVector3 vel = m_rigidbody->getLinearVelocity();
 		m_rigidbody->setLinearVelocity(btVector3(vel.x(), jump_strength, vel.z()));
 	}
-	if (!m_on_ground){
+	if (!m_on_ground && !m_is_jumping){
 		btScalar fall_speed = m_fall_acceleration * time_step;
 		m_rigidbody->applyCentralImpulse(btVector3(0.0f, -fall_speed, 0.0f));
 		btVector3 vel = m_rigidbody->getLinearVelocity();
