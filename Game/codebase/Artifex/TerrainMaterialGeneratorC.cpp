@@ -1202,7 +1202,8 @@ namespace Ogre
 			else
 			{
 				// Apply specular
-				outStream << "	outputCol.rgb += litRes.z * lightSpecularColour * specular * shadow;\n";
+				//outStream << "	outputCol.rgb += litRes.z * lightSpecularColour * specular * shadow;\n";
+				outStream << "	outputCol.rgb += (litRes.z * 0.3) * lightSpecularColour * specular * shadow;\n";
 
 			}
 		}

@@ -11,7 +11,7 @@ public:
 
 	void RegisterCallback(Functor<AnimationManager>* callback);
 	void AddAnimation(const AnimationDef& anim_def);
-	void PlayAnimation(const Ogre::String& anim_id, bool loop = true, int blending_transition = 1);
+	void PlayAnimation(const Ogre::String& anim_id, bool loop = true, int blending_transition = 2);
 
 private:
 	std::vector<AnimationDef> m_animations;

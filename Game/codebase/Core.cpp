@@ -50,7 +50,7 @@ bool Core::Init(){
 
 	rs->setConfigOption("Full Screen", fullscreen);
 	rs->setConfigOption("Video Mode", videoMode);
-	rs->setConfigOption("VSync", "No");
+	rs->setConfigOption("VSync", "Yes");
 	
 	m_render_window = m_root->initialise(true, "Yomi's Bubble Adventure");
 	Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
@@ -95,7 +95,6 @@ void Core::Run(){
 		else {
 			if (dt > 1.0){
 				dt = 0.0;
-				std::cout << "DT IS ZERO!!\n";
 			}
 			last_time = curr_sec;
 		}

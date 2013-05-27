@@ -40,7 +40,7 @@ int DBManager::Load() {
 	mArtifexLoader->mObjectFile.clear();
 	m_paged_geometry = new Forests::PagedGeometry;
 	m_paged_geometry->setCamera(mArtifexLoader->mCamera);
-	m_paged_geometry->setPageSize(20);
+	m_paged_geometry->setPageSize(40);
 	m_paged_geometry->setInfinite();
 	m_paged_geometry->addDetailLevel<Forests::WindBatchPage>(40,10);
 	m_paged_geometry->addDetailLevel<Forests::ImpostorPage>(100, 10);
@@ -52,6 +52,9 @@ int DBManager::Load() {
 	
 	CppSQLite3Table t;
 	
+	std::vector<Ogre::String> shadow_map;
+	this->InitShadowList(shadow_map);
+
 	try {
 		t = mDB->getTable(query.c_str());	
 	} catch (CppSQLite3Exception& e) {
@@ -117,7 +120,7 @@ int DBManager::Load() {
 						if (i->second == "player") {
 							PlayerDef player_def;
 							CharacterControllerDef char_def;
-							char_def.friction = 1.0f;
+							char_def.friction = 0.5f;
 							char_def.velocity = VariableManager::GetSingletonPtr()->GetAsFloat("Player_Speed");
 							char_def.max_speed = VariableManager::GetSingletonPtr()->GetAsFloat("Player_Max_Speed");
 							char_def.deceleration = VariableManager::GetSingletonPtr()->GetAsFloat("Player_Deceleration");
@@ -239,7 +242,11 @@ int DBManager::Load() {
 							particleDef.particle_name = "Particle/Smoke";
 							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_PARTICLE, Ogre::Vector3(x,y,z), &particleDef);
 						}
-						
+						else if (i->second == "rock_slide"){
+							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_GATE, Ogre::Vector3(x,y,z), NULL);
+							Ogre::Quaternion quat = Ogre::Quaternion ((Degree(spawn.rx)), Vector3::UNIT_X)*Quaternion ((Degree(spawn.ry)), Vector3::UNIT_Y)*Quaternion ((Degree(spawn.rz)), Vector3::UNIT_Z);
+							temp->GetComponentMessenger()->Notify(MSG_SET_OBJECT_ORIENTATION, &quat);
+						}
 						interactive = true;
 					}
 				}
@@ -291,6 +298,10 @@ int DBManager::Load() {
 				try {
 					if (collision){
 						newModel = mArtifexLoader->mSceneMgr->createEntity((string) entName, (string) meshFile);
+						std::vector<Ogre::String>::iterator it = std::find(shadow_map.begin(), shadow_map.end(), meshFile);
+						if (it != shadow_map.end()){
+							newModel->setCastShadows(false);
+						}
 					}
 					else {
 						MeshList::iterator it = m_vegetation.find(meshFile);
@@ -301,10 +312,6 @@ int DBManager::Load() {
 							m_vegetation[meshFile] = newModel;
 							m_paged_geometry->setCustomParam(newModel->getName(), "windFactorX", 0.4f);
 							m_paged_geometry->setCustomParam(newModel->getName(), "windFactorY", 0.01f);
-							Ogre::MeshPtr mesh = newModel->getMesh();
-							if (mesh->sharedVertexData != NULL){
-								int p = 0;
-							}
 						}
 						else {
 							newModel = it->second;
@@ -615,4 +622,16 @@ void DBManager::Shut(){
 
 void DBManager::Update(){
 	m_paged_geometry->update();	// Update LOD from camera position each frame
+}
+
+void DBManager::InitShadowList(std::vector<Ogre::String>& shadow_map){
+	shadow_map.push_back("RockPAth.mesh");
+	shadow_map.push_back("Rock_asset1.mesh");
+	shadow_map.push_back("RockPlatform_2.mesh");
+	shadow_map.push_back("RockPlatform_Low.mesh");
+	shadow_map.push_back("RockPlatform_Low.mesh");
+	shadow_map.push_back("Puzzle1.mesh");
+	shadow_map.push_back("Puzzle2.mesh");
+	shadow_map.push_back("Puzzle3.mesh");
+	shadow_map.push_back("RockSlide.mesh");
 }

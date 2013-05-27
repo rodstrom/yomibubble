@@ -75,5 +75,9 @@ public:
 	std::vector<struct CollisionDef*> m_collision_defs;
 	typedef std::map<std::string, Ogre::Entity*> MeshList;
 	MeshList m_vegetation;		// we will page vegetation like grass, bushes and shrooms.
+
+protected:
+	void InitShadowList(std::vector<Ogre::String>& shadow_map);
+
 };
 #endif

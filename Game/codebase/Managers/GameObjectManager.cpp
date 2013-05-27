@@ -48,6 +48,7 @@ void GameObjectManager::Init(PhysicsEngine* physics_engine, Ogre::SceneManager* 
 	m_create_fptr[GAME_OBJECT_PARTICLE]	   =    &GameObjectManager::CreateParticleEffect;
 	m_create_fptr[GAME_OBJECT_QUEST_ITEM]  =    &GameObjectManager::CreateQuestItem;
 	m_create_fptr[GAME_OBJECT_SPEECH_BUBBLE] =  &GameObjectManager::CreateSpeechBubble;
+	m_create_fptr[GAME_OBJECT_ROCK_SLIDE] =		&GameObjectManager::CreateRockSlide;
 
 	m_leaf_iterations = 0;
 	m_particle_iterations = 0;
@@ -760,3 +761,21 @@ GameObject* GameObjectManager::CreateParticleEffect(const Ogre::Vector3& positio
 	return go;
 };
 
+GameObject* GameObjectManager::CreateRockSlide(const Ogre::Vector3& position, void* data, const Ogre::String& id){
+	GameObject* go = new GameObject(GAME_OBJECT_ROCK_SLIDE, id);
+	NodeComponent* node_component = new NodeComponent;
+	go->AddComponent(node_component);
+	MeshRenderComponent* mesh = new MeshRenderComponent;
+	go->AddComponent(mesh);
+	RigidbodyComponent* body = new RigidbodyComponent;
+	go->AddComponent(body);
+	TriggerComponent* trigger = new TriggerComponent;
+	go->AddComponent(trigger);
+
+	RigidBodyDef body_def;
+	body_def.body_type = COLLIDER_TRIANGLE_MESH_SHAPE;
+	body_def.collision_filter.filter = COL_WORLD_STATIC;
+	body_def.collision_filter.mask = COL_BUBBLE | COL_PLAYER | COL_QUESTITEM | COL_TOTT;
+	
+	return go;
+}
