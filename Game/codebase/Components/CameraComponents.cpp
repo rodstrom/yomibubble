@@ -147,8 +147,8 @@ void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewpo
 	//m_env_coll_Zp = false;
 	//m_env_coll_Zn = false;
 
-	m_min_pitch_angle = 140;
-	m_max_pitch_angle = 160;
+	//m_min_pitch_angle = 140;
+	//m_max_pitch_angle = 160;
 
 	m_terrain_group = NULL;
 	//GameObject* terrain = static_cast<GameObject*>(m_owner->GetGameObject("Terrain"));
@@ -217,21 +217,20 @@ void FollowCameraComponent::Update(float dt){
 	Ogre::Vector3 goal_pos = m_camera_goal->getPosition();
 	if(goal_pos.z < 2) m_camera_goal->setPosition(goal_pos.x, goal_pos.y, 2);
 	goal_pos = m_camera_goal->_getDerivedPosition();
-	if(m_camera_pivot->getPosition().y - goal_pos.y < 0) {
+	if(goal_pos.y - m_camera_pivot->getPosition().y < 0) {
 		//m_camera_pivot->pitch(Ogre::Radian(-m_camera_pivot->getOrientation().getPitch()));
 		m_camera_goal->_setDerivedPosition(Ogre::Vector3(goal_pos.x, m_camera_pivot->getPosition().y, goal_pos.z));
-		m_default_pitch = 0;
 	}
-	goal_pos = m_camera_goal->getPosition();
-	if(goal_pos.y / goal_pos.z > Ogre::Math::Tan((Ogre::Radian(-0.5f)))) {
-		//m_camera_pivot->pitch(Ogre::Radian(0.5f) - m_camera_pivot->getOrientation().getPitch());
-		Ogre::Real new_y = (Ogre::Math::Tan(Ogre::Radian(-0.5f)) * goal_pos.z) + m_camera_pivot->getPosition().y;
-		goal_pos = m_camera_goal->_getDerivedPosition();
-		m_camera_goal->_setDerivedPosition(Ogre::Vector3(goal_pos.x, new_y, goal_pos.z));
-	}
-	
-	std::cout << "Pitch: " << m_camera_pivot->getOrientation().getPitch() << "\n";
-	std::cout << "  Yaw: " << m_camera_pivot->getOrientation().getYaw() << "\n";
+	//goal_pos = m_camera_goal->getPosition();
+	//if(m_camera_goal->_getDerivedPosition().y - m_camera_pivot->getPosition().y > Ogre::Math::Tan((Ogre::Radian(0.5f))) * goal_pos.z ) {
+	//	//std::cout << "tan(0.5r) * cam.z: " << Ogre::Math::Tan((Ogre::Radian(0.5f))) * goal_pos.z << "\n";
+	//	Ogre::Real new_y = (Ogre::Math::Tan(Ogre::Radian(0.5f)) * goal_pos.z) + m_camera_pivot->getPosition().y;
+	//	goal_pos = m_camera_goal->_getDerivedPosition();
+	//	m_camera_goal->_setDerivedPosition(Ogre::Vector3(goal_pos.x, new_y, goal_pos.z));
+	//}
+	//
+	//std::cout << "Pitch: " << m_camera_pivot->getOrientation().g	etPitch() << "\n";
+	//std::cout << "  Yaw: " << m_camera_pivot->getOrientation().getYaw() << "\n";
 
 }
 
