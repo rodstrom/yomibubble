@@ -258,7 +258,9 @@ struct GuiDef{
 };
 
 struct ParticleDef{
+	ParticleDef(void) : particle_name(Ogre::StringUtil::BLANK), offset(Ogre::Vector3::ZERO){}
 	Ogre::String particle_name;
+	Ogre::Vector3 offset;
 	Ogre::String test;
 };
 

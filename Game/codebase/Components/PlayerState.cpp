@@ -116,7 +116,7 @@ void PlayerStateMove::Update(float dt){
 	}
 
 	s_animation->PlayAnimation(move_bot);
-	if (!s_manager->IsBlowingBubbles()){
+	if (!s_manager->IsBlowingBubbles() && !s_manager->IsHoldingObject()){
 		s_animation->PlayAnimation(move_top);
 	}
 
@@ -691,9 +691,14 @@ void PlayerBounce::Update(float dt){
 	}
 }
 
-PlayerHoldObject::PlayerHoldObject(PhysicsEngine* physics_engine) : m_object(NULL), m_physics_engine(physics_engine) { 
+PlayerHoldObject::PlayerHoldObject(PhysicsEngine* physics_engine, MessageSystem* message_system) : m_object(NULL), m_physics_engine(physics_engine), m_message_system(message_system) { 
 	m_type = PLAYER_STATE_HOLD_OBJECT; 
 	m_bubble_gravity = VariableManager::GetSingletonPtr()->GetAsFloat("BlueBubbleGravity");
+	m_message_system->Register(EVT_QUEST_ITEM_REMOVE, this, &PlayerHoldObject::ItemRemoved);
+}
+
+PlayerHoldObject::~PlayerHoldObject(void){
+	m_message_system->Unregister(EVT_QUEST_ITEM_REMOVE, this);
 }
 
 void PlayerHoldObject::Enter(){
@@ -705,7 +710,7 @@ void PlayerHoldObject::Enter(){
 	s_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &player_body, "body");
 	Ogre::Vector3 from = player_node->getPosition();
 	Ogre::Vector3 to = child_node->_getDerivedPosition();
-	from.y += 0.5f;
+	from.y += 0.5f;		// player offset in Y from pivot
 	IgnoreBodyCast ray(player_body);
 
 	m_physics_engine->GetDynamicWorld()->rayTest(BtOgre::Convert::toBullet(from), BtOgre::Convert::toBullet(to), ray);
@@ -734,10 +739,10 @@ void PlayerHoldObject::Enter(){
 						ob->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_ACTIVATE, NULL);
 					}
 					ob_body->setGravity(btVector3(0,0,0));
-					Point2PointConstraintDef def;
+					Generic6DofDef def;
 					def.body_a = player_trigger;
 					def.body_b = ob_body;
-					s_input_component->GetOwner()->CreateComponent(COMPONENT_POINT2POINT_CONSTRAINT, Ogre::Vector3(0,0,0), &def);
+					s_input_component->GetOwner()->CreateComponent(COMPONENT_GENERIC_6DOF_COMPONENT, Ogre::Vector3(0,0,0), &def);
 				}
 			}
 		}
@@ -745,7 +750,7 @@ void PlayerHoldObject::Enter(){
 }
 
 void PlayerHoldObject::Exit(){
-	s_input_component->GetOwner()->RemoveComponent(COMPONENT_POINT2POINT_CONSTRAINT);
+	s_input_component->GetOwner()->RemoveComponent(COMPONENT_GENERIC_6DOF_COMPONENT);
 	if (m_object){
 		if (m_object->GetType() == GAME_OBJECT_BLUE_BUBBLE){
 			Ogre::Vector3 gravity(0,-m_bubble_gravity,0);
@@ -761,6 +766,7 @@ void PlayerHoldObject::Exit(){
 
 void PlayerHoldObject::Update(float dt){
 	if (m_object){
+		s_animation->PlayAnimation("Top_Blow_Loop", true, AnimationBlender::BlendThenAnimate);
 		btRigidBody* body = NULL;
 		Ogre::SceneNode* node = NULL;
 		s_messenger->Notify(MSG_CHILD_NODE_GET_NODE, &node);
@@ -773,6 +779,12 @@ void PlayerHoldObject::Update(float dt){
 		}
 	}
 	else {
+		s_manager->HoldObject(false);
+	}
+}
+
+void PlayerHoldObject::ItemRemoved(IEvent* evt){
+	if (evt->m_type == EVT_QUEST_ITEM_REMOVE){
 		s_manager->HoldObject(false);
 	}
 }

@@ -502,6 +502,8 @@ GameObject* GameObjectManager::CreateQuestItem(const Ogre::Vector3& position, vo
 	TottDef tott_def = static_cast<TottController*>(tott->GetComponent(COMPONENT_CHARACTER_CONTROLLER))->m_def;
 	
 	GameObject* go = new GameObject(GAME_OBJECT_QUEST_ITEM);
+	DestroyCallbackComponent* dcc = new DestroyCallbackComponent;
+	go->AddComponent(dcc);
 	NodeComponent* node_comp = new NodeComponent;
 	go->AddComponent(node_comp);
 	MeshRenderComponent* mrc = new MeshRenderComponent;
@@ -510,6 +512,9 @@ GameObject* GameObjectManager::CreateQuestItem(const Ogre::Vector3& position, vo
 	//go->AddComponent(tc);
 	RigidbodyComponent* rc = new RigidbodyComponent;
 	go->AddComponent(rc);
+
+	std::function<void()> func = [&] { IEvent evt; evt.m_type = EVT_QUEST_ITEM_REMOVE; m_message_system->Notify(&evt); };
+	dcc->Init(func);
 
 	node_comp->Init(position, m_scene_manager);
 	mrc->Init(tott_def.quest_object_mesh_name, m_scene_manager);
@@ -729,20 +734,15 @@ GameObject* GameObjectManager::CreateNextLevelTrigger(const Ogre::Vector3& posit
 
 GameObject* GameObjectManager::CreateParticleEffect(const Ogre::Vector3& position, void* data, const Ogre::String& id){
 	ParticleDef& particleDef = *static_cast<ParticleDef*>(data);
-	GameObject* go = new GameObject(GAME_OBJECT_PARTICLE);
+	GameObject* go = new GameObject(GAME_OBJECT_PARTICLE, id);
 	
 	ParticleComponent* particle = new ParticleComponent;
 	go->AddComponent(particle);
-	MeshRenderComponent* mrc = new MeshRenderComponent;
-	go->AddComponent(mrc);
 	NodeComponent* node_comp = new NodeComponent;
 	go->AddComponent(node_comp);
 
 	node_comp->Init(position, m_scene_manager);
-	mrc->Init("Collectable_Leaf.mesh", m_scene_manager);
-	mrc->GetEntity()->setMaterialName("CollectibleLeaf");
 
-	mrc->GetEntity()->setMaterialName("CollectibleLeaf");
 	node_comp->GetSceneNode()->setPosition(Ogre::Vector3(position));
 
 	std::ostringstream stream;
@@ -752,7 +752,6 @@ GameObject* GameObjectManager::CreateParticleEffect(const Ogre::Vector3& positio
 
 	particle->Init(m_scene_manager, particle_id, particleDef.particle_name);
 	particle->CreateParticle(node_comp->GetSceneNode(), node_comp->GetSceneNode()->getPosition(), Ogre::Vector3(0,-1.8f,0));
-
 	return go;
 };
 

@@ -393,7 +393,7 @@ int DBManager::Load() {
 		static_cast<WayPointComponent*>(goIter->first->GetComponent(EComponentType::COMPONENT_AI))->AddWayPoint(followables[goIter->second]);
 	}
 	followers.clear();
-
+	m_paged_geometry->preloadGeometry(Forests::TBounds(0,0,500,500));
 	t.finalize();
 	return 0;	
 };

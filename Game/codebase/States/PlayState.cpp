@@ -27,8 +27,8 @@ void PlayState::Enter(){
 	m_viewport = m_render_window->addViewport(m_camera);
 	m_camera->setAspectRatio(Ogre::Real(m_viewport->getActualWidth()) / Ogre::Real(m_viewport->getActualHeight()));
 
-	Ogre::CompositorManager::getSingleton().addCompositor(m_viewport, "Bloom");
-	Ogre::CompositorManager::getSingleton().setCompositorEnabled(m_viewport, "Bloom", true);
+	//Ogre::CompositorManager::getSingleton().addCompositor(m_viewport, "Bloom");
+	//Ogre::CompositorManager::getSingleton().setCompositorEnabled(m_viewport, "Bloom", true);
 
 	m_game_object_manager = new GameObjectManager;
 	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager, m_message_system, NULL);
@@ -41,14 +41,14 @@ void PlayState::SecondLoading(){
 	//Ogre::Plane plane(Ogre::Vector3::UNIT_Y, -10);
 	//Ogre::MeshManager::getSingleton().createPlane("plane", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane, 50, 50, 20, 20, true, 1, 5, 5, Ogre::Vector3::UNIT_Z);
 	
-	m_scene_manager->setShadowUseInfiniteFarPlane(false);
+	/*m_scene_manager->setShadowUseInfiniteFarPlane(false);
 	m_scene_manager->setShadowTextureSelfShadow(false);
 	m_scene_manager->setShadowCasterRenderBackFaces(false);
 	m_scene_manager->setShadowTextureCount(1);
 	m_scene_manager->setShadowTextureSize(2048);
 	m_scene_manager->setShadowColour(Ogre::ColourValue(0.5f,0.5f,0.6f,1.0f));
 	m_scene_manager->setShadowFarDistance(30.0f);
-	m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
+	m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);*/
 
 	m_level_manager = new LevelManager(m_game_object_manager, m_scene_manager, m_physics_engine);
 	LevelDef level1;
@@ -64,6 +64,10 @@ void PlayState::SecondLoading(){
 	m_level_manager->AddLevel(level2);
 	m_level_manager->AddLevel(level3);
 	m_level_manager->LoadLevel("try");
+
+	ParticleDef particle_def;
+	particle_def.particle_name = "Particle/Smoke";
+
 }
 
 void PlayState::Exit(){

@@ -589,8 +589,8 @@ void ParticleComponent::Init(Ogre::SceneManager* p_scene_manager, const Ogre::St
 }
 
 void ParticleComponent::CreateParticle(Ogre::SceneNode* p_scene_node, const Ogre::Vector3& p_position, const Ogre::Vector3& p_offset_position){
-	m_nodes = p_scene_node;
-	m_node = m_nodes->createChildSceneNode(p_offset_position);
+	m_node = p_scene_node;
+	m_node = m_node->createChildSceneNode(p_offset_position);
 	m_node->attachObject(m_particle_system);
 }
 

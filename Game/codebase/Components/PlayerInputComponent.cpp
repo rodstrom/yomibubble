@@ -166,7 +166,7 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 	m_player_state_manager->AddPlayerState(new PlayerBounce);
 	m_player_state_manager->AddPlayerState(new PlayerOnBubble(message_system));
 	m_player_state_manager->AddPlayerState(new PlayerInsideBubble(message_system));
-	m_player_state_manager->AddPlayerState(new PlayerHoldObject(physics_engine));
+	m_player_state_manager->AddPlayerState(new PlayerHoldObject(physics_engine, message_system));
 	m_player_state_manager->Init();
 	m_player_state_manager->SetPlayerState(m_player_state_manager->GetPlayerState(PLAYER_STATE_FALLING));
 

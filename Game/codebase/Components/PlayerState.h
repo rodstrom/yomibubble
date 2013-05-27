@@ -157,13 +157,15 @@ private:
 
 class PlayerHoldObject : public PlayerState{
 public:
-	PlayerHoldObject(PhysicsEngine* physics_engine);
-	~PlayerHoldObject(void){}
+	PlayerHoldObject(PhysicsEngine* physics_engine, MessageSystem* message_system);
+	~PlayerHoldObject(void);
 	void Enter();
 	void Exit();
 	void Update(float dt);
 private:
+	void ItemRemoved(IEvent* evt);
 	GameObject* m_object;		// the object we are holding
+	MessageSystem* m_message_system;
 	PhysicsEngine* m_physics_engine;
 	float m_bubble_gravity;
 };
