@@ -882,21 +882,21 @@ void TottController::Notify(int type, void* msg){
 		m_state = new_state;
 
 		switch(m_state){
-		case TOTT_STATE::IDLING:
+		case IDLING:
 			m_messenger->Notify(MSG_WAYPOINT_START, NULL);
 			if (m_anim_msg.id != m_walk_animation){
 				m_anim_msg.id = m_walk_animation;
 				m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
 			}
 			break;
-		case TOTT_STATE::CURIOUS:
+		case CURIOUS:
 			m_messenger->Notify(MSG_WAYPOINT_PAUSE, NULL);
 			if (m_anim_msg.id != m_react_animation){
 				m_anim_msg.id = m_react_animation;
 				m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
 			}
 			break;
-		case TOTT_STATE::HAPPY:
+		case HAPPY:
 			m_messenger->Notify(MSG_WAYPOINT_PAUSE, NULL);
 			if (m_anim_msg.id != m_happy_animation){
 				m_anim_msg.id = m_happy_animation;
@@ -941,7 +941,7 @@ void TottController::Init(const Ogre::Vector3& position, PhysicsEngine* physics_
 	m_anim_msg.wait = false;
 
 	m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
-	m_state = TOTT_STATE::IDLING;
+	m_state = IDLING;
 };
 
 void TottController::Idling(){
@@ -957,13 +957,13 @@ void TottController::Update(float dt){
 	CharacterController::Update(dt);
 
 	switch(m_state){
-	case TOTT_STATE::IDLING:
+	case IDLING:
 		Idling();
 		break;
-	case TOTT_STATE::CURIOUS:
+	case CURIOUS:
 		Curious();
 		break;
-	case TOTT_STATE::HAPPY:
+	case HAPPY:
 		Happy();
 		break;
 	default:

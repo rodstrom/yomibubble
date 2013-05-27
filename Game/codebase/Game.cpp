@@ -22,7 +22,7 @@ bool Game::Init(Ogre::RenderWindow* render_window, MessageSystem* message_system
 	m_state_manager->ChangeState(m_state_manager->FindById("MenuState"));
 	//m_state_manager->ChangeState(m_state_manager->FindById("PlayState"));
 
-	//ShowCursor(false);
+	ShowCursor(false);
 
 	return true;
 }

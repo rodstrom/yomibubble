@@ -123,8 +123,8 @@ void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewpo
 	m_env_collision = false;
 	m_player_direction = Ogre::Vector3::ZERO;
 	
-	m_camera_pivot->setPosition(158.070892,72.4587402,252.214386);
-	m_camera_node->setPosition(160.070892,73.4587402,255.214386);
+	m_camera_pivot->setPosition(Ogre::Real(158.070892),Ogre::Real(72.4587402),Ogre::Real(252.214386));
+	m_camera_node->setPosition(Ogre::Real(160.070892),Ogre::Real(73.4587402),Ogre::Real(255.214386));
 
 	//m_camera->lookAt(Ogre::Vector3(145.872f,73.6166f,244.42f));
 	//m_camera->rotate(Ogre::Vector3(0.0491129,0.92081,0.123328), Ogre::Degree(-0.366698));
@@ -216,8 +216,22 @@ void FollowCameraComponent::Update(float dt){
 
 	Ogre::Vector3 goal_pos = m_camera_goal->getPosition();
 	if(goal_pos.z < 2) m_camera_goal->setPosition(goal_pos.x, goal_pos.y, 2);
-
-	//std::cout << "Pitch: " << m_camera_pivot->getOrientation().getPitch() << "\n";
+	goal_pos = m_camera_goal->_getDerivedPosition();
+	if(m_camera_pivot->getPosition().y - goal_pos.y < 0) {
+		//m_camera_pivot->pitch(Ogre::Radian(-m_camera_pivot->getOrientation().getPitch()));
+		m_camera_goal->_setDerivedPosition(Ogre::Vector3(goal_pos.x, m_camera_pivot->getPosition().y, goal_pos.z));
+		m_default_pitch = 0;
+	}
+	goal_pos = m_camera_goal->getPosition();
+	if(goal_pos.y / goal_pos.z > Ogre::Math::Tan((Ogre::Radian(-0.5f)))) {
+		//m_camera_pivot->pitch(Ogre::Radian(0.5f) - m_camera_pivot->getOrientation().getPitch());
+		Ogre::Real new_y = (Ogre::Math::Tan(Ogre::Radian(-0.5f)) * goal_pos.z) + m_camera_pivot->getPosition().y;
+		goal_pos = m_camera_goal->_getDerivedPosition();
+		m_camera_goal->_setDerivedPosition(Ogre::Vector3(goal_pos.x, new_y, goal_pos.z));
+	}
+	
+	std::cout << "Pitch: " << m_camera_pivot->getOrientation().getPitch() << "\n";
+	std::cout << "  Yaw: " << m_camera_pivot->getOrientation().getYaw() << "\n";
 
 }
 
@@ -296,7 +310,7 @@ bool FollowCameraComponent::QueryRaycast(){
 
 	if(m_terrain_group == NULL){
 		GameObject* terrain = static_cast<GameObject*>(m_owner->GetGameObject("Terrain"));
-		TerrainComponent* terrain_component = static_cast<TerrainComponent*>(terrain->GetComponent(EComponentType::COMPONENT_TERRAIN));
+		TerrainComponent* terrain_component = static_cast<TerrainComponent*>(terrain->GetComponent(COMPONENT_TERRAIN));
 		ArtifexLoader* terrain_artifex = terrain_component->GetArtifex();
 		m_terrain_group = terrain_artifex->mTerrainGroup;
 	}
@@ -305,26 +319,26 @@ bool FollowCameraComponent::QueryRaycast(){
 	Ogre::Vector3 cam_pos = m_camera_goal->_getDerivedPosition();
 	Ogre::Real min_distance = m_default_distance;
 	Ogre::Real max_y = m_camera_goal->getPosition().z * 0.2;
-	cam_pos.y -= 0.9;
+	cam_pos.y -= Ogre::Real(0.9);
 	Ogre::Ray camera_ray(cam_pos, Ogre::Vector3::UNIT_Y);
 	Ogre::TerrainGroup::RayResult collision = m_terrain_group->rayIntersects(camera_ray);
 	//Ogre::Real new_y = 0;
 	if(collision.hit){
 		m_env_collision = true;
-		m_camera_goal->_setDerivedPosition(collision.position + Ogre::Vector3::UNIT_Y * 0.9);
+		m_camera_goal->_setDerivedPosition(collision.position + Ogre::Vector3::UNIT_Y * Ogre::Real(0.9));
 	}
 
 	Ogre::Vector3 pivot_pos = m_camera_pivot->getPosition();
-	pivot_pos.y += 0.5;
+	pivot_pos.y += Ogre::Real(0.5);
 	Ogre::Real hit_distance = collision.position.distance(cam_pos);
 	cam_pos = m_camera_goal->_getDerivedPosition();
 	cam_pos.y -= max_y;
 	camera_ray.setOrigin(cam_pos);
 	camera_ray.setDirection(Ogre::Vector3::NEGATIVE_UNIT_Y);
 	collision = m_terrain_group->rayIntersects(camera_ray);
-	if(hit_distance < max_y * 1.25){
+	if(hit_distance < max_y * Ogre::Real(1.25)){
 		m_env_collision = true;
-		m_camera_goal->_setDerivedPosition(collision.position + Ogre::Vector3::UNIT_Y * max_y * 0.8);
+		m_camera_goal->_setDerivedPosition(collision.position + Ogre::Vector3::UNIT_Y * max_y * Ogre::Real(0.8));
 	}
 
 	for(int i = -1; i < 2; i++){

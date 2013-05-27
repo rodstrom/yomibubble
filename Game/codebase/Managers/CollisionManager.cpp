@@ -153,7 +153,7 @@ void CollisionManager::PlayerQuestItem(GameObject* player, GameObject* quest_ite
 
 void CollisionManager::TottQuestItem(GameObject* tott, GameObject* quest_item){
 	std::cout << "Tott vs QuestItem\n";
-	TOTT_STATE ts = TOTT_STATE::HAPPY;
+	TOTT_STATE ts = HAPPY;
 	tott->GetComponentMessenger()->Notify(MSG_TOTT_STATE_CHANGE, &ts);
 };
 
@@ -174,7 +174,7 @@ void CollisionManager::PlayerSpeechBubble(GameObject* player, GameObject* speech
 	}
 	*/
 	speech_bubble->GetComponentMessenger()->Notify(MSG_SP_BUBBLE_SHOW, NULL);
-	TOTT_STATE ts = TOTT_STATE::CURIOUS;
+	TOTT_STATE ts = CURIOUS;
 	static_cast<SpeechBubbleComponent*>(speech_bubble->GetComponent(COMPONENT_SPEECH_BUBBLE))->m_tott->GetComponentMessenger()->Notify(MSG_TOTT_STATE_CHANGE, &ts);
 };
 

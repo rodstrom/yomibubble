@@ -249,7 +249,7 @@ int DBManager::Load() {
 					if (i->first == "sound") {
 						SoundData3D m_3D_music_data;
 						m_3D_music_data = m_sound_manager->Create3DData(i->second, 
-							static_cast<NodeComponent*>(temp->GetComponent(EComponentType::COMPONENT_NODE))->GetSceneNode()->getName(), 
+							static_cast<NodeComponent*>(temp->GetComponent(COMPONENT_NODE))->GetSceneNode()->getName(), 
 							false, false, false, 1.0f, 1.0f);
 					} 
 					else if (i->first == "waypoints") {
@@ -380,7 +380,7 @@ int DBManager::Load() {
 
 	std::map<GameObject*, std::string>::iterator goIter;
 	for (goIter = followers.begin(); goIter != followers.end(); goIter++) {
-		static_cast<WayPointComponent*>(goIter->first->GetComponent(EComponentType::COMPONENT_AI))->AddWayPoint(followables[goIter->second]);
+		static_cast<WayPointComponent*>(goIter->first->GetComponent(COMPONENT_AI))->AddWayPoint(followables[goIter->second]);
 	}
 	followers.clear();
 

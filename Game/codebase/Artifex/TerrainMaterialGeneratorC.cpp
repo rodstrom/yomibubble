@@ -632,7 +632,7 @@ namespace Ogre
 	{
 		params->setIgnoreMissingParams(true);
 		// TODO - parameterise this?
-		Vector4 scaleBiasSpecular(0.03, -0.04, 32, 1);
+		Vector4 scaleBiasSpecular(Ogre::Real(0.03), Ogre::Real(-0.04), Ogre::Real(32), Ogre::Real(1));
 	
 		params->setNamedConstant("scaleBiasSpecular", scaleBiasSpecular);
 
