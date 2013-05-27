@@ -165,7 +165,7 @@ void FollowCameraComponent::Update(float dt){
 	//m_camera->setOrientation(Ogre::Quaternion(0.0491129,0.92081,0.123328,-0.366698));
 	//m_camera->setOrientationMode(Ogre::OrientationMode::OR_DEGREE_180); //this crashes :(
 	
-	QueryRaycast();
+	//QueryRaycast();
 
 	Ogre::Vector3 goal_pos = m_camera_goal->getPosition();
 	if(goal_pos.z < 2) m_camera_goal->setPosition(goal_pos.x, goal_pos.y, 2);

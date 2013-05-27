@@ -217,6 +217,7 @@ void CharacterController::QueryRaycast(){
 			m_messenger->Notify(MSG_RAYCAST_COLLISION_GAME_OBJECT, &go);
 		}
 		m_on_ground = true;
+		m_rigidbody->setFriction(1.0f);
 	}
 }
 
@@ -297,6 +298,7 @@ void CharacterController::Update(float dt){
 	btVector3 vel = m_rigidbody->getLinearVelocity();
 	btVector3 pos = m_rigidbody->getWorldTransform().getOrigin();
 	m_on_ground = false;
+	m_rigidbody->setFriction(0.0f);
 	if (!m_is_jumping){
 		QueryRaycast();
 	}
@@ -313,16 +315,6 @@ void CharacterController::Update(float dt){
 			m_messenger->Notify(MSG_FOLLOW_CAMERA_GET_ORIENTATION, &goal_dir);	// set direction from where the camera is looking
 			ApplyRotation(goal_dir, dt);
 			ApplyImpulse(goal_dir, dt);
-				/*Ogre::Vector3 goal_dir = m_direction;
-				m_messenger->Notify(MSG_FOLLOW_CAMERA_GET_ORIENTATION, &goal_dir);
-				Ogre::Quaternion goal = node->getOrientation().zAxis().getRotationTo(goal_dir);
-				Ogre::Real yaw_to_goal = goal.getYaw().valueDegrees();
-				Ogre::Real yaw_at_speed = yaw_to_goal / Ogre::Math::Abs(yaw_to_goal) * dt * m_turn_speed;
-
-				if (yaw_to_goal < 0) yaw_to_goal = std::min<Ogre::Real>(0, std::max<Ogre::Real>(yaw_to_goal, yaw_at_speed));
-				else if (yaw_to_goal > 0) yaw_to_goal = std::max<Ogre::Real>(0, std::min<Ogre::Real>(yaw_to_goal, yaw_at_speed));
-				node->yaw(Ogre::Degree(yaw_to_goal));*/
-				//m_rigidbody->applyCentralImpulse(btVector3(goal_dir.x * speed, 0.0f, goal_dir.z * speed));
 		}
 		else {
 			Ogre::SceneNode* node = NULL;
@@ -357,9 +349,6 @@ void CharacterController::Update(float dt){
 	}
 	if (m_is_jumping){
 		m_jump_timer += dt;
-		//float jump_strength = m_jump_pwr * dt;
-		//vel = m_rigidbody->getLinearVelocity();
-		//m_rigidbody->setLinearVelocity(btVector3(vel.x(), jump_strength, vel.z()));
 	}
 }
 

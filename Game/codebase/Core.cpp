@@ -95,6 +95,7 @@ void Core::Run(){
 		else {
 			if (dt > 1.0){
 				dt = 0.0;
+				std::cout << "DT IS ZERO!!\n";
 			}
 			last_time = curr_sec;
 		}

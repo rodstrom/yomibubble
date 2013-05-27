@@ -45,7 +45,7 @@ void WayPointComponent::Update(float dt){
 	Ogre::Vector3 empty = Ogre::Vector3::ZERO;
 	if (m_pause) { m_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &empty); }
 	else { m_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &m_way_point->m_direction); }
-//	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &m_way_point->m_direction);
+	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &m_way_point->m_direction);
 	float speed = m_way_point->getSpeed();
 	if (speed != 0.0f) {
 		m_anim_msg.id="walk";

@@ -40,9 +40,9 @@ void PlayerIdle::Exit(){
 }
 
 void PlayerIdle::Update(float dt){
-	if (!s_manager->IsBlowingBubbles()){
+	if (!s_manager->IsBlowingBubbles() && !s_manager->IsHoldingObject()){
 		s_animation->PlayAnimation(m_current_idle_top);
-		if (s_input_component->GetInputManager()->IsButtonPressed(BTN_LEFT_MOUSE) || s_input_component->GetInputManager()->IsButtonPressed(BTN_RIGHT_MOUSE)){
+		if (s_input_component->GetInputManager()->IsButtonPressed(BTN_LEFT_MOUSE) || (s_input_component->CanBlowPink() && s_input_component->GetInputManager()->IsButtonPressed(BTN_RIGHT_MOUSE))){
 			if (!s_manager->IsHoldingObject()){
 				s_manager->BlowBubble(true);
 			}
@@ -77,7 +77,8 @@ void PlayerIdle::Update(float dt){
 	if (!on_ground){
 		s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_FALLING));
 	}
-	if (s_input_component->GetInputManager()->IsButtonPressed(BTN_X)){
+	if (s_input_component->GetInputManager()->IsButtonPressed(BTN_X) && !s_manager->IsBlowingBubbles() && !s_manager->IsHoldingObject()){
+		s_input_component->GetInputManager()->InjectReleasedButton(BTN_X);
 		s_manager->HoldObject(true);
 	}
 	s_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &dir);
@@ -118,10 +119,9 @@ void PlayerStateMove::Update(float dt){
 	if (!s_manager->IsBlowingBubbles()){
 		s_animation->PlayAnimation(move_top);
 	}
-	
 
-	if (!s_manager->IsBlowingBubbles()){
-		if (s_input_component->GetInputManager()->IsButtonPressed(BTN_LEFT_MOUSE) || s_input_component->GetInputManager()->IsButtonPressed(BTN_RIGHT_MOUSE)){
+	if (!s_manager->IsBlowingBubbles() && !s_manager->IsHoldingObject()){
+		if (s_input_component->GetInputManager()->IsButtonPressed(BTN_LEFT_MOUSE) || (s_input_component->CanBlowPink() && s_input_component->GetInputManager()->IsButtonPressed(BTN_RIGHT_MOUSE))){
 			if (!s_manager->IsHoldingObject()){
 				s_manager->BlowBubble(true);
 			}
@@ -137,7 +137,8 @@ void PlayerStateMove::Update(float dt){
 	if (dir == Ogre::Vector3::ZERO){
 		s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_IDLE));	// if the character is not moving, change to idle
 	}
-	if (s_input_component->GetInputManager()->IsButtonPressed(BTN_X)){
+	if (s_input_component->GetInputManager()->IsButtonPressed(BTN_X) && !s_manager->IsBlowingBubbles() && !s_manager->IsHoldingObject()){
+		s_input_component->GetInputManager()->InjectReleasedButton(BTN_X);
 		s_manager->HoldObject(true);
 	}
 	s_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &dir);
@@ -436,6 +437,7 @@ void PlayerOnBubble::Enter(){
 	}
 	m_current_idle = "Base_Idle_On_Bubble";
 	m_current_walk = "Base_Walk_On_Bubble";
+	s_animation->PlayAnimation("Base_Idle_On_Bubble");
 }
 
 void PlayerOnBubble::Exit(){
@@ -693,6 +695,11 @@ void PlayerBounce::Update(float dt){
 	}
 }
 
+PlayerHoldObject::PlayerHoldObject(PhysicsEngine* physics_engine) : m_object(NULL), m_physics_engine(physics_engine) { 
+	m_type = PLAYER_STATE_HOLD_OBJECT; 
+	m_bubble_gravity = VariableManager::GetSingletonPtr()->GetAsFloat("BlueBubbleGravity");
+}
+
 void PlayerHoldObject::Enter(){
 	btRigidBody* player_body = NULL;
 	Ogre::SceneNode* player_node = NULL;
@@ -713,21 +720,61 @@ void PlayerHoldObject::Enter(){
 		CollisionDef* coll_def = static_cast<CollisionDef*>(ray.m_collisionObject->getUserPointer());
 		if (coll_def->flag == COLLISION_FLAG_GAME_OBJECT){
 			GameObject* ob = static_cast<GameObject*>(coll_def->data);
-			if (ob->GetType() == GAME_OBJECT_BLUE_BUBBLE){
-				//std::cout << "collision with blue bubble\n";
+			if (ob->GetType() == GAME_OBJECT_BLUE_BUBBLE || ob->GetType() == GAME_OBJECT_QUEST_ITEM){
 				m_object = ob;
+				btRigidBody* ob_body = NULL;
+				btRigidBody* player_trigger = NULL;
+				s_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &player_trigger, "btrig");
+				if (ob->GetType() == GAME_OBJECT_BLUE_BUBBLE){
+					m_object->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GET_BODY, &ob_body, "body");
+				}
+				else {
+					m_object->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GET_BODY, &ob_body);
+				}
+				
+				if (player_trigger && ob_body){
+					if (ob->GetType() == GAME_OBJECT_BLUE_BUBBLE){
+						ob->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_READY, NULL);
+						ob->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_ACTIVATE, NULL);
+					}
+					ob_body->setGravity(btVector3(0,0,0));
+					Point2PointConstraintDef def;
+					def.body_a = player_trigger;
+					def.body_b = ob_body;
+					s_input_component->GetOwner()->CreateComponent(COMPONENT_POINT2POINT_CONSTRAINT, Ogre::Vector3(0,0,0), &def);
+				}
 			}
 		}
 	}
 }
 
 void PlayerHoldObject::Exit(){
+	s_input_component->GetOwner()->RemoveComponent(COMPONENT_POINT2POINT_CONSTRAINT);
+	if (m_object){
+		if (m_object->GetType() == GAME_OBJECT_BLUE_BUBBLE){
+			Ogre::Vector3 gravity(0,-m_bubble_gravity,0);
+			m_object->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GRAVITY_SET, &gravity);
+		}
+		else {
+			Ogre::Vector3 gravity(0,-9.8,0);
+			m_object->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GRAVITY_SET, &gravity);
+		}
+	}
 	m_object = NULL;
 }
 
 void PlayerHoldObject::Update(float dt){
 	if (m_object){
-		s_manager->HoldObject(false);
+		btRigidBody* body = NULL;
+		Ogre::SceneNode* node = NULL;
+		s_messenger->Notify(MSG_CHILD_NODE_GET_NODE, &node);
+		if (node){
+			Ogre::Vector3 pos = node->_getDerivedPosition();
+			s_messenger->Notify(MSG_RIGIDBODY_POSITION_SET, &pos, "btrig");
+		}
+		if (s_input_component->GetInputManager()->IsButtonPressed(BTN_X)){
+			s_manager->HoldObject(false);
+		}
 	}
 	else {
 		s_manager->HoldObject(false);
