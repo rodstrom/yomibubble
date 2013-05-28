@@ -1005,7 +1005,7 @@ void TottController::Update(float dt){
 		break;
 	case CURIOUS:
 		//rotation = Ogre::Quaternion(0.5f, player_pos.x, player_pos.y, player_pos.z);
-		m_messenger->Notify(MSG_SET_OBJECT_ORIENTATION, &quat_tott); //so this made it party hard
+		//m_messenger->Notify(MSG_SET_OBJECT_ORIENTATION, &quat_tott); //so this made it party hard
 		Curious();
 		break;
 	case HAPPY:
