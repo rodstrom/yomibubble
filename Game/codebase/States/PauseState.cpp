@@ -80,9 +80,9 @@ bool PauseState::Update(float dt){
 		m_buttons[0]->GetComponentMessenger()->Notify(MSG_OVERLAY_HIDE, NULL);
 	}
 
-	if (m_input_manager->IsButtonPressed(BTN_ARROW_DOWN)) 
+	if (m_input_manager->IsButtonPressed(BTN_DOWN)) 
 		m_current_selected_button++;
-	if (m_input_manager->IsButtonPressed(BTN_ARROW_UP)) 
+	if (m_input_manager->IsButtonPressed(BTN_UP)) 
 		m_current_selected_button--;
 
 	if (m_current_selected_button < 0) 

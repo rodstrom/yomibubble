@@ -53,8 +53,6 @@ void MenuState::Enter(){
 	//m_animation_state = yomi->getAnimationState("CATRigRArm1");
 	//m_animation_state->setLoop(true);
 	//m_animation_state->setLoop(true);
-	
-
 
 	PlaneDef plane_def;
 	plane_def.material_name = "Examples/BeachStones";
@@ -134,9 +132,9 @@ bool MenuState::Update(float dt){
 
 	//m_fade->Update(dt);
 
-	if (m_input_manager->IsButtonPressed(BTN_ARROW_DOWN)) 
+	if (m_input_manager->IsButtonPressed(BTN_DOWN)) 
 		m_current_selected_button++;
-	if (m_input_manager->IsButtonPressed(BTN_ARROW_UP)) 
+	if (m_input_manager->IsButtonPressed(BTN_UP)) 
 		m_current_selected_button--;
 
 	if (m_current_selected_button < 0) 
