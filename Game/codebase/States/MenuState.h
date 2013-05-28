@@ -34,6 +34,9 @@ private:
 	Ogre::SceneNode*			m_yomi_node;
 	Ogre::SceneNode*			m_mushroom_node;
 	Ogre::SceneNode*			m_tree_node;
+	Ogre::SceneNode*			m_grass_node;
+	Ogre::SceneNode*			m_grass_node2;
+	Ogre::SceneNode*			m_grass_node3;
 	Ogre::AnimationState*		m_animation_state;
 };
 

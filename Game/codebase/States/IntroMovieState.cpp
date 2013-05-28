@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "IntroMovieState.h"
-#include "..\..\libs\OgreVideo\include\theoraplayer\theoraplayer\TheoraVideoManager.h"
+
 
 
 IntroMovieState::IntroMovieState(void){}

@@ -42,6 +42,10 @@ void MenuState::Enter(){
 	Ogre::Entity* yomi_staff = m_scene_manager->createEntity("Staff.mesh");
 	yomi->attachObjectToBone("CATRigLArmDigit21", yomi_staff);
 	Ogre::Entity* tree = m_scene_manager->createEntity("JumpLeafTree_1.mesh");
+	Ogre::Entity* grass = m_scene_manager->createEntity("nocoll_Day_Bush1.mesh");
+	Ogre::Entity* grass1 = m_scene_manager->createEntity("nocoll_Day_Bush1.mesh");
+	Ogre::Entity* grass2 = m_scene_manager->createEntity("nocoll_Day_Bush1.mesh");
+	Ogre::Entity* grass3 = m_scene_manager->createEntity("nocoll_Day_Bush1.mesh");
 	m_house_node = m_scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(4.0f,2.0f,-24.0f));
 	m_house_node->yaw(Ogre::Radian(1.4));
 	m_house_node->attachObject(yomi_house);
