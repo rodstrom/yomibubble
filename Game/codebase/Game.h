@@ -14,7 +14,7 @@ public:
 	~Game(void);
 
 	bool Update(float dt);
-	bool Init(Ogre::RenderWindow* render_window, MessageSystem* message_system, SoundManager* sound_manager);
+	bool Init(Ogre::RenderWindow* render_window, MessageSystem* message_system);
 	void Shut();
 
 	void InjectPressedButton(int btn);

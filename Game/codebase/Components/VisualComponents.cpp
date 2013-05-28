@@ -296,7 +296,7 @@ void AnimationComponent::Notify(int type, void* msg){
 	case MSG_ANIMATION_SET_WAIT:
 		{
 			int index = *static_cast<int*>(msg);
-			m_animation_states[index].wait = true;
+			//m_animation_states[index].wait = true;
 		}
 		break;
 	case MSG_ANIMATION_GET_CURRENT_NAME:

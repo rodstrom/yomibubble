@@ -304,10 +304,10 @@ PlayerJump::PlayerJump(void){
 
 void PlayerJump::Enter(){
 	s_messenger->Notify(MSG_TGRAPH_STOP, &Ogre::String("Jump"));
-	int p = 1;
-	s_messenger->Notify(MSG_ANIMATION_PAUSE, &p);
-	//s_animation->PlayAnimation("Base_Jump_Start");
-	s_animation->PlayAnimation("Base_Jump_Loop", true, AnimationBlender::BlendSwitch);
+	//int p = 1;
+	//s_messenger->Notify(MSG_ANIMATION_PAUSE, &p);
+	s_animation->PlayAnimation("Base_Jump_Start", false, AnimationBlender::BlendSwitch);
+	//s_animation->PlayAnimation("Base_Jump_Loop", true, AnimationBlender::BlendSwitch);
 	bool jump = true;
 	s_messenger->Notify(MSG_CHARACTER_CONTROLLER_JUMP, &jump);
 }
@@ -317,6 +317,7 @@ void PlayerJump::Exit(){
 }
 
 void PlayerJump::Update(float dt){
+	s_animation->PlayAnimation("Base_Jump_Loop");
 	btRigidBody* body = NULL;
 	s_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &body, "body");
 	float y_vel = body->getLinearVelocity().y();
@@ -339,7 +340,7 @@ void PlayerJump::Update(float dt){
 }
 
 void PlayerFalling::Enter(){
-	s_animation->PlayAnimation("Base_Jump_Loop", true, AnimationBlender::BlendSwitch);
+	s_animation->PlayAnimation("Base_Jump_Loop");
 }
 
 void PlayerFalling::Exit(){
@@ -349,7 +350,8 @@ void PlayerFalling::Exit(){
 void PlayerFalling::Update(float dt){
 	bool on_ground = s_input_component->IsOnGround();
 	if (on_ground){
-		s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_LAND));
+		s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_IDLE));
+		std::cout << "Setting Idle FROM Fall\n";
 	}
 	Ogre::Vector3 dir = s_input_component->GetDirection();
 	s_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &dir);
@@ -386,12 +388,12 @@ void PlayerLand::Update(float dt){
 }
 
 void PlayerLand::Proceed(){
-	Ogre::Vector3 dir = s_input_component->GetDirection();
+	/*Ogre::Vector3 dir = s_input_component->GetDirection();
 	if (dir == Ogre::Vector3::ZERO){
 		int p = 1;
 		s_messenger->Notify(MSG_ANIMATION_PAUSE, &p);
 		s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_IDLE));
-	}
+	}*/
 }
 
 PlayerOnBubble::PlayerOnBubble(MessageSystem* message_system) : m_on_bubble_y_offset(0.0f), m_message_system(message_system),
@@ -434,7 +436,7 @@ void PlayerOnBubble::Enter(){
 	}
 	m_current_idle = "Base_Idle_On_Bubble";
 	m_current_walk = "Base_Walk_On_Bubble";
-	s_animation->PlayAnimation("Base_Idle_On_Bubble");
+	s_animation->PlayAnimation("Base_Jump_End", false);
 }
 
 void PlayerOnBubble::Exit(){
@@ -671,8 +673,8 @@ void PlayerInsideBubble::BubbleRemoved(IEvent* evt){
 }
 
 void PlayerBounce::Enter(){
-	//s_animation->PlayAnimation("Base_Jump_Start");
-	s_animation->PlayAnimation("Base_Jump_Loop", true, AnimationBlender::BlendSwitch);
+	//s_animation->PlayAnimation("Base_Jump_Start", false, AnimationBlender::BlendSwitch);
+	s_animation->PlayAnimation("Base_Jump_Loop");
 }
 
 void PlayerBounce::Exit(){
@@ -680,15 +682,17 @@ void PlayerBounce::Exit(){
 }
 
 void PlayerBounce::Update(float dt){
+	//s_animation->PlayAnimation("Base_Jump_Loop");
 	btRigidBody* body = NULL;
 	s_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &body, "body");
-	float y_vel = body->getWorldTransform().getOrigin().y();
-	if (y_vel > 0.0f){
+	float y_vel = body->getLinearVelocity().y();
+	if (y_vel < 0.0f){
 		s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_FALLING));
 	}
 	bool on_ground = s_input_component->IsOnGround();
 	if (on_ground){
 		s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_LAND));
+		std::cout << "OnGround from Bounce\n";
 	}
 }
 
@@ -767,7 +771,7 @@ void PlayerHoldObject::Exit(){
 
 void PlayerHoldObject::Update(float dt){
 	if (m_object){
-		s_animation->PlayAnimation("Top_Blow_Loop", true, AnimationBlender::BlendThenAnimate);
+		s_animation->PlayAnimation("Top_Blow_Loop");
 		btRigidBody* body = NULL;
 		Ogre::SceneNode* node = NULL;
 		s_messenger->Notify(MSG_CHILD_NODE_GET_NODE, &node);

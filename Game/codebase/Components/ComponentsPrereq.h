@@ -204,7 +204,7 @@ public:
 };
 
 struct AnimationMsg{
-	AnimationMsg(void) : index(0), loop(true), full_body(false), blend(false), wait(false), duration(0.0f), blending_transition(0){}
+	AnimationMsg(void) : index(0), loop(true), full_body(false), blend(false), wait(false), duration(0.0f), blending_transition(2){}
 	int index;
 	int blending_transition;
 	bool blend;

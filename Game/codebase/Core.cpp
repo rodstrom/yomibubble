@@ -56,19 +56,14 @@ bool Core::Init(){
 	Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
 	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
-	/*Ogre::SceneManager* retardedBugfix = */
-	m_root->createSceneManager(Ogre::ST_GENERIC); // Herman was here
 	if (!VariableManager::GetSingletonPtr()->Init())
 		return false;
-	m_sound_manager = new SoundManager();
-	//m_sound_manager->Init(m_root->createSceneManager(Ogre::ST_GENERIC));
-	m_sound_manager->LoadAudio();
-
-	//delete retardedBugfix;
-	//retardedBugfix = NULL;
+	//m_sound_manager = new SoundManager();
+	//m_sound_manager->LoadAudio();
 
 	m_game = new Game;
-	m_game->Init(m_render_window, m_message_system, m_sound_manager);
+	//m_game->Init(m_render_window, m_message_system, m_sound_manager, m_scene_manager);
+	m_game->Init(m_render_window, m_message_system);
 	m_input_system = new InputSystem(m_game, m_render_window);
 	m_input_system->Init();
 
@@ -127,13 +122,11 @@ void Core::Shut(){
 		delete m_input_system;
 		m_input_system = NULL;
 	}
-	if (m_sound_manager){
-		delete m_sound_manager;
-		m_sound_manager = NULL;
+	if (m_root){
+		OGRE_DELETE m_root;
+		m_root = NULL;
+		m_render_window = NULL;
 	}
-	OGRE_DELETE m_root;
-	m_root = NULL;
-	m_render_window = NULL;
 }
 
 void Core::QuitMsg(IEvent* evt){

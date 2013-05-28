@@ -15,15 +15,15 @@ bool Game::Update(float dt){
 	return m_state_manager->Update(dt);
 }
 
-bool Game::Init(Ogre::RenderWindow* render_window, MessageSystem* message_system, SoundManager* sound_manager){
-	m_state_manager = new StateManager(render_window, this, message_system, sound_manager);
+bool Game::Init(Ogre::RenderWindow* render_window, MessageSystem* message_system){
+	m_state_manager = new StateManager(render_window, this, message_system);
 	PlayState::Create<PlayState>(m_state_manager, "PlayState");
 	MenuState::Create<MenuState>(m_state_manager, "MenuState");
 	PauseState::Create<PauseState>(m_state_manager, "PauseState");
 	LoadingState::Create<LoadingState>(m_state_manager, "LoadingState");
 	//IntroLogoState::Create<IntroLogoState>(m_state_manager, "LogoState");
 	IntroMovieState::Create<IntroMovieState>(m_state_manager, "IntroMovieState");
-	m_state_manager->ChangeState(m_state_manager->FindById("PlayState"));
+	m_state_manager->ChangeState(m_state_manager->FindById("MenuState"));
 
 	//ShowCursor(false); // NO WINDOWS SPECIFIC CALLS!
 

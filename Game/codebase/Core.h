@@ -24,7 +24,7 @@ private:
 	Ogre::RenderWindow* m_render_window;
 	InputSystem*		m_input_system;
 	MessageSystem*		m_message_system;
-	SoundManager* 		m_sound_manager;
+	//SoundManager* 		m_sound_manager;
 	Game*				m_game;
 };
 

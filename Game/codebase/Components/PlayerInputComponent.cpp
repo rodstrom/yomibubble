@@ -144,7 +144,7 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 	m_animation_manager->AddAnimation(AnimationDef("Base_Jump_End", 0, 0.1f, "Top_Jump_End"));
 	m_animation_manager->AddAnimation(AnimationDef("Base_Jump_Loop", 0, 0.1f, "Top_Jump_Loop"));
 	m_animation_manager->AddAnimation(AnimationDef("Base_Jump_Start", 0, 0.1f, "Top_Jump_Start"));
-	m_animation_manager->AddAnimation(AnimationDef("Base_PickUpLeaf_State", 0, 0.1f));
+	m_animation_manager->AddAnimation(AnimationDef("Base_PickUpLeaf_State", 0, 0.1f, "Top_PickUpLeaf_State"));
 	m_animation_manager->AddAnimation(AnimationDef("Top_Idle", 1, 0.1f));
 	m_animation_manager->AddAnimation(AnimationDef("Top_Idle2", 1, 0.1f));
 	m_animation_manager->AddAnimation(AnimationDef("Top_Run", 1, 0.1f));

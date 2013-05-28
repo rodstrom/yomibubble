@@ -211,12 +211,13 @@ void CharacterController::QueryRaycast(){
 		CollisionDef& def = *static_cast<CollisionDef*>(ray_callback_bottom.m_collisionObject->getUserPointer());
 		if (def.flag == COLLISION_FLAG_STATIC){
 			m_messenger->Notify(MSG_RAYCAST_COLLISION_STATIC_ENVIRONMENT, NULL);
+			m_on_ground = true;
 		}
 		else if (def.flag == COLLISION_FLAG_GAME_OBJECT){
 			GameObject* go = static_cast<GameObject*>(def.data);
 			m_messenger->Notify(MSG_RAYCAST_COLLISION_GAME_OBJECT, &go);
 		}
-		m_on_ground = true;
+		
 		if (m_actual_direction == Ogre::Vector3::ZERO){
 			if (m_current_friction != m_deceleration){
 				m_current_friction = m_deceleration;
@@ -760,7 +761,6 @@ void PlayerRaycastCollisionComponent::PlayerBubble(GameObject* go){
 	float y_vel = 0.0f;
 	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_GET_FALL_VELOCITY, &y_vel);
 	if (body){
-		//float y_vel = body->getLinearVelocity().y();
 		if (player_state == PLAYER_STATE_FALLING){
 			if (y_vel < -m_bounce_vel && y_vel > -m_into_bubble_vel){   // bounce on bubble
 				player_state = PLAYER_STATE_BOUNCE;
@@ -797,7 +797,6 @@ void PlayerRaycastCollisionComponent::PlayerBubble(GameObject* go){
 			else if (y_vel < -m_into_bubble_vel){   // go inside bubble
 				player_state = PLAYER_STATE_INSIDE_BUBBLE;
 				Ogre::Vector3 gravity(0,0,0);
-				body->clearForces();
 				m_messenger->Notify(MSG_PLAYER_INPUT_SET_BUBBLE, &go);
 				m_messenger->Notify(MSG_PLAYER_INPUT_SET_STATE, &player_state);
 				m_messenger->Notify(MSG_CHARACTER_CONTROLLER_GRAVITY_SET, &gravity);
@@ -806,7 +805,6 @@ void PlayerRaycastCollisionComponent::PlayerBubble(GameObject* go){
 			else {   // stand on bubble
 				player_state = PLAYER_STATE_ON_BUBBLE;
 				Ogre::Vector3 gravity(0,0,0);
-				body->clearForces();
 				m_messenger->Notify(MSG_PLAYER_INPUT_SET_BUBBLE, &go);
 				m_messenger->Notify(MSG_PLAYER_INPUT_SET_STATE, &player_state);
 				m_messenger->Notify(MSG_CHARACTER_CONTROLLER_GRAVITY_SET, &gravity);

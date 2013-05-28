@@ -32,7 +32,7 @@ public:
 		p_parent->ManageState(p_id, state);
 	}
 	void Destroy(void) { delete this; }
-	void Init(Ogre::RenderWindow* render_window, MessageSystem* message_system, SoundManager* sound_manager, FadeInFadeOut* fade) { m_render_window = render_window; m_message_system = message_system; m_sound_manager = sound_manager; m_fade = fade;}
+	void Init(Ogre::RenderWindow* render_window, MessageSystem* message_system, FadeInFadeOut* fade) { m_render_window = render_window; m_message_system = message_system; m_fade = fade; }
 	InputManager* GetInputManager() const { return m_input_manager; }
 	Ogre::Viewport* GetViewport() const { return m_viewport; }
 	virtual bool Update(float dt) = 0;
