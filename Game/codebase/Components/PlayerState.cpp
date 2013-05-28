@@ -17,6 +17,9 @@
 #include "GameObject.h"
 #include "..\Managers\GameObjectManager.h"
 
+#include <stdlib.h>     /* srand, rand */
+#include <time.h>       /* time */
+
 ComponentMessenger* PlayerState::s_messenger = NULL;
 AnimationManager* PlayerState::s_animation = NULL;
 PlayerInputComponent* PlayerState::s_input_component = NULL;
@@ -90,7 +93,6 @@ PlayerStateMove::PlayerStateMove(void){
 
 void PlayerStateMove::Enter(){
 	s_animation->PlayAnimation("Base_Walk");
-	s_messenger->Notify(MSG_SFX2D_PLAY, &m_walk_sound);
 	s_messenger->Notify(MSG_TGRAPH_STOP, &Ogre::String("Stick"));
 }
 
@@ -102,6 +104,7 @@ void PlayerStateMove::PlayTopAnimation(){
 }
 
 void PlayerStateMove::Update(float dt){
+	s_messenger->Notify(MSG_SFX2D_PLAY, &m_walk_sound);
 	Ogre::Vector3 dir = s_input_component->GetDirection();
 	float speed = dir.squaredLength();
 	Ogre::String move_bot = Ogre::StringUtil::BLANK;
@@ -300,6 +303,9 @@ void PlayerBlowBubble::CreateTriggerForBubble(){
 
 PlayerJump::PlayerJump(void){ 
 	m_type = PLAYER_STATE_JUMP;
+	m_jump_sfx_1 = s_sound_manager->Create2DData("Yomi_Jump_1", false, false, false, false, 1.0f, 1.0f);
+	m_jump_sfx_2 = s_sound_manager->Create2DData("Yomi_Jump_2", false, false, false, false, 1.0f, 1.0f);
+	m_jump_sfx_3 = s_sound_manager->Create2DData("Yomi_Jump_3", false, false, false, false, 1.0f, 1.0f);
 }
 
 void PlayerJump::Enter(){
@@ -310,6 +316,28 @@ void PlayerJump::Enter(){
 	s_animation->PlayAnimation("Base_Jump_Loop", true, AnimationBlender::BlendSwitch);
 	bool jump = true;
 	s_messenger->Notify(MSG_CHARACTER_CONTROLLER_JUMP, &jump);
+
+	//randomize IF a jump sound should play: if true, randomize a specific jump sound
+	srand (time(NULL));
+	int play_jump_sound = rand() % 10 + 1;
+	if (play_jump_sound < 3){
+		int which_jump_sound = rand() % 3 + 1;
+		switch(which_jump_sound){
+		case 1:
+			s_messenger->Notify(MSG_SFX2D_PLAY, &m_jump_sfx_1);
+			break;
+		case 2:
+			s_messenger->Notify(MSG_SFX2D_PLAY, &m_jump_sfx_2);
+			break;
+		case 3:
+			s_messenger->Notify(MSG_SFX2D_PLAY, &m_jump_sfx_3);
+			break;
+		default:
+			break;
+		}
+	}
+	else{}
+
 }
 
 void PlayerJump::Exit(){
@@ -355,11 +383,34 @@ void PlayerFalling::Update(float dt){
 	s_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &dir);
 }
 
+PlayerLand::PlayerLand(){
+	m_type = PLAYER_STATE_LAND;
+	m_land_sfx_1 = s_sound_manager->Create2DData("Yomi_Land_1", false, false, false, false, 1.0f, 1.0f);
+	m_land_sfx_2 = s_sound_manager->Create2DData("Yomi_Land_2", false, false, false, false, 1.0f, 1.0f);
+}
+
 void PlayerLand::Enter(){
 	//s_messenger->Notify(MSG_ANIMATION_CLEAR_QUEUE, NULL);
 	//s_animation->PlayAnimation("Base_Jump_End");
 	//std::function<void()> func = [this] { Proceed(); };
 	//s_messenger->Notify(MSG_ANIMATION_CALLBACK, &func);
+
+	srand (time(NULL));
+	int play_land_sound = rand() % 10 + 1;
+	if (play_land_sound < 3){
+		int which_land_sound = rand() % 2 + 1;
+		switch(which_land_sound){
+		case 1:
+			s_messenger->Notify(MSG_SFX2D_PLAY, &m_land_sfx_1);
+			break;
+		case 2:
+			s_messenger->Notify(MSG_SFX2D_PLAY, &m_land_sfx_2);
+			break;
+		default:
+			break;
+		}
+	}
+	else{}
 }
 
 void PlayerLand::Exit(){

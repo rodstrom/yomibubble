@@ -26,6 +26,7 @@ public:
 	bool CanBlowPink() const { return m_can_blow_pink; }
 
 	SoundData2D m_leaf_sfx;
+	SoundData2D m_leaf_giggle_sfx;
 	//AnimationMsg m_anim_msg;
 	SoundData2D m_bounce_sound;
 

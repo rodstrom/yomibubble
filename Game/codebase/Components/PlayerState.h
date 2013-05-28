@@ -88,6 +88,10 @@ public:
 	void Enter();
 	void Exit();
 	void Update(float dt);
+
+	SoundData2D m_jump_sfx_1;
+	SoundData2D m_jump_sfx_2;
+	SoundData2D m_jump_sfx_3;
 };
 
 class PlayerFalling : public PlayerState{
@@ -101,11 +105,15 @@ public:
 
 class PlayerLand : public PlayerState{
 public:
-	PlayerLand(void){ m_type = PLAYER_STATE_LAND; }
+	PlayerLand(void);
 	~PlayerLand(void){}
 	void Enter();
 	void Exit();
 	void Update(float dt);
+
+	SoundData2D m_land_sfx_1;
+	SoundData2D m_land_sfx_2;
+
 private:
 	void Proceed();
 };
