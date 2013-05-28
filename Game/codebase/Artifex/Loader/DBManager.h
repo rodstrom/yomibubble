@@ -21,6 +21,8 @@ class ArtifexLoader;
 
 #include "CppSQLite3.h"
 
+#include "PagedGeometry.h"
+
 #include "..\..\Managers\GameObjectManager.h"
 #include "..\..\Managers\SoundManager.h"
 #include "..\..\PhysicsEngine.h"
@@ -39,6 +41,8 @@ public:
 	int Open(const string path);
 	int Close(void);
 
+	void Update();
+
 	bool ExecSQL (std::string query);
 	bool EmptyTable(std::string tablename);
 	bool WriteSpawn(Spawn2 spawn, std::string spawntype="default");
@@ -56,6 +60,9 @@ public:
 	int Load();
 
 	bool saving;
+	
+	Forests::PagedGeometry* m_paged_geometry;
+
 
 	GameObjectManager *m_game_object_manager;
 	SoundManager *m_sound_manager;	
@@ -66,6 +73,11 @@ public:
 	std::vector<btMotionState*> m_motion_states;
 	std::vector<btCollisionShape*> m_shapes;
 	std::vector<struct CollisionDef*> m_collision_defs;
+	typedef std::map<std::string, Ogre::Entity*> MeshList;
+	MeshList m_vegetation;		// we will page vegetation like grass, bushes and shrooms.
+
+protected:
+	void InitShadowList(std::vector<Ogre::String>& shadow_map);
 
 };
 #endif

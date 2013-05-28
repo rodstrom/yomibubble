@@ -38,7 +38,7 @@ bool StateManager::Update(float dt){
 	}
 
 	if (m_next_state){
-		
+		//m_fade->FadeIn(VariableManager::GetSingletonPtr()->GetAsFloat("Fade_in_timer"));
 		if (!m_state_stack.empty()){
 			Cleanup(m_state_stack.back());
 			m_state_stack.back()->Exit();
@@ -55,11 +55,8 @@ bool StateManager::Update(float dt){
 			Init(m_loading);
 			m_loading->Enter();
 			m_loading->Update(1.0f);
-			m_fade->FadeIn(VariableManager::GetSingletonPtr()->GetAsFloat("Fade_in_timer"));
-			
-			
+			m_fade->FadeIn(VariableManager::GetSingletonPtr()->GetAsFloat("Fade_in_timer"));			
 		}
-		
 	}
 	
 	if(m_fade->IsFading()){

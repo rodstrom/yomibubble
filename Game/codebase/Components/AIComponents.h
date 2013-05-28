@@ -11,16 +11,18 @@ public:
 
 	virtual void Notify(int type, void* message);
 	virtual void Shut();
-	virtual void Init(Ogre::SceneNode *p_node, const Ogre::String& p_loop_way_points);
+	virtual void Init(Ogre::SceneNode *m_node, float walk_speed);
 	virtual void SetMessenger(ComponentMessenger* messenger);
 	virtual void Update(float dt);
 	
 	void AddWayPoint(Ogre::Vector3 way_point);
 	void AddWayPoint(Ogre::SceneNode* scene_node);
-	void SetLoopable(const Ogre::String& loop);
+	void SetLoopable(Ogre::String loop);
 
 private:
 	WayPoint* m_way_point;
+	AnimationMsg m_anim_msg;
+	bool m_pause;
 };
 
 #endif //AI_COMPONENTS_H

@@ -22,11 +22,13 @@ public:
 	ComponentMessenger* GetComponentMessenger() const { return m_messenger; }
 	void RemoveComponent(Component* component);
 	void RemoveComponent(int type, bool all = false);
+	void RemoveGameObject(GameObject* game_object);		// removes a game object using the GameObjectManager (so you don't have to get the game object manager directly)
 	int GetType() { return m_type; }	// Returns the type of game object (eg: Player, Tott, Leaf etc)
 	const Ogre::String& GetId() const { return m_id; }		// Returns the unique ID of the game object.
 	void SetGameObjectManager(GameObjectManager* game_object_manager) { m_game_object_manager = game_object_manager; }
 	void SetId(const Ogre::String& id) { m_id = id; }
-	Component* CreateComponent(int type, const Ogre::Vector3& pos, void* data);		// Creates and adds a component of specified type (Still work in progress)
+	void SetType(int type) { m_type = type; }
+	Component* CreateComponent(int type, const Ogre::Vector3& pos, void* data);		// Creates and adds a component of specified type
 	GameObject* GetGameObject(const Ogre::String& id) const;
 
 private:
@@ -54,11 +56,13 @@ private:
 	Component* CreateFollowCameraComponent(const Ogre::Vector3& pos, void* data);
 	Component* CreatePoint2PointConstraintComponent(const Ogre::Vector3& pos, void* data);
 	Component* CreateHingeConstraintComponent(const Ogre::Vector3& pos, void* data);
+	Component* CreateGeneric6DofComponent(const Ogre::Vector3& pos, void* data);
 	Component* CreateChildNode(const Ogre::Vector3& pos, void* data);
 	Component* CreateNodeComponent(const Ogre::Vector3& pos, void* data);
 	Component* CreateTriggerComponent(const Ogre::Vector3& pos, void* data);
 	Component* CreateSyncedTriggerComponent(const Ogre::Vector3& pos, void* data);
 	Component* CreateRaycastComponent(const Ogre::Vector3& pos, void* data);
+	Component* CreateShapeComponent(const Ogre::Vector3& pos, void* data);
 };
 
 #endif // _N_GAME_OBJECT_H_

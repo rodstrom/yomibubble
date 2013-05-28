@@ -4,6 +4,9 @@
 #include "ComponentsPrereq.h"
 #include "..\Managers\SoundManager.h"
 
+class PhysicsEngine;
+struct IEvent;
+class MessageSystem;
 class GameObject;
 class PlayerStateManager;
 class PlayerInputComponent;
@@ -32,10 +35,14 @@ class PlayerIdle : public PlayerState{
 public:
 	PlayerIdle(void);
 	~PlayerIdle(void){}
-	void PlayTopIdle();
 	void Enter();
 	void Exit();
 	void Update(float dt);
+private:
+	Ogre::String m_current_idle_base;
+	Ogre::String m_current_idle_top;
+	float m_timer;
+	float m_target_time;
 };
 
 class PlayerStateMove : public PlayerState{
@@ -71,6 +78,7 @@ private:
 	float m_min_bubble_size;
 	float m_max_bubble_size;
 	float m_current_scale;
+	float m_bubble_gravity;
 };
 
 class PlayerJump : public PlayerState{
@@ -104,27 +112,36 @@ private:
 
 class PlayerOnBubble : public PlayerState{
 public:
-	PlayerOnBubble(void) { m_type = PLAYER_STATE_ON_BUBBLE; }
-	~PlayerOnBubble(void){}
+	PlayerOnBubble(MessageSystem* message_system);
+	~PlayerOnBubble(void);
 	void Enter();
 	void Exit();
 	void Update(float dt);
 private:
-	bool m_transition;
-	Ogre::String m_current_top;
-	Ogre::String m_current_base;
+	void BubbleRemoved(IEvent* evt);
+	void ChangeTargetTime(float low, float high);
+	MessageSystem* m_message_system;
+	float m_on_bubble_y_offset;
 	GameObject* m_bubble;
+	Ogre::String m_current_idle;
+	Ogre::String m_current_walk;
+	float m_timer;			// when to change animation
+	float m_target_time;
 };
 
 class PlayerInsideBubble : public PlayerState{
 public:
-	PlayerInsideBubble(void){ m_type = PLAYER_STATE_INSIDE_BUBBLE; }
-	~PlayerInsideBubble(void){}
+	PlayerInsideBubble(MessageSystem* message_system);
+	~PlayerInsideBubble(void);
 	void Enter();
 	void Exit();
 	void Update(float dt);
 private:
-	bool m_transition;
+	void ChangeBubbleType();
+	void BubbleRemoved(IEvent* evt);
+	MessageSystem* m_message_system;
+	float m_on_bubble_y_offset;
+	float m_bubble_gravity;
 	GameObject* m_bubble;
 };
 
@@ -136,6 +153,19 @@ public:
 	void Exit();
 	void Update(float dt);
 private:
+};
+
+class PlayerHoldObject : public PlayerState{
+public:
+	PlayerHoldObject(PhysicsEngine* physics_engine);
+	~PlayerHoldObject(void){}
+	void Enter();
+	void Exit();
+	void Update(float dt);
+private:
+	GameObject* m_object;		// the object we are holding
+	PhysicsEngine* m_physics_engine;
+	float m_bubble_gravity;
 };
 
 

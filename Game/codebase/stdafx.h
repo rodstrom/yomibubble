@@ -13,7 +13,6 @@
 #include "OIS\OIS.h"
 #include "btBulletDynamicsCommon.h"
 #include "btBulletCollisionCommon.h"
-//#include "SkyX.h"
 
 #include "nSystem.h"
 #include "Convert.h"
@@ -26,7 +25,5 @@
 #include <iostream>
 #include <string>
 #include <fstream>
-
-//#include "OGRE\Terrain\OgreTerrain.h"
 
 #endif // _NOSTROMO_PRECOMPILED_H_

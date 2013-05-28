@@ -34,31 +34,36 @@ void MenuState::Enter(){
 	m_game_object_manager = new GameObjectManager;
 	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager, m_message_system, NULL);
 	
-	Ogre::Plane plane(Vector3::UNIT_Y, -1);
-	Ogre::MeshManager::getSingleton().createPlane("plane", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane, 20, 20, 5, 5, true, 1, 5, 5, Ogre::Vector3::UNIT_Z);
+	Ogre::Plane plane(Vector3::UNIT_Y, -0.9);
+	Ogre::MeshManager::getSingleton().createPlane("plane", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane, 20, 20, 5, 5, true, 1, 5, 5, Vector3::UNIT_Z);
 
 	Ogre::Entity* yomi_house = m_scene_manager->createEntity("YomiHouse.mesh");
 	Ogre::Entity* yomi = m_scene_manager->createEntity("Yomi.mesh");
+	Ogre::Entity* yomi_staff = m_scene_manager->createEntity("Staff.mesh");
+	yomi->attachObjectToBone("CATRigLArmDigit21", yomi_staff);
+	Ogre::Entity* tree = m_scene_manager->createEntity("JumpLeafTree_1.mesh");
 	m_house_node = m_scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(4.0f,2.0f,-24.0f));
 	m_house_node->yaw(Ogre::Radian(1.4));
 	m_house_node->attachObject(yomi_house);
-	m_yomi_node = m_scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(1.0f, -1.0f, -3.0f));
-	
+	m_yomi_node = m_scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(1.0f, -0.8f, -3.0f));
+	m_yomi_node->attachObject(yomi);
+	m_tree_node = m_scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(-2.0f, 1.5f, -20.0f));
+	m_tree_node->attachObject(tree);
 
 	//m_animation_state = yomi->getAnimationState("CATRigRArm1");
 	//m_animation_state->setLoop(true);
 	//m_animation_state->setLoop(true);
-	//m_yomi_node->attachObject(yomi);
+	
 
 
-	/*PlaneDef plane_def;
+	PlaneDef plane_def;
 	plane_def.material_name = "Examples/BeachStones";
 	plane_def.plane_name = "plane";
 	plane_def.friction = 1.0f;
 	plane_def.restitution = 0.8f;
 	plane_def.collision_filter.filter = COL_WORLD_STATIC;
 	plane_def.collision_filter.mask = COL_BUBBLE | COL_PLAYER | COL_TOTT;
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(0,0,0), &plane_def);*/
+	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(0,0,0), &plane_def);
 
 	OverlayDef menuBackground;
 	menuBackground.overlay_name = "Menu";

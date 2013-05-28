@@ -9,6 +9,9 @@
 #include "..\..\Managers\SoundManager.h"
 #include "..\..\Components\AIComponents.h"
 #include "..\..\Managers\VariableManager.h"
+#include "TreeLoader3D.h"
+#include "WindBatchPage.h"
+#include "ImpostorPage.h"
 #include <map>
 
 DBManager::DBManager(ArtifexLoader *artifexloader, PhysicsEngine *physics_engine, GameObjectManager *game_object_manager, SoundManager *sound_manager) {
@@ -18,8 +21,9 @@ DBManager::DBManager(ArtifexLoader *artifexloader, PhysicsEngine *physics_engine
 	mDB = new CppSQLite3DB();
 	saving = false;
 	m_game_object_manager = game_object_manager;
+	//m_game_object_manager->Init(
 	m_sound_manager = sound_manager;
-
+	m_paged_geometry = NULL;
 };
 
 DBManager::~DBManager() {
@@ -34,12 +38,23 @@ int DBManager::Load() {
 	string meshFile="";
 	string entName="";
 	mArtifexLoader->mObjectFile.clear();
-	
+	m_paged_geometry = new Forests::PagedGeometry;
+	m_paged_geometry->setCamera(mArtifexLoader->mCamera);
+	m_paged_geometry->setPageSize(40);
+	m_paged_geometry->setInfinite();
+	m_paged_geometry->addDetailLevel<Forests::WindBatchPage>(40,10);
+	m_paged_geometry->addDetailLevel<Forests::ImpostorPage>(100, 10);
+
+	Forests::TreeLoader3D* tree_loader = new Forests::TreeLoader3D(m_paged_geometry, Forests::TBounds(0,0,500,500));
+	m_paged_geometry->setPageLoader(tree_loader);
 	//******** get objects from sqlite file *********
 	string query = "SELECT * FROM objects";
 	
 	CppSQLite3Table t;
 	
+	std::vector<Ogre::String> shadow_map;
+	this->InitShadowList(shadow_map);
+
 	try {
 		t = mDB->getTable(query.c_str());	
 	} catch (CppSQLite3Exception& e) {
@@ -105,7 +120,7 @@ int DBManager::Load() {
 						if (i->second == "player") {
 							PlayerDef player_def;
 							CharacterControllerDef char_def;
-							char_def.friction = 1.0f;
+							char_def.friction = 0.5f;
 							char_def.velocity = VariableManager::GetSingletonPtr()->GetAsFloat("Player_Speed");
 							char_def.max_speed = VariableManager::GetSingletonPtr()->GetAsFloat("Player_Max_Speed");
 							char_def.deceleration = VariableManager::GetSingletonPtr()->GetAsFloat("Player_Deceleration");
@@ -121,25 +136,95 @@ int DBManager::Load() {
 							char_def.max_fall_speed = VariableManager::GetSingletonPtr()->GetAsFloat("Player_Max_Fall_Speed");
 							char_def.fall_acceleration = VariableManager::GetSingletonPtr()->GetAsFloat("Player_Fall_Acceleration");
 							char_def.collision_filter.filter = COL_PLAYER;
-							char_def.collision_filter.mask = COL_BUBBLE | COL_BUBBLE_TRIG | COL_TOTT | COL_WORLD_STATIC | COL_WORLD_TRIGGER;
+							char_def.collision_filter.mask = COL_BUBBLE | COL_BUBBLE_TRIG | COL_TOTT | COL_WORLD_STATIC | COL_WORLD_TRIGGER | COL_QUESTITEM;
+							char_def.mesh = meshFile;
 							player_def.character_contr = &char_def;
 							player_def.level_id = mArtifexLoader->mZoneName;
 							player_def.camera_speed = 2.5f;
 							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(x,y,z), &player_def);
-							m_game_object_manager->CreateGameObject(GAME_OBJECT_CAMERA, Ogre::Vector3(x,y,z), m_game_object_manager->GetGameObject("Player"));
+							//m_game_object_manager->CreateGameObject(GAME_OBJECT_CAMERA, Ogre::Vector3(x,y,z), m_game_object_manager->GetGameObject("Player"));
+
+							////////////////////////////TOTT TEST AREA//////////////////////////
+							TottDef tott_def;
+							tott_def.character_controller.friction = 0.1f;
+							tott_def.character_controller.velocity = 20.1f;
+							tott_def.character_controller.max_speed = 10.0f;
+							tott_def.character_controller.jump_power = 200.0f;
+							tott_def.character_controller.restitution = 0.0f;
+							tott_def.character_controller.step_height = 0.35f;
+							tott_def.character_controller.turn_speed = 80.0f;
+							tott_def.character_controller.max_jump_height = 10.0f;
+							tott_def.character_controller.mass = 1.0f;
+							tott_def.character_controller.max_fall_speed = 0.1f;
+							tott_def.character_controller.fall_acceleration = 0.1f;
+							tott_def.character_controller.air_deceleration = 0.5f;
+							tott_def.character_controller.deceleration = 0.5f;
+							tott_def.character_controller.collision_filter.filter = COL_TOTT;
+							tott_def.character_controller.collision_filter.mask = COL_PLAYER | COL_WORLD_STATIC | COL_BUBBLE | COL_TOTT | COL_QUESTITEM;
+							tott_def.character_controller.radius = 0.5f;
+							tott_def.character_controller.height = 0.1f;
+							tott_def.character_controller.offset.y = 0.0f;
+							tott_def.happy_animation = "Excited";
+							tott_def.idle_animation = "Idle";
+							tott_def.mesh_name = "Hidehog.mesh";
+							tott_def.play_music = false;
+							tott_def.quest_object_mesh_name = "Questitem_Blueberry.mesh";
+							tott_def.react_animation = "Respond";
+							tott_def.run_animation = "Run";
+							tott_def.sb_node_name = "node_main";
+							tott_def.sfx_curious = "";
+							tott_def.sfx_happy = "";
+							tott_def.theme_music = "";
+							tott_def.type_name = "Hidehog";
+							tott_def.walk_animation = "walk";/*
+							GameObject* tott = m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y,z), &tott_def);
+							static_cast<WayPointComponent*>(m_game_object_manager->GetGameObject("TestTott")->GetComponent(COMPONENT_AI))->AddWayPoint(Ogre::Vector3(x+4,y,z));
+							static_cast<WayPointComponent*>(m_game_object_manager->GetGameObject("TestTott")->GetComponent(COMPONENT_AI))->AddWayPoint(Ogre::Vector3(x+2,y,z+2));
+							static_cast<WayPointComponent*>(m_game_object_manager->GetGameObject("TestTott")->GetComponent(COMPONENT_AI))->AddWayPoint(Ogre::Vector3(x,y,z+4));
+							m_game_object_manager->CreateGameObject(GAME_OBJECT_QUEST_ITEM, Ogre::Vector3(x+4,y,z), &tott);
+							m_game_object_manager->CreateGameObject(GAME_OBJECT_SPEECH_BUBBLE, Ogre::Vector3(x,y+2,z), &tott);*/
 						}
 						else if (i->second == "tott") {
-							CharacterControllerDef tott_def;
-							tott_def.friction = 1.0f;
-							tott_def.velocity = 500.0f;
-							tott_def.jump_power = 200.0f;
-							tott_def.restitution = 0.0f;
-							tott_def.step_height = 0.35f;
-							tott_def.turn_speed = 1000.0f;
-							tott_def.max_jump_height = 10.0f;
-							tott_def.collision_filter.filter = COL_TOTT;
-							tott_def.collision_filter.mask = COL_PLAYER | COL_WORLD_STATIC | COL_BUBBLE | COL_TOTT;
-							//temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y,z), &tott_def);
+							TottDef tott_def;
+							tott_def.character_controller.friction = 0.1f;
+							tott_def.character_controller.velocity = 20.1f;
+							tott_def.character_controller.max_speed = 10.0f;
+							tott_def.character_controller.jump_power = 200.0f;
+							tott_def.character_controller.restitution = 0.0f;
+							tott_def.character_controller.step_height = 0.35f;
+							tott_def.character_controller.turn_speed = 100.0f;
+							tott_def.character_controller.max_jump_height = 10.0f;
+							tott_def.character_controller.mass = 1.0f;
+							tott_def.character_controller.max_fall_speed = 0.1f;
+							tott_def.character_controller.fall_acceleration = 0.1f;
+							tott_def.character_controller.air_deceleration = 0.5f;
+							tott_def.character_controller.deceleration = 0.5f;
+							tott_def.character_controller.collision_filter.filter = COL_TOTT;
+							tott_def.character_controller.collision_filter.mask = COL_PLAYER | COL_WORLD_STATIC | COL_BUBBLE | COL_TOTT | COL_QUESTITEM;
+							tott_def.character_controller.radius = 0.5f;
+							tott_def.character_controller.height = 0.1f;
+							tott_def.character_controller.offset.y = 0.4f;
+							tott_def.happy_animation = "Excited";
+							tott_def.idle_animation = "Idle";
+							tott_def.mesh_name = "Hidehog.mesh";
+							tott_def.play_music = false;
+							tott_def.quest_object_mesh_name = "Questitem_Cherry.mesh";
+							tott_def.react_animation = "Respond";
+							tott_def.run_animation = "Run";
+							tott_def.sb_node_name = "node_main";
+							tott_def.sfx_curious = "";
+							tott_def.sfx_happy = "";
+							tott_def.theme_music = "";
+							tott_def.type_name = "Hidehog";
+							tott_def.walk_animation = "walk";
+							GameObject* tott = m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y,z), &tott_def);
+							static_cast<WayPointComponent*>(m_game_object_manager->GetGameObject("TestTott")->GetComponent(COMPONENT_AI))->AddWayPoint(Ogre::Vector3(x+4,y,z+5));
+							static_cast<WayPointComponent*>(m_game_object_manager->GetGameObject("TestTott")->GetComponent(COMPONENT_AI))->AddWayPoint(Ogre::Vector3(x+3,y,z+7));
+							static_cast<WayPointComponent*>(m_game_object_manager->GetGameObject("TestTott")->GetComponent(COMPONENT_AI))->AddWayPoint(Ogre::Vector3(x+2,y,z+10));
+							static_cast<WayPointComponent*>(m_game_object_manager->GetGameObject("TestTott")->GetComponent(COMPONENT_AI))->AddWayPoint(Ogre::Vector3(x+3,y,z+1));
+							static_cast<WayPointComponent*>(m_game_object_manager->GetGameObject("TestTott")->GetComponent(COMPONENT_AI))->AddWayPoint(Ogre::Vector3(x+1,y,z+4));
+							m_game_object_manager->CreateGameObject(GAME_OBJECT_QUEST_ITEM, Ogre::Vector3(x+4,y,z), &tott);
+							m_game_object_manager->CreateGameObject(GAME_OBJECT_SPEECH_BUBBLE, Ogre::Vector3(x,y+2,z), &tott);
 						}
 						else if (i->second == "leaf") {
 							ParticleDef particleDef;
@@ -150,13 +235,21 @@ int DBManager::Load() {
 							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_GATE, Ogre::Vector3(x,y,z), NULL);
 							Ogre::Quaternion quat = Ogre::Quaternion ((Degree(spawn.rx)), Vector3::UNIT_X)*Quaternion ((Degree(spawn.ry)), Vector3::UNIT_Y)*Quaternion ((Degree(spawn.rz)), Vector3::UNIT_Z);
 							temp->GetComponentMessenger()->Notify(MSG_SET_OBJECT_ORIENTATION, &quat);
+							if (mArtifexLoader->mZoneName == "try"){
+								Ogre::Quaternion quat = Ogre::Quaternion ((Degree(spawn.rx + 180)), Vector3::UNIT_X)*Quaternion ((Degree(spawn.ry + 180)), Vector3::UNIT_Y)*Quaternion ((Degree(spawn.rz + 180)), Vector3::UNIT_Z);
+								temp->GetComponentMessenger()->Notify(MSG_SET_OBJECT_ORIENTATION, &quat);
+							}
 						}
 						else if (i->second == "particle"){
 							ParticleDef particleDef;
 							particleDef.particle_name = "Particle/Smoke";
 							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_PARTICLE, Ogre::Vector3(x,y,z), &particleDef);
 						}
-						
+						else if (i->second == "rock_slide"){
+							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_GATE, Ogre::Vector3(x,y,z), NULL);
+							Ogre::Quaternion quat = Ogre::Quaternion ((Degree(spawn.rx)), Vector3::UNIT_X)*Quaternion ((Degree(spawn.ry)), Vector3::UNIT_Y)*Quaternion ((Degree(spawn.rz)), Vector3::UNIT_Z);
+							temp->GetComponentMessenger()->Notify(MSG_SET_OBJECT_ORIENTATION, &quat);
+						}
 						interactive = true;
 					}
 				}
@@ -195,13 +288,40 @@ int DBManager::Load() {
 			}
 
 			if(!interactive) {
+				bool collision = true;
+				Ogre::String nocoll = meshFile.substr(0,6);
+				if (nocoll == "nocoll"){
+					collision = false;
+				}
 				//****************************		
 				
 				//***************************
 				Entity *newModel = NULL;
 				lCreateEntity:
 				try {
-					newModel = mArtifexLoader->mSceneMgr->createEntity((string) entName, (string) meshFile);
+					if (collision){
+						newModel = mArtifexLoader->mSceneMgr->createEntity((string) entName, (string) meshFile);
+						std::vector<Ogre::String>::iterator it = std::find(shadow_map.begin(), shadow_map.end(), meshFile);
+						if (it != shadow_map.end()){
+							newModel->setCastShadows(false);
+						}
+					}
+					else {
+						MeshList::iterator it = m_vegetation.find(meshFile);
+						if (it == m_vegetation.end()){
+							newModel = mArtifexLoader->mSceneMgr->createEntity((string) entName, (string) meshFile);
+							//newModel = mArtifexLoader->mSceneMgr->createEntity((string) entName, "nocoll_TestMedDayGrass1.mesh");
+							newModel->setCastShadows(false);
+							m_vegetation[meshFile] = newModel;
+							m_paged_geometry->setCustomParam(newModel->getName(), "windFactorX", 0.4f);
+							m_paged_geometry->setCustomParam(newModel->getName(), "windFactorY", 0.01f);
+						}
+						else {
+							newModel = it->second;
+						}
+						tree_loader->addTree(newModel, Ogre::Vector3(spawn.x, spawn.y, spawn.z), Ogre::Degree(spawn.ry), spawn.sx);
+					}
+					
 				} catch(Exception &e) {
 					if (e.getNumber() != 4) {
 						cout << "\n|= ArtifexTerra3D =| Zoneloader v1.0 RC1 OT beta: Error " << e.getNumber() << " creating Entity " << entName.c_str() << ": " << e.getFullDescription().c_str() << "\n";
@@ -225,43 +345,40 @@ int DBManager::Load() {
 				{
 					SceneNode *mNode = NULL;
 					try {
+					if (collision){
 						mArtifexLoader->mObjectFile.push_back(spawn);
-						bool collision = true;
+
 						mNode = mArtifexLoader->mSceneMgr->getRootSceneNode()->createChildSceneNode(entName+"Node",Ogre::Vector3(spawn.x,spawn.y,spawn.z),Quaternion ((Degree(spawn.ry)), Vector3::UNIT_Y));
 						mNode->attachObject(newModel);
 						mNode->setScale(spawn.sx,spawn.sy,spawn.sz);
 						Ogre::Quaternion quat = Ogre::Quaternion ((Degree(spawn.rx)), Vector3::UNIT_X)*Quaternion ((Degree(spawn.ry)), Vector3::UNIT_Y)*Quaternion ((Degree(spawn.rz)), Vector3::UNIT_Z);
 						mNode->setOrientation(quat);
 						
-						Ogre::String nocoll = meshFile.substr(0,6);
-						if (nocoll == "nocoll"){
-							collision = false;
-						}
 						// Create collision shape and set position if desired
-						if (collision){
-							BtOgre::StaticMeshToShapeConverter converter(newModel);
-							btCollisionShape* shape = converter.createTrimesh();
-							m_shapes.push_back(shape);
-							btMotionState* motion_state = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)));
-							m_motion_states.push_back(motion_state);
-							btRigidBody* body = new btRigidBody(0, motion_state, shape, btVector3(0,0,0));
-							m_bodies.push_back(body);
+						newModel->setRenderingDistance(80.0f);
+						BtOgre::StaticMeshToShapeConverter converter(newModel);
+						btCollisionShape* shape = converter.createTrimesh();
+						m_shapes.push_back(shape);
+						btMotionState* motion_state = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)));
+						m_motion_states.push_back(motion_state);
+						btRigidBody* body = new btRigidBody(0, motion_state, shape, btVector3(0,0,0));
+						m_bodies.push_back(body);
 
-							btTransform transform;
-							transform.setIdentity();
-							transform.setOrigin(btVector3(spawn.x, spawn.y, spawn.z));
-							transform.setRotation(BtOgre::Convert::toBullet(quat));
-							body->setWorldTransform(transform);
-							CollisionDef* collision_def = new CollisionDef;
-							collision_def->data = NULL;
-							collision_def->flag = COLLISION_FLAG_STATIC;
-							body->setUserPointer(collision_def);
-							body->setRestitution(1.0f);
-							body->setFriction(1.0f);
-							m_collision_defs.push_back(collision_def);
-							int mask = COL_TOTT | COL_BUBBLE | COL_PLAYER;
-							m_physics_engine->GetDynamicWorld()->addRigidBody(body, COL_WORLD_STATIC, mask);
-						}
+						btTransform transform;
+						transform.setIdentity();
+						transform.setOrigin(btVector3(spawn.x, spawn.y, spawn.z));
+						transform.setRotation(BtOgre::Convert::toBullet(quat));
+						body->setWorldTransform(transform);
+						CollisionDef* collision_def = new CollisionDef;
+						collision_def->data = NULL;
+						collision_def->flag = COLLISION_FLAG_STATIC;
+						body->setUserPointer(collision_def);
+						body->setRestitution(1.0f);
+						body->setFriction(1.0f);
+						m_collision_defs.push_back(collision_def);
+						int mask = COL_TOTT | COL_BUBBLE | COL_PLAYER;
+						m_physics_engine->GetDynamicWorld()->addRigidBody(body, COL_WORLD_STATIC, mask);
+					}
 
 				} catch (Exception &e) {
 					cout << "\n|= ArtifexTerra3D =| Zoneloader v1.0 RC1 OT beta SQLite: spawnloader error - problems creating " << spawn.name.c_str() << ":" << e.what() << "\n";
@@ -500,4 +617,24 @@ void DBManager::Shut(){
 	m_shapes.clear();
 	m_bodies.clear();
 	m_collision_defs.clear();
+	m_vegetation.clear();
+	delete m_paged_geometry->getPageLoader();
+	delete m_paged_geometry;
+	m_paged_geometry = NULL;
+}
+
+void DBManager::Update(){
+	m_paged_geometry->update();	// Update LOD from camera position each frame
+}
+
+void DBManager::InitShadowList(std::vector<Ogre::String>& shadow_map){
+	shadow_map.push_back("RockPAth.mesh");
+	shadow_map.push_back("Rock_asset1.mesh");
+	shadow_map.push_back("RockPlatform_2.mesh");
+	shadow_map.push_back("RockPlatform_Low.mesh");
+	shadow_map.push_back("RockPlatform_Low.mesh");
+	shadow_map.push_back("Puzzle1.mesh");
+	shadow_map.push_back("Puzzle2.mesh");
+	shadow_map.push_back("Puzzle3.mesh");
+	shadow_map.push_back("RockSlide.mesh");
 }

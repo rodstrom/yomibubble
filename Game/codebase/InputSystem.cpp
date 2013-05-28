@@ -104,12 +104,20 @@ void InputSystem::Capture(){
 			m_game->InjectRelativeMovementZ(1.0f);
 			changeZmove = true;
 		}
+		else{
+			m_game->InjectRelativeMovementZ(0.0f);
+			changeZmove = true;
+		}
 		if (m_keyboard->isKeyDown(OIS::KC_A)){
 			m_game->InjectRelativeMovementX(-1.0f);
 			changeXmove = true;
 		}
 		else if (m_keyboard->isKeyDown(OIS::KC_D)){
 			m_game->InjectRelativeMovementX(1.0f);
+			changeXmove = true;
+		}
+		else{
+			m_game->InjectRelativeMovementX(0.0f);
 			changeXmove = true;
 		}
 	}
@@ -173,6 +181,7 @@ bool InputSystem::keyPressed(const OIS::KeyEvent& e){
 		m_game->InjectPressedButton(BTN_ARROW_LEFT);
 		break;
 	case OIS::KC_W:
+		m_game->InjectRelativeMovementZ(1.0f);
 		break;
 	case OIS::KC_S:
 		break;
@@ -181,7 +190,7 @@ bool InputSystem::keyPressed(const OIS::KeyEvent& e){
 	case OIS::KC_D:
 		break;
 	case OIS::KC_SPACE:
-		m_game->InjectPressedButton(BTN_START);
+		m_game->InjectPressedButton(BTN_A);
 		break;
 	case OIS::KC_ESCAPE:
 		m_game->InjectPressedButton(BTN_BACK);
@@ -207,19 +216,19 @@ bool InputSystem::keyReleased(const OIS::KeyEvent& e){
 		m_game->InjectReleasedButton(BTN_ARROW_LEFT);
 		break;
 	case OIS::KC_W:
-		m_game->InjectRelativeMovementZ(0.0f);
+		//m_game->InjectRelativeMovementZ(0.0f);
 		break;
 	case OIS::KC_S:
-		m_game->InjectRelativeMovementZ(0.0f);
+		//m_game->InjectRelativeMovementZ(0.0f);
 		break;
 	case OIS::KC_A:
-		m_game->InjectRelativeMovementX(0.0f);
+		//m_game->InjectRelativeMovementX(0.0f);
 		break;
 	case OIS::KC_D:
-		m_game->InjectRelativeMovementX(0.0f);
+		//m_game->InjectRelativeMovementX(0.0f);
 		break;
 	case OIS::KC_SPACE:
-		m_game->InjectReleasedButton(BTN_START);
+		m_game->InjectReleasedButton(BTN_A);
 		break;
 	case OIS::KC_ESCAPE:
 		m_game->InjectReleasedButton(BTN_BACK);
@@ -364,7 +373,7 @@ bool InputSystem::buttonPressed(const OIS::JoyStickEvent& e, int button){
 		
 		break;
 	case 2: //X button
-		
+		m_game->InjectPressedButton(BTN_X);
 		break;
 	case 1: //OIS::MouseButtonID::MB_Right: //or GamePad B
 		m_game->InjectPressedButton(BTN_LEFT_MOUSE);
@@ -414,7 +423,7 @@ bool InputSystem::buttonReleased(const OIS::JoyStickEvent& e, int button){
 		
 		break;
 	case 2: //X button
-		
+		m_game->InjectReleasedButton(BTN_X);
 		break;
 	case 1: //OIS::MouseButtonID::MB_Right: //or GamePad B
 		m_game->InjectReleasedButton(BTN_LEFT_MOUSE);

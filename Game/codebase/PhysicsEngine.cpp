@@ -102,7 +102,7 @@ void PhysicsEngine::Step(float dt){
 }
 
 void PhysicsEngine::CreateTerrainCollision(Ogre::Terrain* terrain){
-	if (!m_has_terrain_coll){
+	/*if (!m_has_terrain_coll){
 		size_t w = terrain->getSize();
 		float* terrain_height_data = terrain->getHeightData();
 		float world_size = terrain->getWorldSize();
@@ -143,7 +143,7 @@ void PhysicsEngine::CreateTerrainCollision(Ogre::Terrain* terrain){
 		m_terrain_body->setCollisionFlags(m_terrain_body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
 		m_dynamic_world->addRigidBody(m_terrain_body);
 		m_has_terrain_coll = true;
-	}
+	}*/
 }
 
 

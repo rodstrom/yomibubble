@@ -30,14 +30,6 @@ void LoadingState::Enter(){
 
 	OverlayDef menuBackground;
 	
-	if (m_level != "try"
-		&& m_level != "Dayarea"
-		&& m_level != "NightArea")
-	{ 
-		menuBackground.overlay_name = "LoadingFirst";
-		menuBackground.cont_name = "Loading/Background1"; 
-	}
-
 	if (m_level == "try") { 
 		menuBackground.overlay_name = "LoadingDay";
 		menuBackground.cont_name = "Loading/Background2"; 
@@ -50,7 +42,10 @@ void LoadingState::Enter(){
 		menuBackground.overlay_name = "LoadingNight";
 		menuBackground.cont_name = "Loading/Background3"; 
 	}
-	//menuBackground.cont_name = "Loading/Background"; //+1,2,3
+	else{
+		menuBackground.overlay_name = "LoadingFirst";
+		menuBackground.cont_name = "Loading/Background1"; 
+	}
 	m_game_object_manager->CreateGameObject(GAME_OBJECT_OVERLAY, Ogre::Vector3(0,0,0), &menuBackground);
 }
 

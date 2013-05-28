@@ -47,7 +47,7 @@ void ArtifexLoader::createWater()
 		ETM_GROUP,
 		mWaterPlane,
 		mWaterWidth, mWaterLength,
-		200, 200,
+		20, 20,
 		true, 1,
 		10, 10,
 		Vector3::UNIT_Z);
@@ -64,15 +64,56 @@ void ArtifexLoader::createWater()
 
 void ArtifexLoader::createLight() {
 	mSceneMgr->setAmbientLight(ColourValue(mAmbientR, mAmbientG, mAmbientB));
+	
+	ConfigFile cfgfile;
+	cfgfile.load(mZonePath+mZoneName+"/zonesettings.cfg");
+
+	float dir_x, dir_y, dir_z;
+
+	dir_x = strToF(cfgfile.getSetting("Light_Direction_X"));
+	if (cfgfile.getSetting("Light_Direction_X") == "") dir_x = 0.1f;
+	dir_y = strToF(cfgfile.getSetting("Light_Direction_Y"));
+	if (cfgfile.getSetting("Light_Direction_Y") == "") dir_y = -1.0f;
+	dir_z = strToF(cfgfile.getSetting("Light_Direction_Z"));
+	if (cfgfile.getSetting("Light_Direction_Z") == "") dir_z = 0.2f;
 
 	mLight = mSceneMgr->createLight( "Light" );
 	//mLight->setType( Ogre::Light::LT_POINT );
 	mLight->setType( Ogre::Light::LT_DIRECTIONAL );
-	mLight->setDirection(Ogre::Vector3(0.1f, -1.0f, 0.4f).normalisedCopy());
-	mLight->setPosition(mLightPosX, mLightPosY, mLightPosZ);
-	
+	mLight->setDirection(Ogre::Vector3(0.1f, -1.0f, 0.3f).normalisedCopy());
+	//mLight->setPosition(mLightPosX, mLightPosY, mLightPosZ);
 	mLight->setCastShadows(true);
-	//mLight->setPowerScale(0.5f);
+	
+	/*mAmbientR = strToF(cfgfile.getSetting("Ambient_Light_R"));
+	if (cfgfile.getSetting("Ambient_Light_R")=="") mAmbientR=0.5f;*/
+
+	float diffuse_default = 1.0f;
+	float specular_default = 0.0f;
+	float specular_r, specular_g, specular_b, specular_a, diffuse_r, diffuse_g, diffuse_b, diffuse_a;
+
+	diffuse_r = strToF(cfgfile.getSetting("Diffuse_Light_R"));
+	if (cfgfile.getSetting("Diffuse_Light_R")=="") diffuse_r = diffuse_default;
+	diffuse_g = strToF(cfgfile.getSetting("Diffuse_Light_G"));
+	if (cfgfile.getSetting("Diffuse_Light_G")=="") diffuse_g = diffuse_default;
+	diffuse_b = strToF(cfgfile.getSetting("Diffuse_Light_B"));
+	if (cfgfile.getSetting("Diffuse_Light_B")=="") diffuse_b = diffuse_default;
+	diffuse_a = strToF(cfgfile.getSetting("Diffuse_Light_A"));
+	if (cfgfile.getSetting("Diffuse_Light_A")=="") diffuse_a = 1.0f;
+
+	specular_r = strToF(cfgfile.getSetting("Specular_Light_R"));
+	if (cfgfile.getSetting("Specular_Light_R")=="") specular_r = specular_default;
+	specular_g = strToF(cfgfile.getSetting("Specular_Light_G"));
+	if (cfgfile.getSetting("Specular_Light_G")=="") specular_g = specular_default;
+	specular_b = strToF(cfgfile.getSetting("Specular_Light_B"));
+	if (cfgfile.getSetting("Specular_Light_B")=="") specular_b = specular_default;
+	specular_a = strToF(cfgfile.getSetting("Specular_Light_A"));
+	if (cfgfile.getSetting("Specular_Light_A")=="") specular_a = 1.0f;
+
+	Ogre::ColourValue diffuse(diffuse_r, diffuse_g, diffuse_b, diffuse_a);
+	Ogre::ColourValue specular(specular_r, specular_g, specular_b, specular_a);
+
+	mLight->setDiffuseColour(diffuse);
+	mLight->setSpecularColour(specular);
 };
 
 void ArtifexLoader::loadGrassSettings()

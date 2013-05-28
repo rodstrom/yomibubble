@@ -16,6 +16,7 @@ public:
 	virtual ~NodeComponent(void){}
 
 	virtual void Init(const Ogre::Vector3& pos, Ogre::SceneManager* scene_manager);
+	virtual void Init(Ogre::SceneNode* node, Ogre::SceneManager* scene_manager); 
 	virtual void Notify(int type, void* message);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
@@ -70,11 +71,12 @@ public:
 	virtual void Notify(int type, void* message);
 	virtual void Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager, bool remove_weights = false);
 	virtual void Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager, const Ogre::String& node_id, bool remove_weights = false);
-	virtual void AddAnimationStates(unsigned int value = 1);
+	virtual void AddAnimationState(const Ogre::String& anim_name, bool loop = true);	// add an animation state and initialize the animation with the animation name
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
 
-	AnimationBlender* m_animation_blender;
+	
+	Ogre::String m_current_animation;
 protected:
 	void PlayQueued();
 	void FixPlayerWeights();	// Ugly hack for the player to fix animation weights because we didn't do enough research in the beginning
@@ -82,6 +84,7 @@ protected:
 	std::vector<AnimationData>	m_animation_states;
 	std::deque<AnimationMsg> m_queue;
 	std::function<void()> m_callback;
+	AnimationBlender* m_animation_blender;
 };
 
 class Overlay2DComponent : public Component, public IComponentObserver {
@@ -157,7 +160,7 @@ protected:
 	Ogre::String			m_material_start_button;
 };
 
-class CountableResourceGUI : public Component, public IComponentObserver{
+class CountableResourceGUI : public Component, public IComponentObserver, public IComponentUpdateable{
 public:
 	CountableResourceGUI(void) : m_total_number(0), m_current_number(0){}
 	virtual ~CountableResourceGUI(void){}
@@ -165,10 +168,16 @@ public:
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
 	void Init(const Ogre::String& level_id);
+	virtual void Update(float dt);
 
 protected:
 	int						m_total_number;
 	int						m_current_number;
+	
+	float					m_pickup_timer;
+	float					m_timer_counter;
+
+	bool					m_can_pick_up;
 
 	Ogre::String			m_material_name_active;
 	Ogre::String			m_material_name_inactive;
@@ -209,18 +218,21 @@ protected:
 };
 
 class PhysicsEngine;
-class TerrainComponent : public Component, public IComponentObserver{
+class TerrainComponent : public Component, public IComponentObserver, public IComponentUpdateable{
 public:
 	TerrainComponent(void) : m_scene_manager(NULL), m_physics_engine(NULL), m_artifex_loader(NULL), m_terrain_shape(NULL), 
 		m_terrain_body(NULL), m_terrain_motion_state(NULL), m_data_converter(NULL){ m_type = COMPONENT_TERRAIN; }
 	virtual ~TerrainComponent(void){}
 
+	virtual void Update(float dt);
 	virtual void Notify(int type, void* message);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
 	void Init(Ogre::SceneManager* scene_manager, PhysicsEngine* physics_engine, GameObjectManager* game_object_manager, SoundManager* sound_manager, const Ogre::String& filename);
 
 	btRigidBody* GetRigidBody() { return m_terrain_body; }
+
+	ArtifexLoader* TerrainComponent::GetArtifex();
 
 protected:
 	float*							m_data_converter;
@@ -231,6 +243,54 @@ protected:
 	btRigidBody*					m_terrain_body;
 	btDefaultMotionState*			m_terrain_motion_state;
 	CollisionDef					m_collision_def;
+};
+
+class SpeechBubbleComponent : public Component, public IComponentObserver, public IComponentUpdateable {
+public:
+	SpeechBubbleComponent(void){ m_type = COMPONENT_SPEECH_BUBBLE; };
+	virtual ~SpeechBubbleComponent(void){};
+
+	virtual void Notify(int type, void* message);
+	virtual void Shut();
+	virtual void SetMessenger(ComponentMessenger* messenger);
+	void Init(Ogre::SceneNode* node, SceneManager* scene_manager, GameObject* tott);
+	virtual void Update(float dt);
+
+	bool m_player_collide;
+
+	void ScaleUp();
+	void ScaleDown();
+
+	GameObject* m_tott;
+
+protected:
+	MeshRenderComponent* m_mesh;
+	Ogre::SceneNode* m_node;
+	float m_current_scale;
+};
+
+class TutorialGraphicsComponent : public Component, public IComponentObserver, public IComponentUpdateable {
+public:
+	TutorialGraphicsComponent(void){}
+	virtual ~TutorialGraphicsComponent(void){}
+	
+	virtual void Notify(int type, void* message);
+	virtual void Shut();
+	virtual void SetMessenger(ComponentMessenger* messenger);
+	void Init(const Ogre::String& id, const Ogre::String& level);
+	virtual void Update(float dt);
+
+protected:
+	float m_timer;
+	float m_timer_counter;
+	bool m_first_pic;
+
+	Ogre::String m_pic_one;
+	Ogre::String m_pic_two;
+	Ogre::String m_level;
+
+	Ogre::Overlay* m_overlay;
+
 };
 
 #endif // _N_VISUAL_COMPONENTS_H_

@@ -2,7 +2,7 @@
 #include "PlayerStateManager.h"
 #include "..\Components\PlayerState.h"
 
-PlayerStateManager::PlayerStateManager(void) : m_blow_bubbles(false), m_active(NULL), m_blow_bubble_state(NULL){}
+PlayerStateManager::PlayerStateManager(void) : m_blow_bubbles(false), m_holding_object(false), m_active(NULL), m_blow_bubble_state(NULL), m_holding_object_state(NULL){}
 PlayerStateManager::~PlayerStateManager(void){}
 
 void PlayerStateManager::Update(float dt){
@@ -11,6 +11,9 @@ void PlayerStateManager::Update(float dt){
 	}
 	if (m_blow_bubbles){
 		m_blow_bubble_state->Update(dt);
+	}
+	if (m_holding_object){
+		m_holding_object_state->Update(dt);
 	}
 }
 
@@ -41,6 +44,16 @@ void PlayerStateManager::BlowBubble(bool value){
 	}
 }
 
+void PlayerStateManager::HoldObject(bool value){
+	m_holding_object = value;
+	if (value){
+		m_holding_object_state->Enter();
+	}
+	else {
+		m_holding_object_state->Exit();
+	}
+}
+
 int PlayerStateManager::GetCurrentType(){
 	if (m_active){
 		return m_active->GetType();
@@ -50,4 +63,5 @@ int PlayerStateManager::GetCurrentType(){
 
 void PlayerStateManager::Init(){
 	m_blow_bubble_state = GetPlayerState(PLAYER_STATE_BLOW_BUBBLE);
+	m_holding_object_state = GetPlayerState(PLAYER_STATE_HOLD_OBJECT);
 }

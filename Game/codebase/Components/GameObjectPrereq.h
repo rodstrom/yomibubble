@@ -19,6 +19,9 @@ enum EGameObject{
 	GAME_OBJECT_NEXT_LEVEL,
 	GAME_OBJECT_CAMERA,
 	GAME_OBJECT_PARTICLE,
+	GAME_OBJECT_QUEST_ITEM,
+	GAME_OBJECT_SPEECH_BUBBLE,
+	GAME_OBJECT_ROCK_SLIDE,
 	GAME_OBJECT_SIZE
 };
 
@@ -68,7 +71,7 @@ enum ECollisionTypes{
 
 struct CharacterControllerDef{
 	CharacterControllerDef(void) : step_height(0.0f), turn_speed(0.0f), velocity(0.0f), max_jump_height(0.0f), friction(0.0f), mass(0.0f),
-		restitution(0.0f), jump_power(0.0f), max_speed(0.0f), deceleration(0.0f), air_deceleration(0.0f), radius(0.0f), height(0.0f), offset(Ogre::Vector3::ZERO) {}
+		restitution(0.0f), jump_power(0.0f), max_speed(0.0f), deceleration(0.0f), air_deceleration(0.0f), radius(0.0f), height(0.0f), offset(Ogre::Vector3::ZERO), mesh("") {}
 	float step_height;
 	float turn_speed;
 	float velocity;
@@ -82,10 +85,32 @@ struct CharacterControllerDef{
 	float radius;
 	float height;
 	float mass;
+	Ogre::String mesh;
 	float fall_acceleration;
 	float max_fall_speed;
 	Ogre::Vector3 offset;
 	CollisionFilter collision_filter;
+};
+
+struct TottDef{
+	TottDef(void) : mesh_name(""), quest_object_mesh_name(""), type_name(""), sb_node_name(""), theme_music(""), play_music(false),
+					sfx_happy(""), sfx_curious(""), idle_animation(""), walk_animation(""), run_animation(""), react_animation(""),
+					happy_animation(""){}
+	CharacterControllerDef	character_controller;
+	Ogre::String			mesh_name;
+	Ogre::String			quest_object_mesh_name;
+	Ogre::String			type_name;
+	Ogre::String			sb_node_name;
+	Ogre::String			theme_music;
+	bool					play_music;
+	Ogre::String			sfx_happy;
+	Ogre::String			sfx_curious;
+	Ogre::String			idle_animation;
+	Ogre::String			walk_animation;
+	Ogre::String			run_animation;
+	Ogre::String			react_animation;
+	Ogre::String			happy_animation;
+	Ogre::String			mesh;
 };
 
 struct PlayerDef{

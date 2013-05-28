@@ -19,7 +19,7 @@ public:
 
 	StateManager(Ogre::RenderWindow* render_window, InputListener* input_listener, MessageSystem* message_system, SoundManager* sound_manager);
 	~StateManager(void);
-
+	void Init(State* state);
 	bool Update(float dt);
 	State* FindById(const Ogre::String& id);
 	void ManageState(const Ogre::String& id, State* state);
@@ -32,7 +32,6 @@ public:
 	void ExitTest();
 
 protected:
-	void Init(State* state);
 	void Cleanup(State* state);
 
 	std::vector<State*>			m_state_stack;

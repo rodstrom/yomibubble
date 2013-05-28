@@ -130,78 +130,78 @@ initOgreTerrain();
 string dbpath = mZonePath;
 str_replace(dbpath,'/','\\');
 
-if (mLoadObjectsFrom=="SQL" && fileExists(dbpath+mZoneName+"\\objects.s3db")) {
-mDBManager->Open(dbpath+mZoneName+"\\objects.s3db");
-mDBManager->Load();
-mDBManager->Close();
-} else {
-spawnLoader("static");
-spawnLoader("groundcover");
-spawnLoader("mobile");
-spawnLoader("movable");
-}
+	if (mLoadObjectsFrom=="SQL" && fileExists(dbpath+mZoneName+"\\objects.s3db")) {
+		mDBManager->Open(dbpath+mZoneName+"\\objects.s3db");
+		mDBManager->Load();
+		mDBManager->Close();
+	} 
+	else {
+		spawnLoader("static");
+		spawnLoader("groundcover");
+		spawnLoader("mobile");
+		spawnLoader("movable");
+	}
 
 //mCamNode->setPosition(mCamX,mCamY,mCamZ);
 //mCamera->pitch( Degree(-5) );
 //mCamera->yaw( Degree(75) );
 
-mZoneLoaded = true;
-cout << "Done loading " << mZoneName.c_str() << ".\n";
-return true;
+	mZoneLoaded = true;
+	cout << "Done loading " << mZoneName.c_str() << ".\n";
+	return true;
 };
 bool ArtifexLoader::isZoneLoaded() {
-return mZoneLoaded;
+	return mZoneLoaded;
 };
-void ArtifexLoader::unloadZone()
-{
+void ArtifexLoader::unloadZone() {
+	mZoneLoaded = false;
 
-mZoneLoaded = false;
+	try {
+		StaticGeometry* staticGeometry = mSceneMgr->getStaticGeometry((string)mZoneName+"static");
+		staticGeometry->destroy();
+		mSceneMgr->destroyStaticGeometry(staticGeometry);
+	} catch (...) {};
 
-try {
-StaticGeometry* staticGeometry = mSceneMgr->getStaticGeometry((string)mZoneName+"static");
-staticGeometry->destroy();
-mSceneMgr->destroyStaticGeometry(staticGeometry);
-} catch (...) {};
+	try {
+		StaticGeometry* staticGeometry = mSceneMgr->getStaticGeometry((string)mZoneName+"groundcover");
+		staticGeometry->destroy();
+		mSceneMgr->destroyStaticGeometry(staticGeometry);
+	} catch (...) {};
 
-try {
-StaticGeometry* staticGeometry = mSceneMgr->getStaticGeometry((string)mZoneName+"groundcover");
-staticGeometry->destroy();
-mSceneMgr->destroyStaticGeometry(staticGeometry);
-} catch (...) {};
+	string spawntype = "";
+	std::vector <Spawn2> *tmpSpawns;
 
-string spawntype = "";
-std::vector <Spawn2> *tmpSpawns;
+	Ogre::SceneNode *tmpNode = NULL;
 
-SceneNode *tmpNode = NULL;
+	tmpSpawns = &mObjectFile;
 
-tmpSpawns = &mObjectFile;
+	std::vector<Spawn2>::iterator tmpIter;
 
-std::vector<Spawn2>::iterator tmpIter;
+	for (tmpIter = tmpSpawns->begin(); tmpIter != tmpSpawns->end(); ++tmpIter) {
+		Spawn2 ts = *tmpIter;
+		try {
+			tmpNode = mSceneMgr->getSceneNode(ts.name+"Node");
+			//cout <<"Found "<< ts.name.c_str() <<". \n";
+		} 
+		catch (Exception &e) {
+			cout << "\n|= ArtifexTerra3D =| Zoneloader v1.0 RC1 OT beta: Error - " << e.getDescription().c_str() << "\n";
+		};
 
-for (tmpIter = tmpSpawns->begin(); tmpIter != tmpSpawns->end(); ++tmpIter)
-{
-Spawn2 ts = *tmpIter;
+	if (tmpNode != NULL) {
+		try {
+			tmpNode->detachAllObjects();
+			mSceneMgr->destroySceneNode(tmpNode->getName());
+			mSceneMgr->destroyEntity(ts.name);
+		} 
+		catch(...) {
+	
+		};
+		}
+		tmpNode = NULL;
+	}
 
-try {
-tmpNode = mSceneMgr->getSceneNode(ts.name+"Node");
-//cout <<"Found "<< ts.name.c_str() <<". \n";
-} catch (Exception &e) {
-cout << "\n|= ArtifexTerra3D =| Zoneloader v1.0 RC1 OT beta: Error - " << e.getDescription().c_str() << "\n";
-};
-
-if (tmpNode != NULL) {
-try {
-tmpNode->detachAllObjects();
-mSceneMgr->destroySceneNode(tmpNode->getName());
-mSceneMgr->destroyEntity(ts.name);
-} catch(...) {
-};
-}
-tmpNode = NULL;
-}
-
-tmpSpawns->clear();
-
+	tmpSpawns->clear();
+	mDBManager->Shut();
 #ifdef PG_GRASSLOADER
 if (mArtifexLoaderPGGrass!=NULL) {
 mArtifexLoaderPGGrass->unload();
@@ -239,7 +239,8 @@ mSceneMgr->clearScene();
 
 #ifdef OT_TERRAIN
 try {
-mTerrainGroup->removeAllTerrains();
+	OGRE_DELETE mTerrainGlobals;
+	mTerrainGroup->removeAllTerrains();
 } catch (Exception &e) {};
 #endif
 
@@ -271,3 +272,7 @@ loadGrassSettings();
 loadWaterSettings();
 loadSkyeSettings();
 };
+
+void ArtifexLoader::Update(){
+	mDBManager->Update();
+}

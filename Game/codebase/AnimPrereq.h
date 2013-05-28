@@ -2,11 +2,12 @@
 #define _ANIM_PREREQ_H_
 
 struct AnimationDef{
-	AnimationDef(void) : id(Ogre::StringUtil::BLANK), index(0), full_body(false){}
-	AnimationDef(const Ogre::String& p_id, int p_index, bool p_full_body) : id(p_id), index(p_index), full_body(p_full_body){}
+	AnimationDef(void) : id(Ogre::StringUtil::BLANK), index(0), duration(0.0f), id_2(Ogre::StringUtil::BLANK){}
+	AnimationDef(const Ogre::String& p_id, int p_index, float p_duration, const Ogre::String& p_id_2 = Ogre::StringUtil::BLANK) : id(p_id), index(p_index), duration(p_duration), id_2(p_id_2){}
 	Ogre::String id;
+	Ogre::String id_2;	// used for full body animations when the object has "top" and "bottom" animations
 	int index;
-	bool full_body;	// full body will disable other animations (if any) when played
+	float duration;
 };
 
 #endif // _ANIM_PREREQ_H_

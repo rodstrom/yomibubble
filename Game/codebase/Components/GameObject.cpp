@@ -9,6 +9,7 @@ int GameObject::m_object_counter = 0;
 
 GameObject::GameObject(int type, const Ogre::String& id){
 	m_messenger = new ComponentMessenger;
+	m_type = type;
 	Init();
 	if (id == Ogre::StringUtil::BLANK){
 		m_id = "GameObject" + NumberToString(m_object_counter);
@@ -35,6 +36,8 @@ void GameObject::Init(){
 	m_component_creator[COMPONENT_TRIGGER] = &GameObject::CreateTriggerComponent;
 	m_component_creator[COMPONENT_RAYCAST] = &GameObject::CreateRaycastComponent;
 	m_component_creator[COMPONENT_SYNCED_TRIGGER] = &GameObject::CreateSyncedTriggerComponent;
+	m_component_creator[COMPONENT_SHAPE] = &GameObject::CreateShapeComponent;
+	m_component_creator[COMPONENT_GENERIC_6DOF_COMPONENT] = &GameObject::CreateGeneric6DofComponent;
 }
 
 Component* GameObject::CreateComponent(int type, const Ogre::Vector3& pos, void* data){
@@ -50,6 +53,10 @@ void GameObject::Update(float dt){
 	}
 }
 
+GameObject* GameObject::GetGameObject(const Ogre::String& id) const{
+	return m_game_object_manager->GetGameObject(id);
+}
+
 Component* GameObject::GetComponent(int type){
 	if (!m_components.empty()){
 		for (unsigned int i = 0; i < m_components.size(); i++){
@@ -61,14 +68,14 @@ Component* GameObject::GetComponent(int type){
 	return NULL;
 }
 
-GameObject* GameObject::GetGameObject(const Ogre::String& id) const{
-	return m_game_object_manager->GetGameObject(id);
-}
-
 void GameObject::AddComponent(Component* component){
 	m_components.push_back(component);
 	component->SetOwner(this);
 	component->SetMessenger(m_messenger);
+}
+
+void GameObject::RemoveGameObject(GameObject* game_object){
+	m_game_object_manager->RemoveGameObject(game_object);
 }
 
 void GameObject::AddComponentToFront(Component* component){
@@ -224,4 +231,20 @@ Component* GameObject::CreateSyncedTriggerComponent(const Ogre::Vector3& pos, vo
 	AddUpdateable(stc);
 	stc->Init(pos, GetGameObjectManager()->GetPhysicsEngine(), &def);
 	return stc;
+}
+
+Component* GameObject::CreateShapeComponent(const Ogre::Vector3& pos, void* data){
+	ShapeDef& def = *static_cast<ShapeDef*>(data);
+	ShapeComponent* shape_comp = new ShapeComponent;
+	AddComponentToFront(shape_comp);
+	shape_comp->Init(def);
+	return shape_comp;
+}
+
+Component* GameObject::CreateGeneric6DofComponent(const Ogre::Vector3& pos, void* data){
+	Generic6DofDef& def = *static_cast<Generic6DofDef*>(data);
+	Generic6DofConstraintComponent* comp = new Generic6DofConstraintComponent;
+	AddComponentToFront(comp);
+	comp->Init(m_game_object_manager->GetPhysicsEngine(), def);
+	return comp;
 }

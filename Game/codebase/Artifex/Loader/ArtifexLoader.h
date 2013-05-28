@@ -85,6 +85,8 @@ public:
 ArtifexLoader(Root *root, SceneManager *scenemgr, SceneNode *camnode, Camera *camera, PhysicsEngine* physics_engine, GameObjectManager* game_object_manager, SoundManager* sound_manager, string zonepath="");
 ~ArtifexLoader();
 
+void Update();
+
 Root *mRoot;
 SceneManager *mSceneMgr;
 
