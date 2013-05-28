@@ -237,6 +237,7 @@ void PlayerBlowBubble::Update(float dt){
 				Ogre::Vector3 scale_incr(m_current_scale);
 				m_bubble->GetComponentMessenger()->Notify(MSG_INCREASE_SCALE_BY_VALUE, &scale_incr);
 			}
+			m_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_READY, NULL);
 			btRigidBody* bubble_body = NULL;
 			m_bubble->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GET_BODY, &bubble_body, "body");
 			bubble_body->setLinearVelocity(btVector3(0,0,0));

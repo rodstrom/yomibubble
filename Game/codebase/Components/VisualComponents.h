@@ -205,12 +205,9 @@ public:
 	virtual void Notify(int type, void* message);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
-	void Init(Ogre::SceneManager* p_scene_manager, const Ogre::String& p_particle_name, const Ogre::String& p_particle_file_name);
+	void Init(Ogre::SceneManager* p_scene_manager, const Ogre::String& p_particle_name, const Ogre::String& p_particle_file_name, const Ogre::Vector3& position, Ogre::SceneNode* node);
 	Ogre::ParticleSystem* GetParticleSystem() const { return m_particle_system; }
-	Ogre::SceneNode* GetSceneNode() const { return m_node; }
-	void CreateParticle(Ogre::SceneNode* p_scene_node, const Ogre::Vector3& p_position, const Ogre::Vector3& p_offset_position = Ogre::Vector3(0,0,0));
 protected:
-	Ogre::SceneNode*			m_node;
 	Ogre::SceneManager*			m_scene_manager;
 	Ogre::ParticleSystem*		m_particle_system;
 };

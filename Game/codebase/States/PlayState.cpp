@@ -63,11 +63,7 @@ void PlayState::SecondLoading(){
 	m_level_manager->AddLevel(level1);
 	m_level_manager->AddLevel(level2);
 	m_level_manager->AddLevel(level3);
-	m_level_manager->LoadLevel("try");
-
-	ParticleDef particle_def;
-	particle_def.particle_name = "Particle/Smoke";
-	//m_game_object_manager->CreateGameObject(GAME_OBJECT_PARTICLE, Ogre::Vector3(158.0f, 72.0f, 253.0f), &particle_def);
+	m_level_manager->LoadLevel(VariableManager::GetSingletonPtr()->GetAsString("StartLevel"));
 
 }
 

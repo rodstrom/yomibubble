@@ -259,10 +259,10 @@ struct GuiDef{
 };
 
 struct ParticleDef{
-	ParticleDef(void) : particle_name(Ogre::StringUtil::BLANK), offset(Ogre::Vector3::ZERO){}
+	ParticleDef(void) : particle_name(Ogre::StringUtil::BLANK), particle_id(Ogre::StringUtil::BLANK), position(Ogre::Vector3::ZERO){}
 	Ogre::String particle_name;
-	Ogre::Vector3 offset;
-	Ogre::String test;
+	Ogre::String particle_id;
+	Ogre::Vector3 position;
 };
 
 struct RaycastDef{

@@ -145,7 +145,7 @@ int DBManager::Load() {
 							//m_game_object_manager->CreateGameObject(GAME_OBJECT_CAMERA, Ogre::Vector3(x,y,z), m_game_object_manager->GetGameObject("Player"));
 
 							////////////////////////////TOTT TEST AREA//////////////////////////
-							TottDef tott_def;
+							/*TottDef tott_def;
 							tott_def.character_controller.friction = 0.1f;
 							tott_def.character_controller.velocity = 20.1f;
 							tott_def.character_controller.max_speed = 10.0f;
@@ -182,7 +182,7 @@ int DBManager::Load() {
 							static_cast<WayPointComponent*>(m_game_object_manager->GetGameObject("TestTott")->GetComponent(COMPONENT_AI))->AddWayPoint(Ogre::Vector3(x+2,y,z+2));
 							static_cast<WayPointComponent*>(m_game_object_manager->GetGameObject("TestTott")->GetComponent(COMPONENT_AI))->AddWayPoint(Ogre::Vector3(x,y,z+4));
 							m_game_object_manager->CreateGameObject(GAME_OBJECT_QUEST_ITEM, Ogre::Vector3(x+4,y,z), &tott);
-							m_game_object_manager->CreateGameObject(GAME_OBJECT_SPEECH_BUBBLE, Ogre::Vector3(x,y+2,z), &tott);
+							m_game_object_manager->CreateGameObject(GAME_OBJECT_SPEECH_BUBBLE, Ogre::Vector3(x,y+2,z), &tott);*/
 						}
 						else if (i->second == "tott") {
 							TottDef tott_def;
@@ -240,11 +240,6 @@ int DBManager::Load() {
 								temp->GetComponentMessenger()->Notify(MSG_SET_OBJECT_ORIENTATION, &quat);
 							}
 						}
-						else if (i->second == "particle"){
-							ParticleDef particleDef;
-							particleDef.particle_name = "Particle/Smoke";
-							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_PARTICLE, Ogre::Vector3(x,y,z), &particleDef);
-						}
 						else if (i->second == "rock_slide"){
 							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_GATE, Ogre::Vector3(x,y,z), NULL);
 							Ogre::Quaternion quat = Ogre::Quaternion ((Degree(spawn.rx)), Vector3::UNIT_X)*Quaternion ((Degree(spawn.ry)), Vector3::UNIT_Y)*Quaternion ((Degree(spawn.rz)), Vector3::UNIT_Z);
@@ -276,6 +271,15 @@ int DBManager::Load() {
 					}
 					else if (i->first == "followable") { 
 						//followables[i->second] = static_cast<NodeComponent*>(temp->GetComponent(EComponentType::COMPONENT_NODE))->GetSceneNode();
+					}
+					else if (i->first == "particle"){
+						static int particle_counter = 0;
+						ParticleDef particleDef;
+						particleDef.particle_name = i->second;
+						particleDef.particle_id = "particle" + NumberToString(particle_counter);
+						temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_PARTICLE, Ogre::Vector3(x,y,z), &particleDef);
+						particle_counter++;
+						interactive = true;
 					}
 				}
 

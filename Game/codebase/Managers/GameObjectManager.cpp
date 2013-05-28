@@ -318,12 +318,13 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 	go->AddComponent(bc);
 	go->AddUpdateable(bc);
 
-	bc->Init(m_physics_engine, m_message_system, VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleImpulse"), VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleMaxVelocity"));
-	//bc->SetCustomVariables(VariableManager::GetSingletonPtr()->GetAsFloat("Blue_Bubble_Life_Time"));
 	node_comp->Init(position, m_scene_manager);
 	mrc->Init("BlueBubble.mesh", m_scene_manager);
-	Ogre::Vector3 scale(0.1f);
+	Ogre::Vector3 scale(def.start_scale);
 	node_comp->GetSceneNode()->setScale(scale);
+	bc->Init(m_physics_engine, m_message_system, VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleImpulse"), VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleMaxVelocity"), def.start_scale);
+	//bc->SetCustomVariables(VariableManager::GetSingletonPtr()->GetAsFloat("Blue_Bubble_Life_Time"));
+
 	RigidBodyDef body_def;
 	body_def.body_type = DYNAMIC_BODY;
 	body_def.collider_type = COLLIDER_SPHERE;
@@ -358,13 +359,13 @@ GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, v
 	RigidbodyComponent* rc = new RigidbodyComponent;
 	go->AddComponent(rc);
 
-
-	bc->Init(m_physics_engine, m_message_system, VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleImpulse"), VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleMaxVelocity"));
-	//bc->SetCustomVariables(VariableManager::GetSingletonPtr()->GetAsFloat("Pink_Bubble_Life_Time"));
 	node_comp->Init(position, m_scene_manager);
 	mrc->Init("PinkBubble.mesh", m_scene_manager);
 	Ogre::Vector3 scale(def.start_scale);
 	node_comp->GetSceneNode()->setScale(scale);
+	bc->Init(m_physics_engine, m_message_system, VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleImpulse"), VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleMaxVelocity"), def.start_scale);
+	//bc->SetCustomVariables(VariableManager::GetSingletonPtr()->GetAsFloat("Pink_Bubble_Life_Time"));
+
 	//mrc->GetEntity()->setMaterialName("PinkBubble");
 	RigidBodyDef body_def;
 	body_def.body_type = DYNAMIC_BODY;
@@ -647,8 +648,8 @@ GameObject* GameObjectManager::CreateLeaf(const Ogre::Vector3& position, void* d
 	m_leaf_iterations++;
 	Ogre::String leaf_id = stream.str();
 
-	particle->Init(m_scene_manager, leaf_id, particleDef.particle_name);
-	particle->CreateParticle(node_comp->GetSceneNode(), node_comp->GetSceneNode()->getPosition(), Ogre::Vector3(0,-1.8f,0));
+	particle->Init(m_scene_manager, leaf_id, particleDef.particle_name, node_comp->GetSceneNode()->getPosition(), node_comp->GetSceneNode());
+	//particle->CreateParticle(node_comp->GetSceneNode(), node_comp->GetSceneNode()->getPosition(), Ogre::Vector3(0,-1.8f,0));
 
 	TriggerDef trdef;
 	trdef.body_type = STATIC_BODY;
@@ -742,7 +743,6 @@ GameObject* GameObjectManager::CreateParticleEffect(const Ogre::Vector3& positio
 	go->AddComponent(node_comp);
 
 	node_comp->Init(position, m_scene_manager);
-
 	node_comp->GetSceneNode()->setPosition(Ogre::Vector3(position));
 
 	std::ostringstream stream;
@@ -750,8 +750,7 @@ GameObject* GameObjectManager::CreateParticleEffect(const Ogre::Vector3& positio
 	m_particle_iterations++;
 	Ogre::String particle_id = stream.str();
 
-	particle->Init(m_scene_manager, particle_id, particleDef.particle_name);
-	particle->CreateParticle(node_comp->GetSceneNode(), node_comp->GetSceneNode()->getPosition(), Ogre::Vector3(0,-1.8f,0));
+	particle->Init(m_scene_manager, particle_id, particleDef.particle_name, Ogre::Vector3(0,0,0), node_comp->GetSceneNode());
 	return go;
 };
 
