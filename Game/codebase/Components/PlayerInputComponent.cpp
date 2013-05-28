@@ -166,7 +166,7 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 	m_player_state_manager->AddPlayerState(new PlayerBounce);
 	m_player_state_manager->AddPlayerState(new PlayerOnBubble(message_system));
 	m_player_state_manager->AddPlayerState(new PlayerInsideBubble(message_system));
-	m_player_state_manager->AddPlayerState(new PlayerHoldObject(physics_engine));
+	m_player_state_manager->AddPlayerState(new PlayerHoldObject(physics_engine, message_system));
 	m_player_state_manager->Init();
 	m_player_state_manager->SetPlayerState(m_player_state_manager->GetPlayerState(PLAYER_STATE_FALLING));
 
@@ -213,7 +213,7 @@ void BubbleController::Notify(int type, void* msg){
 			m_impulse = *static_cast<Ogre::Vector3*>(msg);
 			break;
 		case MSG_BUBBLE_CONTROLLER_TIMER_RUN:
-			m_run_timer = *static_cast<bool*>(msg);
+			//m_run_timer = *static_cast<bool*>(msg);
 			break;
 		case MSG_BUBBLE_CONTROLLER_ACTIVATE:
 			{
@@ -228,7 +228,15 @@ void BubbleController::Notify(int type, void* msg){
 			}
 			break;
 		case MSG_BUBBLE_CONTROLLER_READY:
-			m_ready = true;
+			{
+				m_ready = true;
+				Ogre::SceneNode* node = NULL;
+				m_messenger->Notify(MSG_NODE_GET_NODE, &node);
+				if (node){
+					m_original_scale = node->getScale().y;
+					m_max_scale = m_original_scale * 1.2f;
+				}
+			}
 			break;
 	default:
 		break;
@@ -250,12 +258,16 @@ void BubbleController::Shut(){
 	m_physics_engine->RemoveObjectSimulationStep(this);
 }
 
-void BubbleController::Init(PhysicsEngine* physics_engine, MessageSystem* message_system, float velocity, float max_velocity){
+void BubbleController::Init(PhysicsEngine* physics_engine, MessageSystem* message_system, float velocity, float max_velocity, float scale){
 	m_physics_engine = physics_engine;
 	m_message_system = message_system;
 	m_velocity = velocity;
 	m_max_velocity = max_velocity;
-	m_max_life_time = VariableManager::GetSingletonPtr()->GetAsFloat("PinkBubbleLifetime");
+	m_distance = VariableManager::GetSingletonPtr()->GetAsFloat("PinkBubbleDistance");
+	m_max_distance = m_distance;
+	m_original_scale = scale;
+	m_max_scale = scale * 1.1f;
+	m_scale_increment = 1.4f;
 	physics_engine->AddObjectSimulationStep(this);
 }
 
@@ -272,10 +284,34 @@ void BubbleController::Update(float dt){
 		Ogre::Vector3 impulse = (m_impulse * m_velocity) * dt;
 		m_messenger->Notify(MSG_RIGIDBODY_APPLY_IMPULSE, &impulse, "body");
 		m_apply_impulse = false;
+		m_distance -= impulse.squaredLength();
 	}
-	if (m_run_timer){
-		m_life_timer = std::min(m_life_timer + dt, m_max_life_time);
-		if (m_life_timer >= m_max_life_time){
+	if (m_owner->GetType() == GAME_OBJECT_PINK_BUBBLE){
+		float percent = m_max_distance * 0.5f;
+		if (m_distance < percent){
+			Ogre::SceneNode* node = NULL;
+			m_messenger->Notify(MSG_NODE_GET_NODE, &node);
+			if (node){
+				float scale_inc = (m_scale_increment * (percent / m_distance)) * dt;
+				if (m_scale_state == 0) {    // increase size
+					Ogre::Vector3 scale = node->getScale() + scale_inc;
+					node->setScale(scale);
+					if (node->getScale().y > m_max_scale){
+						node->setScale(Ogre::Vector3(m_max_scale));
+						m_scale_state = 1;
+					}
+				}
+				else if (m_scale_state == 1){    // decrease size
+					Ogre::Vector3 scale = node->getScale() - scale_inc;
+					node->setScale(scale);
+					if (node->getScale().y < m_original_scale){
+						node->setScale(Ogre::Vector3(m_original_scale));
+						m_scale_state = 0;
+					}
+				}
+			}
+		}
+		if (m_distance <= 0.0f){
 			SoundData2D pop_sound = m_owner->GetGameObjectManager()->GetSoundManager()->Create2DData("Bubble_Burst", false, false, false, false, 1.0, 1.0);
 			m_owner->GetGameObjectManager()->GetGameObject("Player")->GetComponentMessenger()->Notify(MSG_SFX2D_PLAY, &pop_sound);
 			m_owner->RemoveGameObject(m_owner);

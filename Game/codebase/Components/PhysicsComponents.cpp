@@ -903,7 +903,7 @@ void TottController::Notify(int type, void* msg){
 		m_state = new_state;
 
 		switch(m_state){
-		case TOTT_STATE::IDLING:
+		case IDLING:
 			m_messenger->Notify(MSG_WAYPOINT_START, NULL);
 			if (m_anim_msg.id != m_walk_animation){
 				//static_cast<MeshRenderComponent*>(m_owner->GetComponent(COMPONENT_MESH_RENDER))->GetEntity()->setVisible(false); // so this crashes
@@ -911,14 +911,14 @@ void TottController::Notify(int type, void* msg){
 				m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
 			}
 			break;
-		case TOTT_STATE::CURIOUS:
+		case CURIOUS:
 			m_messenger->Notify(MSG_WAYPOINT_PAUSE, NULL);
 			if (m_anim_msg.id != m_react_animation){
 				m_anim_msg.id = m_react_animation;
 				m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
 			}
 			break;
-		case TOTT_STATE::HAPPY:
+		case HAPPY:
 			m_messenger->Notify(MSG_WAYPOINT_PAUSE, NULL);
 			if (m_anim_msg.id != m_happy_animation){
 				m_anim_msg.id = m_happy_animation;
@@ -963,7 +963,7 @@ void TottController::Init(const Ogre::Vector3& position, PhysicsEngine* physics_
 	m_anim_msg.wait = false;
 
 	m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
-	m_state = TOTT_STATE::IDLING;
+	m_state = IDLING;
 };
 
 void TottController::Idling(){
@@ -995,15 +995,15 @@ void TottController::Update(float dt){
 	Ogre::Quaternion quat_tott = Ogre::Quaternion ((Degree(tott_ori.getYaw())), Vector3::UNIT_X)*Quaternion ((Degree(tott_ori.getPitch())), Vector3::UNIT_Y)*Quaternion ((Degree(tott_ori.getRoll())), Vector3::UNIT_Z);
 
 	switch(m_state){
-	case TOTT_STATE::IDLING:
+	case IDLING:
 		Idling();
 		break;
-	case TOTT_STATE::CURIOUS:
+	case CURIOUS:
 		//rotation = Ogre::Quaternion(0.5f, player_pos.x, player_pos.y, player_pos.z);
 		m_messenger->Notify(MSG_SET_OBJECT_ORIENTATION, &quat_tott); //so this made it party hard
 		Curious();
 		break;
-	case TOTT_STATE::HAPPY:
+	case HAPPY:
 		Happy();
 		break;
 	default:

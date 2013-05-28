@@ -47,8 +47,8 @@ void CollisionManager::Init(){
 	m_collision[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_TRIGGER_TEST)] = &CollisionManager::PlayerTrigger;
 	m_collision[MakeIntPair(GAME_OBJECT_LEAF, GAME_OBJECT_PLAYER)] = &CollisionManager::LeafPlayer;
 	m_collision[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_LEAF)] = &CollisionManager::PlayerLeaf;
-	m_collision[MakeIntPair(GAME_OBJECT_CAMERA, GAME_OBJECT_TERRAIN)] = &CollisionManager::CameraTerrain;
-	m_collision[MakeIntPair(GAME_OBJECT_TERRAIN, GAME_OBJECT_CAMERA)] = &CollisionManager::TerrainCamera;
+	//m_collision[MakeIntPair(GAME_OBJECT_CAMERA, GAME_OBJECT_TERRAIN)] = &CollisionManager::CameraTerrain;
+	//m_collision[MakeIntPair(GAME_OBJECT_TERRAIN, GAME_OBJECT_CAMERA)] = &CollisionManager::TerrainCamera;
 	m_collision[MakeIntPair(GAME_OBJECT_GATE, GAME_OBJECT_PLAYER)] = &CollisionManager::GatePlayer;
 	m_collision[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_GATE)] = &CollisionManager::PlayerGate;
 	m_collision[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_QUEST_ITEM)] = &CollisionManager::PlayerQuestItem;
@@ -152,8 +152,8 @@ void CollisionManager::PlayerQuestItem(GameObject* player, GameObject* quest_ite
 };
 
 void CollisionManager::TottQuestItem(GameObject* tott, GameObject* quest_item){
-	//std::cout << "Tott vs QuestItem\n";
-	TOTT_STATE ts = TOTT_STATE::HAPPY;
+	std::cout << "Tott vs QuestItem\n";
+	TOTT_STATE ts = HAPPY;
 	tott->GetComponentMessenger()->Notify(MSG_TOTT_STATE_CHANGE, &ts);
 	//typ ljudeffekt
 	ParticleDef particleDef;
@@ -179,7 +179,7 @@ void CollisionManager::PlayerSpeechBubble(GameObject* player, GameObject* speech
 	}
 	*/
 	speech_bubble->GetComponentMessenger()->Notify(MSG_SP_BUBBLE_SHOW, NULL);
-	TOTT_STATE ts = TOTT_STATE::CURIOUS;
+	TOTT_STATE ts = CURIOUS;
 	static_cast<SpeechBubbleComponent*>(speech_bubble->GetComponent(COMPONENT_SPEECH_BUBBLE))->m_tott->GetComponentMessenger()->Notify(MSG_TOTT_STATE_CHANGE, &ts);
 };
 

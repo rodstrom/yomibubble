@@ -108,13 +108,13 @@ protected:
 class BubbleController : public Component, public IComponentObserver, public IComponentSimulationStep, public IComponentUpdateable{
 public:
 	BubbleController(void) :  m_velocity(0.0f), m_max_velocity(0.0f), m_impulse(Ogre::Vector3::ZERO), m_apply_impulse(false),
-		m_run_timer(false), m_life_timer(0.0f), m_ready(false)
+		m_distance(0.0f), m_ready(false), m_scale_state(0)
 	{ m_type = COMPONENT_BUBBLE_CONTROL; m_update = true; }
 	virtual ~BubbleController(void){}
 
 	virtual void Notify(int type, void* message);
 	virtual void Shut();
-	virtual void Init(PhysicsEngine* physics_engine, MessageSystem* message_system, float velocity, float max_velocity);
+	virtual void Init(PhysicsEngine* physics_engine, MessageSystem* message_system, float velocity, float max_velocity, float scale);
 	virtual void SetMessenger(ComponentMessenger* messenger);
 	virtual void Update(float dt);
 	virtual void SimulationStep(btScalar time_step);
@@ -128,9 +128,13 @@ protected:
 	Ogre::Vector3 m_impulse;
 	float m_velocity;
 	float m_max_velocity;
-	float m_life_timer;
-	float m_max_life_time;
-	bool m_run_timer;
+	float m_distance;
+	float m_max_distance;
+	float m_original_scale;
+	float m_current_scale;
+	float m_scale_increment;
+	float m_max_scale;
+	short m_scale_state;
 	bool m_ready;
 };
 

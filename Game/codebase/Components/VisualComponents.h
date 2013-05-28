@@ -205,14 +205,9 @@ public:
 	virtual void Notify(int type, void* message);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
-	void Init(Ogre::SceneManager* p_scene_manager, const Ogre::String& p_particle_name, const Ogre::String& p_particle_file_name);
+	void Init(Ogre::SceneManager* p_scene_manager, const Ogre::String& p_particle_name, const Ogre::String& p_particle_file_name, const Ogre::Vector3& position, Ogre::SceneNode* node);
 	Ogre::ParticleSystem* GetParticleSystem() const { return m_particle_system; }
-	Ogre::SceneNode* GetSceneNode() const { return m_scene_node; }
-	void CreateParticle(Ogre::SceneNode* p_scene_node, const Ogre::Vector3& p_position, const Ogre::Vector3& p_offset_position = Ogre::Vector3(0,0,0));
 protected:
-	Ogre::SceneNode*			m_scene_node;
-	Ogre::SceneNode*			m_node;
-	Ogre::SceneNode*			m_nodes;
 	Ogre::SceneManager*			m_scene_manager;
 	Ogre::ParticleSystem*		m_particle_system;
 };
@@ -291,6 +286,22 @@ protected:
 
 	Ogre::Overlay* m_overlay;
 
+};
+
+class DestroyCallbackComponent : public Component, public IComponentObserver{
+public:
+	DestroyCallbackComponent(void) : m_callback(NULL){}
+	~DestroyCallbackComponent(void){}
+	virtual void Notify(int type, void* message){}
+	virtual void Shut(){
+		if (m_callback){
+			m_callback();
+		}
+	}
+	virtual void SetMessenger(ComponentMessenger* messenger){ m_messenger = messenger; }
+	virtual void Init(std::function<void()> callback) { m_callback = callback; }
+protected:
+	std::function<void()> m_callback;
 };
 
 #endif // _N_VISUAL_COMPONENTS_H_
