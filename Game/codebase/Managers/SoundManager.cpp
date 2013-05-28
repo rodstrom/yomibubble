@@ -32,6 +32,7 @@ void SoundManager::Init(Ogre::SceneManager* scene_manager){
 
 void SoundManager::Exit(){
 	m_scene_manager = NULL;
+	m_sound_manager->destroyAllSounds();
 }
 
 void SoundManager::LoadAudio(){
