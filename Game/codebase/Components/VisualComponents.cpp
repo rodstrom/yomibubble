@@ -703,9 +703,6 @@ void TerrainComponent::Init(Ogre::SceneManager* scene_manager, PhysicsEngine* ph
 	m_physics_engine = physics_engine;
 	m_artifex_loader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_scene_manager->getCamera("MainCamera"), physics_engine, game_object_manager, sound_manager, "../../resources/terrain/");
 
-//mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_camera, m_game_object_manager, m_sound_manager, "../../resources/terrain/");
-
-
 	m_artifex_loader->loadZone(filename, true, true, true, true, true, false);
 	Ogre::Terrain* terrain = m_artifex_loader->mTerrain;
 	size_t w = terrain->getSize();

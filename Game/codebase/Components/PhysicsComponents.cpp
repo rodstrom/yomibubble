@@ -493,6 +493,11 @@ void CharacterController::SimulationStep(btScalar time_step){
 		btVector3 vel = m_rigidbody->getLinearVelocity();
 		m_rigidbody->setLinearVelocity(btVector3(vel.x(), jump_strength, vel.z()));
 	}
+	/*if (m_on_ground){
+		btScalar fall_speed = m_fall_acceleration * time_step;
+		m_rigidbody->applyCentralImpulse(btVector3(0.0f, -fall_speed, 0.0f));
+	}*/
+
 	if (!m_on_ground && !m_is_jumping){
 		btScalar fall_speed = m_fall_acceleration * time_step;
 		m_rigidbody->applyCentralImpulse(btVector3(0.0f, -fall_speed, 0.0f));
