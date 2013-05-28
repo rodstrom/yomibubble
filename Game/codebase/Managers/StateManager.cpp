@@ -88,10 +88,7 @@ State* StateManager::FindById(const Ogre::String& id){
 	return NULL;
 }
 
-void StateManager::ChangeState(State* state, bool fade){
-	if(fade){
-			//m_fading = true;
-		}
+void StateManager::ChangeState(State* state){
 	if (!m_next_state){
 		m_next_state = state;
 	}

@@ -114,5 +114,5 @@ void PauseState::ResumeGame(){
 
 void PauseState::ToMainMenu(){
 	PopState();		//need to flush all states first
-	ChangeState(FindByName("MenuState"), true);
+	ChangeState(FindByName("MenuState"));
 }

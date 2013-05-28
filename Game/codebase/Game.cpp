@@ -23,9 +23,9 @@ bool Game::Init(Ogre::RenderWindow* render_window, MessageSystem* message_system
 	LoadingState::Create<LoadingState>(m_state_manager, "LoadingState");
 	//IntroLogoState::Create<IntroLogoState>(m_state_manager, "LogoState");
 	IntroMovieState::Create<IntroMovieState>(m_state_manager, "IntroMovieState");
-	m_state_manager->ChangeState(m_state_manager->FindById("MenuState"), true);
+	m_state_manager->ChangeState(m_state_manager->FindById("MenuState"));
 
-	//ShowCursor(false);
+	//ShowCursor(false); // NO WINDOWS SPECIFIC CALLS!
 
 	return true;
 }

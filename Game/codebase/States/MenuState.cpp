@@ -164,7 +164,7 @@ bool MenuState::Update(float dt){
 
 void MenuState::ChangeStateToPlayState()
 {
-	ChangeState(FindByName("PlayState"), true);
+	ChangeState(FindByName("PlayState"));
 }
 
 void MenuState::ChangeStateToOptions(){}

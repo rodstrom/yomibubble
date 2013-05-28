@@ -25,5 +25,6 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <functional>
 
 #endif // _NOSTROMO_PRECOMPILED_H_

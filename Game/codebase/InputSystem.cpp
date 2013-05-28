@@ -360,12 +360,12 @@ bool InputSystem::buttonPressed(const OIS::JoyStickEvent& e, int button){
 		
 		break;
 	case 5: //Right Button
-		m_delta_zoom += 20.00005;
+		m_delta_zoom += 30.00005f;
 		//m_game->InjectRelativeCameraAxisZ(m_delta_zoom);
 		//m_game->InjectRelativeCameraAxisZ(1000.0);
 		break;
 	case 4: //Left Button
-		m_delta_zoom -= 20.00005;
+		m_delta_zoom -= 30.00005f;
 		//m_game->InjectRelativeCameraAxisZ(m_delta_zoom);
 		//m_game->InjectRelativeCameraAxisZ(-1000.0);
 		break;

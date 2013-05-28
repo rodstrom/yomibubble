@@ -26,7 +26,7 @@ void NodeComponent::Notify(int type, void* msg){
 	case MSG_NODE_GET_NODE:
 		*static_cast<Ogre::SceneNode**>(msg) = m_node;
 		//if (m_owner->GetId() == "TestTott") { std::cout << "Tott pos " << m_node->getPosition() << std::endl; }
-	//	if (m_owner->GetId() == "TestSpeechBubble") { std::cout << "Speech Bubble at " << m_node->getPosition() << std::endl; }
+		//if (m_owner->GetId() == "TestSpeechBubble") { std::cout << "Speech Bubble at " << m_node->getPosition() << std::endl; }
 		break;
 	case MSG_INCREASE_SCALE_BY_VALUE:
 		{
@@ -582,34 +582,24 @@ void OverlayCallbackComponent::Shut(){
 	m_messenger->Unregister(MSG_OVERLAY_CALLBACK, this);
 }
 
-void ParticleComponent::Init(Ogre::SceneManager* p_scene_manager, const Ogre::String& p_particle_name, const Ogre::String& p_particle_file_name){
+void ParticleComponent::Init(Ogre::SceneManager* p_scene_manager, const Ogre::String& p_particle_name, const Ogre::String& p_particle_file_name, const Ogre::Vector3& position, Ogre::SceneNode* node){
 	m_scene_manager = p_scene_manager;
 	m_particle_system = m_scene_manager->createParticleSystem(p_particle_name, p_particle_file_name);
 	m_particle_system->setDefaultHeight(0.1f);
-}
-
-void ParticleComponent::CreateParticle(Ogre::SceneNode* p_scene_node, const Ogre::Vector3& p_position, const Ogre::Vector3& p_offset_position){
-	m_nodes = p_scene_node;
-	m_node = m_nodes->createChildSceneNode(p_offset_position);
-	m_node->attachObject(m_particle_system);
+	m_particle_system->setCastShadows(false);
+	node->attachObject(m_particle_system);
 }
 
 void ParticleComponent::Notify(int type, void* message){
-	/*switch (type)
-	{
-	default:
-		break;
-	}*/
 }
 
 void ParticleComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger = messenger;
-	m_messenger->Register(MSG_CREATE_PARTICLE, this);
 }
 
 void ParticleComponent::Shut(){
-	m_messenger->Unregister(MSG_CREATE_PARTICLE, this);
 	m_particle_system->removeAllEmitters();
+	m_scene_manager->destroyParticleSystem(m_particle_system);
 }
 
 void CountableResourceGUI::Notify(int type, void* message){

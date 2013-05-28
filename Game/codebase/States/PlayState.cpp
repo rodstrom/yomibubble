@@ -28,8 +28,8 @@ void PlayState::Enter(){
 	m_viewport = m_render_window->addViewport(m_camera);
 	m_camera->setAspectRatio(Ogre::Real(m_viewport->getActualWidth()) / Ogre::Real(m_viewport->getActualHeight()));
 
-	Ogre::CompositorManager::getSingleton().addCompositor(m_viewport, "Bloom");
-	Ogre::CompositorManager::getSingleton().setCompositorEnabled(m_viewport, "Bloom", true);
+	//Ogre::CompositorManager::getSingleton().addCompositor(m_viewport, "Bloom");
+	//Ogre::CompositorManager::getSingleton().setCompositorEnabled(m_viewport, "Bloom", true);
 
 	m_game_object_manager = new GameObjectManager;
 	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager, m_message_system, NULL);
@@ -63,7 +63,8 @@ void PlayState::SecondLoading(){
 	m_level_manager->AddLevel(level1);
 	m_level_manager->AddLevel(level2);
 	m_level_manager->AddLevel(level3);
-	m_level_manager->LoadLevel("try");
+	m_level_manager->LoadLevel(VariableManager::GetSingletonPtr()->GetAsString("StartLevel"));
+
 }
 
 void PlayState::Exit(){

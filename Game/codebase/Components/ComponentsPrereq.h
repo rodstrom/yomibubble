@@ -118,7 +118,7 @@ enum EComponentMsg{
 	MSG_TOTT_STATE_CHANGE,
 	MSG_WAYPOINT_PAUSE,
 	MSG_WAYPOINT_START,
-	MSG_DEFAULT_WAY_POINTS,
+	MSG_CAMERA_CHECK_COLLISION,
 	MSG_SIZE
 };
 
@@ -259,8 +259,10 @@ struct GuiDef{
 };
 
 struct ParticleDef{
+	ParticleDef(void) : particle_name(Ogre::StringUtil::BLANK), particle_id(Ogre::StringUtil::BLANK), position(Ogre::Vector3::ZERO){}
 	Ogre::String particle_name;
-	Ogre::String test;
+	Ogre::String particle_id;
+	Ogre::Vector3 position;
 };
 
 struct RaycastDef{

@@ -15,7 +15,7 @@ public:
 	virtual ~StateListener(void){}
 	virtual void ManageState(const Ogre::String& id, State* state) = 0;
 	virtual State* FindById(const Ogre::String& id) = 0;
-	virtual void ChangeState(State* state, bool fade) = 0;
+	virtual void ChangeState(State* state) = 0;
 	virtual bool PushState(State* state) = 0;
 	virtual void PopState() = 0;
 	virtual void Init(State* state) = 0;
@@ -46,7 +46,7 @@ protected:
 	virtual ~State(void){ delete m_input_manager; }
 
 	State* FindByName(const Ogre::String& id) { return m_parent->FindById(id); }
-	void ChangeState(State* state, bool fade) { m_parent->ChangeState(state, fade); }
+	void ChangeState(State* state) { m_parent->ChangeState(state); }
 	bool PushState(State* state) { return m_parent->PushState(state); }
 	void PopState() { m_parent->PopState(); }
 

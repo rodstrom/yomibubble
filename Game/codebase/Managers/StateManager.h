@@ -24,7 +24,7 @@ public:
 	State* FindById(const Ogre::String& id);
 	void ManageState(const Ogre::String& id, State* state);
 	void Start(State* state);
-	void ChangeState(State*, bool fade = true);
+	void ChangeState(State*);
 	bool PushState(State*);
 	void PopState();
 	void Shut();

@@ -80,7 +80,7 @@ void ArtifexLoader::createLight() {
 	mLight = mSceneMgr->createLight( "Light" );
 	//mLight->setType( Ogre::Light::LT_POINT );
 	mLight->setType( Ogre::Light::LT_DIRECTIONAL );
-	mLight->setDirection(Ogre::Vector3(0.1f, -1.0f, 0.3f).normalisedCopy());
+	mLight->setDirection(Ogre::Vector3(dir_x, dir_y, dir_z).normalisedCopy());
 	//mLight->setPosition(mLightPosX, mLightPosY, mLightPosZ);
 	mLight->setCastShadows(true);
 	
