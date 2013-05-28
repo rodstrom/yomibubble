@@ -906,6 +906,7 @@ void TottController::Notify(int type, void* msg){
 		case TOTT_STATE::IDLING:
 			m_messenger->Notify(MSG_WAYPOINT_START, NULL);
 			if (m_anim_msg.id != m_walk_animation){
+				//static_cast<MeshRenderComponent*>(m_owner->GetComponent(COMPONENT_MESH_RENDER))->GetEntity()->setVisible(false); // so this crashes
 				m_anim_msg.id = m_walk_animation;
 				m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
 			}
@@ -966,22 +967,40 @@ void TottController::Init(const Ogre::Vector3& position, PhysicsEngine* physics_
 };
 
 void TottController::Idling(){
+	//m_messenger->Notify(MSG_MESH_RENDERER_GET_ENTITY
+
+	
 };
 	
 void TottController::Curious(){
+	m_anim_msg.id = m_react_animation;
+	m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
 };
 	
 void TottController::Happy(){
+	m_anim_msg.id = m_happy_animation;
+	m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
 };
 
 void TottController::Update(float dt){
 	CharacterController::Update(dt);
+	Ogre::Quaternion rotation;
+	Ogre::Vector3 tott_pos = static_cast<NodeComponent*>(m_owner->GetComponent(COMPONENT_NODE))->GetSceneNode()->getPosition();
+	Ogre::Quaternion tott_ori = static_cast<NodeComponent*>(m_owner->GetComponent(COMPONENT_NODE))->GetSceneNode()->getOrientation();
+
+	Ogre::Vector3 player_pos = static_cast<NodeComponent*>(m_owner->GetGameObjectManager()->GetGameObject("Player")->GetComponent(COMPONENT_NODE))->GetSceneNode()->getPosition();
+	Ogre::Quaternion player_ori = static_cast<NodeComponent*>(m_owner->GetGameObjectManager()->GetGameObject("Player")->GetComponent(COMPONENT_NODE))->GetSceneNode()->getOrientation();
+
+	Ogre::Quaternion quat = Ogre::Quaternion ((Degree(player_ori.getYaw())), Vector3::UNIT_X)*Quaternion ((Degree(player_ori.getPitch())), Vector3::UNIT_Y)*Quaternion ((Degree(player_ori.getRoll())), Vector3::UNIT_Z);
+	Ogre::Quaternion quat_tott = Ogre::Quaternion ((Degree(tott_ori.getYaw())), Vector3::UNIT_X)*Quaternion ((Degree(tott_ori.getPitch())), Vector3::UNIT_Y)*Quaternion ((Degree(tott_ori.getRoll())), Vector3::UNIT_Z);
 
 	switch(m_state){
 	case TOTT_STATE::IDLING:
 		Idling();
 		break;
 	case TOTT_STATE::CURIOUS:
+		//rotation = Ogre::Quaternion(0.5f, player_pos.x, player_pos.y, player_pos.z);
+		m_messenger->Notify(MSG_SET_OBJECT_ORIENTATION, &quat_tott); //so this made it party hard
 		Curious();
 		break;
 	case TOTT_STATE::HAPPY:

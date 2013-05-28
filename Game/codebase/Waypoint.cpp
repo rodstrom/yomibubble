@@ -82,6 +82,10 @@ bool WayPoint::withinDistance(float meters){
 	return false;
 }
 
+void WayPoint::UpdateGoal(){
+	m_direction = m_destination - m_node->getPosition();
+};
+
 void WayPoint::Update(float dt){
 	//std::cout << "Tott pos: " << m_node->getPosition() << std::endl;
 
@@ -99,6 +103,7 @@ void WayPoint::Update(float dt){
         if (NextLocation()) { }
     }
 	else {
+		UpdateGoal();
 		//do naaathing
 		//std::cout << "Deque empty: " << m_walk_list.empty() << std::endl;
 	}

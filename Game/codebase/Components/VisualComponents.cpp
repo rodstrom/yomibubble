@@ -26,7 +26,7 @@ void NodeComponent::Notify(int type, void* msg){
 	case MSG_NODE_GET_NODE:
 		*static_cast<Ogre::SceneNode**>(msg) = m_node;
 		//if (m_owner->GetId() == "TestTott") { std::cout << "Tott pos " << m_node->getPosition() << std::endl; }
-	//	if (m_owner->GetId() == "TestSpeechBubble") { std::cout << "Speech Bubble at " << m_node->getPosition() << std::endl; }
+		//if (m_owner->GetId() == "TestSpeechBubble") { std::cout << "Speech Bubble at " << m_node->getPosition() << std::endl; }
 		break;
 	case MSG_INCREASE_SCALE_BY_VALUE:
 		{

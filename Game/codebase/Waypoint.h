@@ -15,6 +15,7 @@ public:
 	
 	void AddWayPoint(Ogre::Vector3 way_point);
 	void AddWayPoint(Ogre::SceneNode* scene_node);
+	void UpdateGoal();
 
     Ogre::Vector3 m_direction;              // The direction the object is moving
     Ogre::Vector3 m_destination;            // The destination the object is moving towards
