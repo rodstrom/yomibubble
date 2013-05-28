@@ -91,6 +91,8 @@ public:
 	void SetMaxSpeed(float value) { m_max_speed = value; }
 	void SetDeacceleration(float value) { m_deceleration = value; }
 
+
+
 protected:
 	void ApplyRotation(const Ogre::Vector3& dir, float dt);
 	void ApplyImpulse(const Ogre::Vector3& dir, float dt);
@@ -147,6 +149,10 @@ public:
 	void Happy();
 	
 	TottDef m_def;
+	bool m_quest_done;
+	float m_state_timer_counter;
+	float m_state_timer;
+	bool m_can_change_state;
 	
 protected:
 	TOTT_STATE m_state;

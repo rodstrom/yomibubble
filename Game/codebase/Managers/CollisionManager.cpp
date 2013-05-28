@@ -123,8 +123,9 @@ void CollisionManager::PlayerPlane(GameObject* player, GameObject* plane){
 
 void CollisionManager::LeafPlayer(GameObject* leaf, GameObject* player){
 	leaf->GetGameObjectManager()->RemoveGameObject(leaf);
-	player->GetComponentMessenger()->Notify(MSG_LEAF_PICKUP, NULL);
+	player->GetComponentMessenger()->Notify(MSG_LEAF_PICKUP, NULL); 
 	player->GetComponentMessenger()->Notify(MSG_SFX2D_PLAY, &static_cast<PlayerInputComponent*>(player->GetComponent(COMPONENT_PLAYER_INPUT))->m_leaf_sfx);
+	player->GetComponentMessenger()->Notify(MSG_SFX2D_PLAY, &static_cast<PlayerInputComponent*>(player->GetComponent(COMPONENT_PLAYER_INPUT))->m_leaf_giggle_sfx);
 };
 
 void CollisionManager::PlayerTrigger(GameObject* player, GameObject* trigger){

@@ -905,6 +905,8 @@ void TottController::Notify(int type, void* msg){
 		//new_state = static_cast<TOTT_STATE*>(msg);
 		m_state = new_state;
 
+		if (m_can_change_state){
+
 		switch(m_state){
 		case IDLING:
 			m_messenger->Notify(MSG_WAYPOINT_START, NULL);
@@ -930,7 +932,10 @@ void TottController::Notify(int type, void* msg){
 			break;
 		default:
 			break;
-		};/*
+		};
+		m_can_change_state = false;
+		}
+		/*
 		break;
 	default:
 		break;
@@ -967,11 +972,18 @@ void TottController::Init(const Ogre::Vector3& position, PhysicsEngine* physics_
 
 	m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
 	m_state = IDLING;
+
+	m_quest_done = false;
+
+	m_state_timer_counter = 0.0f;
+	m_state_timer = 1.0f;
+	m_can_change_state = true;
 };
 
 void TottController::Idling(){
 	//m_messenger->Notify(MSG_MESH_RENDERER_GET_ENTITY
-
+	m_anim_msg.id = m_idle_animation;
+	m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
 	
 };
 	
@@ -983,6 +995,9 @@ void TottController::Curious(){
 void TottController::Happy(){
 	m_anim_msg.id = m_happy_animation;
 	m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
+	if (!m_quest_done){
+		//m_owner->GetGameObjectManager()->RemoveGameObject(m_speech_bubble); //or something like that
+	}
 };
 
 void TottController::Update(float dt){
@@ -997,13 +1012,22 @@ void TottController::Update(float dt){
 	Ogre::Quaternion quat = Ogre::Quaternion ((Degree(player_ori.getYaw())), Vector3::UNIT_X)*Quaternion ((Degree(player_ori.getPitch())), Vector3::UNIT_Y)*Quaternion ((Degree(player_ori.getRoll())), Vector3::UNIT_Z);
 	Ogre::Quaternion quat_tott = Ogre::Quaternion ((Degree(tott_ori.getYaw())), Vector3::UNIT_X)*Quaternion ((Degree(tott_ori.getPitch())), Vector3::UNIT_Y)*Quaternion ((Degree(tott_ori.getRoll())), Vector3::UNIT_Z);
 
+	if (!m_can_change_state){
+		m_state_timer_counter += dt;
+
+		if (m_state_timer_counter > m_state_timer){
+			m_can_change_state = true;
+			m_state_timer_counter = 0.0f;
+		}
+	}
+
 	switch(m_state){
 	case IDLING:
 		Idling();
 		break;
 	case CURIOUS:
 		//rotation = Ogre::Quaternion(0.5f, player_pos.x, player_pos.y, player_pos.z);
-		m_messenger->Notify(MSG_SET_OBJECT_ORIENTATION, &quat_tott); //so this made it party hard
+		//m_messenger->Notify(MSG_SET_OBJECT_ORIENTATION, &quat_tott); //so this made it party hard
 		Curious();
 		break;
 	case HAPPY:

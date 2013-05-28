@@ -229,8 +229,12 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	go->AddComponent(camera_rcc);
 	//RigidbodyComponent* camera_rb = new RigidbodyComponent;
 	*/
-
-	tutorial->Init("Jump", def.level_id);
+	if (def.level_id == "try"){
+		tutorial->Init("Level1", def.level_id);
+	}
+	else{
+		tutorial->Init("Level2", def.level_id);
+	}
 
 	go->SetId("Player");
 

@@ -102,11 +102,12 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 	m_physics_engine = physics_engine;
 
 	m_start_music = sound_manager->Create2DData("Tutorial_Theme", false, false, false, false, 1.0f, 1.0f);
-	m_day_music = sound_manager->Create2DData("Day_Theme", false, false, false, false, 1.0f, 1.0f);;
-	m_night_music = sound_manager->Create2DData("Night_Theme", false, false, false, false, 1.0f, 1.0f);;
+	m_day_music = sound_manager->Create2DData("Day_Theme", false, false, false, false, 1.0f, 1.0f);
+	m_night_music = sound_manager->Create2DData("Night_Theme", false, false, false, false, 1.0f, 1.0f);
 
 	m_bounce_sound = sound_manager->Create2DData("Bounce", false, false, false, false, 1.0f, 1.0f);
 	m_leaf_sfx = sound_manager->Create2DData("Take_Leaf", false, false, false, false, 1.0f, 1.0f);
+	m_leaf_giggle_sfx = sound_manager->Create2DData("Yomi_Giggle", false, false, false, false, 1.0f, 1.0f);
 	m_walk_sound = sound_manager->Create2DData("Yomi_Walk", false, false, false, false, 1.0f, 1.0f);
 	m_test_sfx = sound_manager->Create2DData("Dun_Dun", true, false, false, false, 1.0f, 1.0f);
 	m_3D_music_data = sound_manager->Create3DData("Main_Theme", "", false, false, false, 1.0f, 1.0f);
