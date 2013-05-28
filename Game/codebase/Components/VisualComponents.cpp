@@ -200,7 +200,6 @@ void AnimationComponent::FixPlayerWeights(){
 	Ogre::String line = Ogre::StringUtil::BLANK;
 	Ogre::String anim_id = Ogre::StringUtil::BLANK;
 	Ogre::String base = "Base";
-	Ogre::String blow = "Blow";
 	Ogre::String top = "Top";
 
 	for (int i = 0; i < m_entity->getSkeleton()->getNumAnimations(); i++){
@@ -209,11 +208,6 @@ void AnimationComponent::FixPlayerWeights(){
 		size_t find = anim_id.find(base);
 		if (find  != std::string::npos){
 			RemoveWeights(top_anims, anim);
-			continue;
-		}
-		find = anim_id.find(blow);
-		if (find != std::string::npos){
-			RemoveWeights(base_anims, anim);
 			continue;
 		}
 		find = anim_id.find(top);
@@ -244,52 +238,12 @@ void AnimationComponent::AddAnimationState(const Ogre::String& anim_name, bool l
 
 void AnimationComponent::Update(float dt){
 	for (unsigned int i = 0; i < m_animation_states.size(); i++){
-		//if (m_animation_states[i].anim_state != NULL){
-			//if (m_animation_states[i].anim_state->getEnabled()){
-				//m_animation_states[i].anim_state->addTime(dt);
-			//if (m_animation_states[i].active){
-				m_animation_states[i].animation_blender->addTime(dt);
-			//}
-				/*if (!m_animation_states[i].anim_state->getLoop() && m_animation_states[i].anim_state->hasEnded()){
-					if (m_animation_states[i].wait){
-						m_animation_states[i].wait = false;
-					}
-					if (m_callback){
-						m_callback();
-						m_callback = NULL;
-					}
-					PlayQueued();
-				}*/
-			//}
-		//}
+		m_animation_states[i].animation_blender->addTime(dt);
 	}
 }
 
 void AnimationComponent::PlayQueued(){
-	/*if (!m_queue.empty()){
-		if (m_animation_states[m_queue.front().index].anim_state != NULL){
-			if (m_animation_states[m_queue.front().index].anim_state->getEnabled()){
-				m_animation_states[m_queue.front().index].anim_state->setTimePosition(0);
-				m_animation_states[m_queue.front().index].anim_state->setEnabled(false);
-				m_animation_states[m_queue.front().index].id = Ogre::StringUtil::BLANK;
-			}
-		}
-		if (m_queue.front().full_body){
-			if (m_animation_states[1].anim_state != NULL){
-				if (m_animation_states[1].anim_state->getEnabled()){
-					m_animation_states[1].anim_state->setTimePosition(0);
-					m_animation_states[1].anim_state->setEnabled(false);
-					m_animation_states[1].id = Ogre::StringUtil::BLANK;
-				}
-			}
-		}
-		m_animation_states[m_queue.front().index].anim_state = m_entity->getAnimationState(m_queue.front().id);
-		m_animation_states[m_queue.front().index].anim_state->setEnabled(true);
-		m_animation_states[m_queue.front().index].anim_state->setLoop(m_queue.front().loop);
-		m_animation_states[m_queue.front().index].anim_state->setTimePosition(0);
-		m_animation_states[m_queue.front().index].id = m_queue.front().id;
-		m_queue.pop_front();
-	}*/
+
 }
 
 void AnimationComponent::Notify(int type, void* msg){
@@ -752,7 +706,6 @@ void TerrainComponent::Init(Ogre::SceneManager* scene_manager, PhysicsEngine* ph
 	m_collision_def.flag = COLLISION_FLAG_STATIC;
 	m_collision_def.data = m_owner;
 	m_terrain_body->setUserPointer(&m_collision_def);
-	//m_artifex_loader->mTerrain->setPosition(Ogre::Vector3(20000, 0, 20000));
 }
 
 void TerrainComponent::Update(float dt){
@@ -768,8 +721,7 @@ void PlayerStaffComponent::Notify(int type, void* msg){
 }
 
 void PlayerStaffComponent::Update(float dt){
-	Ogre::Bone* bone = m_player_entity->getSkeleton()->getBone("CATRigLArmDigit21");
-	Ogre::Vector3 pos = bone->_getDerivedPosition() * m_node->_getDerivedPosition();
+
 }
 
 void PlayerStaffComponent::Shut(){
@@ -839,12 +791,12 @@ void SpeechBubbleComponent::Update(float dt){
 	
 	if (m_player_collide){
 		//static_cast<MeshRenderComponent*>(m_owner->GetComponent(COMPONENT_MESH_RENDER))->GetEntity()->setMaterialName("SolidColor/Blue");
-		m_messenger->Notify(MSG_MESH_SET_MATERIAL_NAME, &Ogre::String("SpeechCherry"));
+		//m_messenger->Notify(MSG_MESH_SET_MATERIAL_NAME, &Ogre::String("SpeechCherry"));
 		//ScaleUp();
 	}
 	else {
 		//static_cast<MeshRenderComponent*>(m_owner->GetComponent(COMPONENT_MESH_RENDER))->GetEntity()->setMaterialName("SolidColor/Green");
-		m_messenger->Notify(MSG_MESH_SET_MATERIAL_NAME, &Ogre::String("SpeechCherryInvisible"));
+		//m_messenger->Notify(MSG_MESH_SET_MATERIAL_NAME, &Ogre::String("SpeechCherryInvisible"));
 		//ScaleDown();
 	}
 
@@ -861,7 +813,7 @@ void SpeechBubbleComponent::Init(Ogre::SceneNode* node, SceneManager* scene_mana
 	m_node = node;
 	m_player_collide = false;
 	m_current_scale = 1.0f;
-
+	m_messenger->Notify(MSG_MESH_SET_MATERIAL_NAME, &Ogre::String("SpeechCherry"));
 	m_tott = tott;
 
 	//m_messenger->Notify(MSG_NODE_ATTACH_ENTITY, static_cast<MeshRenderComponent*>(m_owner->GetComponent(COMPONENT_MESH_RENDER))->GetEntity());
@@ -954,8 +906,8 @@ void TutorialGraphicsComponent::Update(float dt){
 	if (m_overlay->isVisible()){
 		if (m_first_pic){
 			Ogre::Overlay::Overlay2DElementsIterator it = m_overlay->get2DElementsIterator();
-			Ogre::OverlayContainer* container = it.peekNext();		
-			container->setMaterialName(m_pic_one); 
+			Ogre::OverlayContainer* container = it.peekNext();
+			container->setMaterialName(m_pic_one);
 		}
 		else{
 			Ogre::Overlay::Overlay2DElementsIterator it = m_overlay->get2DElementsIterator();
