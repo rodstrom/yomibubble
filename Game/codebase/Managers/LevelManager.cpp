@@ -15,9 +15,12 @@ LevelManager::~LevelManager(void){}
 void LevelManager::ChangeLevel(){	
 	Ogre::String next_level = m_levels[m_current_level].next_level;
 	m_game_object_manager->ClearAllGameObjects();
-	m_scene_manager->clearScene();
+	m_scene_manager->destroyAllAnimations();
+	m_scene_manager->destroyAllAnimationStates();
+	m_scene_manager->destroyAllLights();
+	m_scene_manager->destroyAllParticleSystems();
 	m_physics_engine->ResetPhysicsEngine();
-	// set loading screen game object here
+
 	LoadLevel(next_level);
 }
 

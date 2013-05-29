@@ -1,15 +1,16 @@
 #include "stdafx.h"
 #include "InputSystem.h"
 #include "Game.h"
-
+#include "MessageSystem.h"
 #include <iostream>
 
-InputSystem::InputSystem(Game* game, Ogre::RenderWindow* render_window) : 
+InputSystem::InputSystem(Game* game, Ogre::RenderWindow* render_window, MessageSystem* message_system) : 
 m_game(game),
 m_render_window(render_window),
 m_mouse(nullptr),
 m_keyboard(nullptr),
 m_ois_input_manager(nullptr),
+m_message_system(message_system),
 m_last_x(0.0f), m_last_z(0.0f), 
 m_delta_zoom(0.0f),
 m_movement_dead_zone(0.2f),
@@ -451,5 +452,7 @@ void InputSystem::windowResized(Ogre::RenderWindow* rw){
 }
 
 void InputSystem::windowClosed(Ogre::RenderWindow* rw){
-	
+	IEvent evt;
+	evt.m_type = EVT_QUIT;
+	m_message_system->Notify(&evt);
 }

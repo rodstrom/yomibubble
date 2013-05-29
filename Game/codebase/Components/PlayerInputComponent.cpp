@@ -160,7 +160,7 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 	PlayerState::Init(m_owner->GetComponentMessenger(), m_animation_manager, this, m_player_state_manager, sound_manager);
 	m_player_state_manager->AddPlayerState(new PlayerIdle);
 	m_player_state_manager->AddPlayerState(new PlayerStateMove);
-	m_player_state_manager->AddPlayerState(new PlayerBlowBubble);
+	m_player_state_manager->AddPlayerState(new PlayerBlowBubble(m_physics_engine));
 	m_player_state_manager->AddPlayerState(new PlayerJump);
 	m_player_state_manager->AddPlayerState(new PlayerFalling);
 	m_player_state_manager->AddPlayerState(new PlayerLand);

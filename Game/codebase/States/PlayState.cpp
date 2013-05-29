@@ -18,8 +18,11 @@ PlayState::~PlayState(void){}
 
 void PlayState::Enter(){
 	m_message_system->Register(EVT_CHANGE_LEVEL, this, &PlayState::ChangeLevel);
-	m_scene_manager = Ogre::Root::getSingleton().createSceneManager("OctreeSceneManager", "PlayStateSceneManager");
+	m_scene_manager = Ogre::Root::getSingleton().createSceneManager("OctreeSceneManager");
+	//std::cout << "Creating SoundManager instance\n";
 	m_sound_manager = new SoundManager;
+	m_sound_manager->Init(m_scene_manager);
+	//std::cout << "Loading Audio\n";
 	m_sound_manager->LoadAudio();
 	m_physics_engine = new PhysicsEngine;
 	m_physics_engine->Init();
@@ -43,14 +46,14 @@ void PlayState::SecondLoading(){
 	//Ogre::Plane plane(Ogre::Vector3::UNIT_Y, -10);
 	//Ogre::MeshManager::getSingleton().createPlane("plane", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane, 50, 50, 20, 20, true, 1, 5, 5, Ogre::Vector3::UNIT_Z);
 
-	//m_scene_manager->setShadowUseInfiniteFarPlane(false);
-	//m_scene_manager->setShadowTextureSelfShadow(false);
-	//m_scene_manager->setShadowCasterRenderBackFaces(false);
-	//m_scene_manager->setShadowTextureCount(1);
-	//m_scene_manager->setShadowTextureSize(2048);
-	//m_scene_manager->setShadowColour(Ogre::ColourValue(0.5f,0.5f,0.6f,1.0f));
-	//m_scene_manager->setShadowFarDistance(30.0f);
-	//m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
+	m_scene_manager->setShadowUseInfiniteFarPlane(false);
+	m_scene_manager->setShadowTextureSelfShadow(false);
+	m_scene_manager->setShadowCasterRenderBackFaces(false);
+	m_scene_manager->setShadowTextureCount(1);
+	m_scene_manager->setShadowTextureSize(2048);
+	m_scene_manager->setShadowColour(Ogre::ColourValue(0.5f,0.5f,0.6f,1.0f));
+	m_scene_manager->setShadowFarDistance(30.0f);
+	m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
 
 	m_level_manager = new LevelManager(m_game_object_manager, m_scene_manager, m_physics_engine);
 	LevelDef level1;

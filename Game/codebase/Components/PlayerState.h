@@ -61,7 +61,7 @@ private:
 
 class PlayerBlowBubble : public PlayerState{
 public:
-	PlayerBlowBubble(void);
+	PlayerBlowBubble(PhysicsEngine* physics_engine);
 	~PlayerBlowBubble(void){}
 	void Enter();
 	void Exit();
@@ -75,10 +75,16 @@ private:
     void CreateTriggerForBubble();
 	GameObject* m_bubble;	// the bubble that we will create
 	SoundData2D m_bubble_blow_sound;
+	bool m_hit_wall;
 	float m_min_bubble_size;
 	float m_max_bubble_size;
 	float m_current_scale;
 	float m_bubble_gravity;
+	Ogre::SceneNode* m_child_node;
+	Ogre::SceneNode* m_player_node;
+	btRigidBody* m_player_body;
+	btRigidBody* m_trigger_body;
+	PhysicsEngine* m_physics_engine;
 };
 
 class PlayerJump : public PlayerState{

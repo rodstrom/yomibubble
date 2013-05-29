@@ -9,6 +9,7 @@ SoundManager::SoundManager(){
     mSoundDeletesPending = new std::list<OgreOggISound*>;
 
 	m_sound_manager->init();
+
 	/*
 	m_ear_node = scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(0,0,0), Ogre::Quaternion::IDENTITY);
 	m_ear_node->attachObject(m_sound_manager->getListener());
@@ -25,14 +26,15 @@ SoundManager::~SoundManager(){
 }
 
 void SoundManager::Init(Ogre::SceneManager* scene_manager){
+	m_sound_manager->setSceneManager(scene_manager);
 	m_scene_manager = scene_manager;
-	m_ear_node = scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(0,0,0), Ogre::Quaternion::IDENTITY);
-	m_ear_node->attachObject(m_sound_manager->getListener());
+	//m_ear_node = scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(0,0,0), Ogre::Quaternion::IDENTITY);
+	//m_ear_node->attachObject(m_sound_manager->getListener());
 }
 
 void SoundManager::Exit(){
 	m_scene_manager = NULL;
-	m_sound_manager->destroyAllSounds();
+	//m_sound_manager->destroyAllSounds();
 }
 
 void SoundManager::LoadAudio(){

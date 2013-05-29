@@ -60,13 +60,11 @@ bool Core::Init(){
 		return false;
 	//m_sound_manager = new SoundManager();
 	//m_sound_manager->LoadAudio();
-
 	m_game = new Game;
 	//m_game->Init(m_render_window, m_message_system, m_sound_manager, m_scene_manager);
 	m_game->Init(m_render_window, m_message_system);
-	m_input_system = new InputSystem(m_game, m_render_window);
+	m_input_system = new InputSystem(m_game, m_render_window, m_message_system);
 	m_input_system->Init();
-
 	gContactAddedCallback = Collision::ContactCallback;
 	return true;
 }
@@ -88,7 +86,7 @@ void Core::Run(){
 			render = false;
 		}
 		else {
-			if (dt > 1.0){
+			if (dt > 0.5){
 				dt = 0.0;
 			}
 			last_time = curr_sec;

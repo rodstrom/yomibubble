@@ -260,14 +260,6 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	contr->HasFollowCam(true);
 	contr->SetId("body");
 	contr->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
-	pccomp->Init(m_input_manager, m_sound_manager, m_physics_engine, m_message_system);
-	pccomp->SetCustomVariables(
-		VariableManager::GetSingletonPtr()->GetAsFloat("Bubble_Min_Size"),
-		VariableManager::GetSingletonPtr()->GetAsFloat("Bubble_Max_Size"), 
-		VariableManager::GetSingletonPtr()->GetAsFloat("On_Bubble_Speed_Mod"), 
-		VariableManager::GetSingletonPtr()->GetAsFloat("In_Bubble_Speed_Mod"),
-		def.level_id
-		);
 	sound2D->Init(m_sound_manager);
 	sound3D->Init(m_sound_manager);
 	music2D->Init(m_sound_manager);
@@ -293,6 +285,14 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 		);
 	staff_mesh_comp->Init("Staff.mesh", m_scene_manager, Ogre::StringUtil::BLANK);
 	acomp->GetEntity()->attachObjectToBone("CATRigLArmDigit21", staff_mesh_comp->GetEntity(), Ogre::Quaternion(1.0f, 1.0f, 0.7f, 0.0f), Ogre::Vector3(0.01f, -0.02f, 0.0f));
+	pccomp->Init(m_input_manager, m_sound_manager, m_physics_engine, m_message_system);
+	pccomp->SetCustomVariables(
+		VariableManager::GetSingletonPtr()->GetAsFloat("Bubble_Min_Size"),
+		VariableManager::GetSingletonPtr()->GetAsFloat("Bubble_Max_Size"), 
+		VariableManager::GetSingletonPtr()->GetAsFloat("On_Bubble_Speed_Mod"), 
+		VariableManager::GetSingletonPtr()->GetAsFloat("In_Bubble_Speed_Mod"),
+		def.level_id
+		);
 	return go;
 }
 

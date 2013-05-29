@@ -14,6 +14,7 @@ MenuState::~MenuState(void){}
 void MenuState::Enter(){
 	m_scene_manager = Ogre::Root::getSingleton().createSceneManager(Ogre::ST_GENERIC, "MenuStateSceneManager");
 	m_sound_manager = new SoundManager;
+	m_sound_manager->Init(m_scene_manager);
 	m_sound_manager->LoadAudio();
 	m_fade->SetFadeInCallBack(NULL);
 	std::function<void()> func = [this] { ChangeStateToPlayState(); };
