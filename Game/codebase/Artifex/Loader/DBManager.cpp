@@ -318,7 +318,7 @@ int DBManager::Load() {
 						mNode->setOrientation(quat);
 						
 						// Create collision shape and set position if desired
-						newModel->setRenderingDistance(80.0f);
+						//newModel->setRenderingDistance(80.0f);
 						BtOgre::StaticMeshToShapeConverter converter(newModel);
 						btCollisionShape* shape = converter.createTrimesh();
 						m_shapes.push_back(shape);
@@ -592,10 +592,12 @@ void DBManager::Update(){
 
 void DBManager::InitShadowList(std::vector<Ogre::String>& shadow_map){
 	shadow_map.push_back("RockPAth.mesh");
+	shadow_map.push_back("RockPAth2.mesh");
 	shadow_map.push_back("Rock_asset1.mesh");
+	shadow_map.push_back("Rock_asset2.mesh");
 	shadow_map.push_back("RockPlatform_2.mesh");
 	shadow_map.push_back("RockPlatform_Low.mesh");
-	shadow_map.push_back("RockPlatform_Low.mesh");
+	shadow_map.push_back("RockPlatform_Low2.mesh");
 	shadow_map.push_back("Puzzle1.mesh");
 	shadow_map.push_back("Puzzle2.mesh");
 	shadow_map.push_back("Puzzle3.mesh");

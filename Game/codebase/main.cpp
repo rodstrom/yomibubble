@@ -5,7 +5,7 @@
 #endif
 
 // comment out this part to compile with console window and set project properites accordingly
-//#define NO_CONSOLE
+#define NO_CONSOLE
 
 #ifdef NO_CONSOLE
 INT WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT)

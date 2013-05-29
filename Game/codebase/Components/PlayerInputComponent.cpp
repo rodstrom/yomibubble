@@ -91,6 +91,11 @@ void PlayerInputComponent::Shut(){
 		delete m_animation_manager;
 		m_animation_manager = NULL;
 	}
+	if (m_player_state_manager){
+		m_player_state_manager->Shut();
+		delete m_player_state_manager;
+		m_player_state_manager = NULL;
+	}
 	m_physics_engine->RemoveObjectSimulationStep(this);
 
 	if (m_level == "try"){ m_messenger->Notify(MSG_SFX2D_STOP, &m_start_music); }
