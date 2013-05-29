@@ -270,7 +270,7 @@ void PlayerBlowBubble::Update(float dt){
 			if (m_bubble != NULL)
 			{
 				s_input_component->GetOwner()->GetGameObjectManager()->RemoveGameObject(m_bubble);
-				m_bubble = NULL;
+				//m_bubble = NULL;
 				//insert pop sound here
 				SoundData2D pop_sound = s_sound_manager->Create2DData("Bubble_Burst", false, false, false, false, 1.0, 1.0);
 				s_messenger->Notify(MSG_SFX2D_PLAY, &pop_sound);
@@ -773,6 +773,7 @@ void PlayerBounce::Exit(){
 }
 
 void PlayerBounce::Update(float dt){
+	Ogre::Vector3 dir = s_input_component->GetDirection();
 	s_animation->PlayAnimation("Base_Jump_Loop");
 	btRigidBody* body = NULL;
 	s_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &body, "body");
@@ -784,6 +785,7 @@ void PlayerBounce::Update(float dt){
 	if (on_ground){
 		s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_LAND));
 	}
+	s_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &dir);
 }
 
 PlayerHoldObject::PlayerHoldObject(PhysicsEngine* physics_engine, MessageSystem* message_system) : m_object(NULL), m_physics_engine(physics_engine), m_message_system(message_system) { 
