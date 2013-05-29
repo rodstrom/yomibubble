@@ -233,7 +233,8 @@ void FollowCameraComponent::Update(float dt){
 
 	Ogre::Vector3 goal_pos = m_camera_goal->getPosition();
 	if(goal_pos.z < Ogre::Real(2)) m_camera_goal->setPosition(goal_pos.x, goal_pos.y, Ogre::Real(2));
-	if(goal_pos.z > Ogre::Real(15)) m_camera_goal->setPosition(goal_pos.x, goal_pos.y, Ogre::Real(15));
+	//if(goal_pos.z > Ogre::Real(15)) m_camera_goal->setPosition(goal_pos.x, goal_pos.y, Ogre::Real(15));
+	if(m_default_distance > 15.0f) m_default_distance = 15.0f;
 	goal_pos = m_camera_goal->_getDerivedPosition();
 	if(goal_pos.y - m_camera_pivot->getPosition().y < 0) {
 		//m_camera_pivot->pitch(Ogre::Radian(-m_camera_pivot->getOrientation().getPitch()));
@@ -255,10 +256,10 @@ void FollowCameraComponent::Update(float dt){
 		Ogre::Ray distance(m_camera_pivot->getPosition(), m_camera_goal->_getDerivedPosition() - m_camera_pivot->getPosition());
 		m_camera_goal->_setDerivedPosition(distance.getPoint(Ogre::Real(2)));
 	}
-	else if(m_camera_pivot->getPosition().distance(m_camera_goal->_getDerivedPosition()) > Ogre::Real(15)) {
-		Ogre::Ray distance(m_camera_pivot->getPosition(), m_camera_goal->_getDerivedPosition() - m_camera_pivot->getPosition());
-		m_camera_goal->_setDerivedPosition(distance.getPoint(Ogre::Real(15)));
-	}
+	//else if(m_camera_pivot->getPosition().distance(m_camera_goal->_getDerivedPosition()) > Ogre::Real(15)) {
+	//	Ogre::Ray distance(m_camera_pivot->getPosition(), m_camera_goal->_getDerivedPosition() - m_camera_pivot->getPosition());
+	//	m_camera_goal->_setDerivedPosition(distance.getPoint(Ogre::Real(15)));
+	//}
 
 }
 
