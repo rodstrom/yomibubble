@@ -31,9 +31,10 @@ void PlayState::Enter(){
 	m_viewport = m_render_window->addViewport(m_camera);
 	m_camera->setAspectRatio(Ogre::Real(m_viewport->getActualWidth()) / Ogre::Real(m_viewport->getActualHeight()));
 
+#ifdef NDEBUG
 	Ogre::CompositorManager::getSingleton().addCompositor(m_viewport, "Bloom");
 	Ogre::CompositorManager::getSingleton().setCompositorEnabled(m_viewport, "Bloom", true);
-
+#endif
 	m_game_object_manager = new GameObjectManager;
 	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager, m_message_system, NULL);
 	//RUN SECONDLOADING
@@ -91,6 +92,9 @@ void PlayState::Exit(){
 }
 
 bool PlayState::Update(float dt){
+	m_sound_manager->Update(m_scene_manager, dt);
+	m_game_object_manager->Update(dt);
+	m_physics_engine->Step(dt);
 	if (m_change_level){
     
 		State* loading = FindByName("LoadingState");
@@ -105,8 +109,7 @@ bool PlayState::Update(float dt){
 
 		loading->Exit();
 	}
-	m_sound_manager->Update(m_scene_manager, dt);
-	m_game_object_manager->Update(dt);
+
 	
 	//if(m_pause){
 	//	//CreatePauseScreen();
@@ -114,7 +117,7 @@ bool PlayState::Update(float dt){
 	//}
 	//else {
 		
-		m_physics_engine->Step(dt);
+		
 
 		/*if (m_input_manager->IsButtonDown(BTN_ARROW_UP)){
 			m_physics_engine->ShowDebugDraw(true);
