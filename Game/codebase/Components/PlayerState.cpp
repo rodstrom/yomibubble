@@ -885,3 +885,57 @@ void PlayerHoldObject::ItemRemoved(IEvent* evt){
 		s_manager->HoldObject(false);
 	}
 }
+
+PlayerLeafCollect::PlayerLeafCollect(MessageSystem* message_system) : m_message_system(message_system), m_leaf_object(NULL){
+	m_type = PLAYER_STATE_LEAF_COLLECT;
+	m_message_system->Register(EVT_LEAF_PICKUP,this, &PlayerLeafCollect::GetLeaf);
+	s_messenger->Notify(MSG_NODE_GET_NODE, &m_player_node);
+}
+
+PlayerLeafCollect::~PlayerLeafCollect(void){
+	m_message_system->Unregister(EVT_LEAF_PICKUP, this);
+}
+
+void PlayerLeafCollect::Enter(){
+	m_is_dancing = false;
+	bool on_ground = s_input_component->IsOnGround();
+	if (on_ground){
+		m_is_dancing = true;
+		s_animation->PlayAnimation("Base_PickUpLeaf_State");
+		m_leaf_object->GetComponentMessenger()->Notify(MSG_BOBBING_START_MOVING, &m_player_node);
+	}
+}
+
+void PlayerLeafCollect::Exit(){
+	m_leaf_node = NULL;
+	m_leaf_object = NULL;
+}
+
+void PlayerLeafCollect::Update(float dt){
+	Ogre::Vector3 dir = Ogre::Vector3::ZERO;
+	if (!m_is_dancing){
+		bool on_ground = s_input_component->IsOnGround();
+		if (on_ground){
+			m_is_dancing = true;
+			s_animation->PlayAnimation("Base_PickUpLeaf_State");
+			m_leaf_object->GetComponentMessenger()->Notify(MSG_BOBBING_START_MOVING, &m_player_node);
+		}
+	}
+	else {
+		float distance = m_leaf_node->getPosition().distance(m_player_node->getPosition());
+		if (distance <= 0.06f){
+			m_leaf_object->RemoveGameObject(m_leaf_object);
+			s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_IDLE));
+		}
+	}
+	s_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &dir);
+}
+
+void PlayerLeafCollect::GetLeaf(IEvent* evt){
+	if (m_leaf_object == NULL){
+		if (evt->m_type == EVT_LEAF_PICKUP){
+			m_leaf_object = static_cast<LeafEvent*>(evt)->leaf;
+			m_leaf_node = static_cast<LeafEvent*>(evt)->leaf_node;
+		}
+	}
+}

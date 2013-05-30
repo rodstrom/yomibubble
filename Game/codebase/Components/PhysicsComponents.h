@@ -285,23 +285,27 @@ protected:
 	float m_bounce_power;
 };
 
-class BobbingComponent : public Component, public IComponentUpdateable{
+class BobbingComponent : public Component, public IComponentUpdateable, public IComponentObserver{
 public:
-	BobbingComponent(void){}
+	BobbingComponent(void) : m_player_node(NULL), m_start_moving(false){}
 	virtual ~BobbingComponent(void){}
 
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
+	virtual void Notify(int type, void* msg);
 	virtual void Init(Ogre::SceneNode* node);
 	virtual void Update(float dt);
 
 private:
 	Ogre::SceneNode* m_node;
-
+	Ogre::SceneNode* m_player_node;
 	float m_current_time;
 	float m_bob_timer;
 	float m_rotation_speed;
+	bool m_start_moving;	// decides if the leaf should start moving towards the player or not
 	bool m_up;
+	float m_y_distance;
+	float m_move_speed;
 };
 
 #endif // _N_PHYSICS_COMPONENTS_H_

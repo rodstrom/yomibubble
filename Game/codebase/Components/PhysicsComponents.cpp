@@ -824,35 +824,71 @@ void PlayerRaycastCollisionComponent::PlayerLandscape(){
 }
 
 void BobbingComponent::Shut(){
-
+	m_messenger->Unregister(MSG_BOBBING_START_MOVING, this);
 };
 
 void BobbingComponent::SetMessenger(ComponentMessenger* messenger){
-
+	m_messenger = messenger;
+	m_messenger->Register(MSG_BOBBING_START_MOVING, this);
 };
+
+void BobbingComponent::Notify(int type, void* msg){
+	switch (type){
+	case MSG_BOBBING_START_MOVING:
+		{
+			if (!m_start_moving){
+				m_player_node = *static_cast<Ogre::SceneNode**>(msg);
+				m_start_moving = true;
+				m_up = true;
+			}
+		}
+		break;
+	default:
+		break;
+	}
+}
 
 void BobbingComponent::Init(Ogre::SceneNode* node){
 	m_node = node;
 	m_rotation_speed = VariableManager::GetSingletonPtr()->GetAsFloat("LeafRotationSpeed");
 	m_current_time = 0.0f;
 	m_bob_timer = 2.0f;
-
+	m_y_distance = 3.0f;
+	m_move_speed = 2.0f;
 	m_up = true;
 };
 
 void BobbingComponent::Update(float dt){
-	m_current_time += dt;
-	if (m_current_time >= m_bob_timer){
-		m_current_time = 0.0f;
-	if (m_up) { m_up = false; }
-	else { m_up = true; }
+	if (!m_start_moving){
+		m_current_time += dt;
+		if (m_current_time >= m_bob_timer){
+			m_current_time = 0.0f;
+		if (m_up) { m_up = false; }
+		else { m_up = true; }
+		}
+		else{
+		if (m_up){
+			m_node->setPosition(m_node->getPosition().x, m_node->getPosition().y + 0.01, m_node->getPosition().z);
+		}
+		else{
+				m_node->setPosition(m_node->getPosition().x, m_node->getPosition().y - 0.01, m_node->getPosition().z);
+			}
+		}
 	}
-	else{
-	if (m_up){
-		m_node->setPosition(m_node->getPosition().x, m_node->getPosition().y + 0.01, m_node->getPosition().z);
-	}
-	else{
-			m_node->setPosition(m_node->getPosition().x, m_node->getPosition().y - 0.01, m_node->getPosition().z);
+	else {
+		float speed = m_move_speed * dt;
+		if (m_up){
+			m_node->translate(0.0f, speed, 0.0f);
+			m_y_distance -= speed;
+			if (m_y_distance <= 0.0f){
+				m_up = false;
+			}
+		}
+		else {
+			Ogre::Vector3 dir = m_player_node->getPosition() - m_node->getPosition();
+			dir.normalise();
+			dir *= speed;
+			m_node->translate(dir);
 		}
 	}
 	float rot_speed = m_rotation_speed * dt;

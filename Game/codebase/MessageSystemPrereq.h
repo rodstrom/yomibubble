@@ -147,6 +147,12 @@ struct BubbleEvent : IEvent{
 	GameObject* bubble;
 };
 
+struct LeafEvent: IEvent{
+	LeafEvent() { m_type = EVT_LEAF_PICKUP; }
+	GameObject* leaf;
+	Ogre::SceneNode* leaf_node;
+};
+
 struct ResizeEvent : IEvent {
 	ResizeEvent() {m_type=EVT_RESIZE;};
 	int m_width,m_height;

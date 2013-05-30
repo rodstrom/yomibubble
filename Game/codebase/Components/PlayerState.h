@@ -184,5 +184,22 @@ private:
 	float m_bubble_gravity;
 };
 
+class PlayerLeafCollect : public PlayerState{
+public:
+	PlayerLeafCollect(MessageSystem* message_system);
+	~PlayerLeafCollect(void);
+	void Enter();
+	void Exit();
+	void Update(float dt);
+
+	void GetLeaf(IEvent* evt);
+
+private:
+	bool m_is_dancing;
+	MessageSystem* m_message_system;
+	GameObject* m_leaf_object;
+	Ogre::SceneNode* m_leaf_node;
+	Ogre::SceneNode* m_player_node;
+};
 
 #endif // _PLAYER_STATE_H_

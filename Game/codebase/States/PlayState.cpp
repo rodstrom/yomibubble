@@ -44,6 +44,7 @@ void PlayState::SecondLoading(){
 	//Ogre::Plane plane(Ogre::Vector3::UNIT_Y, -10);
 	//Ogre::MeshManager::getSingleton().createPlane("plane", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane, 50, 50, 20, 20, true, 1, 5, 5, Ogre::Vector3::UNIT_Z);
 
+#ifdef NDEBUG
 	m_scene_manager->setShadowUseInfiniteFarPlane(false);
 	m_scene_manager->setShadowTextureSelfShadow(false);
 	m_scene_manager->setShadowCasterRenderBackFaces(false);
@@ -52,7 +53,7 @@ void PlayState::SecondLoading(){
 	m_scene_manager->setShadowColour(Ogre::ColourValue(0.5f,0.5f,0.6f,1.0f));
 	m_scene_manager->setShadowFarDistance(30.0f);
 	m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
-
+#endif
 	std::function<void()> func = [this] { ChangeToWinState(); };
 	m_level_manager = new LevelManager(m_game_object_manager, m_scene_manager, m_physics_engine, func);
 	LevelDef level1;

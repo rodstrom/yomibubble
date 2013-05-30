@@ -122,13 +122,24 @@ void CollisionManager::PlayerPlane(GameObject* player, GameObject* plane){
 }
 
 void CollisionManager::LeafPlayer(GameObject* leaf, GameObject* player){
-	IEvent evt;
-	evt.m_type = EVT_LEAF_PICKUP;
+	btRigidBody* player_body = NULL;
+	player->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GET_BODY, &player_body, "body");
+	if (player_body){
+		float y_vel = player_body->getLinearVelocity().y();
+		player_body->setLinearVelocity(btVector3(0.0f, y_vel, 0.0f));
+	}
+	Ogre::SceneNode* leaf_node = NULL;
+	leaf->GetComponentMessenger()->Notify(MSG_NODE_GET_NODE, &leaf_node);
+	LeafEvent evt;
+	evt.leaf = leaf;
+	evt.leaf_node = leaf_node;
 	m_message_system->Notify(&evt);
-	leaf->GetGameObjectManager()->RemoveGameObject(leaf);
+	int player_state = PLAYER_STATE_LEAF_COLLECT;
+	player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_SET_STATE, &player_state);
 	player->GetComponentMessenger()->Notify(MSG_LEAF_PICKUP, NULL); 
 	player->GetComponentMessenger()->Notify(MSG_SFX2D_PLAY, &static_cast<PlayerInputComponent*>(player->GetComponent(COMPONENT_PLAYER_INPUT))->m_leaf_sfx);
 	player->GetComponentMessenger()->Notify(MSG_SFX2D_PLAY, &static_cast<PlayerInputComponent*>(player->GetComponent(COMPONENT_PLAYER_INPUT))->m_leaf_giggle_sfx);
+	leaf->RemoveComponent(COMPONENT_TRIGGER);
 };
 
 void CollisionManager::PlayerTrigger(GameObject* player, GameObject* trigger){

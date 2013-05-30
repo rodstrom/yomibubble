@@ -142,7 +142,6 @@ void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* 
 void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager, const Ogre::String& node_id, bool remove_weights){
 	MeshRenderComponent::Init(filename, scene_manager, node_id);
 	m_entity->getSkeleton()->setBlendMode(ANIMBLEND_CUMULATIVE);
-	//m_animation_blender = new AnimationBlender(GetEntity());
 	if (remove_weights){
 		FixPlayerWeights();
 	}
@@ -265,10 +264,6 @@ void AnimationComponent::Notify(int type, void* msg){
 	case MSG_ANIMATION_PAUSE:
 		{
 			int index = *static_cast<int*>(msg);
-			//m_animation_states[index].animation_blender->getSource()->setWeight(0);
-			//m_animation_states[index].active = false;
-			//m_animation_states[index].animation_blender->getSource()->setTimePosition(0);
-			//m_animation_states[index].animation_blender->getSource()->setEnabled(false);
 		}
 		break;
 	case MSG_ANIMATION_LOOP:
