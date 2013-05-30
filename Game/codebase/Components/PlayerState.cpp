@@ -818,7 +818,7 @@ void PlayerHoldObject::Enter(){
 		CollisionDef* coll_def = static_cast<CollisionDef*>(ray.m_collisionObject->getUserPointer());
 		if (coll_def->flag == COLLISION_FLAG_GAME_OBJECT){
 			GameObject* ob = static_cast<GameObject*>(coll_def->data);
-			if (ob->GetType() == GAME_OBJECT_BLUE_BUBBLE || ob->GetType() == GAME_OBJECT_QUEST_ITEM){
+			if (ob->GetType() == GAME_OBJECT_QUEST_ITEM){
 				m_object = ob;
 				btRigidBody* ob_body = NULL;
 				btRigidBody* player_trigger = NULL;
@@ -841,6 +841,13 @@ void PlayerHoldObject::Enter(){
 					def.body_b = ob_body;
 					s_input_component->GetOwner()->CreateComponent(COMPONENT_GENERIC_6DOF_COMPONENT, Ogre::Vector3(0,0,0), &def);
 				}
+			}
+			else if (ob->GetType() == GAME_OBJECT_BLUE_BUBBLE || ob->GetType() == GAME_OBJECT_PINK_BUBBLE){
+				Ogre::Vector3 gravity(0,0,0);
+				s_messenger->Notify(MSG_PLAYER_INPUT_SET_BUBBLE, &ob);
+				s_messenger->Notify(MSG_CHARACTER_CONTROLLER_GRAVITY_SET, &gravity);
+				s_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &gravity);
+				s_manager->HoldObject(false);
 			}
 		}
 	}
