@@ -153,6 +153,8 @@ void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewpo
 
 	m_first_person = false;
 
+	m_player_character = static_cast<AnimationComponent*>(m_owner->GetComponent(COMPONENT_ANIMATION))->GetEntity();
+
 	//bool inv_contr = VariableManager::GetSingletonPtr()->GetAsInt("Camera_Inverted_Controller_Sticks");
 	//if (inv_contr == 0){
 	//	m_inverted_controller = false;
@@ -278,16 +280,17 @@ void FollowCameraComponent::Update(float dt){
 	//}
 
 	if(m_first_person) {
-		static_cast<AnimationComponent*>(m_owner->GetComponent(COMPONENT_ANIMATION))->GetEntity()->setVisible(false);
+		m_player_character->setVisible(false);
 		//m_camera_goal->_setDerivedPosition(m_camera_pivot->getPosition());
-		m_camera_goal->setPosition(0, 0, 0.1);
+		m_camera_goal->setPosition(0, 0, 0.75);
+		if(input->GetMovementAxis().x + input->GetMovementAxis().z != 0) m_first_person = false;
 	}
 	else {
 		if(m_camera_pivot->getPosition().distance(m_camera_node->_getDerivedPosition()) < Ogre::Real(2)) {
-			static_cast<AnimationComponent*>(m_owner->GetComponent(COMPONENT_ANIMATION))->GetEntity()->setVisible(false);
+			m_player_character->setVisible(false);
 		}
 		else {
-			static_cast<AnimationComponent*>(m_owner->GetComponent(COMPONENT_ANIMATION))->GetEntity()->setVisible(true);
+			m_player_character->setVisible(true);
 		}
 	}
 

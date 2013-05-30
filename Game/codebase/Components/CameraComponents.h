@@ -96,6 +96,9 @@ protected:
 
 	bool				m_first_person;
 
+	Ogre::Entity*		m_player_character;
+	//Ogre::Vector3		m_old_player_position;
+
 //	TriggerComponent*	m_trigger;
 };
 //
