@@ -41,7 +41,7 @@ public:
 	void SetMovementSpeed(float value) { m_movement_speed = value; }
 	void SetInputSystem(InputSystem* input_system) { m_input_system = input_system; }
 
-	void SetCustomVariables(int inverted_camera, float camera_zoom_speed, float stick_rotation_acceleration, float change_angle_after_player, float default_distance, float default_pitch);
+	void SetCustomVariables(float camera_zoom_speed, float stick_rotation_acceleration, float change_angle_after_player, float default_distance, float default_pitch);
 
 	AltRaycastDef		m_left_ray;
 	AltRaycastDef		m_right_ray;
@@ -78,7 +78,7 @@ protected:
 	float				m_movement_speed;
 	InputSystem*		m_input_system;
 
-	bool				m_inverted_controller;
+	//bool				m_inverted_controller;
 
 	float				m_camera_zoom_speed;
 	float				m_camera_stick_rotation_acceleration;
@@ -90,6 +90,9 @@ protected:
 	//float				m_max_pitch_angle;
 
 	Ogre::TerrainGroup*	m_terrain_group;
+	
+	int					m_horizontal_coefficient;
+	int					m_vertical_coefficient;
 
 //	TriggerComponent*	m_trigger;
 };

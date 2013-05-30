@@ -277,7 +277,7 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 
 	fcc->SetPhysEngine(m_physics_engine);
 	fcc->SetCustomVariables(
-		VariableManager::GetSingletonPtr()->GetAsInt("Camera_Inverted_Controller_Sticks"), 
+		//VariableManager::GetSingletonPtr()->GetAsInt("Camera_Inverted_Controller_Sticks"), 
 		VariableManager::GetSingletonPtr()->GetAsFloat("Camera_Zoom_Speed"), 
 		VariableManager::GetSingletonPtr()->GetAsFloat("Camera_Stick_Rotation_Acceleration"), 
 		VariableManager::GetSingletonPtr()->GetAsFloat("Camera_Change_Angle_After_Player"),

@@ -197,6 +197,12 @@ bool InputSystem::keyPressed(const OIS::KeyEvent& e){
 	case OIS::KC_ESCAPE:
 		m_game->InjectPressedButton(BTN_BACK);
 		break;
+	case OIS::KC_V:
+		m_game->InjectPressedButton(BTN_INVERT_VERTICAL);
+		break;
+	case OIS::KC_H:
+		m_game->InjectPressedButton(BTN_INVERT_HORIZONTAL);
+		break;
 	default:
 		break;
 	};
@@ -234,6 +240,12 @@ bool InputSystem::keyReleased(const OIS::KeyEvent& e){
 		break;
 	case OIS::KC_ESCAPE:
 		m_game->InjectReleasedButton(BTN_BACK);
+		break;
+	case OIS::KC_V:
+		m_game->InjectReleasedButton(BTN_INVERT_VERTICAL);
+		break;
+	case OIS::KC_H:
+		m_game->InjectReleasedButton(BTN_INVERT_HORIZONTAL);
 		break;
 	default:
 		break;

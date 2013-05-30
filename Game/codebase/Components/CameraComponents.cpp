@@ -148,13 +148,16 @@ void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewpo
 
 	m_on_ground = true;
 
-	bool inv_contr = VariableManager::GetSingletonPtr()->GetAsInt("Camera_Inverted_Controller_Sticks");
-	if (inv_contr == 0){
-		m_inverted_controller = false;
-	}
-	else{
-		m_inverted_controller = true;
-	}
+	m_vertical_coefficient = 1;
+	m_horizontal_coefficient = 1;
+
+	//bool inv_contr = VariableManager::GetSingletonPtr()->GetAsInt("Camera_Inverted_Controller_Sticks");
+	//if (inv_contr == 0){
+	//	m_inverted_controller = false;
+	//}
+	//else{
+	//	m_inverted_controller = true;
+	//}
 
 	//m_env_coll_Xp = false;
 	//m_env_coll_Xn = false;
@@ -187,6 +190,8 @@ void FollowCameraComponent::Update(float dt){
 		InputManager* input = NULL;
 		m_messenger->Notify(MSG_INPUT_MANAGER_GET, &input);
 		if (input){
+			if(input->IsButtonPressed(BTN_INVERT_VERTICAL)) m_vertical_coefficient *= -1;
+			if(input->IsButtonPressed(BTN_INVERT_HORIZONTAL)) m_horizontal_coefficient *= -1;
 			CameraAxis axis = input->GetCameraAxis();
 			//UpdateCameraGoal(-0.1f * axis.x, -0.1f * axis.y, -0.0005f * axis.z);
 			Ogre::Real speed = 20;
@@ -278,9 +283,7 @@ void FollowCameraComponent::SimulationStep(btScalar time_step){
 
 };
 
-void FollowCameraComponent::SetCustomVariables(int inverted_camera, float camera_zoom_speed, float stick_rotation_acceleration, float change_angle_after_player, float default_distance, float default_pitch){
-	if (inverted_camera == 1) { m_inverted_controller = true; }
-	else { m_inverted_controller = false; }
+void FollowCameraComponent::SetCustomVariables(float camera_zoom_speed, float stick_rotation_acceleration, float change_angle_after_player, float default_distance, float default_pitch){
 	m_camera_zoom_speed = camera_zoom_speed;
 	m_camera_stick_rotation_acceleration = stick_rotation_acceleration;
 	m_camera_change_angle_after_player = change_angle_after_player;
@@ -314,19 +317,17 @@ void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real de
 	if (!m_getting_input){
 		//m_camera_goal->setPosition(0, m_default_distance * 0.2, m_default_distance);		//now set in queryraycast
 		m_pivot_pitch = m_default_pitch;
-		m_camera_pivot->yaw(Ogre::Degree(m_player_direction.x * -2.15 * m_camera_change_angle_after_player), Ogre::Node::TS_WORLD);
+		//m_camera_pivot->yaw(Ogre::Degree(m_player_direction.x * -2.15 * m_camera_change_angle_after_player), Ogre::Node::TS_WORLD);
 	}
 	
 	if (m_getting_input){
-		if (!m_inverted_controller) { m_camera_pivot->yaw(Ogre::Degree(delta_yaw * m_camera_stick_rotation_acceleration), Ogre::Node::TS_WORLD); }
-		else { m_camera_pivot->yaw(Ogre::Degree(-delta_yaw* m_camera_stick_rotation_acceleration), Ogre::Node::TS_WORLD); }
+		m_camera_pivot->yaw(Ogre::Degree(m_horizontal_coefficient * delta_yaw * m_camera_stick_rotation_acceleration), Ogre::Node::TS_WORLD);
 	}
-
-	if (!(m_pivot_pitch + delta_pitch > -10 && delta_pitch > 0) && 
-		!(m_pivot_pitch + delta_pitch < -40 && delta_pitch < 0)
+	// << m_pivot_pitch << "\n";
+	if (!(m_pivot_pitch + delta_pitch > 10 && delta_pitch > 0) && 
+		!(m_pivot_pitch + delta_pitch < -30 && delta_pitch < 0)
 		&& m_getting_input){
-			if (!m_inverted_controller) { m_camera_pivot->pitch(Ogre::Degree(delta_pitch * m_camera_stick_rotation_acceleration), Ogre::Node::TS_LOCAL); }
-			else { m_camera_pivot->pitch(Ogre::Degree(-delta_pitch * m_camera_stick_rotation_acceleration), Ogre::Node::TS_LOCAL); }
+			m_camera_pivot->pitch(Ogre::Degree(m_vertical_coefficient * delta_pitch * m_camera_stick_rotation_acceleration), Ogre::Node::TS_LOCAL);
 			m_pivot_pitch += delta_pitch;
 			//cout << m_pivot_pitch << "\n";
 			m_default_pitch = m_pivot_pitch;

@@ -17,6 +17,8 @@ enum EButtonType {
 	BTN_A,
 	BTN_B,
 	BTN_X,
+	BTN_INVERT_VERTICAL,
+	BTN_INVERT_HORIZONTAL,
 	BTN_SIZE
 };
 
