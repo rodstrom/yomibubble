@@ -515,10 +515,11 @@ GameObject* GameObjectManager::CreateQuestItem(const Ogre::Vector3& position, vo
 	go->AddComponent(node_comp);
 	MeshRenderComponent* mrc = new MeshRenderComponent;
 	go->AddComponent(mrc);
-	//TriggerComponent* tc = new TriggerComponent;
-	//go->AddComponent(tc);
 	RigidbodyComponent* rc = new RigidbodyComponent;
 	go->AddComponent(rc);
+	RotationComponent* rot_comp = new RotationComponent;
+	go->AddComponent(rot_comp);
+	go->AddUpdateable(rot_comp);
 
 	std::function<void()> func = [&] { IEvent evt; evt.m_type = EVT_QUEST_ITEM_REMOVE; m_message_system->Notify(&evt); };
 	dcc->Init(func);
@@ -533,23 +534,15 @@ GameObject* GameObjectManager::CreateQuestItem(const Ogre::Vector3& position, vo
 	body_def.mass = 1.0f;
 	body_def.collision_filter.filter = COL_QUESTITEM;
 	body_def.collision_filter.mask = COL_PLAYER | COL_TOTT | COL_WORLD_STATIC;
+	body_def.sync_orientation = false;
 	rc->Init(position,  mrc->GetEntity(), m_physics_engine, body_def);
 	rc->GetRigidbody()->setGravity(btVector3(0.0f, -0.3f, 0.0f));
 	rc->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
 	rc->GetRigidbody()->setActivationState(DISABLE_DEACTIVATION);
 	rc->GetRigidbody()->setDamping(0.5, 0.5);
 	rc->SetId("questitem");
+	rot_comp->Init(node_comp->GetSceneNode(), VariableManager::GetSingletonPtr()->GetAsFloat("QuestItemRotationSpeed"));
 
-	/*
-	TriggerDef trdef;
-	trdef.body_type = DYNAMIC_BODY;
-	trdef.collider_type = COLLIDER_SPHERE;
-	trdef.mass = 0.0f;
-	trdef.radius = 1.5f;
-	trdef.collision_filter.filter = COL_WORLD_TRIGGER;
-	trdef.collision_filter.mask = COL_PLAYER;
-	tc->Init(position, m_physics_engine, trdef);
-	*/
 	return go;
 };
 
@@ -702,6 +695,7 @@ GameObject* GameObjectManager::CreateTerrain(const Ogre::Vector3& position, void
 }
 
 GameObject* GameObjectManager::CreateGate(const Ogre::Vector3& position, void* data, const Ogre::String& id){
+	GateDef& def = *static_cast<GateDef*>(data);
 	GameObject* go = new GameObject(GAME_OBJECT_GATE);
 	NodeComponent* nc = new NodeComponent;
 	go->AddComponent(nc);
@@ -709,18 +703,22 @@ GameObject* GameObjectManager::CreateGate(const Ogre::Vector3& position, void* d
 	go->AddComponent(mrc);
 	RigidbodyComponent* rc = new RigidbodyComponent;
 	go->AddComponent(rc);
+	GateControllerComponent* gate_controller = new GateControllerComponent;
+	go->AddComponent(gate_controller);
+	go->AddUpdateable(gate_controller);
 
-	RigidBodyDef def;
-	def.body_type = STATIC_BODY;
-	def.collider_type = COLLIDER_BOX;
-	def.mass = 1.0f;
-	def.collision_filter.filter = COL_WORLD_STATIC;
-	def.collision_filter.mask = COL_PLAYER | COL_TOTT | COL_BUBBLE;
+	RigidBodyDef body_def;
+	body_def.body_type = STATIC_BODY;
+	body_def.collider_type = COLLIDER_BOX;
+	body_def.mass = 1.0f;
+	body_def.collision_filter.filter = COL_WORLD_STATIC;
+	body_def.collision_filter.mask = COL_PLAYER | COL_TOTT | COL_BUBBLE;
 
 	nc->Init(position, m_scene_manager);
 	mrc->Init("Gate.mesh", m_scene_manager);
 
-	rc->Init(position, mrc->GetEntity(), m_physics_engine, def);
+	rc->Init(position, mrc->GetEntity(), m_physics_engine, body_def);
+	gate_controller->Init(m_message_system, def.leaves);
 	return go;
 }
 

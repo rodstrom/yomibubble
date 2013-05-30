@@ -300,7 +300,7 @@ private:
 
 	float m_current_time;
 	float m_bob_timer;
-
+	float m_rotation_speed;
 	bool m_up;
 };
 

@@ -8,6 +8,7 @@
 #include "..\Managers\GameObjectManager.h"
 #include "..\Managers\SoundManager.h"
 #include "..\PhysicsPrereq.h"
+#include "..\MessageSystem.h"
 
 void NodeComponent::Init(const Ogre::Vector3& pos, Ogre::SceneManager* scene_manager){
 	m_scene_manager = scene_manager;
@@ -916,3 +917,88 @@ void TutorialGraphicsComponent::Update(float dt){
 		}
 	}
 };
+
+void GateControllerComponent::Notify(int type, void* msg){
+	switch (type){
+	case MSG_GATE_OPEN_GET:
+		{
+			if (m_counter <= 0){
+				*static_cast<bool*>(msg) = true;
+			}
+			else {
+				*static_cast<bool*>(msg) = false;
+			}
+		}
+		break;
+	default:
+		break;
+	}
+}
+
+void GateControllerComponent::Shut(){
+	m_messenger->Unregister(MSG_GATE_OPEN_GET, this);
+	m_message_system->Unregister(EVT_LEAF_PICKUP, this);
+}
+
+void GateControllerComponent::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
+	m_messenger->Register(MSG_GATE_OPEN_GET, this);
+}
+
+void GateControllerComponent::Update(float dt){
+	if (!m_can_decrease){   // ugly hack to prevent double pickup
+		m_timer += dt;
+		if (m_timer >= 1.0f){
+			m_can_decrease = true;
+		}
+	}
+}
+
+void GateControllerComponent::Init(MessageSystem* message_system, int leaves){
+	m_counter = leaves;
+	m_message_system = message_system;
+	m_message_system->Register(EVT_LEAF_PICKUP, this, &GateControllerComponent::LeafPickup);
+}
+
+void GateControllerComponent::LeafPickup(IEvent* evt){
+	if (evt->m_type == EVT_LEAF_PICKUP){
+		if (m_can_decrease){
+			m_counter--;
+			std::cout << "Leaves left: " << m_counter << std::endl;
+			if (m_counter <= 0){
+				this->OpenGate();
+			}
+			else {
+				m_can_decrease = false;
+				m_timer = 0.0f;
+			}
+		}
+	}
+}
+
+void GateControllerComponent::OpenGate(){
+	// todo run the open gate
+	std::cout << "GATE IS OPEN!!!!\n";
+}
+
+void RotationComponent::Notify(int type, void* message){
+
+}
+
+void RotationComponent::Shut(){
+
+}
+
+void RotationComponent::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
+}
+
+void RotationComponent::Update(float dt){
+	float rot_speed = m_rotation_speed * dt;
+	m_node->rotate(Ogre::Quaternion(1.0f, 0.0f, rot_speed, 0.0f));
+}
+
+void RotationComponent::Init(Ogre::SceneNode* node, float rotation_speed){
+	m_node = node;
+	m_rotation_speed = rotation_speed;
+}
