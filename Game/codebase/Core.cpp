@@ -88,6 +88,7 @@ void Core::Run(){
 		else {
 			if (dt > 0.5){
 				dt = 0.0;
+				std::cout << "DT is larger than 0.5, setting to 0.0f\n";
 			}
 			last_time = curr_sec;
 		}

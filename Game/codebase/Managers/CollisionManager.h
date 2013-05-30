@@ -43,6 +43,8 @@ private:
 	void PlayerTrigger(GameObject* player, GameObject* trigger);
 	void TottBlueBubble(GameObject* tott, GameObject* blue_bubble);
 	void BlueBubbleTott(GameObject* blue_bubble, GameObject* tott) { TottBlueBubble(tott, blue_bubble); }
+	void PlayerLevelChange(GameObject* player, GameObject* level_change);
+	void LevelChangePlayer(GameObject* level_change, GameObject* player) { PlayerLevelChange(player, level_change); }
 
 	void PlayerQuestItem(GameObject* player, GameObject* quest_item);
 	void QuestItemPlayer(GameObject* quest_item, GameObject* player) { PlayerQuestItem(player, quest_item); }

@@ -94,6 +94,7 @@ void RigidbodyComponent::Init(const Ogre::Vector3& position, Ogre::Entity* entit
 		btVector3 inertia;
 		m_shape->calculateLocalInertia(mass, inertia);
 		m_motion_state = new BtOgre::RigidBodyState(m_messenger);
+		static_cast<BtOgre::RigidBodyState*>(m_motion_state)->UpdateOrientation(def.sync_orientation);
 		m_rigidbody = new btRigidBody(mass, m_motion_state, m_shape, inertia);
 	}
 	else if (def.body_type == STATIC_BODY){
@@ -104,6 +105,53 @@ void RigidbodyComponent::Init(const Ogre::Vector3& position, Ogre::Entity* entit
 	m_collision_def.data = m_owner;
 	m_rigidbody->setUserPointer(&m_collision_def);
 	m_rigidbody->getWorldTransform().setOrigin(BtOgre::Convert::toBullet(position));
+	m_rigidbody->setCollisionFlags(m_rigidbody->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+	m_rigidbody->setRestitution(def.restitution);
+	m_rigidbody->setFriction(def.friction);
+	m_rigidbody->setRollingFriction(def.rolling_friction);
+	m_physics_engine->GetDynamicWorld()->addRigidBody(m_rigidbody, def.collision_filter.filter, def.collision_filter.mask);
+}
+
+void RigidbodyComponent::Init(const Ogre::Vector3& pos, PhysicsEngine* physics_engine, const RigidBodyDef& def){
+	m_physics_engine = physics_engine;
+	switch (def.collider_type){
+	case COLLIDER_BOX:
+		m_shape = new btBoxShape(btVector3(def.collider_def.x, def.collider_def.y, def.collider_def.z));
+		break;
+	case COLLIDER_CAPSULE:
+		m_shape = new btCapsuleShape(def.collider_def.radius, def.collider_def.y);
+		break;
+	case COLLIDER_CYLINDER:
+		m_shape = new btCylinderShape(btVector3(def.collider_def.x, def.collider_def.y, def.collider_def.z));
+		break;
+	case COLLIDER_SPHERE:
+		m_shape = new btSphereShape(def.collider_def.radius);
+		break;
+	default:
+		break;
+	}
+	btTransform transform;
+	transform.setIdentity();
+	transform.setOrigin(btVector3(0,0,0));
+	m_compound_shape = new btCompoundShape;
+	m_compound_shape->addChildShape(transform, m_shape);
+
+	if (def.body_type == DYNAMIC_BODY){
+		btScalar mass = (btScalar)def.mass;
+		btVector3 inertia;
+		m_shape->calculateLocalInertia(mass, inertia);
+		m_motion_state = new BtOgre::RigidBodyState(m_messenger);
+		static_cast<BtOgre::RigidBodyState*>(m_motion_state)->UpdateOrientation(def.sync_orientation);
+		m_rigidbody = new btRigidBody(mass, m_motion_state, m_shape, inertia);
+	}
+	else if (def.body_type == STATIC_BODY){
+		m_motion_state = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)));
+		m_rigidbody = new btRigidBody(0, m_motion_state, m_shape, btVector3(0,0,0));
+	}
+	m_collision_def.flag = COLLISION_FLAG_GAME_OBJECT;
+	m_collision_def.data = m_owner;
+	m_rigidbody->setUserPointer(&m_collision_def);
+	m_rigidbody->getWorldTransform().setOrigin(BtOgre::Convert::toBullet(pos));
 	m_rigidbody->setCollisionFlags(m_rigidbody->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 	m_rigidbody->setRestitution(def.restitution);
 	m_rigidbody->setFriction(def.friction);
@@ -823,37 +871,84 @@ void PlayerRaycastCollisionComponent::PlayerLandscape(){
 }
 
 void BobbingComponent::Shut(){
-
+	m_messenger->Unregister(MSG_BOBBING_START_MOVING, this);
 };
 
 void BobbingComponent::SetMessenger(ComponentMessenger* messenger){
-
+	m_messenger = messenger;
+	m_messenger->Register(MSG_BOBBING_START_MOVING, this);
 };
+
+void BobbingComponent::Notify(int type, void* msg){
+	switch (type){
+	case MSG_BOBBING_START_MOVING:
+		{
+			if (!m_start_moving){
+				m_player_node = *static_cast<Ogre::SceneNode**>(msg);
+				m_start_moving = true;
+				m_up = true;
+			}
+		}
+		break;
+	default:
+		break;
+	}
+}
 
 void BobbingComponent::Init(Ogre::SceneNode* node){
 	m_node = node;
-
+	m_rotation_speed = VariableManager::GetSingletonPtr()->GetAsFloat("LeafRotationSpeed");
 	m_current_time = 0.0f;
 	m_bob_timer = 2.0f;
-
+	m_y_distance = VariableManager::GetSingletonPtr()->GetAsFloat("LeafYDistance");
+	m_move_speed = VariableManager::GetSingletonPtr()->GetAsFloat("LeafMovement");
+	m_min_scale = VariableManager::GetSingletonPtr()->GetAsFloat("LeafMinScale");
+	m_scale_speed = VariableManager::GetSingletonPtr()->GetAsFloat("LeafScaleSpeed");
 	m_up = true;
 };
 
 void BobbingComponent::Update(float dt){
-	m_current_time += dt;
-	if (m_current_time >= m_bob_timer){
-		m_current_time = 0.0f;
-	if (m_up) { m_up = false; }
-	else { m_up = true; }
-	}
-	else{
-	if (m_up){
-		m_node->setPosition(m_node->getPosition().x, m_node->getPosition().y + 0.01, m_node->getPosition().z);
-	}
-	else{
-			m_node->setPosition(m_node->getPosition().x, m_node->getPosition().y - 0.01, m_node->getPosition().z);
+	if (!m_start_moving){
+		m_current_time += dt;
+		if (m_current_time >= m_bob_timer){
+			m_current_time = 0.0f;
+		if (m_up) { m_up = false; }
+		else { m_up = true; }
+		}
+		else{
+		if (m_up){
+			m_node->setPosition(m_node->getPosition().x, m_node->getPosition().y + 0.01, m_node->getPosition().z);
+		}
+		else{
+				m_node->setPosition(m_node->getPosition().x, m_node->getPosition().y - 0.01, m_node->getPosition().z);
+			}
 		}
 	}
+	else {
+		float speed = m_move_speed * dt;
+		float new_scale = m_scale_speed * dt;
+		Ogre::Vector3 scale = m_node->getScale();
+		scale -= new_scale;
+		if (scale.y <= m_min_scale){
+			scale = m_min_scale;
+		}
+		m_node->setScale(Ogre::Vector3(scale));
+		if (m_up){
+			m_node->translate(0.0f, speed, 0.0f);
+			m_y_distance -= speed;
+			if (m_y_distance <= 0.0f){
+				m_up = false;
+			}
+		}
+		else {
+			Ogre::Vector3 dir = m_player_node->getPosition() - m_node->getPosition();
+			dir.normalise();
+			dir *= speed;
+			m_node->translate(dir);
+		}
+	}
+	float rot_speed = m_rotation_speed * dt;
+	m_node->rotate(Ogre::Quaternion(1.0f, 0.0f, rot_speed, 0.0f));
 };
 
 void SyncedTriggerComponent::Init(const Ogre::Vector3& pos, PhysicsEngine* physics_engine, struct TriggerDef* def){
@@ -966,6 +1061,8 @@ void TottController::Init(const Ogre::Vector3& position, PhysicsEngine* physics_
 	m_react_animation = def.react_animation;
 	m_happy_animation = def.happy_animation;
 	
+	//def.theme_music = Ogre::String("Hidehog_Theme");
+
 	m_anim_msg.blend = false;
 	m_anim_msg.full_body = true;
 	m_anim_msg.id = "Idle";
@@ -982,6 +1079,14 @@ void TottController::Init(const Ogre::Vector3& position, PhysicsEngine* physics_
 	m_state_timer_counter = 0.0f;
 	m_state_timer = 1.0f;
 	m_can_change_state = true;
+
+	m_music.m_attached = false;
+	m_music.m_change_pitch = false;
+	m_music.m_change_volume = false;
+	m_music.m_name = "Hidehog_Theme";
+	m_music.m_node_name = def.node_name;
+	m_music.m_pitch = 1.0f;
+	m_music.m_volume = 1.0f;
 };
 
 void TottController::Idling(){
@@ -1006,6 +1111,9 @@ void TottController::Happy(){
 
 void TottController::Update(float dt){
 	CharacterController::Update(dt);
+
+	//m_owner->GetGameObjectManager()->GetGameObject("Player")->GetComponentMessenger()->Notify(MSG_MUSIC3D_PLAY, &m_music);
+
 	//m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
 	/*
 	Ogre::Quaternion rotation;

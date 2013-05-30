@@ -22,6 +22,7 @@ enum EGameObject{
 	GAME_OBJECT_QUEST_ITEM,
 	GAME_OBJECT_SPEECH_BUBBLE,
 	GAME_OBJECT_ROCK_SLIDE,
+	GAME_OBJECT_LEVEL_CHANGE,
 	GAME_OBJECT_SIZE
 };
 
@@ -95,7 +96,7 @@ struct CharacterControllerDef{
 struct TottDef{
 	TottDef(void) : mesh_name(""), quest_object_mesh_name(""), type_name(""), sb_node_name(""), theme_music(""), play_music(false),
 					sfx_happy(""), sfx_curious(""), idle_animation(""), walk_animation(""), run_animation(""), react_animation(""),
-					happy_animation(""){}
+					happy_animation(""), node_name(""){}
 	CharacterControllerDef	character_controller;
 	Ogre::String			mesh_name;
 	Ogre::String			quest_object_mesh_name;
@@ -111,6 +112,7 @@ struct TottDef{
 	Ogre::String			react_animation;
 	Ogre::String			happy_animation;
 	Ogre::String			mesh;
+	Ogre::String			node_name;
 };
 
 struct PlayerDef{
@@ -119,16 +121,29 @@ struct PlayerDef{
 	float camera_speed;
 };
 
+struct ColliderDef{
+	float x;
+	float y;
+	float z;
+	float radius;
+};
+
 struct RigidBodyDef{
-	RigidBodyDef(void) : collider_type(0.0f), mass(0.0f), body_type(0), restitution(0.0f), friction(0.0f), rolling_friction(0.0f) {}
-	RigidBodyDef(int p_collider_type, float p_mass) : collider_type(p_collider_type), mass(p_mass) {} 
+	RigidBodyDef(void) : collider_type(0.0f), mass(0.0f), body_type(0), restitution(0.0f), friction(0.0f), rolling_friction(0.0f), sync_orientation(true) {}
+	RigidBodyDef(int p_collider_type, float p_mass) : collider_type(p_collider_type), mass(p_mass), sync_orientation(true) {} 
 	int body_type;
 	int collider_type;
 	float mass;
 	float restitution;
 	float friction;
 	float rolling_friction;
+	bool sync_orientation;
 	CollisionFilter collision_filter;
+	ColliderDef collider_def;
+};
+
+struct GateDef {
+	int leaves;
 };
 
 #endif //GAME_OBJECT_PREREQ_H

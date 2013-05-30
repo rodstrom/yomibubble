@@ -159,6 +159,7 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 	m_animation_manager->AddAnimation(AnimationDef("Base_Idle_On_Bubble", 0, 0.1f, "Top_Idle_On_Bubble"));
 	m_animation_manager->AddAnimation(AnimationDef("Base_Idle_On_Bubble2", 0, 0.1f, "Top_Idle_On_Bubble2"));
 	m_animation_manager->AddAnimation(AnimationDef("Base_Walk_On_Bubble2", 0, 0.1f, "Top_Walk_On_Bubble2"));
+	m_animation_manager->AddAnimation(AnimationDef("Base_PickUpLeaf_State", 0, 0.1f, "Top_PickUpLeaf_State"));
 	
 	m_player_state_manager = new PlayerStateManager;
 
@@ -173,6 +174,7 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 	m_player_state_manager->AddPlayerState(new PlayerOnBubble(message_system));
 	m_player_state_manager->AddPlayerState(new PlayerInsideBubble(message_system));
 	m_player_state_manager->AddPlayerState(new PlayerHoldObject(physics_engine, message_system));
+	m_player_state_manager->AddPlayerState(new PlayerLeafCollect(message_system));
 	m_player_state_manager->Init();
 	m_player_state_manager->SetPlayerState(m_player_state_manager->GetPlayerState(PLAYER_STATE_FALLING));
 

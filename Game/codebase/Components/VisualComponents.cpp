@@ -8,6 +8,7 @@
 #include "..\Managers\GameObjectManager.h"
 #include "..\Managers\SoundManager.h"
 #include "..\PhysicsPrereq.h"
+#include "..\MessageSystem.h"
 
 void NodeComponent::Init(const Ogre::Vector3& pos, Ogre::SceneManager* scene_manager){
 	m_scene_manager = scene_manager;
@@ -141,7 +142,6 @@ void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* 
 void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager, const Ogre::String& node_id, bool remove_weights){
 	MeshRenderComponent::Init(filename, scene_manager, node_id);
 	m_entity->getSkeleton()->setBlendMode(ANIMBLEND_CUMULATIVE);
-	//m_animation_blender = new AnimationBlender(GetEntity());
 	if (remove_weights){
 		FixPlayerWeights();
 	}
@@ -264,10 +264,6 @@ void AnimationComponent::Notify(int type, void* msg){
 	case MSG_ANIMATION_PAUSE:
 		{
 			int index = *static_cast<int*>(msg);
-			//m_animation_states[index].animation_blender->getSource()->setWeight(0);
-			//m_animation_states[index].active = false;
-			//m_animation_states[index].animation_blender->getSource()->setTimePosition(0);
-			//m_animation_states[index].animation_blender->getSource()->setEnabled(false);
 		}
 		break;
 	case MSG_ANIMATION_LOOP:
@@ -916,3 +912,98 @@ void TutorialGraphicsComponent::Update(float dt){
 		}
 	}
 };
+
+void GateControllerComponent::Notify(int type, void* msg){
+	switch (type){
+	case MSG_GATE_OPEN_GET:
+		{
+			if (m_counter <= 0){
+				*static_cast<bool*>(msg) = true;
+			}
+			else {
+				*static_cast<bool*>(msg) = false;
+			}
+		}
+		break;
+	default:
+		break;
+	}
+}
+
+void GateControllerComponent::Shut(){
+	m_messenger->Unregister(MSG_GATE_OPEN_GET, this);
+	m_message_system->Unregister(EVT_LEAF_PICKUP, this);
+}
+
+void GateControllerComponent::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
+	m_messenger->Register(MSG_GATE_OPEN_GET, this);
+}
+
+void GateControllerComponent::Update(float dt){
+	if (!m_can_decrease) {   // ugly hack to prevent double pickup
+		m_timer += dt;
+		if (m_timer >= 1.0f){
+			m_can_decrease = true;
+		}
+	}
+	if (m_rotate){
+		float y_axis = m_left_gate_node->getOrientation().y;
+		if (y_axis >= 0.7f){
+			m_rotate = false;
+		}
+		float rot_speed = 0.1f * dt;
+		m_left_gate_node->rotate(Ogre::Quaternion(1.0f, 0.0f, rot_speed, 0.0f));
+		m_right_gate_node->rotate(Ogre::Quaternion(1.0f, 0.0f, -rot_speed, 0.0f));
+	}
+}
+
+void GateControllerComponent::Init(MessageSystem* message_system, int leaves){
+	m_counter = leaves;
+	m_message_system = message_system;
+	m_message_system->Register(EVT_LEAF_PICKUP, this, &GateControllerComponent::LeafPickup);
+	m_messenger->Notify(MSG_CHILD_NODE_GET_NODE, &m_left_gate_node, "left_gate_node");
+	m_messenger->Notify(MSG_CHILD_NODE_GET_NODE, &m_right_gate_node, "right_gate_node");
+}
+
+void GateControllerComponent::LeafPickup(IEvent* evt){
+	if (evt->m_type == EVT_LEAF_PICKUP){
+		if (m_can_decrease){
+			m_counter--;
+			if (m_counter <= 0){
+				this->OpenGate();
+			}
+			else {
+				m_can_decrease = false;
+				m_timer = 0.0f;
+			}
+		}
+	}
+}
+
+void GateControllerComponent::OpenGate(){
+	m_rotate = true;
+	m_owner->RemoveComponent(COMPONENT_RIGIDBODY);	// remove the collider so we can pass through the gate
+}
+
+void RotationComponent::Notify(int type, void* message){
+
+}
+
+void RotationComponent::Shut(){
+
+}
+
+void RotationComponent::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
+}
+
+void RotationComponent::Update(float dt){
+	float rot_speed = m_rotation_speed * dt;
+	m_node->rotate(Ogre::Quaternion(1.0f, 0.0f, rot_speed, 0.0f));
+}
+
+void RotationComponent::Init(Ogre::SceneNode* node, float rotation_speed){
+	m_node = node;
+	m_rotation_speed = rotation_speed;
+}

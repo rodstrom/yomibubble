@@ -14,8 +14,10 @@ int main(int argc, char** argv)
 #endif
 {
 	Core core;
-	if (!core.Init())
+	if (!core.Init()){
+		core.Shut();
 		return -1;
+	}
 	core.Run();
 	core.Shut();
 	return 0;
