@@ -5,6 +5,7 @@
 #include "GameObject.h"
 #include "GameObjectPrereq.h"
 #include "VisualComponents.h"
+#include "..\Managers\VariableManager.h"
 
 #include <iostream> //for debugging, wohoo
 
@@ -146,6 +147,14 @@ void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewpo
 	m_bot_ray.length = btVector3(0, -1, 0);
 
 	m_on_ground = true;
+
+	bool inv_contr = VariableManager::GetSingletonPtr()->GetAsInt("Camera_Inverted_Controller_Sticks");
+	if (inv_contr == 0){
+		m_inverted_controller = false;
+	}
+	else{
+		m_inverted_controller = true;
+	}
 
 	//m_env_coll_Xp = false;
 	//m_env_coll_Xn = false;
@@ -307,8 +316,8 @@ void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real de
 	}
 	
 	if (m_getting_input){
-		if (!m_inverted_controller) { m_camera_pivot->yaw(Ogre::Degree(-delta_yaw * m_camera_stick_rotation_acceleration), Ogre::Node::TS_WORLD); }
-		else { m_camera_pivot->yaw(Ogre::Degree(delta_yaw* m_camera_stick_rotation_acceleration), Ogre::Node::TS_WORLD); }
+		if (!m_inverted_controller) { m_camera_pivot->yaw(Ogre::Degree(delta_yaw * m_camera_stick_rotation_acceleration), Ogre::Node::TS_WORLD); }
+		else { m_camera_pivot->yaw(Ogre::Degree(-delta_yaw* m_camera_stick_rotation_acceleration), Ogre::Node::TS_WORLD); }
 	}
 	if (!(m_pivot_pitch + delta_pitch > -15 && delta_pitch > 0) && 
 		!(m_pivot_pitch + delta_pitch < -35 && delta_pitch < 0)

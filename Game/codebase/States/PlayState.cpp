@@ -20,7 +20,7 @@ void PlayState::Enter(){
 	m_message_system->Register(EVT_CHANGE_LEVEL, this, &PlayState::ChangeLevel);
 	m_scene_manager = Ogre::Root::getSingleton().createSceneManager("OctreeSceneManager");
 	m_sound_manager = new SoundManager;
-	m_sound_manager->Init(m_scene_manager);
+	m_sound_manager->Init(m_scene_manager, true);
 	m_sound_manager->LoadAudio();
 	m_physics_engine = new PhysicsEngine;
 	m_physics_engine->Init();

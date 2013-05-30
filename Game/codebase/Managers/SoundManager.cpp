@@ -25,11 +25,14 @@ SoundManager::~SoundManager(){
 	m_sound_manager = NULL;
 }
 
-void SoundManager::Init(Ogre::SceneManager* scene_manager){
+void SoundManager::Init(Ogre::SceneManager* scene_manager, bool play_state){
 	m_sound_manager->setSceneManager(scene_manager);
 	m_scene_manager = scene_manager;
-	//m_ear_node = scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(0,0,0), Ogre::Quaternion::IDENTITY);
-	//m_ear_node->attachObject(m_sound_manager->getListener());
+	m_ear_node = scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(0,0,0), Ogre::Quaternion::IDENTITY);
+	if (play_state == true){
+		m_ear_node->attachObject(m_sound_manager->getListener());
+	}
+	//System::Notify
 }
 
 void SoundManager::Exit(){
@@ -82,10 +85,12 @@ void SoundManager::LoadAudio(){
 	//////////////////// MUSIC /////////////////////////
 	m_sound_manager->createSound("Tutorial_Theme", "Music/Menu_theme.wav", false, true, true);
 	m_sound_manager->createSound("Day_Theme", "Music/Day_area_theme.wav", false, true, true);
-	ChangeVolume("Day_Theme", 0.5f);
+	//ChangeVolume("Day_Theme", 0.5f);
 	m_sound_manager->createSound("Night_Theme", "Music/Night_area_theme.wav", false, true, true);
-	ChangeVolume("Night_Theme", 0.2f);
+	//ChangeVolume("Night_Theme", 0.2f);
 	m_sound_manager->createSound("Hidehog_Theme", "Music/Day_area_theme_Hidehog.wav", false, true, true);
+	//setta 3d-properties
+	Init3D("Hidehog_Theme", 0.20f, 1.0f, 0.150f);
 	m_sound_manager->createSound("Shroomfox_Theme", "Music/Day_area_theme_Shroomfox.wav", false, true, true);
 	m_sound_manager->createSound("Nightcap_Theme", "Music/Night_area_theme_Nightcap.wav", false, true, true);
 
@@ -192,9 +197,10 @@ void SoundManager::ChangePitch(Ogre::String name, float new_pitch){ //Around 0.0
 
 void SoundManager::Update(Ogre::SceneManager* scene_manager, float dt){
 	m_sound_manager->update(dt);
-
-//	m_ear_node->setPosition(scene_manager->getSceneNode(m_yomi_node_name)->getPosition());
-//	m_ear_node->setOrientation(scene_manager->getSceneNode(m_yomi_node_name)->getOrientation());
+	if (m_ear_node && m_yomi_node_name != ""){
+	m_ear_node->setPosition(scene_manager->getSceneNode(m_yomi_node_name)->getPosition());
+	m_ear_node->setOrientation(scene_manager->getSceneNode(m_yomi_node_name)->getOrientation());
+	}
 
 //	std::cout << "Ear node pos : " << m_ear_node->getPosition() << std::endl;
 	processSoundDeletesPending();

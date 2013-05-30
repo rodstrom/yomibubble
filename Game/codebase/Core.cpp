@@ -127,7 +127,6 @@ void Core::Shut(){
 	}
 }
 
-
 void Core::QuitMsg(IEvent* evt){
 	m_run = false;
 }

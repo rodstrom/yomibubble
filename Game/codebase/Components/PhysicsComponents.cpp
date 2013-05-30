@@ -1005,6 +1005,8 @@ void TottController::Init(const Ogre::Vector3& position, PhysicsEngine* physics_
 	m_react_animation = def.react_animation;
 	m_happy_animation = def.happy_animation;
 	
+	//def.theme_music = Ogre::String("Hidehog_Theme");
+
 	m_anim_msg.blend = false;
 	m_anim_msg.full_body = true;
 	m_anim_msg.id = "Idle";
@@ -1021,6 +1023,14 @@ void TottController::Init(const Ogre::Vector3& position, PhysicsEngine* physics_
 	m_state_timer_counter = 0.0f;
 	m_state_timer = 1.0f;
 	m_can_change_state = true;
+
+	m_music.m_attached = false;
+	m_music.m_change_pitch = false;
+	m_music.m_change_volume = false;
+	m_music.m_name = "Hidehog_Theme";
+	m_music.m_node_name = def.node_name;
+	m_music.m_pitch = 1.0f;
+	m_music.m_volume = 1.0f;
 };
 
 void TottController::Idling(){
@@ -1045,6 +1055,9 @@ void TottController::Happy(){
 
 void TottController::Update(float dt){
 	CharacterController::Update(dt);
+
+	m_owner->GetGameObjectManager()->GetGameObject("Player")->GetComponentMessenger()->Notify(MSG_MUSIC3D_PLAY, &m_music);
+
 	//m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
 	/*
 	Ogre::Quaternion rotation;

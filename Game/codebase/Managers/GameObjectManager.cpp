@@ -412,6 +412,8 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 	//go->AddComponent(child_node);
 	
 	node_comp->Init(position, m_scene_manager);
+	node_comp->SetId("Tott");
+	def.node_name = node_comp->GetSceneNode()->getName();
 	//m_temp_node = node_comp->GetSceneNode();
 	acomp->Init(def.mesh_name, m_scene_manager);
 	acomp->AddAnimationState("Run", true);
@@ -634,6 +636,8 @@ GameObject* GameObjectManager::CreateLeaf(const Ogre::Vector3& position, void* d
 	TriggerComponent* stc = new TriggerComponent;
 	go->AddComponent(stc);
 
+
+	Ogre::Vector3 scale = Ogre::Vector3(0.6f);
 	node_comp->Init(position, m_scene_manager);
 	mrc->Init("Collectable_Leaf.mesh", m_scene_manager);
 	mrc->GetEntity()->setMaterialName("CollectibleLeaf");
@@ -641,6 +645,7 @@ GameObject* GameObjectManager::CreateLeaf(const Ogre::Vector3& position, void* d
 
 	mrc->GetEntity()->setMaterialName("CollectibleLeaf");
 	node_comp->GetSceneNode()->setPosition(Ogre::Vector3(position));
+	node_comp->GetSceneNode()->setScale(scale);
 
 	std::ostringstream stream;
 	stream << "Leaf_" << m_leaf_iterations;
@@ -654,7 +659,7 @@ GameObject* GameObjectManager::CreateLeaf(const Ogre::Vector3& position, void* d
 	trdef.body_type = STATIC_BODY;
 	trdef.collider_type = COLLIDER_SPHERE;
 	trdef.mass = 0.0f;
-	trdef.radius = 1.5f;
+	trdef.radius = 1.0f;
 	trdef.collision_filter.filter = COL_WORLD_TRIGGER;
 	trdef.collision_filter.mask = COL_PLAYER;
 	stc->Init(position, m_physics_engine, trdef);
