@@ -13,6 +13,7 @@ public:
 	virtual ~RigidbodyComponent(void){}
 	virtual void Notify(int type, void* message);
 	virtual void Init(const Ogre::Vector3& position, Ogre::Entity* entity, PhysicsEngine* physics_engine, const RigidBodyDef& def);
+	virtual void Init(const Ogre::Vector3& pos, PhysicsEngine* physics_engine, const RigidBodyDef& def);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
 	btRigidBody* GetRigidbody() { return m_rigidbody; }
@@ -309,6 +310,8 @@ private:
 	bool m_up;
 	float m_y_distance;
 	float m_move_speed;
+	float m_scale_speed;
+	float m_min_scale;
 };
 
 #endif // _N_PHYSICS_COMPONENTS_H_

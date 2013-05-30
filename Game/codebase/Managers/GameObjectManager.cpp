@@ -639,13 +639,11 @@ GameObject* GameObjectManager::CreateLeaf(const Ogre::Vector3& position, void* d
 
 	Ogre::Vector3 scale = Ogre::Vector3(0.6f);
 	node_comp->Init(position, m_scene_manager);
+	node_comp->GetSceneNode()->setPosition(Ogre::Vector3(position));
+	node_comp->GetSceneNode()->setScale(scale);
 	mrc->Init("Collectable_Leaf.mesh", m_scene_manager);
 	mrc->GetEntity()->setMaterialName("CollectibleLeaf");
 	bc->Init(node_comp->GetSceneNode());
-
-	mrc->GetEntity()->setMaterialName("CollectibleLeaf");
-	node_comp->GetSceneNode()->setPosition(Ogre::Vector3(position));
-	node_comp->GetSceneNode()->setScale(scale);
 
 	std::ostringstream stream;
 	stream << "Leaf_" << m_leaf_iterations;
@@ -704,13 +702,30 @@ GameObject* GameObjectManager::CreateGate(const Ogre::Vector3& position, void* d
 	GameObject* go = new GameObject(GAME_OBJECT_GATE);
 	NodeComponent* nc = new NodeComponent;
 	go->AddComponent(nc);
-	MeshRenderComponent* mrc = new MeshRenderComponent;
-	go->AddComponent(mrc);
+	MeshRenderComponent* left_gate_mesh = new MeshRenderComponent;
+	go->AddComponent(left_gate_mesh);
+	MeshRenderComponent* right_gate_mesh = new MeshRenderComponent;
+	go->AddComponent(right_gate_mesh);
+	ChildSceneNodeComponent* left_gate_node = new ChildSceneNodeComponent;
+	go->AddComponent(left_gate_node);
+	ChildSceneNodeComponent* right_gate_node = new ChildSceneNodeComponent;
+	go->AddComponent(right_gate_node);
+
 	RigidbodyComponent* rc = new RigidbodyComponent;
 	go->AddComponent(rc);
 	GateControllerComponent* gate_controller = new GateControllerComponent;
 	go->AddComponent(gate_controller);
 	go->AddUpdateable(gate_controller);
+
+	nc->Init(position, m_scene_manager);
+	left_gate_mesh->Init("GateLeft.mesh", m_scene_manager, Ogre::StringUtil::BLANK);
+	right_gate_mesh->Init("GateRight.mesh", m_scene_manager, Ogre::StringUtil::BLANK);
+	left_gate_node->Init(Ogre::Vector3(2.7f,0,0), "left_gate_node", nc->GetSceneNode());
+	left_gate_node->SetId("left_gate_node");
+	right_gate_node->Init(Ogre::Vector3(-2.7f,0,0), "right_gate_node", nc->GetSceneNode());
+	right_gate_node->SetId("right_gate_node");
+	left_gate_node->GetNode()->attachObject(left_gate_mesh->GetEntity());
+	right_gate_node->GetNode()->attachObject(right_gate_mesh->GetEntity());
 
 	RigidBodyDef body_def;
 	body_def.body_type = STATIC_BODY;
@@ -718,11 +733,11 @@ GameObject* GameObjectManager::CreateGate(const Ogre::Vector3& position, void* d
 	body_def.mass = 1.0f;
 	body_def.collision_filter.filter = COL_WORLD_STATIC;
 	body_def.collision_filter.mask = COL_PLAYER | COL_TOTT | COL_BUBBLE;
+	body_def.collider_def.x = 4.0f;
+	body_def.collider_def.y = 6.0f;
+	body_def.collider_def.z = 0.5f;
 
-	nc->Init(position, m_scene_manager);
-	mrc->Init("Gate.mesh", m_scene_manager);
-
-	rc->Init(position, mrc->GetEntity(), m_physics_engine, body_def);
+	rc->Init(position, m_physics_engine, body_def);
 	gate_controller->Init(m_message_system, def.leaves);
 	return go;
 }

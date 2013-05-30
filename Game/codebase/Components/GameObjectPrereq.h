@@ -120,6 +120,13 @@ struct PlayerDef{
 	float camera_speed;
 };
 
+struct ColliderDef{
+	float x;
+	float y;
+	float z;
+	float radius;
+};
+
 struct RigidBodyDef{
 	RigidBodyDef(void) : collider_type(0.0f), mass(0.0f), body_type(0), restitution(0.0f), friction(0.0f), rolling_friction(0.0f), sync_orientation(true) {}
 	RigidBodyDef(int p_collider_type, float p_mass) : collider_type(p_collider_type), mass(p_mass), sync_orientation(true) {} 
@@ -131,6 +138,7 @@ struct RigidBodyDef{
 	float rolling_friction;
 	bool sync_orientation;
 	CollisionFilter collision_filter;
+	ColliderDef collider_def;
 };
 
 struct GateDef {

@@ -112,6 +112,53 @@ void RigidbodyComponent::Init(const Ogre::Vector3& position, Ogre::Entity* entit
 	m_physics_engine->GetDynamicWorld()->addRigidBody(m_rigidbody, def.collision_filter.filter, def.collision_filter.mask);
 }
 
+void RigidbodyComponent::Init(const Ogre::Vector3& pos, PhysicsEngine* physics_engine, const RigidBodyDef& def){
+	m_physics_engine = physics_engine;
+	switch (def.collider_type){
+	case COLLIDER_BOX:
+		m_shape = new btBoxShape(btVector3(def.collider_def.x, def.collider_def.y, def.collider_def.z));
+		break;
+	case COLLIDER_CAPSULE:
+		m_shape = new btCapsuleShape(def.collider_def.radius, def.collider_def.y);
+		break;
+	case COLLIDER_CYLINDER:
+		m_shape = new btCylinderShape(btVector3(def.collider_def.x, def.collider_def.y, def.collider_def.z));
+		break;
+	case COLLIDER_SPHERE:
+		m_shape = new btSphereShape(def.collider_def.radius);
+		break;
+	default:
+		break;
+	}
+	btTransform transform;
+	transform.setIdentity();
+	transform.setOrigin(btVector3(0,0,0));
+	m_compound_shape = new btCompoundShape;
+	m_compound_shape->addChildShape(transform, m_shape);
+
+	if (def.body_type == DYNAMIC_BODY){
+		btScalar mass = (btScalar)def.mass;
+		btVector3 inertia;
+		m_shape->calculateLocalInertia(mass, inertia);
+		m_motion_state = new BtOgre::RigidBodyState(m_messenger);
+		static_cast<BtOgre::RigidBodyState*>(m_motion_state)->UpdateOrientation(def.sync_orientation);
+		m_rigidbody = new btRigidBody(mass, m_motion_state, m_shape, inertia);
+	}
+	else if (def.body_type == STATIC_BODY){
+		m_motion_state = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)));
+		m_rigidbody = new btRigidBody(0, m_motion_state, m_shape, btVector3(0,0,0));
+	}
+	m_collision_def.flag = COLLISION_FLAG_GAME_OBJECT;
+	m_collision_def.data = m_owner;
+	m_rigidbody->setUserPointer(&m_collision_def);
+	m_rigidbody->getWorldTransform().setOrigin(BtOgre::Convert::toBullet(pos));
+	m_rigidbody->setCollisionFlags(m_rigidbody->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+	m_rigidbody->setRestitution(def.restitution);
+	m_rigidbody->setFriction(def.friction);
+	m_rigidbody->setRollingFriction(def.rolling_friction);
+	m_physics_engine->GetDynamicWorld()->addRigidBody(m_rigidbody, def.collision_filter.filter, def.collision_filter.mask);
+}
+
 void RigidbodyComponent::Shut(){
 	if (m_shape){
 		m_compound_shape->removeChildShape(m_shape);
@@ -853,8 +900,10 @@ void BobbingComponent::Init(Ogre::SceneNode* node){
 	m_rotation_speed = VariableManager::GetSingletonPtr()->GetAsFloat("LeafRotationSpeed");
 	m_current_time = 0.0f;
 	m_bob_timer = 2.0f;
-	m_y_distance = 3.0f;
-	m_move_speed = 2.0f;
+	m_y_distance = VariableManager::GetSingletonPtr()->GetAsFloat("LeafYDistance");
+	m_move_speed = VariableManager::GetSingletonPtr()->GetAsFloat("LeafMovement");
+	m_min_scale = VariableManager::GetSingletonPtr()->GetAsFloat("LeafMinScale");
+	m_scale_speed = VariableManager::GetSingletonPtr()->GetAsFloat("LeafScaleSpeed");
 	m_up = true;
 };
 
@@ -877,6 +926,13 @@ void BobbingComponent::Update(float dt){
 	}
 	else {
 		float speed = m_move_speed * dt;
+		float new_scale = m_scale_speed * dt;
+		Ogre::Vector3 scale = m_node->getScale();
+		scale -= new_scale;
+		if (scale.y <= m_min_scale){
+			scale = m_min_scale;
+		}
+		m_node->setScale(Ogre::Vector3(scale));
 		if (m_up){
 			m_node->translate(0.0f, speed, 0.0f);
 			m_y_distance -= speed;

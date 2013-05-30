@@ -932,10 +932,8 @@ void PlayerLeafCollect::Update(float dt){
 }
 
 void PlayerLeafCollect::GetLeaf(IEvent* evt){
-	if (m_leaf_object == NULL){
-		if (evt->m_type == EVT_LEAF_PICKUP){
-			m_leaf_object = static_cast<LeafEvent*>(evt)->leaf;
-			m_leaf_node = static_cast<LeafEvent*>(evt)->leaf_node;
-		}
+	if (evt->m_type == EVT_LEAF_PICKUP){
+		m_leaf_object = static_cast<LeafEvent*>(evt)->leaf;
+		m_leaf_node = static_cast<LeafEvent*>(evt)->leaf_node;
 	}
 }
