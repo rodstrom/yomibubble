@@ -151,6 +151,8 @@ void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewpo
 	m_vertical_coefficient = 1;
 	m_horizontal_coefficient = 1;
 
+	m_first_person = false;
+
 	//bool inv_contr = VariableManager::GetSingletonPtr()->GetAsInt("Camera_Inverted_Controller_Sticks");
 	//if (inv_contr == 0){
 	//	m_inverted_controller = false;
@@ -178,7 +180,7 @@ void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewpo
 }
 
 void FollowCameraComponent::Update(float dt){
-	std::cout << "DT: " << dt << std::endl;
+	//std::cout << "DT: " << dt << std::endl;
 	//m_camera->lookAt(Ogre::Vector3(150.872f,75.6166f,244.42f));
 	//m_camera->rotate(Ogre::Vector3(0.0491129,0.92081,0.123328), Ogre::Radian(-0.366698));
 	//m_camera->setOrientation(Ogre::Quaternion(0.0491129,0.92081,0.123328,-0.366698));
@@ -192,6 +194,7 @@ void FollowCameraComponent::Update(float dt){
 		if (input){
 			if(input->IsButtonPressed(BTN_INVERT_VERTICAL)) m_vertical_coefficient *= -1;
 			if(input->IsButtonPressed(BTN_INVERT_HORIZONTAL)) m_horizontal_coefficient *= -1;
+			if(input->IsButtonPressed(BTN_FIRST_PERSON)) m_first_person = !m_first_person;
 			CameraAxis axis = input->GetCameraAxis();
 			//UpdateCameraGoal(-0.1f * axis.x, -0.1f * axis.y, -0.0005f * axis.z);
 			Ogre::Real speed = 20;
@@ -245,12 +248,13 @@ void FollowCameraComponent::Update(float dt){
 
 	QueryRaycast();
 
-	Ogre::Vector3 goal_pos = m_camera_goal->getPosition();
-	if(goal_pos.z < Ogre::Real(2)) m_camera_goal->setPosition(goal_pos.x, goal_pos.y, Ogre::Real(2));
+//	Ogre::Vector3 goal_pos = m_camera_goal->getPosition();
+//	if(goal_pos.z < Ogre::Real(2)) m_camera_goal->setPosition(goal_pos.x, goal_pos.y, Ogre::Real(2));
+	
 	//if(goal_pos.z > Ogre::Real(15)) m_camera_goal->setPosition(goal_pos.x, goal_pos.y, Ogre::Real(15));
 	if(m_default_distance > 15.0f) m_default_distance = 15.0f;
-	goal_pos = m_camera_goal->_getDerivedPosition();
-
+	
+	//goal_pos = m_camera_goal->_getDerivedPosition();
 	//if(goal_pos.y - m_camera_pivot->getPosition().y < 0) {		//bugfix, camera n ot clipping ground
 	//	//m_camera_pivot->pitch(Ogre::Radian(-m_camera_pivot->getOrientation().getPitch()));
 	//	m_camera_goal->_setDerivedPosition(Ogre::Vector3(goal_pos.x, m_camera_pivot->getPosition().y, goal_pos.z));
@@ -268,10 +272,25 @@ void FollowCameraComponent::Update(float dt){
 	//std::cout << " Roll: " << m_camera_pivot->getOrientation().getRoll() << "\n";
 	//std::cout << "  Yaw: " << m_camera_pivot->getOrientation().getYaw() << "\n";
 
-	if(m_camera_pivot->getPosition().distance(m_camera_goal->_getDerivedPosition()) < Ogre::Real(2)) {
-		Ogre::Ray distance(m_camera_pivot->getPosition(), m_camera_goal->_getDerivedPosition() - m_camera_pivot->getPosition());
-		m_camera_goal->_setDerivedPosition(distance.getPoint(Ogre::Real(2)));
+	//if(m_camera_pivot->getPosition().distance(m_camera_goal->_getDerivedPosition()) < Ogre::Real(2)) {
+	//	Ogre::Ray distance(m_camera_pivot->getPosition(), m_camera_goal->_getDerivedPosition() - m_camera_pivot->getPosition());
+	//	m_camera_goal->_setDerivedPosition(distance.getPoint(Ogre::Real(2)));
+	//}
+
+	if(m_first_person) {
+		static_cast<AnimationComponent*>(m_owner->GetComponent(COMPONENT_ANIMATION))->GetEntity()->setVisible(false);
+		//m_camera_goal->_setDerivedPosition(m_camera_pivot->getPosition());
+		m_camera_goal->setPosition(0, 0, 0.1);
 	}
+	else {
+		if(m_camera_pivot->getPosition().distance(m_camera_node->_getDerivedPosition()) < Ogre::Real(2)) {
+			static_cast<AnimationComponent*>(m_owner->GetComponent(COMPONENT_ANIMATION))->GetEntity()->setVisible(false);
+		}
+		else {
+			static_cast<AnimationComponent*>(m_owner->GetComponent(COMPONENT_ANIMATION))->GetEntity()->setVisible(true);
+		}
+	}
+
 	//else if(m_camera_pivot->getPosition().distance(m_camera_goal->_getDerivedPosition()) > Ogre::Real(15)) {
 	//	Ogre::Ray distance(m_camera_pivot->getPosition(), m_camera_goal->_getDerivedPosition() - m_camera_pivot->getPosition());
 	//	m_camera_goal->_setDerivedPosition(distance.getPoint(Ogre::Real(15)));

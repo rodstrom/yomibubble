@@ -94,6 +94,8 @@ protected:
 	int					m_horizontal_coefficient;
 	int					m_vertical_coefficient;
 
+	bool				m_first_person;
+
 //	TriggerComponent*	m_trigger;
 };
 //
