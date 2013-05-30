@@ -94,6 +94,11 @@ protected:
 	int					m_horizontal_coefficient;
 	int					m_vertical_coefficient;
 
+	bool				m_first_person;
+
+	Ogre::Entity*		m_player_character;
+	//Ogre::Vector3		m_old_player_position;
+
 //	TriggerComponent*	m_trigger;
 };
 //
