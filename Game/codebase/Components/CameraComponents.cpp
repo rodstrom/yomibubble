@@ -245,10 +245,12 @@ void FollowCameraComponent::Update(float dt){
 	//if(goal_pos.z > Ogre::Real(15)) m_camera_goal->setPosition(goal_pos.x, goal_pos.y, Ogre::Real(15));
 	if(m_default_distance > 15.0f) m_default_distance = 15.0f;
 	goal_pos = m_camera_goal->_getDerivedPosition();
-	if(goal_pos.y - m_camera_pivot->getPosition().y < 0) {
-		//m_camera_pivot->pitch(Ogre::Radian(-m_camera_pivot->getOrientation().getPitch()));
-		m_camera_goal->_setDerivedPosition(Ogre::Vector3(goal_pos.x, m_camera_pivot->getPosition().y, goal_pos.z));
-	}
+
+	//if(goal_pos.y - m_camera_pivot->getPosition().y < 0) {		//bugfix, camera n ot clipping ground
+	//	//m_camera_pivot->pitch(Ogre::Radian(-m_camera_pivot->getOrientation().getPitch()));
+	//	m_camera_goal->_setDerivedPosition(Ogre::Vector3(goal_pos.x, m_camera_pivot->getPosition().y, goal_pos.z));
+	//}
+
 	//goal_pos = m_camera_goal->getPosition();
 	//if(m_camera_goal->_getDerivedPosition().y - m_camera_pivot->getPosition().y > Ogre::Math::Tan((Ogre::Radian(0.5f))) * goal_pos.z ) {
 	//	//std::cout << "tan(0.5r) * cam.z: " << Ogre::Math::Tan((Ogre::Radian(0.5f))) * goal_pos.z << "\n";
@@ -319,7 +321,7 @@ void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real de
 		if (!m_inverted_controller) { m_camera_pivot->yaw(Ogre::Degree(delta_yaw * m_camera_stick_rotation_acceleration), Ogre::Node::TS_WORLD); }
 		else { m_camera_pivot->yaw(Ogre::Degree(-delta_yaw* m_camera_stick_rotation_acceleration), Ogre::Node::TS_WORLD); }
 	}
-	if (!(m_pivot_pitch + delta_pitch > -15 && delta_pitch > 0) && 
+	if (!(m_pivot_pitch + delta_pitch > 10 && delta_pitch > 0) && 
 		!(m_pivot_pitch + delta_pitch < -35 && delta_pitch < 0)
 		&& m_getting_input){
 			if (!m_inverted_controller) { m_camera_pivot->pitch(Ogre::Degree(delta_pitch * m_camera_stick_rotation_acceleration), Ogre::Node::TS_LOCAL); }
