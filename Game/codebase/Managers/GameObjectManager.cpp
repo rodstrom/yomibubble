@@ -414,7 +414,7 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 	node_comp->Init(position, m_scene_manager);
 	//m_temp_node = node_comp->GetSceneNode();
 	acomp->Init(def.mesh_name, m_scene_manager);
-	acomp->AddAnimationState("Idle");
+	acomp->AddAnimationState("Run", true);
 	//child_node->Init(position, "TottNode", node_comp->GetSceneNode());
 
 	//acomp->GetEntity()->setMaterialName("SolidColor/Green");

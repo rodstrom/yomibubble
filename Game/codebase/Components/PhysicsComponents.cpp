@@ -9,6 +9,7 @@
 #include "GameObject.h"
 #include "..\Managers\GameObjectManager.h"
 #include "VisualComponents.h"
+#include "..\AnimationBlender.h"
 
 void RigidbodyComponent::Notify(int type, void* msg){
 	switch (type){
@@ -898,6 +899,7 @@ void CameraRaycastCollisionComponent::SetMessenger(ComponentMessenger* messenger
 
 void TottController::Notify(int type, void* msg){
 	CharacterController::Notify(type, msg);
+	/*
 	TOTT_STATE& new_state = *static_cast<TOTT_STATE*>(msg);
 
 	//switch(type){
@@ -935,6 +937,7 @@ void TottController::Notify(int type, void* msg){
 		};
 		m_can_change_state = false;
 		}
+		*/
 		/*
 		break;
 	default:
@@ -969,6 +972,7 @@ void TottController::Init(const Ogre::Vector3& position, PhysicsEngine* physics_
 	m_anim_msg.index = 0;
 	m_anim_msg.loop = true;
 	m_anim_msg.wait = false;
+	m_anim_msg.blending_transition = AnimationBlender::BlendThenAnimate;
 
 	m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
 	m_state = IDLING;
@@ -1002,6 +1006,8 @@ void TottController::Happy(){
 
 void TottController::Update(float dt){
 	CharacterController::Update(dt);
+	//m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
+	/*
 	Ogre::Quaternion rotation;
 	Ogre::Vector3 tott_pos = static_cast<NodeComponent*>(m_owner->GetComponent(COMPONENT_NODE))->GetSceneNode()->getPosition();
 	Ogre::Quaternion tott_ori = static_cast<NodeComponent*>(m_owner->GetComponent(COMPONENT_NODE))->GetSceneNode()->getOrientation();
@@ -1036,7 +1042,7 @@ void TottController::Update(float dt){
 	default:
 		break;
 	};
-	
+	*/
 
 	//Ogre::SceneNode* test = static_cast<NodeComponent*>(m_owner->GetComponent(COMPONENT_NODE))->GetSceneNode();
 

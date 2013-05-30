@@ -42,7 +42,7 @@ public:
 	SoundManager();
 	~SoundManager();
 
-	void Init(Ogre::SceneManager* scene_manager);
+	void Init(Ogre::SceneManager* scene_manager, bool play_state = false);
 	void Exit();
 
     void deleteSoundInstance(OgreOggISound* sound);

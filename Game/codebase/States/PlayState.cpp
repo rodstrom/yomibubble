@@ -19,10 +19,8 @@ PlayState::~PlayState(void){}
 void PlayState::Enter(){
 	m_message_system->Register(EVT_CHANGE_LEVEL, this, &PlayState::ChangeLevel);
 	m_scene_manager = Ogre::Root::getSingleton().createSceneManager("OctreeSceneManager");
-	//std::cout << "Creating SoundManager instance\n";
 	m_sound_manager = new SoundManager;
-	m_sound_manager->Init(m_scene_manager);
-	//std::cout << "Loading Audio\n";
+	m_sound_manager->Init(m_scene_manager, true);
 	m_sound_manager->LoadAudio();
 	m_physics_engine = new PhysicsEngine;
 	m_physics_engine->Init();
@@ -55,7 +53,8 @@ void PlayState::SecondLoading(){
 	m_scene_manager->setShadowFarDistance(30.0f);
 	m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
 
-	m_level_manager = new LevelManager(m_game_object_manager, m_scene_manager, m_physics_engine);
+	std::function<void()> func = [this] { ChangeToWinState(); };
+	m_level_manager = new LevelManager(m_game_object_manager, m_scene_manager, m_physics_engine, func);
 	LevelDef level1;
 	level1.filepath = "try";
 	level1.next_level = "Dayarea";
@@ -137,4 +136,8 @@ bool PlayState::Update(float dt){
 
 void PlayState::ChangeLevel(IEvent*) {
 	m_change_level = true;
+}
+
+void PlayState::ChangeToWinState(){
+	ChangeState(FindByName("WinState"));
 }

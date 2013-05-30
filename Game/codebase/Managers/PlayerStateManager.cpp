@@ -65,3 +65,13 @@ void PlayerStateManager::Init(){
 	m_blow_bubble_state = GetPlayerState(PLAYER_STATE_BLOW_BUBBLE);
 	m_holding_object_state = GetPlayerState(PLAYER_STATE_HOLD_OBJECT);
 }
+
+void PlayerStateManager::Shut(){
+	if (!m_player_states.empty()){
+		for (unsigned int i = 0; i < m_player_states.size(); i++){
+			delete m_player_states[i];
+			m_player_states[i] = NULL;
+		}
+		m_player_states.clear();
+	}
+}

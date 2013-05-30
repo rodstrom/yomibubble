@@ -17,6 +17,7 @@ void MenuState::Enter(){
 	m_sound_manager->Init(m_scene_manager);
 	m_sound_manager->LoadAudio();
 	m_fade->SetFadeInCallBack(NULL);
+	m_fade->FadeIn(VariableManager::GetSingletonPtr()->GetAsFloat("Fade_in_timer"));
 	std::function<void()> func = [this] { ChangeStateToPlayState(); };
 	m_fade->SetFadeOutCallBack(func);
 	

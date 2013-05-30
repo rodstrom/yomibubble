@@ -7,61 +7,61 @@
 #include "Managers\CollisionManager.h"
 #include "Managers\VariableManager.h"
 
-Core::Core(void) : m_root(NULL), m_game(NULL), m_message_system(NULL), m_input_system(NULL), m_run(true) {}
+Core::Core(void) : m_root(NULL), m_game(NULL), m_message_system(NULL), m_input_system(NULL), m_render_window(NULL), m_run(true) {}
 Core::~Core(void){}
 
 bool Core::Init(){
 	m_message_system = new MessageSystem;
 	m_message_system->Register(EVT_QUIT, this, &Core::QuitMsg);
 	CollisionManager::GetSingletonPtr()->SetMessageSystem(m_message_system);
-	Ogre::String pluginsCfg = Ogre::StringUtil::BLANK;
-	Ogre::String resourceCfg  = "../../resources/config/resources.cfg";
+	m_root = OGRE_NEW Ogre::Root;
 #ifdef _DEBUG
-	pluginsCfg = "plugins_d.cfg";
+	m_root->loadPlugin(".\\RenderSystem_Direct3D9_d");
+	m_root->loadPlugin(".\\Plugin_CgProgramManager_d");
+	m_root->loadPlugin(".\\Plugin_OctreeSceneManager_d");
+	m_root->loadPlugin(".\\Plugin_ParticleFX_d");
+	m_root->loadPlugin(".\\OgreOggSound_d");
 #else
-	pluginsCfg = "plugins.cfg";
+	m_root->loadPlugin(".\\RenderSystem_Direct3D9");
+	m_root->loadPlugin(".\\Plugin_CgProgramManager");
+	m_root->loadPlugin(".\\Plugin_OctreeSceneManager");
+	m_root->loadPlugin(".\\Plugin_ParticleFX");
+	m_root->loadPlugin(".\\OgreOggSound");
 #endif
+	// We hardcode our resource locations so users can't change them.
+	Ogre::ResourceGroupManager::getSingleton().addResourceLocation("../../resources", "FileSystem", "General");
+	Ogre::ResourceGroupManager::getSingleton().addResourceLocation("../../resources/fonts", "FileSystem", "Popular");
+	Ogre::ResourceGroupManager::getSingleton().addResourceLocation("../../resources/materials/programs", "FileSystem", "Popular");
+	Ogre::ResourceGroupManager::getSingleton().addResourceLocation("../../resources/materials/scripts", "FileSystem", "Popular");
+	Ogre::ResourceGroupManager::getSingleton().addResourceLocation("../../resources/materials/scripts/overlays", "FileSystem", "Popular");
+	Ogre::ResourceGroupManager::getSingleton().addResourceLocation("../../resources/materials/scripts/bloom", "FileSystem", "Popular");
+	Ogre::ResourceGroupManager::getSingleton().addResourceLocation("../../resources/materials/scripts/particles", "FileSystem", "Popular");
+	Ogre::ResourceGroupManager::getSingleton().addResourceLocation("../../resources/materials/scripts/cg_shaders", "FileSystem", "Popular");
+	Ogre::ResourceGroupManager::getSingleton().addResourceLocation("../../resources/materials/scripts/depth_shadowmap", "FileSystem", "Popular");
+	Ogre::ResourceGroupManager::getSingleton().addResourceLocation("../../resources/materials/scripts/programs", "FileSystem", "Popular");
+	Ogre::ResourceGroupManager::getSingleton().addResourceLocation("../../resources/materials/textures", "FileSystem", "Popular");
+	Ogre::ResourceGroupManager::getSingleton().addResourceLocation("../../resources/materials/textures/glow_maps", "FileSystem", "Popular");
+	Ogre::ResourceGroupManager::getSingleton().addResourceLocation("../../resources/materials/textures/normal_maps", "FileSystem", "Popular");
+	Ogre::ResourceGroupManager::getSingleton().addResourceLocation("../../resources/materials/textures/specular_maps", "FileSystem", "Popular");
+	Ogre::ResourceGroupManager::getSingleton().addResourceLocation("../../resources/materials/textures/GUI", "FileSystem", "Popular");
+	Ogre::ResourceGroupManager::getSingleton().addResourceLocation("../../resources/materials/textures/HUD", "FileSystem", "Popular");
+	Ogre::ResourceGroupManager::getSingleton().addResourceLocation("../../resources/models", "FileSystem", "Popular");
+	Ogre::ResourceGroupManager::getSingleton().addResourceLocation("../../resources/models/grass", "FileSystem", "Popular");
+	Ogre::ResourceGroupManager::getSingleton().addResourceLocation("../../resources/models/characters", "FileSystem", "Popular");
+	Ogre::ResourceGroupManager::getSingleton().addResourceLocation("../../resources/terrain", "FileSystem", "Popular");
+	Ogre::ResourceGroupManager::getSingleton().addResourceLocation("../../resources/audio", "FileSystem", "Popular");
 
-	m_root = OGRE_NEW Ogre::Root(pluginsCfg);
-
-	Ogre::ConfigFile cf;
-	cf.load(resourceCfg);
-
-	Ogre::ConfigFile::SectionIterator seci = cf.getSectionIterator();
-	Ogre::String secName, typeName, archName;
-	while (seci.hasMoreElements()){
-		secName = seci.peekNextKey();
-		Ogre::ConfigFile::SettingsMultiMap* settings = seci.getNext();
-		for (auto it = settings->begin(); it != settings->end(); it++){
-			typeName = it->first;
-			archName = it->second;
-			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(archName, typeName, secName);
-		}
+	if (!m_root->showConfigDialog()){
+		return false;
 	}
 
-	Ogre::ConfigFile videoCfg;
-	videoCfg.load(Ogre::String("../../resources/config/ogre.cfg"));
-	Ogre::String rendersystem = videoCfg.getSetting("Render System", Ogre::StringUtil::BLANK, "Direct3D9 Rendering Subsystem");
-	Ogre::String fullscreen = videoCfg.getSetting("Full Screen", rendersystem, "No");
-	Ogre::String videoMode = videoCfg.getSetting("Video Mode", rendersystem, "1024 x 768 @ 32-bit colour");
-
-	Ogre::RenderSystem* rs = m_root->getRenderSystemByName(rendersystem);
-	m_root->setRenderSystem(rs);
-
-	rs->setConfigOption("Full Screen", fullscreen);
-	rs->setConfigOption("Video Mode", videoMode);
-	rs->setConfigOption("VSync", "Yes");
-
 	m_render_window = m_root->initialise(true, "Yomi's Bubble Adventure");
-	Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
 	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
-
+	Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
 	if (!VariableManager::GetSingletonPtr()->Init())
 		return false;
-	//m_sound_manager = new SoundManager();
-	//m_sound_manager->LoadAudio();
+
 	m_game = new Game;
-	//m_game->Init(m_render_window, m_message_system, m_sound_manager, m_scene_manager);
 	m_game->Init(m_render_window, m_message_system);
 	m_input_system = new InputSystem(m_game, m_render_window, m_message_system);
 	m_input_system->Init();

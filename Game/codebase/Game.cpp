@@ -7,6 +7,7 @@
 #include "States\LoadingState.h"
 #include "States\IntroLogoState.h"
 #include "States\IntroMovieState.h"
+#include "States\WinState.h"
 
 Game::Game(void) : m_state_manager(NULL){}
 Game::~Game(void){}
@@ -21,9 +22,11 @@ bool Game::Init(Ogre::RenderWindow* render_window, MessageSystem* message_system
 	MenuState::Create<MenuState>(m_state_manager, "MenuState");
 	PauseState::Create<PauseState>(m_state_manager, "PauseState");
 	LoadingState::Create<LoadingState>(m_state_manager, "LoadingState");
+	IntroLogoState::Create<IntroLogoState>(m_state_manager, "IntroLogoState");
 	//IntroLogoState::Create<IntroLogoState>(m_state_manager, "LogoState");
 	IntroMovieState::Create<IntroMovieState>(m_state_manager, "IntroMovieState");
-	m_state_manager->ChangeState(m_state_manager->FindById("MenuState"));
+	WinState::Create<WinState>(m_state_manager, "WinState");
+	m_state_manager->ChangeState(m_state_manager->FindById("IntroLogoState"));
 
 	//ShowCursor(false); // NO WINDOWS SPECIFIC CALLS!
 
