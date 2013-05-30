@@ -983,6 +983,7 @@ void GateControllerComponent::LeafPickup(IEvent* evt){
 
 void GateControllerComponent::OpenGate(){
 	m_rotate = true;
+	m_owner->RemoveComponent(COMPONENT_RIGIDBODY);	// remove the collider so we can pass through the gate
 }
 
 void RotationComponent::Notify(int type, void* message){

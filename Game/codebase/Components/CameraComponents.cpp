@@ -175,7 +175,7 @@ void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewpo
 }
 
 void FollowCameraComponent::Update(float dt){
-
+	std::cout << "DT: " << dt << std::endl;
 	//m_camera->lookAt(Ogre::Vector3(150.872f,75.6166f,244.42f));
 	//m_camera->rotate(Ogre::Vector3(0.0491129,0.92081,0.123328), Ogre::Radian(-0.366698));
 	//m_camera->setOrientation(Ogre::Quaternion(0.0491129,0.92081,0.123328,-0.366698));
@@ -321,8 +321,8 @@ void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real de
 		if (!m_inverted_controller) { m_camera_pivot->yaw(Ogre::Degree(delta_yaw * m_camera_stick_rotation_acceleration), Ogre::Node::TS_WORLD); }
 		else { m_camera_pivot->yaw(Ogre::Degree(-delta_yaw* m_camera_stick_rotation_acceleration), Ogre::Node::TS_WORLD); }
 	}
-	if (!(m_pivot_pitch + delta_pitch > 10 && delta_pitch > 0) && 
-		!(m_pivot_pitch + delta_pitch < -35 && delta_pitch < 0)
+	if (!(m_pivot_pitch + delta_pitch > -10 && delta_pitch > 0) && 
+		!(m_pivot_pitch + delta_pitch < -40 && delta_pitch < 0)
 		&& m_getting_input){
 			if (!m_inverted_controller) { m_camera_pivot->pitch(Ogre::Degree(delta_pitch * m_camera_stick_rotation_acceleration), Ogre::Node::TS_LOCAL); }
 			else { m_camera_pivot->pitch(Ogre::Degree(-delta_pitch * m_camera_stick_rotation_acceleration), Ogre::Node::TS_LOCAL); }

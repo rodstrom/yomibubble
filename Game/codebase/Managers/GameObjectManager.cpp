@@ -49,6 +49,7 @@ void GameObjectManager::Init(PhysicsEngine* physics_engine, Ogre::SceneManager* 
 	m_create_fptr[GAME_OBJECT_QUEST_ITEM]  =    &GameObjectManager::CreateQuestItem;
 	m_create_fptr[GAME_OBJECT_SPEECH_BUBBLE] =  &GameObjectManager::CreateSpeechBubble;
 	m_create_fptr[GAME_OBJECT_ROCK_SLIDE] =		&GameObjectManager::CreateRockSlide;
+	m_create_fptr[GAME_OBJECT_LEVEL_CHANGE] =   &GameObjectManager::CreateLevelChange;
 
 	m_leaf_iterations = 0;
 	m_particle_iterations = 0;
@@ -794,5 +795,15 @@ GameObject* GameObjectManager::CreateRockSlide(const Ogre::Vector3& position, vo
 	body_def.collision_filter.filter = COL_WORLD_STATIC;
 	body_def.collision_filter.mask = COL_BUBBLE | COL_PLAYER | COL_QUESTITEM | COL_TOTT;
 	
+	return go;
+}
+
+GameObject* GameObjectManager::CreateLevelChange(const Ogre::Vector3& position, void* data, const Ogre::String& id){
+	TriggerDef& def = *static_cast<TriggerDef*>(data);
+	GameObject* go = new GameObject(GAME_OBJECT_LEVEL_CHANGE, id);
+	TriggerComponent* trigger_comp = new TriggerComponent;
+	go->AddComponent(trigger_comp);
+
+	trigger_comp->Init(position, m_physics_engine, def);
 	return go;
 }

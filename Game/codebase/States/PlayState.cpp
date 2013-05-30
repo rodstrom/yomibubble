@@ -105,6 +105,7 @@ bool PlayState::Update(float dt){
 
 		loading->Exit();
 	}
+	m_sound_manager->Update(m_scene_manager, dt);
 	m_game_object_manager->Update(dt);
 	
 	//if(m_pause){
@@ -112,7 +113,7 @@ bool PlayState::Update(float dt){
 	//	PushState(FindByName("PauseState"));
 	//}
 	//else {
-		m_sound_manager->Update(m_scene_manager, dt);
+		
 		m_physics_engine->Step(dt);
 
 		/*if (m_input_manager->IsButtonDown(BTN_ARROW_UP)){

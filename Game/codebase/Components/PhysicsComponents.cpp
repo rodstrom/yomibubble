@@ -1112,7 +1112,7 @@ void TottController::Happy(){
 void TottController::Update(float dt){
 	CharacterController::Update(dt);
 
-	m_owner->GetGameObjectManager()->GetGameObject("Player")->GetComponentMessenger()->Notify(MSG_MUSIC3D_PLAY, &m_music);
+	//m_owner->GetGameObjectManager()->GetGameObject("Player")->GetComponentMessenger()->Notify(MSG_MUSIC3D_PLAY, &m_music);
 
 	//m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
 	/*

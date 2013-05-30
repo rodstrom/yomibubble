@@ -385,8 +385,17 @@ int DBManager::Load() {
 								temp->GetComponentMessenger()->Notify(MSG_SET_OBJECT_ORIENTATION, &quat);
 							}*/
 						}
-						else if (i->second == "rock_slide"){
-							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_GATE, Ogre::Vector3(x,y,z), NULL);
+						else if (i->second == "levelchange"){
+							TriggerDef def;
+							def.body_type = STATIC_BODY;
+							def.collision_filter.filter = COL_WORLD_TRIGGER;
+							def.collision_filter.mask = COL_PLAYER;
+							def.mass = 1.0f;
+							def.collider_type = COLLIDER_BOX;
+							def.x = spawn.sx * 3.5f;
+							def.y = spawn.sy * 3.5f;
+							def.z = spawn.sz * 3.5f;
+							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_LEVEL_CHANGE, Ogre::Vector3(spawn.x, spawn.y, spawn.z), &def);
 							Ogre::Quaternion quat = Ogre::Quaternion ((Degree(spawn.rx)), Vector3::UNIT_X)*Quaternion ((Degree(spawn.ry)), Vector3::UNIT_Y)*Quaternion ((Degree(spawn.rz)), Vector3::UNIT_Z);
 							temp->GetComponentMessenger()->Notify(MSG_SET_OBJECT_ORIENTATION, &quat);
 						}
