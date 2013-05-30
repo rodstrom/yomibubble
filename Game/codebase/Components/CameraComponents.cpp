@@ -200,7 +200,7 @@ void FollowCameraComponent::Update(float dt){
 			CameraAxis axis = input->GetCameraAxis();
 			//UpdateCameraGoal(-0.1f * axis.x, -0.1f * axis.y, -0.0005f * axis.z);
 			Ogre::Real speed = 20;
-			UpdateCameraGoal(axis.x * m_movement_speed * dt * speed, axis.y * m_movement_speed * dt * speed, -0.0005f * axis.z * dt * speed);
+			UpdateCameraGoal(m_horizontal_coefficient * axis.x * m_movement_speed * dt * speed, m_vertical_coefficient * axis.y * m_movement_speed * dt * speed, -0.0005f * axis.z * dt * speed);
 		}
 	//}
 		
@@ -343,13 +343,13 @@ void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real de
 	}
 	
 	if (m_getting_input){
-		m_camera_pivot->yaw(Ogre::Degree(m_horizontal_coefficient * delta_yaw * m_camera_stick_rotation_acceleration), Ogre::Node::TS_WORLD);
+		m_camera_pivot->yaw(Ogre::Degree(delta_yaw * m_camera_stick_rotation_acceleration), Ogre::Node::TS_WORLD);
 	}
 	// << m_pivot_pitch << "\n";
 	if (!(m_pivot_pitch + delta_pitch > 10 && delta_pitch > 0) && 
 		!(m_pivot_pitch + delta_pitch < -30 && delta_pitch < 0)
 		&& m_getting_input){
-			m_camera_pivot->pitch(Ogre::Degree(m_vertical_coefficient * delta_pitch * m_camera_stick_rotation_acceleration), Ogre::Node::TS_LOCAL);
+			m_camera_pivot->pitch(Ogre::Degree(delta_pitch * m_camera_stick_rotation_acceleration), Ogre::Node::TS_LOCAL);
 			m_pivot_pitch += delta_pitch;
 			//cout << m_pivot_pitch << "\n";
 			m_default_pitch = m_pivot_pitch;
@@ -382,16 +382,16 @@ bool FollowCameraComponent::QueryRaycast(){
 	//Ogre::Vector3 cam_pos = m_camera_node->getPosition();
 	Ogre::Vector3 cam_pos = m_camera_goal->_getDerivedPosition();
 	Ogre::Real min_distance = m_default_distance;
-	Ogre::Real max_y = m_camera_goal->getPosition().z * 0.2;
-	cam_pos.y -= Ogre::Real(0.9);
+	cam_pos.y -= Ogre::Real(0.7);
 	Ogre::Ray camera_ray(cam_pos, Ogre::Vector3::UNIT_Y);
 	Ogre::TerrainGroup::RayResult collision = m_terrain_group->rayIntersects(camera_ray);
 	//Ogre::Real new_y = 0;
 	if(collision.hit){
 		m_env_collision = true;
-		m_camera_goal->_setDerivedPosition(collision.position + Ogre::Vector3::UNIT_Y * Ogre::Real(0.9));
+		m_camera_goal->_setDerivedPosition(collision.position + Ogre::Vector3::UNIT_Y * Ogre::Real(0.7));
 	}
-
+	
+	Ogre::Real max_y = m_camera_goal->getPosition().z * 0.1;
 	Ogre::Vector3 pivot_pos = m_camera_pivot->getPosition();
 	pivot_pos.y += Ogre::Real(0.5);
 	Ogre::Real hit_distance = collision.position.distance(cam_pos);
