@@ -178,7 +178,6 @@ void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewpo
 }
 
 void FollowCameraComponent::Update(float dt){
-	std::cout << "DT: " << dt << std::endl;
 	//m_camera->lookAt(Ogre::Vector3(150.872f,75.6166f,244.42f));
 	//m_camera->rotate(Ogre::Vector3(0.0491129,0.92081,0.123328), Ogre::Radian(-0.366698));
 	//m_camera->setOrientation(Ogre::Quaternion(0.0491129,0.92081,0.123328,-0.366698));

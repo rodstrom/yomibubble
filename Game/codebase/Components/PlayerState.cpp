@@ -650,6 +650,8 @@ void PlayerInsideBubble::Enter(){
 	m_bubble->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GET_BODY, &bubble_body, "body");
 	m_bubble->GetComponentMessenger()->Notify(MSG_NODE_GET_NODE, &bubble_node);
 	if (player_body && bubble_body && bubble_node){
+		int coll = btCollisionObject::CF_NO_CONTACT_RESPONSE;
+		s_messenger->Notify(MSG_RIGIDBODY_COLLISION_FLAG_SET, &coll, "body");
 		float y_scale = bubble_node->getScale().y;
 		y_scale *= 0.5f;
 		y_scale = y_scale - m_on_bubble_y_offset;
@@ -657,8 +659,6 @@ void PlayerInsideBubble::Enter(){
 		def.body_a = bubble_body;
 		def.body_b = player_body;
 		def.pivot_b.setY(m_on_bubble_y_offset);
-		btScalar mass = 0.0f;
-		btVector3 inertia(0,0,0);
 		s_input_component->GetOwner()->CreateComponent(COMPONENT_GENERIC_6DOF_COMPONENT, Ogre::Vector3(0,0,0), &def);
 		bool limit = false;
 		s_messenger->Notify(MSG_CHARACTER_CONTROLLER_LIMIT_MAX_SPEED, &limit);
@@ -712,11 +712,14 @@ void PlayerInsideBubble::Update(float dt){
 	}
 	if (bubble_node && m_bubble){
 		s_messenger->Notify(MSG_FOLLOW_CAMERA_GET_ORIENTATION, &dir);
+		std::cout << dir << std::endl;
 		dir.normalise();
 		m_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_APPLY_IMPULSE, &dir);
 		DirDT dirdt(dir, dt);
 		s_messenger->Notify(MSG_CHARACTER_CONTROLLER_APPLY_ROTATION, &dirdt);
 	}
+	Ogre::Vector3 zerodir = Ogre::Vector3::ZERO;
+	s_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &zerodir);
 }
 
 void PlayerInsideBubble::ChangeBubbleType(){
@@ -844,10 +847,13 @@ void PlayerHoldObject::Enter(){
 			}
 			else if (ob->GetType() == GAME_OBJECT_BLUE_BUBBLE || ob->GetType() == GAME_OBJECT_PINK_BUBBLE){
 				Ogre::Vector3 gravity(0,0,0);
+				player_body->clearForces();
 				s_messenger->Notify(MSG_PLAYER_INPUT_SET_BUBBLE, &ob);
+				ob->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_ACTIVATE, NULL);
 				s_messenger->Notify(MSG_CHARACTER_CONTROLLER_GRAVITY_SET, &gravity);
 				s_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &gravity);
 				s_manager->HoldObject(false);
+				s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_INSIDE_BUBBLE));
 			}
 		}
 	}
@@ -856,14 +862,8 @@ void PlayerHoldObject::Enter(){
 void PlayerHoldObject::Exit(){
 	s_input_component->GetOwner()->RemoveComponent(COMPONENT_GENERIC_6DOF_COMPONENT);
 	if (m_object){
-		if (m_object->GetType() == GAME_OBJECT_BLUE_BUBBLE){
-			Ogre::Vector3 gravity(Ogre::Real(0),-m_bubble_gravity,Ogre::Real(0));
-			m_object->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GRAVITY_SET, &gravity);
-		}
-		else {
-			Ogre::Vector3 gravity(Ogre::Real(0),Ogre::Real(-9.8),Ogre::Real(0));
-			m_object->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GRAVITY_SET, &gravity);
-		}
+		Ogre::Vector3 gravity(Ogre::Real(0),Ogre::Real(-9.8),Ogre::Real(0));
+		m_object->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GRAVITY_SET, &gravity);
 	}
 	m_object = NULL;
 }
