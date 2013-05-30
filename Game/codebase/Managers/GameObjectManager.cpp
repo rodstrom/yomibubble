@@ -337,7 +337,7 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 	body_def.friction = def.friction;
 	body_def.mass = 1.0f;
 	body_def.collision_filter.filter = COL_BUBBLE;
-	body_def.collision_filter.mask = COL_PLAYER | COL_TOTT | COL_BUBBLE | COL_WORLD_STATIC;
+	body_def.collision_filter.mask = COL_PLAYER | COL_TOTT | COL_BUBBLE | COL_WORLD_STATIC | COL_QUESTITEM;
 	rc->Init(position,  mrc->GetEntity(), m_physics_engine, body_def);
 	rc->SetId("body");
 	rc->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
@@ -536,7 +536,7 @@ GameObject* GameObjectManager::CreateQuestItem(const Ogre::Vector3& position, vo
 	body_def.friction = 1.0;
 	body_def.mass = 1.0f;
 	body_def.collision_filter.filter = COL_QUESTITEM;
-	body_def.collision_filter.mask = COL_PLAYER | COL_TOTT | COL_WORLD_STATIC;
+	body_def.collision_filter.mask = COL_PLAYER | COL_TOTT | COL_WORLD_STATIC | COL_BUBBLE;
 	body_def.sync_orientation = false;
 	rc->Init(position,  mrc->GetEntity(), m_physics_engine, body_def);
 	rc->GetRigidbody()->setGravity(btVector3(0.0f, -0.3f, 0.0f));
@@ -658,7 +658,7 @@ GameObject* GameObjectManager::CreateLeaf(const Ogre::Vector3& position, void* d
 	trdef.body_type = STATIC_BODY;
 	trdef.collider_type = COLLIDER_SPHERE;
 	trdef.mass = 0.0f;
-	trdef.radius = 1.0f;
+	trdef.radius = 0.4f;
 	trdef.collision_filter.filter = COL_WORLD_TRIGGER;
 	trdef.collision_filter.mask = COL_PLAYER;
 	stc->Init(position, m_physics_engine, trdef);
@@ -733,7 +733,7 @@ GameObject* GameObjectManager::CreateGate(const Ogre::Vector3& position, void* d
 	body_def.collider_type = COLLIDER_BOX;
 	body_def.mass = 1.0f;
 	body_def.collision_filter.filter = COL_WORLD_STATIC;
-	body_def.collision_filter.mask = COL_PLAYER | COL_TOTT | COL_BUBBLE;
+	body_def.collision_filter.mask = COL_PLAYER | COL_TOTT | COL_BUBBLE | COL_QUESTITEM;
 	body_def.collider_def.x = 4.0f;
 	body_def.collider_def.y = 6.0f;
 	body_def.collider_def.z = 0.5f;

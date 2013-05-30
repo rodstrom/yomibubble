@@ -650,8 +650,6 @@ void PlayerInsideBubble::Enter(){
 	m_bubble->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GET_BODY, &bubble_body, "body");
 	m_bubble->GetComponentMessenger()->Notify(MSG_NODE_GET_NODE, &bubble_node);
 	if (player_body && bubble_body && bubble_node){
-		int coll = btCollisionObject::CF_NO_CONTACT_RESPONSE;
-		s_messenger->Notify(MSG_RIGIDBODY_COLLISION_FLAG_SET, &coll, "body");
 		float y_scale = bubble_node->getScale().y;
 		y_scale *= 0.5f;
 		y_scale = y_scale - m_on_bubble_y_offset;
@@ -663,10 +661,10 @@ void PlayerInsideBubble::Enter(){
 		bool limit = false;
 		s_messenger->Notify(MSG_CHARACTER_CONTROLLER_LIMIT_MAX_SPEED, &limit);
 	}
-	if (m_bubble->GetType() == GAME_OBJECT_PINK_BUBBLE){
+	/*if (m_bubble->GetType() == GAME_OBJECT_PINK_BUBBLE){
 		bool start = true;
 		m_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_TIMER_RUN, &start);
-	}
+	}*/
 }
 
 void PlayerInsideBubble::Exit(){
@@ -708,7 +706,9 @@ void PlayerInsideBubble::Update(float dt){
 		s_messenger->Notify(MSG_CHARACTER_CONTROLLER_LIMIT_MAX_SPEED, &limit);
 	}
 	if (s_input_component->GetInputManager()->IsButtonPressed(BTN_LEFT_MOUSE) || s_input_component->GetInputManager()->IsButtonPressed(BTN_RIGHT_MOUSE)){
-		this->ChangeBubbleType();
+		if (s_input_component->CanBlowPink()){
+			this->ChangeBubbleType();
+		}
 	}
 	if (bubble_node && m_bubble){
 		s_messenger->Notify(MSG_FOLLOW_CAMERA_GET_ORIENTATION, &dir);
@@ -849,7 +849,9 @@ void PlayerHoldObject::Enter(){
 				Ogre::Vector3 gravity(0,0,0);
 				player_body->clearForces();
 				s_messenger->Notify(MSG_PLAYER_INPUT_SET_BUBBLE, &ob);
-				ob->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_ACTIVATE, NULL);
+				if (ob->GetType() == GAME_OBJECT_BLUE_BUBBLE){
+					ob->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_ACTIVATE, NULL);
+				}
 				s_messenger->Notify(MSG_CHARACTER_CONTROLLER_GRAVITY_SET, &gravity);
 				s_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &gravity);
 				s_manager->HoldObject(false);

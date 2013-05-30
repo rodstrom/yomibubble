@@ -292,7 +292,9 @@ void BubbleController::Update(float dt){
 		Ogre::Vector3 impulse = (m_impulse * m_velocity) * dt;
 		m_messenger->Notify(MSG_RIGIDBODY_APPLY_IMPULSE, &impulse, "body");
 		m_apply_impulse = false;
-		m_distance -= impulse.squaredLength();
+		if (m_owner->GetType() == GAME_OBJECT_PINK_BUBBLE){
+			m_distance -= impulse.squaredLength();
+		}
 	}
 	if (m_owner->GetType() == GAME_OBJECT_PINK_BUBBLE){
 		float percent = m_max_distance * 0.5f;

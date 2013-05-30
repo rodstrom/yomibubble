@@ -392,7 +392,7 @@ int DBManager::Load() {
 							def.collision_filter.mask = COL_PLAYER;
 							def.mass = 1.0f;
 							def.collider_type = COLLIDER_BOX;
-							def.x = spawn.sx * 3.5f;
+							def.x = spawn.sx * 3.5f;	// "godtyckliga" values to scale the magic teleportation box into Bullet values
 							def.y = spawn.sy * 3.5f;
 							def.z = spawn.sz * 3.5f;
 							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_LEVEL_CHANGE, Ogre::Vector3(spawn.x, spawn.y, spawn.z), &def);
@@ -420,7 +420,7 @@ int DBManager::Load() {
 						//WayPointComponent* tempWP = static_cast<WayPointComponent*>(temp->GetComponent(EComponentType::COMPONENT_AI));
 						//tempWP->SetLoopable(i->second);
 					}
-					else if (i->first == "waypoint") {		//dont render the waypoints
+					else if (i->first == "waypoint") {		//dont render the waypoints (of course not, why would you want to render waypoints? // greetings from Olof)
 						//interactive = true;
 					}
 					else if (i->first == "followable") { 
@@ -468,7 +468,6 @@ int DBManager::Load() {
 						MeshList::iterator it = m_vegetation.find(meshFile);
 						if (it == m_vegetation.end()){
 							newModel = mArtifexLoader->mSceneMgr->createEntity((string) entName, (string) meshFile);
-							//newModel = mArtifexLoader->mSceneMgr->createEntity((string) entName, "nocoll_TestMedDayGrass1.mesh");
 							newModel->setCastShadows(false);
 							m_vegetation[meshFile] = newModel;
 							m_paged_geometry->setCustomParam(newModel->getName(), "windFactorX", 0.4f);
@@ -514,8 +513,14 @@ int DBManager::Load() {
 						
 						// Create collision shape and set position if desired
 						//newModel->setRenderingDistance(80.0f);
-						BtOgre::StaticMeshToShapeConverter converter(newModel);
-						btCollisionShape* shape = converter.createTrimesh();
+						btCollisionShape* shape = NULL;
+						if (meshFile == "Gate.mesh"){
+							shape = new btBoxShape(btVector3(4.0f, 6.0f, 0.5f));	// hardcoded collision box for the static gate :)
+						}
+						else {
+							BtOgre::StaticMeshToShapeConverter converter(newModel);
+							shape = converter.createTrimesh();
+						}
 						m_shapes.push_back(shape);
 						btMotionState* motion_state = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)));
 						m_motion_states.push_back(motion_state);
@@ -534,7 +539,7 @@ int DBManager::Load() {
 						body->setRestitution(1.0f);
 						body->setFriction(1.0f);
 						m_collision_defs.push_back(collision_def);
-						int mask = COL_TOTT | COL_BUBBLE | COL_PLAYER;
+						int mask = COL_TOTT | COL_BUBBLE | COL_PLAYER | COL_QUESTITEM;
 						m_physics_engine->GetDynamicWorld()->addRigidBody(body, COL_WORLD_STATIC, mask);
 					}
 

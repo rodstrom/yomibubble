@@ -844,6 +844,9 @@ void PlayerRaycastCollisionComponent::PlayerBubble(GameObject* go){
 				std::cout << y_vel << std::endl;
 			}
 			else if (y_vel < -m_into_bubble_vel){   // go inside bubble
+				if (go->GetType() == GAME_OBJECT_BLUE_BUBBLE){
+					go->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_ACTIVATE, NULL);
+				}
 				player_state = PLAYER_STATE_INSIDE_BUBBLE;
 				Ogre::Vector3 gravity(0,0,0);
 				m_messenger->Notify(MSG_PLAYER_INPUT_SET_BUBBLE, &go);
@@ -852,6 +855,9 @@ void PlayerRaycastCollisionComponent::PlayerBubble(GameObject* go){
 				m_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &gravity);	// make sure direction is set to zero
 			}
 			else {   // stand on bubble
+				if (go->GetType() == GAME_OBJECT_BLUE_BUBBLE){
+					go->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_ACTIVATE, NULL);
+				}
 				player_state = PLAYER_STATE_ON_BUBBLE;
 				Ogre::Vector3 gravity(0,0,0);
 				m_messenger->Notify(MSG_PLAYER_INPUT_SET_BUBBLE, &go);
