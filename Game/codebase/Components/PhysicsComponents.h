@@ -4,6 +4,7 @@
 #include "ComponentsPrereq.h"
 #include "GameObjectPrereq.h"
 #include "BulletCollision\CollisionDispatch\btGhostObject.h"
+#include "..\Managers\SoundManager.h"
 
 class PhysicsEngine;
 class RigidbodyComponent : public Component, public IComponentObserver{
@@ -153,6 +154,8 @@ public:
 	float m_state_timer_counter;
 	float m_state_timer;
 	bool m_can_change_state;
+
+	SoundData3D m_music;
 	
 protected:
 	TOTT_STATE m_state;

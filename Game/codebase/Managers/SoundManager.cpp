@@ -30,7 +30,7 @@ void SoundManager::Init(Ogre::SceneManager* scene_manager, bool play_state){
 	m_scene_manager = scene_manager;
 	m_ear_node = scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(0,0,0), Ogre::Quaternion::IDENTITY);
 	if (play_state == true){
-	//	m_ear_node->attachObject(m_sound_manager->getListener());
+		m_ear_node->attachObject(m_sound_manager->getListener());
 	}
 	//System::Notify
 }
@@ -89,6 +89,8 @@ void SoundManager::LoadAudio(){
 	m_sound_manager->createSound("Night_Theme", "Music/Night_area_theme.wav", false, true, true);
 	//ChangeVolume("Night_Theme", 0.2f);
 	m_sound_manager->createSound("Hidehog_Theme", "Music/Day_area_theme_Hidehog.wav", false, true, true);
+	//setta 3d-properties
+	Init3D("Hidehog_Theme", 0.20f, 1.0f, 0.150f);
 	m_sound_manager->createSound("Shroomfox_Theme", "Music/Day_area_theme_Shroomfox.wav", false, true, true);
 	m_sound_manager->createSound("Nightcap_Theme", "Music/Night_area_theme_Nightcap.wav", false, true, true);
 

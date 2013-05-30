@@ -165,14 +165,15 @@ int DBManager::Load() {
 							tott_def.happy_animation = "Excited";
 							tott_def.idle_animation = "Idle";
 							tott_def.mesh_name = "Hidehog.mesh";
-							tott_def.play_music = false;
+							tott_def.play_music = true;
 							tott_def.quest_object_mesh_name = "Questitem_Cherry.mesh";
 							tott_def.react_animation = "Respond";
 							tott_def.run_animation = "Run";
 							tott_def.sb_node_name = "node_main";
 							tott_def.sfx_curious = "";
 							tott_def.sfx_happy = "";
-							tott_def.theme_music = "";
+							tott_def.theme_music = "Hidehog_Theme";
+							tott_def.node_name = "";
 							tott_def.type_name = "Hidehog";
 							tott_def.walk_animation = "walk";
 							GameObject* tott = m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y,z), &tott_def);
