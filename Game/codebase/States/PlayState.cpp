@@ -85,10 +85,9 @@ void PlayState::Exit(){
 
 bool PlayState::Update(float dt){
 	if (m_change_level){
-    
+		
 		State* loading = FindByName("LoadingState");
 		m_parent->Init(loading);
-
 		static_cast<LoadingState*>(loading)->SetLevel(m_level_manager->GetCurrentLevel());
 		loading->Enter();
 		loading->Update(1.0f);
@@ -96,6 +95,7 @@ bool PlayState::Update(float dt){
 		m_level_manager->ChangeLevel();
 		m_change_level = false;
 
+		
 		loading->Exit();
 	}
 	m_game_object_manager->Update(dt);
@@ -125,6 +125,11 @@ bool PlayState::Update(float dt){
 			m_pause = false;
 		}
 	//}
+		if(m_fade->IsFading())
+		{
+			m_fade->Update(dt);
+		}
+
 	return m_running;
 }
 

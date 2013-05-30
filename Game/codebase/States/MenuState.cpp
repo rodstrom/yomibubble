@@ -8,6 +8,7 @@
 #include "..\Managers\VariableManager.h"
 #include "..\PhysicsPrereq.h"
 
+
 MenuState::MenuState(void) : m_quit(false), m_current_selected_button(0) {} 
 MenuState::~MenuState(void){}
 
@@ -15,17 +16,38 @@ void MenuState::Enter(){
 	m_fade->SetFadeInCallBack(NULL);
 	std::function<void()> func = [this] { ChangeStateToPlayState(); };
 	m_fade->SetFadeOutCallBack(func);
-	
+	float dir_x, dir_y, dir_z;
+	dir_x = 0.0f;
+	dir_y = -1.0f;
+	dir_z = 0.0f;
 	m_scene_manager = Ogre::Root::getSingleton().createSceneManager("OctreeSceneManager");
 	//m_sound_manager->Init(m_scene_manager);
 	m_scene_manager->setSkyBox(true, "_MySky", 2300.0f);
-
+	
+	
 	m_camera = m_scene_manager->createCamera("MenuCamera");
 	m_camera->setNearClipDistance(1.0f);
 	m_viewport = m_render_window->addViewport(m_camera);
 	//m_viewport->setBackgroundColour(Ogre::ColourValue(0.0,0.0,1.0));
 	m_camera->setAspectRatio(Ogre::Real(m_viewport->getActualWidth()) / Ogre::Real(m_viewport->getActualHeight()));
-	
+
+	m_scene_manager->setShadowTextureSelfShadow(false);
+	m_scene_manager->setShadowCasterRenderBackFaces(false);
+	m_scene_manager->setShadowTextureCount(1);
+	m_scene_manager->setShadowTextureSize(2048);
+	m_scene_manager->setShadowColour(Ogre::ColourValue(0.5f,0.5f,0.6f,1.0f));
+	m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
+
+	Ogre::Light* mLight = m_scene_manager->createLight( "Light" );
+	//mLight->setType( Ogre::Light::LT_POINT );
+	mLight->setType( Ogre::Light::LT_DIRECTIONAL );
+	mLight->setDirection(Ogre::Vector3(dir_x, dir_y, dir_z).normalisedCopy());
+	Ogre::ColourValue diffuse(0.5, 0.5, 0.5, 0.5);
+	Ogre::ColourValue specular(0.5, 0.5, 0.5, 0.5);
+	mLight->setDiffuseColour(diffuse);
+	mLight->setSpecularColour(specular);
+	//mLight->setPosition(mLightPosX, mLightPosY, mLightPosZ);
+	mLight->setCastShadows(true);
 
 	m_physics_engine = new PhysicsEngine;
 	m_physics_engine->Init();
@@ -34,40 +56,30 @@ void MenuState::Enter(){
 	m_game_object_manager = new GameObjectManager;
 	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager, m_message_system, NULL);
 	
-	Ogre::Plane plane(Vector3::UNIT_Y, -0.9);
-	Ogre::MeshManager::getSingleton().createPlane("plane", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane, 20, 20, 5, 5, true, 1, 5, 5, Vector3::UNIT_Z);
-
-	Ogre::Entity* yomi_house = m_scene_manager->createEntity("YomiHouse.mesh");
-	Ogre::Entity* yomi = m_scene_manager->createEntity("Yomi.mesh");
+	//Ogre::Plane plane(Vector3::UNIT_Y, -0.9);
+	//Ogre::MeshManager::getSingleton().createPlane("plane", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane, 20, 20, 5, 5, true, 1, 5, 5, Vector3::UNIT_Z);
+	m_yomi_ent = m_scene_manager->createEntity("Yomi.mesh");
+	Ogre::Entity* menu_scene = m_scene_manager->createEntity("MenySceen.mesh");
+	Ogre::Entity* tott = m_scene_manager->createEntity("Hidehog.mesh");
 	Ogre::Entity* yomi_staff = m_scene_manager->createEntity("Staff.mesh");
-	yomi->attachObjectToBone("CATRigLArmDigit21", yomi_staff);
-	Ogre::Entity* tree = m_scene_manager->createEntity("JumpLeafTree_1.mesh");
-	Ogre::Entity* grass = m_scene_manager->createEntity("nocoll_Day_Bush1.mesh");
-	Ogre::Entity* grass1 = m_scene_manager->createEntity("nocoll_Day_Bush1.mesh");
-	Ogre::Entity* grass2 = m_scene_manager->createEntity("nocoll_Day_Bush1.mesh");
-	Ogre::Entity* grass3 = m_scene_manager->createEntity("nocoll_Day_Bush1.mesh");
-	m_house_node = m_scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(4.0f,2.0f,-24.0f));
-	m_house_node->yaw(Ogre::Radian(1.4));
-	m_house_node->attachObject(yomi_house);
-	m_yomi_node = m_scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(1.0f, -0.8f, -3.0f));
-	m_yomi_node->attachObject(yomi);
-	m_tree_node = m_scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(-2.0f, 1.5f, -20.0f));
-	m_tree_node->attachObject(tree);
-
-	//m_animation_state = yomi->getAnimationState("CATRigRArm1");
-	//m_animation_state->setLoop(true);
-	//m_animation_state->setLoop(true);
+	m_yomi_ent->attachObjectToBone("CATRigLArmDigit21", yomi_staff);
+	Ogre::Entity* menu_grass = m_scene_manager->createEntity("MainMenyGrass.mesh");
 	
+	FixYomiWeights();
+	m_yomi_node = m_scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(0.8f, -2.0f, -8.0f));
+	m_yomi_node->attachObject(m_yomi_ent);
 
+	m_scene_node = m_scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(0.0f, -2.0f, -3.0f));
+	m_scene_node->attachObject(menu_scene);
+	
+	m_menu_grass = m_scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(m_scene_node->getPosition()));
+	m_menu_grass->attachObject(menu_grass);
 
-	PlaneDef plane_def;
-	plane_def.material_name = "Examples/BeachStones";
-	plane_def.plane_name = "plane";
-	plane_def.friction = 1.0f;
-	plane_def.restitution = 0.8f;
-	plane_def.collision_filter.filter = COL_WORLD_STATIC;
-	plane_def.collision_filter.mask = COL_BUBBLE | COL_PLAYER | COL_TOTT;
-	m_game_object_manager->CreateGameObject(GAME_OBJECT_PLANE, Ogre::Vector3(0,0,0), &plane_def);
+	m_yomi_base = m_yomi_ent->getAnimationState("Base_Idle");
+	m_yomi_top = m_yomi_ent->getAnimationState("Top_Idle");
+
+	m_yomi_base->setEnabled(true);
+	m_yomi_top->setEnabled(true);
 
 	OverlayDef menuBackground;
 	menuBackground.overlay_name = "Menu";
@@ -108,7 +120,6 @@ void MenuState::Enter(){
 	buttonDef.func = [this] { ChangeStateToExit(); };
 	m_buttons[3] = m_game_object_manager->CreateGameObject(GAME_OBJECT_BUTTON, Ogre::Vector3(0,0,0), &buttonDef);
 
-	//m_scene_manager->setSkyDome(true, "Examples/CloudySky");
 }
 
 void MenuState::Exit(){
@@ -128,13 +139,15 @@ void MenuState::Exit(){
 }
 
 bool MenuState::Update(float dt){
-	
 	//m_sound_manager->Update(m_camera, m_scene_manager, dt);
 	m_game_object_manager->Update(dt);
 	m_physics_engine->Step(dt);
 	//m_game_object_manager->LateUpdate(dt);
 	if (m_input_manager->IsButtonPressed(BTN_BACK))
 		return false;
+
+	m_yomi_base->addTime(dt);
+	m_yomi_top->addTime(dt);
 
 	//m_fade->Update(dt);
 
@@ -177,4 +190,92 @@ void MenuState::ChangeStateToCredits(){}
 
 void MenuState::ChangeStateToExit(){
 	m_quit = true;
+}
+
+void MenuState::FixYomiWeights(){
+	std::vector<std::string> base_anims;
+	base_anims.push_back("CATRigLLegPlatform");
+	base_anims.push_back("CATRigLLegAnkle");
+	base_anims.push_back("CATRigLLeg2");
+	base_anims.push_back("CATRigLLeg1");
+	base_anims.push_back("Yomi_Pelvis");
+	base_anims.push_back("CATRigRLeg1");
+	base_anims.push_back("CATRigRLeg2");
+	base_anims.push_back("CATRigRLegAnkle");
+	base_anims.push_back("CATRigAnkleBone001");
+	base_anims.push_back("CATRigRLegPlatform");
+	base_anims.push_back("CATRigTail1");
+	base_anims.push_back("CATRigTail2");
+	base_anims.push_back("CATRigTail3");
+	base_anims.push_back("CATRigTail4");
+	base_anims.push_back("CATRigTail5");
+	std::vector<std::string> top_anims;
+	top_anims.push_back("CATRigSpine1");
+	top_anims.push_back("CATRigSpine2");
+	top_anims.push_back("CATRigSpine3");
+	top_anims.push_back("Yomi_Torso");
+	top_anims.push_back("CATRigLArmCollarbone");
+	top_anims.push_back("CATRigLArm1");
+	top_anims.push_back("CATRigLArm21");
+	top_anims.push_back("CATRigLArm22");
+	top_anims.push_back("CATRigLArmPalm");
+	top_anims.push_back("CATRigLArmDigit21");
+	top_anims.push_back("CATRigLArmDigit22");
+	top_anims.push_back("CATRigLArmDigit11");
+	top_anims.push_back("CATRigRArmCollarbone");
+	top_anims.push_back("CATRigRArm1");
+	top_anims.push_back("CATRigRArm21");
+	top_anims.push_back("CATRigRArm22");
+	top_anims.push_back("CATRigRArmPalm");
+	top_anims.push_back("CATRigRArmDigit21");
+	top_anims.push_back("CATRigRArmDigit22");
+	top_anims.push_back("CATRigRArmDigit11");
+	top_anims.push_back("CATRigRightHair1");
+	top_anims.push_back("CATRigRightHair2");
+	top_anims.push_back("CATRigRightHair3");
+	top_anims.push_back("CATRigLeftHair1");
+	top_anims.push_back("CATRigLeftHair2");
+	top_anims.push_back("CATRigLeftHair3");
+	top_anims.push_back("CATRigBackHair1");
+	top_anims.push_back("CATRigBackHair2");
+	top_anims.push_back("CATRigBackHair3");
+	top_anims.push_back("Yomi_Head");
+
+	Ogre::String line = Ogre::StringUtil::BLANK;
+	Ogre::String anim_id = Ogre::StringUtil::BLANK;
+	Ogre::String base = "Base";
+	Ogre::String blow = "Blow";
+	Ogre::String top = "Top";
+
+	for (int i = 0; i < m_yomi_ent->getSkeleton()->getNumAnimations(); i++){
+		Ogre::Animation* anim = m_yomi_ent->getSkeleton()->getAnimation(i);
+		anim_id = anim->getName();
+		size_t find = anim_id.find(base);
+		if (find  != std::string::npos){
+			RemoveWeights(top_anims, anim);
+			continue;
+		}
+		find = anim_id.find(blow);
+		if (find != std::string::npos){
+			RemoveWeights(base_anims, anim);
+			continue;
+		}
+		find = anim_id.find(top);
+		if (find != std::string::npos){
+			RemoveWeights(base_anims, anim);
+			continue;
+		}
+	}
+}
+
+void MenuState::RemoveWeights(std::vector<std::string>& list, Ogre::Animation* anim){
+	Ogre::Skeleton::BoneIterator bone_it = m_yomi_ent->getSkeleton()->getBoneIterator();
+	while (bone_it.hasMoreElements()){
+		Ogre::Bone* bone = bone_it.getNext();
+		Ogre::String bone_id = bone->getName();
+		std::vector<std::string>::iterator it = std::find(list.begin(), list.end(), bone_id);
+		if (it != list.end()){
+			anim->destroyNodeTrack(bone->getHandle());
+		}
+	}
 }

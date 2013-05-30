@@ -19,6 +19,8 @@ public:
 	void ChangeStateToOptions();
 	void ChangeStateToCredits();
 	void ChangeStateToExit();
+	void RemoveWeights(std::vector<std::string>& list, Ogre::Animation* anim);
+	void FixYomiWeights();
 
 	//DECLARE_STATE_CLASS(MenuState);
 
@@ -30,14 +32,14 @@ private:
 	int							m_current_selected_button;
 	GameObject*					m_buttons[4];
 	OverlayDef					m_overlayDef;
-	Ogre::SceneNode*			m_house_node;
 	Ogre::SceneNode*			m_yomi_node;
-	Ogre::SceneNode*			m_mushroom_node;
-	Ogre::SceneNode*			m_tree_node;
-	Ogre::SceneNode*			m_grass_node;
-	Ogre::SceneNode*			m_grass_node2;
-	Ogre::SceneNode*			m_grass_node3;
+	Ogre::SceneNode*			m_tott;
+	Ogre::SceneNode*			m_scene_node;
+	Ogre::SceneNode*			m_menu_grass;
 	Ogre::AnimationState*		m_animation_state;
+	Ogre::Entity*				m_yomi_ent;
+	Ogre::AnimationState*		m_yomi_base;
+	Ogre::AnimationState*		m_yomi_top;
 };
 
 
