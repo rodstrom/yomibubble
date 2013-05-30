@@ -979,7 +979,7 @@ void TottController::Init(const Ogre::Vector3& position, PhysicsEngine* physics_
 	m_anim_msg.wait = false;
 	m_anim_msg.blending_transition = AnimationBlender::BlendThenAnimate;
 
-	m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
+	//m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
 	m_state = IDLING;
 
 	m_quest_done = false;
@@ -1020,7 +1020,7 @@ void TottController::Happy(){
 void TottController::Update(float dt){
 	CharacterController::Update(dt);
 
-	m_owner->GetGameObjectManager()->GetGameObject("Player")->GetComponentMessenger()->Notify(MSG_MUSIC3D_PLAY, &m_music);
+	//m_owner->GetGameObjectManager()->GetGameObject("Player")->GetComponentMessenger()->Notify(MSG_MUSIC3D_PLAY, &m_music);
 
 	//m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
 	/*

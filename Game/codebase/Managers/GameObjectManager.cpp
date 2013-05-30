@@ -52,6 +52,7 @@ void GameObjectManager::Init(PhysicsEngine* physics_engine, Ogre::SceneManager* 
 
 	m_leaf_iterations = 0;
 	m_particle_iterations = 0;
+	m_tott_iterations = 0;
 	m_temp_node = NULL;
 }
 
@@ -410,13 +411,32 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 	go->AddUpdateable(way_point);
 	//ChildSceneNodeComponent* child_node = new ChildSceneNodeComponent;
 	//go->AddComponent(child_node);
+
+	std::ostringstream stream;
+	stream << "Tott_" << m_tott_iterations;
+	m_tott_iterations++;
+	Ogre::String tott_id = stream.str();
 	
 	node_comp->Init(position, m_scene_manager);
-	node_comp->SetId("Tott");
+	node_comp->SetId(tott_id);
 	def.node_name = node_comp->GetSceneNode()->getName();
 	//m_temp_node = node_comp->GetSceneNode();
 	acomp->Init(def.mesh_name, m_scene_manager);
-	acomp->AddAnimationState("Run", true);
+	
+	if (def.type_name == "Hidehog"){
+		acomp->AddAnimationState("Run", true);
+	}
+	else if (def.type_name == "Kittyshroom"){
+		acomp->AddAnimationState("walk", true);
+	}
+	else if (def.type_name == "Nightcap"){
+	}
+	else if (def.type_name == "Shroomfox"){
+	}
+	//lägg till de andra två
+	else{
+		acomp->AddAnimationState("Run", true);
+	}
 	//child_node->Init(position, "TottNode", node_comp->GetSceneNode());
 
 	//acomp->GetEntity()->setMaterialName("SolidColor/Green");
@@ -483,7 +503,7 @@ GameObject* GameObjectManager::CreateSpeechBubble(const Ogre::Vector3& position,
 	
 	node_comp->Init(node, m_scene_manager);
 	node_comp->SetId("node_main");
-	mrc->Init("PratBubblaCherry.mesh", m_scene_manager, "node_main");//, node->getName());
+	mrc->Init("PratBubblaCherry.mesh", m_scene_manager, node_comp->GetSceneNode()->getName());//, node->getName());
 	sbcomp->Init(node, m_scene_manager, tott);
 	
 	/*
