@@ -235,13 +235,22 @@ int DBManager::Load() {
 							m_game_object_manager->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(x,y,z), &particleDef);
 						}
 						else if (i->second == "gate"){
-							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_GATE, Ogre::Vector3(x,y,z), NULL);
+							ConfigFile cfgfile;
+							cfgfile.load(mArtifexLoader->mZonePath+mArtifexLoader->mZoneName+"/zonesettings.cfg");
+							int leaves = strToI(cfgfile.getSetting("Leaves"));
+							if (cfgfile.getSetting("Leaves") == "") {
+								System::Notify("ERROR: Leaves for level " + mArtifexLoader->mZoneName + " has not been set, default Leaves set to 3.", "Level Load Error");
+								leaves = 1;
+							}
+							GateDef gate_def;
+							gate_def.leaves = leaves;
+							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_GATE, Ogre::Vector3(x,y,z), &gate_def);
 							Ogre::Quaternion quat = Ogre::Quaternion ((Degree(spawn.rx)), Vector3::UNIT_X)*Quaternion ((Degree(spawn.ry)), Vector3::UNIT_Y)*Quaternion ((Degree(spawn.rz)), Vector3::UNIT_Z);
 							temp->GetComponentMessenger()->Notify(MSG_SET_OBJECT_ORIENTATION, &quat);
-							if (mArtifexLoader->mZoneName == "try"){
+							/*if (mArtifexLoader->mZoneName == "try"){
 								Ogre::Quaternion quat = Ogre::Quaternion ((Degree(spawn.rx + 180)), Vector3::UNIT_X)*Quaternion ((Degree(spawn.ry + 180)), Vector3::UNIT_Y)*Quaternion ((Degree(spawn.rz + 180)), Vector3::UNIT_Z);
 								temp->GetComponentMessenger()->Notify(MSG_SET_OBJECT_ORIENTATION, &quat);
-							}
+							}*/
 						}
 						else if (i->second == "rock_slide"){
 							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_GATE, Ogre::Vector3(x,y,z), NULL);

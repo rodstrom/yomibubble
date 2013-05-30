@@ -304,4 +304,41 @@ protected:
 	std::function<void()> m_callback;
 };
 
+class GateControllerComponent : public Component, public IComponentObserver, public IComponentUpdateable{
+public:
+	GateControllerComponent(void) : m_proceed(false){}
+	~GateControllerComponent(void){}
+
+	virtual void Notify(int type, void* message);
+	virtual void Shut();
+	virtual void SetMessenger(ComponentMessenger* messenger);
+	virtual void Update(float dt);
+	virtual void Init(MessageSystem* message_system, int leaves);
+	void LeafPickup(struct IEvent*);
+
+protected:
+	void OpenGate();
+	class MessageSystem* m_message_system;
+	bool m_can_decrease;
+	bool m_proceed;	// if true the player can change level
+	float m_timer;
+	int m_counter;	// amount of leafs
+};
+
+class RotationComponent : public Component, public IComponentUpdateable, public IComponentObserver{
+public:
+	RotationComponent(void) : m_node(NULL){}
+	~RotationComponent(void){}
+
+	virtual void Notify(int type, void* message);
+	virtual void Shut();
+	virtual void SetMessenger(ComponentMessenger* messenger);
+	virtual void Update(float dt);
+	virtual void Init(Ogre::SceneNode* node, float rotation_speed);
+
+protected:
+	Ogre::SceneNode* m_node;
+	float m_rotation_speed;
+};
+
 #endif // _N_VISUAL_COMPONENTS_H_

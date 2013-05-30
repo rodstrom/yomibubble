@@ -122,6 +122,9 @@ void CollisionManager::PlayerPlane(GameObject* player, GameObject* plane){
 }
 
 void CollisionManager::LeafPlayer(GameObject* leaf, GameObject* player){
+	IEvent evt;
+	evt.m_type = EVT_LEAF_PICKUP;
+	m_message_system->Notify(&evt);
 	leaf->GetGameObjectManager()->RemoveGameObject(leaf);
 	player->GetComponentMessenger()->Notify(MSG_LEAF_PICKUP, NULL); 
 	player->GetComponentMessenger()->Notify(MSG_SFX2D_PLAY, &static_cast<PlayerInputComponent*>(player->GetComponent(COMPONENT_PLAYER_INPUT))->m_leaf_sfx);
@@ -143,9 +146,13 @@ void CollisionManager::CameraTerrain(GameObject* camera, GameObject* terrain){
 };
 
 void CollisionManager::GatePlayer(GameObject* gate, GameObject* player){
-	IEvent evt;
-	evt.m_type = EVT_CHANGE_LEVEL;
-	m_message_system->Notify(&evt);
+	bool is_gate_open = false;
+	gate->GetComponentMessenger()->Notify(MSG_GATE_OPEN_GET, &is_gate_open);
+	if (is_gate_open){
+		IEvent evt;
+		evt.m_type = EVT_CHANGE_LEVEL;
+		m_message_system->Notify(&evt);
+	}
 }
 
 void CollisionManager::PlayerQuestItem(GameObject* player, GameObject* quest_item){

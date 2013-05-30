@@ -94,6 +94,7 @@ void RigidbodyComponent::Init(const Ogre::Vector3& position, Ogre::Entity* entit
 		btVector3 inertia;
 		m_shape->calculateLocalInertia(mass, inertia);
 		m_motion_state = new BtOgre::RigidBodyState(m_messenger);
+		static_cast<BtOgre::RigidBodyState*>(m_motion_state)->UpdateOrientation(def.sync_orientation);
 		m_rigidbody = new btRigidBody(mass, m_motion_state, m_shape, inertia);
 	}
 	else if (def.body_type == STATIC_BODY){
@@ -832,7 +833,7 @@ void BobbingComponent::SetMessenger(ComponentMessenger* messenger){
 
 void BobbingComponent::Init(Ogre::SceneNode* node){
 	m_node = node;
-
+	m_rotation_speed = VariableManager::GetSingletonPtr()->GetAsFloat("LeafRotationSpeed");
 	m_current_time = 0.0f;
 	m_bob_timer = 2.0f;
 
@@ -854,6 +855,8 @@ void BobbingComponent::Update(float dt){
 			m_node->setPosition(m_node->getPosition().x, m_node->getPosition().y - 0.01, m_node->getPosition().z);
 		}
 	}
+	float rot_speed = m_rotation_speed * dt;
+	m_node->rotate(Ogre::Quaternion(1.0f, 0.0f, rot_speed, 0.0f));
 };
 
 void SyncedTriggerComponent::Init(const Ogre::Vector3& pos, PhysicsEngine* physics_engine, struct TriggerDef* def){
