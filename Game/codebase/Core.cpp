@@ -98,6 +98,7 @@ void Core::Run(){
 			if (!m_game->Update(dt)){
 				return;
 			}
+
 			if (!m_root->renderOneFrame((float)dt)){
 				return;
 			}
