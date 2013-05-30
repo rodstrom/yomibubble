@@ -361,7 +361,7 @@ void PlayerJump::Enter(){
 	//randomize IF a jump sound should play: if true, randomize a specific jump sound
 	srand (time(NULL));
 	int play_jump_sound = rand() % 10 + 1;
-	if (play_jump_sound < 3){
+	if (play_jump_sound < 7){
 		int which_jump_sound = rand() % 3 + 1;
 		switch(which_jump_sound){
 		case 1:
@@ -440,7 +440,7 @@ void PlayerLand::Enter(){
 
 	srand (time(NULL));
 	int play_land_sound = rand() % 10 + 1;
-	if (play_land_sound < 3){
+	if (play_land_sound < 6){
 		int which_land_sound = rand() % 2 + 1;
 		switch(which_land_sound){
 		case 1:
