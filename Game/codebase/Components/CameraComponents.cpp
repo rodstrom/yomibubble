@@ -321,7 +321,7 @@ void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real de
 		if (!m_inverted_controller) { m_camera_pivot->yaw(Ogre::Degree(delta_yaw * m_camera_stick_rotation_acceleration), Ogre::Node::TS_WORLD); }
 		else { m_camera_pivot->yaw(Ogre::Degree(-delta_yaw* m_camera_stick_rotation_acceleration), Ogre::Node::TS_WORLD); }
 	}
-	std::cout << m_pivot_pitch << std::endl;
+
 	if (!(m_pivot_pitch + delta_pitch > -10 && delta_pitch > 0) && 
 		!(m_pivot_pitch + delta_pitch < -40 && delta_pitch < 0)
 		&& m_getting_input){
