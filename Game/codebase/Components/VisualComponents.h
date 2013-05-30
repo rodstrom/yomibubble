@@ -303,5 +303,20 @@ public:
 protected:
 	std::function<void()> m_callback;
 };
+/*
+class GateControllerComponent : public Component, public IComponentObserver, public IComponentUpdateable{
+public:
+	GateControllerComponent(void){}
+	~GateControllerComponent(void){}
+
+	virtual void Notify(int type, void* message);
+	virtual void Shut();
+	virtual void SetMessenger(ComponentMessenger* messenger);
+	virtual void Update(float dt);
+	virtual void Init();
+
+protected:
+
+};*/
 
 #endif // _N_VISUAL_COMPONENTS_H_
