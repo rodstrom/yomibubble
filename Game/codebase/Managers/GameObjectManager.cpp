@@ -49,10 +49,13 @@ void GameObjectManager::Init(PhysicsEngine* physics_engine, Ogre::SceneManager* 
 	m_create_fptr[GAME_OBJECT_QUEST_ITEM]  =    &GameObjectManager::CreateQuestItem;
 	m_create_fptr[GAME_OBJECT_SPEECH_BUBBLE] =  &GameObjectManager::CreateSpeechBubble;
 	m_create_fptr[GAME_OBJECT_ROCK_SLIDE] =		&GameObjectManager::CreateRockSlide;
+	m_create_fptr[GAME_OBJECT_LEVEL_CHANGE] =   &GameObjectManager::CreateLevelChange;
 
 	m_leaf_iterations = 0;
 	m_particle_iterations = 0;
 	m_tott_iterations = 0;
+	m_speech_bubble_iterations = 0;
+	m_quest_item_iterations = 0;
 	m_temp_node = NULL;
 }
 
@@ -277,7 +280,7 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 
 	fcc->SetPhysEngine(m_physics_engine);
 	fcc->SetCustomVariables(
-		VariableManager::GetSingletonPtr()->GetAsInt("Camera_Inverted_Controller_Sticks"), 
+		//VariableManager::GetSingletonPtr()->GetAsInt("Camera_Inverted_Controller_Sticks"), 
 		VariableManager::GetSingletonPtr()->GetAsFloat("Camera_Zoom_Speed"), 
 		VariableManager::GetSingletonPtr()->GetAsFloat("Camera_Stick_Rotation_Acceleration"), 
 		VariableManager::GetSingletonPtr()->GetAsFloat("Camera_Change_Angle_After_Player"),
@@ -337,7 +340,7 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 	body_def.friction = def.friction;
 	body_def.mass = 1.0f;
 	body_def.collision_filter.filter = COL_BUBBLE;
-	body_def.collision_filter.mask = COL_PLAYER | COL_TOTT | COL_BUBBLE | COL_WORLD_STATIC;
+	body_def.collision_filter.mask = COL_PLAYER | COL_TOTT | COL_BUBBLE | COL_WORLD_STATIC | COL_QUESTITEM;
 	rc->Init(position,  mrc->GetEntity(), m_physics_engine, body_def);
 	rc->SetId("body");
 	rc->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
@@ -395,8 +398,13 @@ GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, v
 }
 
 GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* data, const Ogre::String& id){
+	std::ostringstream stream;
+	stream << "Tott_" << m_tott_iterations;
+	m_tott_iterations++;
+	Ogre::String tott_id = stream.str();
+	
 	TottDef& def = *static_cast<TottDef*>(data);
-	GameObject* go = new GameObject(GAME_OBJECT_TOTT, "TestTott");
+	GameObject* go = new GameObject(GAME_OBJECT_TOTT, tott_id);
 	NodeComponent* node_comp = new NodeComponent;
 	go->AddComponent(node_comp);
 	AnimationComponent* acomp = new AnimationComponent;
@@ -412,10 +420,7 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 	//ChildSceneNodeComponent* child_node = new ChildSceneNodeComponent;
 	//go->AddComponent(child_node);
 
-	std::ostringstream stream;
-	stream << "Tott_" << m_tott_iterations;
-	m_tott_iterations++;
-	Ogre::String tott_id = stream.str();
+
 	
 	node_comp->Init(position, m_scene_manager);
 	node_comp->SetId(tott_id);
@@ -430,10 +435,11 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 		acomp->AddAnimationState("walk", true);
 	}
 	else if (def.type_name == "Nightcap"){
+		acomp->AddAnimationState("walk", true);
 	}
 	else if (def.type_name == "Shroomfox"){
+		acomp->AddAnimationState("Idle", true);
 	}
-	//lägg till de andra två
 	else{
 		acomp->AddAnimationState("Run", true);
 	}
@@ -485,11 +491,18 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 GameObject* GameObjectManager::CreateSpeechBubble(const Ogre::Vector3& position, void* data, const Ogre::String& id){
 	//Ogre::SceneNode* node = *static_cast<Ogre::SceneNode**>(data);
 
+	std::ostringstream stream;
+	stream << "Speech_Bubble_" << m_speech_bubble_iterations;
+	m_speech_bubble_iterations++;
+	Ogre::String spbubble_id = stream.str();
+
 	GameObject* tott = *static_cast<GameObject**>(data);
 	Ogre::SceneNode* node = static_cast<NodeComponent*>(tott->GetComponent(COMPONENT_NODE))->GetSceneNode();
 	TottDef tott_def = static_cast<TottController*>(tott->GetComponent(COMPONENT_CHARACTER_CONTROLLER))->m_def;
 
-	GameObject* go = new GameObject(GAME_OBJECT_SPEECH_BUBBLE, "TestSpeechBubble");
+	static_cast<TottController*>(tott->GetComponent(COMPONENT_CHARACTER_CONTROLLER))->SetSpeechBubble(spbubble_id);
+
+	GameObject* go = new GameObject(GAME_OBJECT_SPEECH_BUBBLE, spbubble_id);
 	NodeComponent* node_comp = new NodeComponent;
 	go->AddComponent(node_comp);
 	MeshRenderComponent* mrc = new MeshRenderComponent;
@@ -500,9 +513,11 @@ GameObject* GameObjectManager::CreateSpeechBubble(const Ogre::Vector3& position,
 	SpeechBubbleComponent* sbcomp = new SpeechBubbleComponent;
 	go->AddComponent(sbcomp);
 	go->AddUpdateable(sbcomp);
-	
+
+
+
 	node_comp->Init(node, m_scene_manager);
-	node_comp->SetId("node_main");
+	node_comp->SetId(spbubble_id);
 	mrc->Init("PratBubblaCherry.mesh", m_scene_manager, node_comp->GetSceneNode()->getName());//, node->getName());
 	sbcomp->Init(node, m_scene_manager, tott);
 	
@@ -546,7 +561,13 @@ GameObject* GameObjectManager::CreateQuestItem(const Ogre::Vector3& position, vo
 	std::function<void()> func = [&] { IEvent evt; evt.m_type = EVT_QUEST_ITEM_REMOVE; m_message_system->Notify(&evt); };
 	dcc->Init(func);
 
+	std::ostringstream stream;
+	stream << "Quest_Item_" << m_quest_item_iterations;
+	m_quest_item_iterations++;
+	Ogre::String quest_item_id = stream.str();
+
 	node_comp->Init(position, m_scene_manager);
+	node_comp->SetId(quest_item_id);
 	mrc->Init(tott_def.quest_object_mesh_name, m_scene_manager);
 	
 	RigidBodyDef body_def;
@@ -555,14 +576,14 @@ GameObject* GameObjectManager::CreateQuestItem(const Ogre::Vector3& position, vo
 	body_def.friction = 1.0;
 	body_def.mass = 1.0f;
 	body_def.collision_filter.filter = COL_QUESTITEM;
-	body_def.collision_filter.mask = COL_PLAYER | COL_TOTT | COL_WORLD_STATIC;
+	body_def.collision_filter.mask = COL_PLAYER | COL_TOTT | COL_WORLD_STATIC | COL_BUBBLE;
 	body_def.sync_orientation = false;
 	rc->Init(position,  mrc->GetEntity(), m_physics_engine, body_def);
 	rc->GetRigidbody()->setGravity(btVector3(0.0f, -0.3f, 0.0f));
 	rc->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
 	rc->GetRigidbody()->setActivationState(DISABLE_DEACTIVATION);
 	rc->GetRigidbody()->setDamping(0.5, 0.5);
-	rc->SetId("questitem");
+	rc->SetId(quest_item_id);
 	rot_comp->Init(node_comp->GetSceneNode(), VariableManager::GetSingletonPtr()->GetAsFloat("QuestItemRotationSpeed"));
 
 	return go;
@@ -659,13 +680,11 @@ GameObject* GameObjectManager::CreateLeaf(const Ogre::Vector3& position, void* d
 
 	Ogre::Vector3 scale = Ogre::Vector3(0.6f);
 	node_comp->Init(position, m_scene_manager);
+	node_comp->GetSceneNode()->setPosition(Ogre::Vector3(position));
+	node_comp->GetSceneNode()->setScale(scale);
 	mrc->Init("Collectable_Leaf.mesh", m_scene_manager);
 	mrc->GetEntity()->setMaterialName("CollectibleLeaf");
 	bc->Init(node_comp->GetSceneNode());
-
-	mrc->GetEntity()->setMaterialName("CollectibleLeaf");
-	node_comp->GetSceneNode()->setPosition(Ogre::Vector3(position));
-	node_comp->GetSceneNode()->setScale(scale);
 
 	std::ostringstream stream;
 	stream << "Leaf_" << m_leaf_iterations;
@@ -679,7 +698,7 @@ GameObject* GameObjectManager::CreateLeaf(const Ogre::Vector3& position, void* d
 	trdef.body_type = STATIC_BODY;
 	trdef.collider_type = COLLIDER_SPHERE;
 	trdef.mass = 0.0f;
-	trdef.radius = 1.0f;
+	trdef.radius = 0.4f;
 	trdef.collision_filter.filter = COL_WORLD_TRIGGER;
 	trdef.collision_filter.mask = COL_PLAYER;
 	stc->Init(position, m_physics_engine, trdef);
@@ -724,25 +743,42 @@ GameObject* GameObjectManager::CreateGate(const Ogre::Vector3& position, void* d
 	GameObject* go = new GameObject(GAME_OBJECT_GATE);
 	NodeComponent* nc = new NodeComponent;
 	go->AddComponent(nc);
-	MeshRenderComponent* mrc = new MeshRenderComponent;
-	go->AddComponent(mrc);
+	MeshRenderComponent* left_gate_mesh = new MeshRenderComponent;
+	go->AddComponent(left_gate_mesh);
+	MeshRenderComponent* right_gate_mesh = new MeshRenderComponent;
+	go->AddComponent(right_gate_mesh);
+	ChildSceneNodeComponent* left_gate_node = new ChildSceneNodeComponent;
+	go->AddComponent(left_gate_node);
+	ChildSceneNodeComponent* right_gate_node = new ChildSceneNodeComponent;
+	go->AddComponent(right_gate_node);
+
 	RigidbodyComponent* rc = new RigidbodyComponent;
 	go->AddComponent(rc);
 	GateControllerComponent* gate_controller = new GateControllerComponent;
 	go->AddComponent(gate_controller);
 	go->AddUpdateable(gate_controller);
 
+	nc->Init(position, m_scene_manager);
+	left_gate_mesh->Init("GateLeft.mesh", m_scene_manager, Ogre::StringUtil::BLANK);
+	right_gate_mesh->Init("GateRight.mesh", m_scene_manager, Ogre::StringUtil::BLANK);
+	left_gate_node->Init(Ogre::Vector3(2.7f,0,0), "left_gate_node", nc->GetSceneNode());
+	left_gate_node->SetId("left_gate_node");
+	right_gate_node->Init(Ogre::Vector3(-2.7f,0,0), "right_gate_node", nc->GetSceneNode());
+	right_gate_node->SetId("right_gate_node");
+	left_gate_node->GetNode()->attachObject(left_gate_mesh->GetEntity());
+	right_gate_node->GetNode()->attachObject(right_gate_mesh->GetEntity());
+
 	RigidBodyDef body_def;
 	body_def.body_type = STATIC_BODY;
 	body_def.collider_type = COLLIDER_BOX;
 	body_def.mass = 1.0f;
 	body_def.collision_filter.filter = COL_WORLD_STATIC;
-	body_def.collision_filter.mask = COL_PLAYER | COL_TOTT | COL_BUBBLE;
+	body_def.collision_filter.mask = COL_PLAYER | COL_TOTT | COL_BUBBLE | COL_QUESTITEM;
+	body_def.collider_def.x = 4.0f;
+	body_def.collider_def.y = 6.0f;
+	body_def.collider_def.z = 0.5f;
 
-	nc->Init(position, m_scene_manager);
-	mrc->Init("Gate.mesh", m_scene_manager);
-
-	rc->Init(position, mrc->GetEntity(), m_physics_engine, body_def);
+	rc->Init(position, m_physics_engine, body_def);
 	gate_controller->Init(m_message_system, def.leaves);
 	return go;
 }
@@ -799,5 +835,15 @@ GameObject* GameObjectManager::CreateRockSlide(const Ogre::Vector3& position, vo
 	body_def.collision_filter.filter = COL_WORLD_STATIC;
 	body_def.collision_filter.mask = COL_BUBBLE | COL_PLAYER | COL_QUESTITEM | COL_TOTT;
 	
+	return go;
+}
+
+GameObject* GameObjectManager::CreateLevelChange(const Ogre::Vector3& position, void* data, const Ogre::String& id){
+	TriggerDef& def = *static_cast<TriggerDef*>(data);
+	GameObject* go = new GameObject(GAME_OBJECT_LEVEL_CHANGE, id);
+	TriggerComponent* trigger_comp = new TriggerComponent;
+	go->AddComponent(trigger_comp);
+
+	trigger_comp->Init(position, m_physics_engine, def);
 	return go;
 }

@@ -61,6 +61,8 @@ void CollisionManager::Init(){
 	m_collision[MakeIntPair(GAME_OBJECT_TOTT, GAME_OBJECT_BLUE_BUBBLE)] = &CollisionManager::TottBlueBubble;
 	m_collision[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_BLUE_BUBBLE)] = &CollisionManager::PlayerBlueBubble;
 	m_collision[MakeIntPair(GAME_OBJECT_BLUE_BUBBLE, GAME_OBJECT_PLAYER)] = &CollisionManager::BlueBubblePlayer;
+	m_collision[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_LEVEL_CHANGE)] = &CollisionManager::PlayerLevelChange;
+	m_collision[MakeIntPair(GAME_OBJECT_LEVEL_CHANGE, GAME_OBJECT_PLAYER)] = &CollisionManager::LevelChangePlayer;
 
 	m_raycast_map[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_PINK_BUBBLE)] = &CollisionManager::PlayerPinkBubble;
 	m_raycast_map[MakeIntPair(GAME_OBJECT_PINK_BUBBLE, GAME_OBJECT_PLAYER)] = &CollisionManager::PinkBubblePlayer;
@@ -122,13 +124,39 @@ void CollisionManager::PlayerPlane(GameObject* player, GameObject* plane){
 }
 
 void CollisionManager::LeafPlayer(GameObject* leaf, GameObject* player){
-	IEvent evt;
-	evt.m_type = EVT_LEAF_PICKUP;
-	m_message_system->Notify(&evt);
-	leaf->GetGameObjectManager()->RemoveGameObject(leaf);
-	player->GetComponentMessenger()->Notify(MSG_LEAF_PICKUP, NULL); 
-	player->GetComponentMessenger()->Notify(MSG_SFX2D_PLAY, &static_cast<PlayerInputComponent*>(player->GetComponent(COMPONENT_PLAYER_INPUT))->m_leaf_sfx);
-	player->GetComponentMessenger()->Notify(MSG_SFX2D_PLAY, &static_cast<PlayerInputComponent*>(player->GetComponent(COMPONENT_PLAYER_INPUT))->m_leaf_giggle_sfx);
+	int player_state = PLAYER_STATE_MOVE;
+	player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_STATE_GET, &player_state);
+
+	if (player_state != PLAYER_STATE_ON_BUBBLE && player_state != PLAYER_STATE_INSIDE_BUBBLE){
+		btRigidBody* player_body = NULL;
+		player->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GET_BODY, &player_body, "body");
+		if (player_body){
+			float y_vel = player_body->getLinearVelocity().y();
+			player_body->setLinearVelocity(btVector3(0.0f, y_vel, 0.0f));
+		}
+		Ogre::SceneNode* leaf_node = NULL;
+		leaf->GetComponentMessenger()->Notify(MSG_NODE_GET_NODE, &leaf_node);
+		LeafEvent evt;
+		evt.leaf = leaf;
+		evt.leaf_node = leaf_node;
+		m_message_system->Notify(&evt);
+		int player_state = PLAYER_STATE_LEAF_COLLECT;
+		player->GetComponentMessenger()->Notify(MSG_PLAYER_INPUT_SET_STATE, &player_state);
+		player->GetComponentMessenger()->Notify(MSG_LEAF_PICKUP, NULL); 
+		player->GetComponentMessenger()->Notify(MSG_SFX2D_PLAY, &static_cast<PlayerInputComponent*>(player->GetComponent(COMPONENT_PLAYER_INPUT))->m_leaf_sfx);
+		player->GetComponentMessenger()->Notify(MSG_SFX2D_PLAY, &static_cast<PlayerInputComponent*>(player->GetComponent(COMPONENT_PLAYER_INPUT))->m_leaf_giggle_sfx);
+	}
+	else {
+		LeafEvent evt;
+		evt.leaf = leaf;
+		evt.leaf_node = NULL;
+		m_message_system->Notify(&evt);
+		player->GetComponentMessenger()->Notify(MSG_LEAF_PICKUP, NULL); 
+		player->GetComponentMessenger()->Notify(MSG_SFX2D_PLAY, &static_cast<PlayerInputComponent*>(player->GetComponent(COMPONENT_PLAYER_INPUT))->m_leaf_sfx);
+		player->GetComponentMessenger()->Notify(MSG_SFX2D_PLAY, &static_cast<PlayerInputComponent*>(player->GetComponent(COMPONENT_PLAYER_INPUT))->m_leaf_giggle_sfx);
+		leaf->RemoveGameObject(leaf);
+	}
+	leaf->RemoveComponent(COMPONENT_TRIGGER);
 };
 
 void CollisionManager::PlayerTrigger(GameObject* player, GameObject* trigger){
@@ -146,13 +174,13 @@ void CollisionManager::CameraTerrain(GameObject* camera, GameObject* terrain){
 };
 
 void CollisionManager::GatePlayer(GameObject* gate, GameObject* player){
-	bool is_gate_open = false;
+	/*bool is_gate_open = false;
 	gate->GetComponentMessenger()->Notify(MSG_GATE_OPEN_GET, &is_gate_open);
 	if (is_gate_open){
 		IEvent evt;
 		evt.m_type = EVT_CHANGE_LEVEL;
 		m_message_system->Notify(&evt);
-	}
+	}*/
 }
 
 void CollisionManager::PlayerQuestItem(GameObject* player, GameObject* quest_item){
@@ -168,7 +196,7 @@ void CollisionManager::TottQuestItem(GameObject* tott, GameObject* quest_item){
 	particleDef.particle_name = "Particle/Smoke";
 	quest_item->GetGameObjectManager()->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(static_cast<NodeComponent*>(quest_item->GetComponent(COMPONENT_NODE))->GetSceneNode()->getPosition().x, static_cast<NodeComponent*>(quest_item->GetComponent(COMPONENT_NODE))->GetSceneNode()->getPosition().y + 2, static_cast<NodeComponent*>(quest_item->GetComponent(COMPONENT_NODE))->GetSceneNode()->getPosition().z), &particleDef);
 	quest_item->GetGameObjectManager()->RemoveGameObject(quest_item);
-	quest_item->GetGameObjectManager()->RemoveGameObject(quest_item->GetGameObjectManager()->GetGameObject("TestSpeechBubble"));
+	quest_item->GetGameObjectManager()->RemoveGameObject(quest_item->GetGameObjectManager()->GetGameObject( static_cast<TottController*>(tott->GetComponent(COMPONENT_CHARACTER_CONTROLLER))->GetSpeechBubble())); //gotta fix a generic name here, stored somewhere
 };
 
 void CollisionManager::PlayerSpeechBubble(GameObject* player, GameObject* speech_bubble){
@@ -194,4 +222,10 @@ void CollisionManager::PlayerSpeechBubble(GameObject* player, GameObject* speech
 
 void CollisionManager::TottBlueBubble(GameObject* tott, GameObject* blue_bubble){
 	blue_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_ACTIVATE, NULL);
+}
+
+void CollisionManager::PlayerLevelChange(GameObject* player, GameObject* level_change){
+	IEvent evt;
+	evt.m_type = EVT_CHANGE_LEVEL;
+	m_message_system->Notify(&evt);
 }

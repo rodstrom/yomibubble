@@ -86,8 +86,9 @@ void Core::Run(){
 			render = false;
 		}
 		else {
-			if (dt > 0.5){
+			if (dt > 0.2){
 				dt = 0.0;
+				std::cout << "DT is larger than 0.2, setting to 0.0f\n";
 			}
 			last_time = curr_sec;
 		}
@@ -98,6 +99,7 @@ void Core::Run(){
 			if (!m_game->Update(dt)){
 				return;
 			}
+
 			if (!m_root->renderOneFrame((float)dt)){
 				return;
 			}

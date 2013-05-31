@@ -13,6 +13,7 @@ public:
 	virtual ~RigidbodyComponent(void){}
 	virtual void Notify(int type, void* message);
 	virtual void Init(const Ogre::Vector3& position, Ogre::Entity* entity, PhysicsEngine* physics_engine, const RigidBodyDef& def);
+	virtual void Init(const Ogre::Vector3& pos, PhysicsEngine* physics_engine, const RigidBodyDef& def);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
 	btRigidBody* GetRigidbody() { return m_rigidbody; }
@@ -145,6 +146,9 @@ public:
 	virtual void Update(float dt);
 	virtual void SimulationStep(btScalar time_step);
 
+	void SetSpeechBubble(Ogre::String spbubble){ m_speech_bubble = spbubble; }
+	Ogre::String GetSpeechBubble() { return m_speech_bubble; }
+
 	void Idling();
 	void Curious();
 	void Happy();
@@ -156,10 +160,14 @@ public:
 	bool m_can_change_state;
 
 	SoundData3D m_music;
+
+	
 	
 protected:
 	TOTT_STATE m_state;
 	AnimationMsg m_anim_msg;
+
+	Ogre::String m_speech_bubble;
 
 	Ogre::String m_idle_animation;
 	Ogre::String m_walk_animation;
@@ -288,23 +296,29 @@ protected:
 	float m_bounce_power;
 };
 
-class BobbingComponent : public Component, public IComponentUpdateable{
+class BobbingComponent : public Component, public IComponentUpdateable, public IComponentObserver{
 public:
-	BobbingComponent(void){}
+	BobbingComponent(void) : m_player_node(NULL), m_start_moving(false){}
 	virtual ~BobbingComponent(void){}
 
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
+	virtual void Notify(int type, void* msg);
 	virtual void Init(Ogre::SceneNode* node);
 	virtual void Update(float dt);
 
 private:
 	Ogre::SceneNode* m_node;
-
+	Ogre::SceneNode* m_player_node;
 	float m_current_time;
 	float m_bob_timer;
 	float m_rotation_speed;
+	bool m_start_moving;	// decides if the leaf should start moving towards the player or not
 	bool m_up;
+	float m_y_distance;
+	float m_move_speed;
+	float m_scale_speed;
+	float m_min_scale;
 };
 
 #endif // _N_PHYSICS_COMPONENTS_H_

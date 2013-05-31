@@ -657,16 +657,14 @@ void PlayerInsideBubble::Enter(){
 		def.body_a = bubble_body;
 		def.body_b = player_body;
 		def.pivot_b.setY(m_on_bubble_y_offset);
-		btScalar mass = 0.0f;
-		btVector3 inertia(0,0,0);
 		s_input_component->GetOwner()->CreateComponent(COMPONENT_GENERIC_6DOF_COMPONENT, Ogre::Vector3(0,0,0), &def);
 		bool limit = false;
 		s_messenger->Notify(MSG_CHARACTER_CONTROLLER_LIMIT_MAX_SPEED, &limit);
 	}
-	if (m_bubble->GetType() == GAME_OBJECT_PINK_BUBBLE){
+	/*if (m_bubble->GetType() == GAME_OBJECT_PINK_BUBBLE){
 		bool start = true;
 		m_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_TIMER_RUN, &start);
-	}
+	}*/
 }
 
 void PlayerInsideBubble::Exit(){
@@ -708,15 +706,20 @@ void PlayerInsideBubble::Update(float dt){
 		s_messenger->Notify(MSG_CHARACTER_CONTROLLER_LIMIT_MAX_SPEED, &limit);
 	}
 	if (s_input_component->GetInputManager()->IsButtonPressed(BTN_LEFT_MOUSE) || s_input_component->GetInputManager()->IsButtonPressed(BTN_RIGHT_MOUSE)){
-		this->ChangeBubbleType();
+		if (s_input_component->CanBlowPink()){
+			this->ChangeBubbleType();
+		}
 	}
 	if (bubble_node && m_bubble){
 		s_messenger->Notify(MSG_FOLLOW_CAMERA_GET_ORIENTATION, &dir);
+		std::cout << dir << std::endl;
 		dir.normalise();
 		m_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_APPLY_IMPULSE, &dir);
 		DirDT dirdt(dir, dt);
 		s_messenger->Notify(MSG_CHARACTER_CONTROLLER_APPLY_ROTATION, &dirdt);
 	}
+	Ogre::Vector3 zerodir = Ogre::Vector3::ZERO;
+	s_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &zerodir);
 }
 
 void PlayerInsideBubble::ChangeBubbleType(){
@@ -818,7 +821,7 @@ void PlayerHoldObject::Enter(){
 		CollisionDef* coll_def = static_cast<CollisionDef*>(ray.m_collisionObject->getUserPointer());
 		if (coll_def->flag == COLLISION_FLAG_GAME_OBJECT){
 			GameObject* ob = static_cast<GameObject*>(coll_def->data);
-			if (ob->GetType() == GAME_OBJECT_BLUE_BUBBLE || ob->GetType() == GAME_OBJECT_QUEST_ITEM){
+			if (ob->GetType() == GAME_OBJECT_QUEST_ITEM){
 				m_object = ob;
 				btRigidBody* ob_body = NULL;
 				btRigidBody* player_trigger = NULL;
@@ -842,6 +845,18 @@ void PlayerHoldObject::Enter(){
 					s_input_component->GetOwner()->CreateComponent(COMPONENT_GENERIC_6DOF_COMPONENT, Ogre::Vector3(0,0,0), &def);
 				}
 			}
+			else if (ob->GetType() == GAME_OBJECT_BLUE_BUBBLE || ob->GetType() == GAME_OBJECT_PINK_BUBBLE){
+				Ogre::Vector3 gravity(0,0,0);
+				player_body->clearForces();
+				s_messenger->Notify(MSG_PLAYER_INPUT_SET_BUBBLE, &ob);
+				if (ob->GetType() == GAME_OBJECT_BLUE_BUBBLE){
+					ob->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_ACTIVATE, NULL);
+				}
+				s_messenger->Notify(MSG_CHARACTER_CONTROLLER_GRAVITY_SET, &gravity);
+				s_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &gravity);
+				s_manager->HoldObject(false);
+				s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_INSIDE_BUBBLE));
+			}
 		}
 	}
 }
@@ -849,14 +864,8 @@ void PlayerHoldObject::Enter(){
 void PlayerHoldObject::Exit(){
 	s_input_component->GetOwner()->RemoveComponent(COMPONENT_GENERIC_6DOF_COMPONENT);
 	if (m_object){
-		if (m_object->GetType() == GAME_OBJECT_BLUE_BUBBLE){
-			Ogre::Vector3 gravity(Ogre::Real(0),-m_bubble_gravity,Ogre::Real(0));
-			m_object->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GRAVITY_SET, &gravity);
-		}
-		else {
-			Ogre::Vector3 gravity(Ogre::Real(0),Ogre::Real(-9.8),Ogre::Real(0));
-			m_object->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GRAVITY_SET, &gravity);
-		}
+		Ogre::Vector3 gravity(Ogre::Real(0),Ogre::Real(-9.8),Ogre::Real(0));
+		m_object->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GRAVITY_SET, &gravity);
 	}
 	m_object = NULL;
 }
@@ -883,5 +892,57 @@ void PlayerHoldObject::Update(float dt){
 void PlayerHoldObject::ItemRemoved(IEvent* evt){
 	if (evt->m_type == EVT_QUEST_ITEM_REMOVE){
 		s_manager->HoldObject(false);
+	}
+}
+
+PlayerLeafCollect::PlayerLeafCollect(MessageSystem* message_system) : m_message_system(message_system), m_leaf_object(NULL){
+	m_type = PLAYER_STATE_LEAF_COLLECT;
+	m_message_system->Register(EVT_LEAF_PICKUP,this, &PlayerLeafCollect::GetLeaf);
+	s_messenger->Notify(MSG_NODE_GET_NODE, &m_player_node);
+}
+
+PlayerLeafCollect::~PlayerLeafCollect(void){
+	m_message_system->Unregister(EVT_LEAF_PICKUP, this);
+}
+
+void PlayerLeafCollect::Enter(){
+	m_is_dancing = false;
+	bool on_ground = s_input_component->IsOnGround();
+	if (on_ground){
+		m_is_dancing = true;
+		s_animation->PlayAnimation("Base_PickUpLeaf_State");
+		m_leaf_object->GetComponentMessenger()->Notify(MSG_BOBBING_START_MOVING, &m_player_node);
+	}
+}
+
+void PlayerLeafCollect::Exit(){
+	m_leaf_node = NULL;
+	m_leaf_object = NULL;
+}
+
+void PlayerLeafCollect::Update(float dt){
+	Ogre::Vector3 dir = Ogre::Vector3::ZERO;
+	if (!m_is_dancing){
+		bool on_ground = s_input_component->IsOnGround();
+		if (on_ground){
+			m_is_dancing = true;
+			s_animation->PlayAnimation("Base_PickUpLeaf_State");
+			m_leaf_object->GetComponentMessenger()->Notify(MSG_BOBBING_START_MOVING, &m_player_node);
+		}
+	}
+	else {
+		float distance = m_leaf_node->getPosition().distance(m_player_node->getPosition());
+		if (distance <= 0.06f){
+			m_leaf_object->RemoveGameObject(m_leaf_object);
+			s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_IDLE));
+		}
+	}
+	s_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &dir);
+}
+
+void PlayerLeafCollect::GetLeaf(IEvent* evt){
+	if (evt->m_type == EVT_LEAF_PICKUP){
+		m_leaf_object = static_cast<LeafEvent*>(evt)->leaf;
+		m_leaf_node = static_cast<LeafEvent*>(evt)->leaf_node;
 	}
 }

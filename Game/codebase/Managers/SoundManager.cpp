@@ -30,7 +30,7 @@ void SoundManager::Init(Ogre::SceneManager* scene_manager, bool play_state){
 	m_scene_manager = scene_manager;
 	m_ear_node = scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(0,0,0), Ogre::Quaternion::IDENTITY);
 	if (play_state == true){
-		m_ear_node->attachObject(m_sound_manager->getListener());
+		//m_ear_node->attachObject(m_sound_manager->getListener());
 	}
 	//System::Notify
 }

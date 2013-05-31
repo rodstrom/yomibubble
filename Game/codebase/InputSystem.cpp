@@ -27,8 +27,10 @@ void InputSystem::Init(){
 		m_render_window->getCustomAttribute("WINDOW", &windowHnd);
 		windowHndStr << windowHnd;
 		pl.insert(std::make_pair(std::string("WINDOW"), windowHndStr.str()));
-		//pl.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_FOREGROUND")));
-		//pl.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_NONEXCLUSIVE")));
+#ifndef NO_CONSOLE
+		pl.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_FOREGROUND")));
+		pl.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_NONEXCLUSIVE")));
+#endif
 		m_ois_input_manager = OIS::InputManager::createInputSystem(pl);
 		
 		if (m_ois_input_manager->getNumberOfDevices(OIS::OISKeyboard) > 0){
@@ -195,6 +197,15 @@ bool InputSystem::keyPressed(const OIS::KeyEvent& e){
 	case OIS::KC_ESCAPE:
 		m_game->InjectPressedButton(BTN_BACK);
 		break;
+	case OIS::KC_V:
+		m_game->InjectPressedButton(BTN_INVERT_VERTICAL);
+		break;
+	case OIS::KC_H:
+		m_game->InjectPressedButton(BTN_INVERT_HORIZONTAL);
+		break;
+	case OIS::KC_F:
+		m_game->InjectPressedButton(BTN_FIRST_PERSON);
+		break;
 	default:
 		break;
 	};
@@ -232,6 +243,15 @@ bool InputSystem::keyReleased(const OIS::KeyEvent& e){
 		break;
 	case OIS::KC_ESCAPE:
 		m_game->InjectReleasedButton(BTN_BACK);
+		break;
+	case OIS::KC_V:
+		m_game->InjectReleasedButton(BTN_INVERT_VERTICAL);
+		break;
+	case OIS::KC_H:
+		m_game->InjectReleasedButton(BTN_INVERT_HORIZONTAL);
+		break;
+	case OIS::KC_F:
+		m_game->InjectReleasedButton(BTN_FIRST_PERSON);
 		break;
 	default:
 		break;
@@ -358,8 +378,8 @@ bool InputSystem::buttonPressed(const OIS::JoyStickEvent& e, int button){
 	case 9:
 		//m_game->InjectPressedButton(BTN_RIGHT_MOUSE);
 		break;
-	case 8: //?
-
+	case 8: //LS
+		m_game->InjectPressedButton(BTN_FIRST_PERSON);
 		break;
 	case 7: //Start Button
 		
@@ -414,7 +434,7 @@ bool InputSystem::buttonReleased(const OIS::JoyStickEvent& e, int button){
 		//m_game->InjectReleasedButton(BTN_RIGHT_MOUSE);
 		break;
 	case 8: //?
-		
+		m_game->InjectReleasedButton(BTN_FIRST_PERSON);
 		break;
 	case 7: //Start Button
 		

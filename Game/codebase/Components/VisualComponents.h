@@ -306,7 +306,7 @@ protected:
 
 class GateControllerComponent : public Component, public IComponentObserver, public IComponentUpdateable{
 public:
-	GateControllerComponent(void) : m_proceed(false){}
+	GateControllerComponent(void) : m_proceed(false), m_rotate(false), m_right_gate_node(NULL), m_left_gate_node(NULL){}
 	~GateControllerComponent(void){}
 
 	virtual void Notify(int type, void* message);
@@ -323,6 +323,9 @@ protected:
 	bool m_proceed;	// if true the player can change level
 	float m_timer;
 	int m_counter;	// amount of leafs
+	bool m_rotate;
+	Ogre::SceneNode* m_left_gate_node;
+	Ogre::SceneNode* m_right_gate_node;
 };
 
 class RotationComponent : public Component, public IComponentUpdateable, public IComponentObserver{
