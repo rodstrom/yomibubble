@@ -314,6 +314,9 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, void* data, const Ogre::String& id){
 	BubbleDef& def = *static_cast<BubbleDef*>(data);
 	GameObject* go = new GameObject(GAME_OBJECT_BLUE_BUBBLE);
+	BubbleController* bc = new BubbleController;
+	go->AddComponent(bc);
+	go->AddUpdateable(bc);
 	NodeComponent* node_comp = new NodeComponent;
 	go->AddComponent(node_comp);
 	MeshRenderComponent* mrc = new MeshRenderComponent;
@@ -322,16 +325,14 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 	go->AddComponent(cons);
 	RigidbodyComponent* rc = new RigidbodyComponent;
 	go->AddComponent(rc);
-	BubbleController* bc = new BubbleController;
-	go->AddComponent(bc);
-	go->AddUpdateable(bc);
+
 
 	node_comp->Init(position, m_scene_manager);
 	mrc->Init("BlueBubble.mesh", m_scene_manager);
 	mrc->GetEntity()->setRenderQueueGroup(60);
 	Ogre::Vector3 scale(def.start_scale);
 	node_comp->GetSceneNode()->setScale(scale);
-	bc->Init(m_physics_engine, m_message_system, VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleImpulse"), VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleMaxVelocity"), def.start_scale);
+	
 	//bc->SetCustomVariables(VariableManager::GetSingletonPtr()->GetAsFloat("Blue_Bubble_Life_Time"));
 
 	RigidBodyDef body_def;
@@ -348,6 +349,7 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 	rc->GetRigidbody()->setActivationState(DISABLE_DEACTIVATION);
 	rc->GetRigidbody()->setDamping(VariableManager::GetSingletonPtr()->GetAsFloat("Bubble_Linear_Damping"), VariableManager::GetSingletonPtr()->GetAsFloat("Bubble_Angular_Damping"));
 	cons->Init(m_physics_engine,rc->GetRigidbody(), def.connection_body, btVector3(0,0,0), btVector3(0,0,0));
+	bc->Init(m_physics_engine, m_message_system, VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleImpulse"), VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleMaxVelocity"), def.start_scale);
 	this->CheckBubbleSize();
 	m_bubbles.push_back(go);
 	return go;
@@ -356,15 +358,16 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, void* data, const Ogre::String& id){
 	BubbleDef& def = *static_cast<BubbleDef*>(data);
 	GameObject* go = new GameObject(GAME_OBJECT_PINK_BUBBLE);
+	BubbleController* bc = new BubbleController;
+	go->AddComponent(bc);
+	go->AddUpdateable(bc);
 	NodeComponent* node_comp = new NodeComponent;
 	go->AddComponent(node_comp);
 	MeshRenderComponent* mrc = new MeshRenderComponent;
 	go->AddComponent(mrc);
 	Point2PointConstraintComponent* cons = new Point2PointConstraintComponent;
 	go->AddComponent(cons);
-	BubbleController* bc = new BubbleController;
-	go->AddComponent(bc);
-	go->AddUpdateable(bc);
+
 	RigidbodyComponent* rc = new RigidbodyComponent;
 	go->AddComponent(rc);
 
@@ -373,7 +376,7 @@ GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, v
 	mrc->GetEntity()->setRenderQueueGroup(60);
 	Ogre::Vector3 scale(def.start_scale);
 	node_comp->GetSceneNode()->setScale(scale);
-	bc->Init(m_physics_engine, m_message_system, VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleImpulse"), VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleMaxVelocity"), def.start_scale);
+	
 	//bc->SetCustomVariables(VariableManager::GetSingletonPtr()->GetAsFloat("Pink_Bubble_Life_Time"));
 
 	//mrc->GetEntity()->setMaterialName("PinkBubble");
@@ -389,9 +392,10 @@ GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, v
 	//rc->GetRigidbody()->setLinearFactor(btVector3(1,0,1));
 	rc->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
 	rc->GetRigidbody()->setActivationState(DISABLE_DEACTIVATION);
-	rc->GetRigidbody()->setDamping(0.5, 0.5);
+	//rc->GetRigidbody()->setDamping(0.5, 0.5);
 	rc->SetId("body");
 	cons->Init(m_physics_engine,rc->GetRigidbody(), def.connection_body, btVector3(0,0,0), btVector3(0,0,0));
+	bc->Init(m_physics_engine, m_message_system, VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleImpulse"), VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleMaxVelocity"), def.start_scale);
 	this->CheckBubbleSize();
 	m_bubbles.push_back(go);
 	return go;
@@ -438,7 +442,7 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 		acomp->AddAnimationState("walk", true);
 	}
 	else if (def.type_name == "Shroomfox"){
-		acomp->AddAnimationState("Idle", true);
+		acomp->AddAnimationState("idle", true);
 	}
 	else{
 		acomp->AddAnimationState("Run", true);

@@ -195,8 +195,11 @@ void CollisionManager::TottQuestItem(GameObject* tott, GameObject* quest_item){
 	ParticleDef particleDef;
 	particleDef.particle_name = "Particle/Smoke";
 	quest_item->GetGameObjectManager()->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(static_cast<NodeComponent*>(quest_item->GetComponent(COMPONENT_NODE))->GetSceneNode()->getPosition().x, static_cast<NodeComponent*>(quest_item->GetComponent(COMPONENT_NODE))->GetSceneNode()->getPosition().y + 2, static_cast<NodeComponent*>(quest_item->GetComponent(COMPONENT_NODE))->GetSceneNode()->getPosition().z), &particleDef);
-	quest_item->GetGameObjectManager()->RemoveGameObject(quest_item);
-	quest_item->GetGameObjectManager()->RemoveGameObject(quest_item->GetGameObjectManager()->GetGameObject( static_cast<TottController*>(tott->GetComponent(COMPONENT_CHARACTER_CONTROLLER))->GetSpeechBubble())); //gotta fix a generic name here, stored somewhere
+	if (static_cast<SpeechBubbleComponent*>(tott->GetComponent(COMPONENT_SPEECH_BUBBLE))->m_given_leaf == false){
+		//quest_item->GetGameObjectManager()->RemoveGameObject(quest_item->GetGameObjectManager()->GetGameObject(static_cast<TottController*>(tott->GetComponent(COMPONENT_CHARACTER_CONTROLLER))->GetSpeechBubble()));
+		quest_item->GetGameObjectManager()->RemoveGameObject(quest_item);
+		static_cast<SpeechBubbleComponent*>(tott->GetComponent(COMPONENT_SPEECH_BUBBLE))->m_given_leaf = true;
+	}
 };
 
 void CollisionManager::PlayerSpeechBubble(GameObject* player, GameObject* speech_bubble){

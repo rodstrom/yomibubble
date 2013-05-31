@@ -27,7 +27,7 @@ void InputSystem::Init(){
 		m_render_window->getCustomAttribute("WINDOW", &windowHnd);
 		windowHndStr << windowHnd;
 		pl.insert(std::make_pair(std::string("WINDOW"), windowHndStr.str()));
-#ifndef NO_CONSOLE
+#ifndef NDEBUG
 		pl.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_FOREGROUND")));
 		pl.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_NONEXCLUSIVE")));
 #endif
@@ -376,10 +376,11 @@ bool InputSystem::buttonPressed(const OIS::JoyStickEvent& e, int button){
 		//m_game->InjectPressedButton(BTN_RIGHT_MOUSE);
 		break;
 	case 9:
+		m_game->InjectPressedButton(BTN_FIRST_PERSON);
 		//m_game->InjectPressedButton(BTN_RIGHT_MOUSE);
 		break;
 	case 8: //LS
-		m_game->InjectPressedButton(BTN_FIRST_PERSON);
+		
 		break;
 	case 7: //Start Button
 		
@@ -431,10 +432,11 @@ bool InputSystem::buttonReleased(const OIS::JoyStickEvent& e, int button){
 		//m_game->InjectReleasedButton(BTN_RIGHT_MOUSE);
 		break;
 	case 9:
+		m_game->InjectReleasedButton(BTN_FIRST_PERSON);
 		//m_game->InjectReleasedButton(BTN_RIGHT_MOUSE);
 		break;
 	case 8: //?
-		m_game->InjectReleasedButton(BTN_FIRST_PERSON);
+		
 		break;
 	case 7: //Start Button
 		

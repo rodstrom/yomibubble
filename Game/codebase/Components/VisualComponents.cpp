@@ -811,7 +811,7 @@ void SpeechBubbleComponent::Init(Ogre::SceneNode* node, SceneManager* scene_mana
 	m_current_scale = 1.0f;
 	m_messenger->Notify(MSG_MESH_SET_MATERIAL_NAME, &Ogre::String("SpeechCherry"));
 	m_tott = tott;
-
+	m_given_leaf = false;
 	//m_messenger->Notify(MSG_NODE_ATTACH_ENTITY, static_cast<MeshRenderComponent*>(m_owner->GetComponent(COMPONENT_MESH_RENDER))->GetEntity());
 
 	//static_cast<MeshRenderComponent*>(speech_bubble->GetComponent(COMPONENT_MESH_RENDER))->GetEntity()->setMaterialName("SolidColor/Blue");

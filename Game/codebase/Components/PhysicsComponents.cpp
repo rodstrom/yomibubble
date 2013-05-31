@@ -351,6 +351,11 @@ void CharacterController::Notify(int type, void* msg){
 			ApplyRotation(dirdt.dir, dirdt.dt);
 		}
 		break;
+	case MSG_CHARACTER_CONTROLLER_SET_STEP_HEIGHT:
+		{
+			m_step_height = *static_cast<float*>(msg);
+		}
+		break;
 	default:
 		break;
 	}
@@ -445,6 +450,7 @@ void CharacterController::Shut(){
 		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_GET_FALL_VELOCITY, this);
 		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_APPLY_ROTATION, this);
 		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_APPLY_IMPULSE, this);
+		m_messenger->Unregister(MSG_CHARACTER_CONTROLLER_SET_STEP_HEIGHT, this);
 	}
 	m_physics_engine->RemoveObjectSimulationStep(this);
 }
@@ -462,6 +468,7 @@ void CharacterController::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_CHARACTER_CONTROLLER_GET_FALL_VELOCITY, this);
 	m_messenger->Register(MSG_CHARACTER_CONTROLLER_APPLY_ROTATION, this);
 	m_messenger->Register(MSG_CHARACTER_CONTROLLER_APPLY_IMPULSE, this);
+	m_messenger->Register(MSG_CHARACTER_CONTROLLER_SET_STEP_HEIGHT, this);
 }
 
 void CharacterController::Init(const Ogre::Vector3& position, PhysicsEngine* physics_engine, const CharacterControllerDef& def){
@@ -810,7 +817,8 @@ void PlayerRaycastCollisionComponent::PlayerBubble(GameObject* go){
 	float y_vel = 0.0f;
 	m_messenger->Notify(MSG_CHARACTER_CONTROLLER_GET_FALL_VELOCITY, &y_vel);
 	if (body){
-		if (player_state == PLAYER_STATE_FALLING){
+		PlayerInputComponent* pic = static_cast<PlayerInputComponent*>(m_owner->GetComponent(COMPONENT_PLAYER_INPUT));
+		if (player_state == PLAYER_STATE_FALLING && !pic->IsInsideBubble()){
 			if (y_vel < -m_bounce_vel && y_vel > -m_into_bubble_vel){   // bounce on bubble
 				player_state = PLAYER_STATE_BOUNCE;
 				m_messenger->Notify(MSG_PLAYER_INPUT_SET_BUBBLE, &go);
@@ -853,6 +861,8 @@ void PlayerRaycastCollisionComponent::PlayerBubble(GameObject* go){
 				m_messenger->Notify(MSG_PLAYER_INPUT_SET_STATE, &player_state);
 				m_messenger->Notify(MSG_CHARACTER_CONTROLLER_GRAVITY_SET, &gravity);
 				m_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &gravity);	// make sure direction is set to zero
+				player_state = PLAYER_STATE_IDLE;
+				m_messenger->Notify(MSG_PLAYER_INPUT_SET_STATE, &player_state);
 			}
 			else {   // stand on bubble
 				if (go->GetType() == GAME_OBJECT_BLUE_BUBBLE){
@@ -910,7 +920,6 @@ void BobbingComponent::Init(Ogre::SceneNode* node){
 	m_move_speed = 4.0f;
 	m_min_scale = 0.2f;
 	m_scale_speed = 1.0f;
-
 	m_up = true;
 };
 

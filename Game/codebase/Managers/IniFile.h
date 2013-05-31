@@ -37,6 +37,7 @@ public:
 	const std::string& getValue(const std::string& group, const std::string& key, const std::string& defaultValue = " ");	// Get value as string
 	float getValueAsFloat(const std::string& group, const std::string& key, float defaultValue = 0.0f);	// get the value as a float
 	int getValueAsInt(const std::string& group, const std::string& key, int defaultValue = 0);	// get the value as an int
+	bool getValueAsBool(const std::string& group, const std::string& key, bool defaultValue = 0);
 
 	void addModify(const std::string& group, const std::string& key, const std::string& value);	// when you want to change values
 	void save();	// run after addModify() to save changes and write to file

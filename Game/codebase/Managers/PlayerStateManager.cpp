@@ -2,7 +2,7 @@
 #include "PlayerStateManager.h"
 #include "..\Components\PlayerState.h"
 
-PlayerStateManager::PlayerStateManager(void) : m_blow_bubbles(false), m_holding_object(false), m_active(NULL), m_blow_bubble_state(NULL), m_holding_object_state(NULL){}
+PlayerStateManager::PlayerStateManager(void) : m_blow_bubbles(false), m_holding_object(false), m_active(NULL), m_blow_bubble_state(NULL), m_holding_object_state(NULL), m_is_inside_bubble(false){}
 PlayerStateManager::~PlayerStateManager(void){}
 
 void PlayerStateManager::Update(float dt){
@@ -14,6 +14,9 @@ void PlayerStateManager::Update(float dt){
 	}
 	if (m_holding_object){
 		m_holding_object_state->Update(dt);
+	}
+	if (m_is_inside_bubble){
+		m_inside_bubble->Update(dt);
 	}
 }
 
@@ -54,6 +57,16 @@ void PlayerStateManager::HoldObject(bool value){
 	}
 }
 
+void PlayerStateManager::GoInsideBubble(bool value){
+	m_is_inside_bubble = value;
+	if (value){
+		m_inside_bubble->Enter();
+	}
+	else {
+		m_inside_bubble->Exit();
+	}
+}
+
 int PlayerStateManager::GetCurrentType(){
 	if (m_active){
 		return m_active->GetType();
@@ -64,6 +77,7 @@ int PlayerStateManager::GetCurrentType(){
 void PlayerStateManager::Init(){
 	m_blow_bubble_state = GetPlayerState(PLAYER_STATE_BLOW_BUBBLE);
 	m_holding_object_state = GetPlayerState(PLAYER_STATE_HOLD_OBJECT);
+	m_inside_bubble = static_cast<PlayerInsideBubble*>(GetPlayerState(PLAYER_STATE_INSIDE_BUBBLE));
 }
 
 void PlayerStateManager::Shut(){
