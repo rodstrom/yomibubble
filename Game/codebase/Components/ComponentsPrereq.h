@@ -119,6 +119,8 @@ enum EComponentMsg{
 	MSG_WAYPOINT_PAUSE,
 	MSG_WAYPOINT_START,
 	MSG_CAMERA_CHECK_COLLISION,
+	MSG_GATE_OPEN_GET,
+	MSG_BOBBING_START_MOVING,
 	MSG_SIZE
 };
 
@@ -146,6 +148,7 @@ enum EPlayerState{
 	PLAYER_STATE_LAND,
 	PLAYER_STATE_BOUNCE,
 	PLAYER_STATE_HOLD_OBJECT,
+	PLAYER_STATE_LEAF_COLLECT,
 	PLAYER_STATE_SIZE
 };
 
@@ -204,7 +207,7 @@ public:
 };
 
 struct AnimationMsg{
-	AnimationMsg(void) : index(0), loop(true), full_body(false), blend(false), wait(false), duration(0.0f), blending_transition(0){}
+	AnimationMsg(void) : index(0), loop(true), full_body(false), blend(false), wait(false), duration(0.0f), blending_transition(2){}
 	int index;
 	int blending_transition;
 	bool blend;

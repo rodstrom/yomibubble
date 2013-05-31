@@ -91,6 +91,11 @@ void PlayerInputComponent::Shut(){
 		delete m_animation_manager;
 		m_animation_manager = NULL;
 	}
+	if (m_player_state_manager){
+		m_player_state_manager->Shut();
+		delete m_player_state_manager;
+		m_player_state_manager = NULL;
+	}
 	m_physics_engine->RemoveObjectSimulationStep(this);
 
 	if (m_level == "try"){ m_messenger->Notify(MSG_SFX2D_STOP, &m_start_music); }
@@ -102,11 +107,12 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 	m_physics_engine = physics_engine;
 
 	m_start_music = sound_manager->Create2DData("Tutorial_Theme", false, false, false, false, 1.0f, 1.0f);
-	m_day_music = sound_manager->Create2DData("Day_Theme", false, false, false, false, 1.0f, 1.0f);;
-	m_night_music = sound_manager->Create2DData("Night_Theme", false, false, false, false, 1.0f, 1.0f);;
+	m_day_music = sound_manager->Create2DData("Day_Theme", false, false, false, false, 1.0f, 1.0f);
+	m_night_music = sound_manager->Create2DData("Night_Theme", false, false, false, false, 1.0f, 1.0f);
 
 	m_bounce_sound = sound_manager->Create2DData("Bounce", false, false, false, false, 1.0f, 1.0f);
 	m_leaf_sfx = sound_manager->Create2DData("Take_Leaf", false, false, false, false, 1.0f, 1.0f);
+	m_leaf_giggle_sfx = sound_manager->Create2DData("Yomi_Giggle", false, false, false, false, 1.0f, 1.0f);
 	m_walk_sound = sound_manager->Create2DData("Yomi_Walk", false, false, false, false, 1.0f, 1.0f);
 	m_test_sfx = sound_manager->Create2DData("Dun_Dun", true, false, false, false, 1.0f, 1.0f);
 	m_3D_music_data = sound_manager->Create3DData("Main_Theme", "", false, false, false, 1.0f, 1.0f);
@@ -134,32 +140,33 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 
 	m_player_action = 0;
 	m_animation_manager = new AnimationManager(m_messenger);
-	m_animation_manager->AddAnimation(AnimationDef("Base_Idle", 0, 0.2f));
-	m_animation_manager->AddAnimation(AnimationDef("Base_Idle2", 0, 0.2f));
-	m_animation_manager->AddAnimation(AnimationDef("Base_Run", 0, 0.2f));
-	m_animation_manager->AddAnimation(AnimationDef("Base_Walk", 0, 0.2f));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Idle", 0, 0.1f));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Idle2", 0, 0.1f));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Run", 0, 0.1f));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Walk", 0, 0.1f));
 	m_animation_manager->AddAnimation(AnimationDef("Top_Blow_End", 1, 0.1f));
 	m_animation_manager->AddAnimation(AnimationDef("Top_Blow_Loop", 1, 0.1f));
 	m_animation_manager->AddAnimation(AnimationDef("Top_Blow_Start", 1, 0.1f));
-	m_animation_manager->AddAnimation(AnimationDef("Base_Jump_End", 0, 0.2f, "Top_Jump_End"));
-	m_animation_manager->AddAnimation(AnimationDef("Base_Jump_Loop", 0, 0.2f, "Top_Jump_Loop"));
-	m_animation_manager->AddAnimation(AnimationDef("Base_Jump_Start", 0, 0.2f, "Top_Jump_Start"));
-	m_animation_manager->AddAnimation(AnimationDef("Base_PickUpLeaf_State", 0, 0.2f));
-	m_animation_manager->AddAnimation(AnimationDef("Top_Idle", 1, 0.2f));
-	m_animation_manager->AddAnimation(AnimationDef("Top_Idle2", 1, 0.2f));
-	m_animation_manager->AddAnimation(AnimationDef("Top_Run", 1, 0.2f));
-	m_animation_manager->AddAnimation(AnimationDef("Top_Walk", 1, 0.2f));
-	m_animation_manager->AddAnimation(AnimationDef("Base_Walk_On_Bubble", 0, 0.2f, "Top_Walk_On_Bubble"));
-	m_animation_manager->AddAnimation(AnimationDef("Base_Idle_On_Bubble", 0, 0.2f, "Top_Idle_On_Bubble"));
-	m_animation_manager->AddAnimation(AnimationDef("Base_Idle_On_Bubble2", 0, 0.2f, "Top_Idle_On_Bubble2"));
-	m_animation_manager->AddAnimation(AnimationDef("Base_Walk_On_Bubble2", 0, 0.2f, "Top_Walk_On_Bubble2"));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Jump_End", 0, 0.1f, "Top_Jump_End"));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Jump_Loop", 0, 0.1f, "Top_Jump_Loop"));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Jump_Start", 0, 0.1f, "Top_Jump_Start"));
+	m_animation_manager->AddAnimation(AnimationDef("Base_PickUpLeaf_State", 0, 0.1f, "Top_PickUpLeaf_State"));
+	m_animation_manager->AddAnimation(AnimationDef("Top_Idle", 1, 0.1f));
+	m_animation_manager->AddAnimation(AnimationDef("Top_Idle2", 1, 0.1f));
+	m_animation_manager->AddAnimation(AnimationDef("Top_Run", 1, 0.1f));
+	m_animation_manager->AddAnimation(AnimationDef("Top_Walk", 1, 0.1f));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Walk_On_Bubble", 0, 0.1f, "Top_Walk_On_Bubble"));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Idle_On_Bubble", 0, 0.1f, "Top_Idle_On_Bubble"));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Idle_On_Bubble2", 0, 0.1f, "Top_Idle_On_Bubble2"));
+	m_animation_manager->AddAnimation(AnimationDef("Base_Walk_On_Bubble2", 0, 0.1f, "Top_Walk_On_Bubble2"));
+	m_animation_manager->AddAnimation(AnimationDef("Base_PickUpLeaf_State", 0, 0.1f, "Top_PickUpLeaf_State"));
 	
 	m_player_state_manager = new PlayerStateManager;
 
 	PlayerState::Init(m_owner->GetComponentMessenger(), m_animation_manager, this, m_player_state_manager, sound_manager);
 	m_player_state_manager->AddPlayerState(new PlayerIdle);
 	m_player_state_manager->AddPlayerState(new PlayerStateMove);
-	m_player_state_manager->AddPlayerState(new PlayerBlowBubble);
+	m_player_state_manager->AddPlayerState(new PlayerBlowBubble(m_physics_engine));
 	m_player_state_manager->AddPlayerState(new PlayerJump);
 	m_player_state_manager->AddPlayerState(new PlayerFalling);
 	m_player_state_manager->AddPlayerState(new PlayerLand);
@@ -167,6 +174,7 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 	m_player_state_manager->AddPlayerState(new PlayerOnBubble(message_system));
 	m_player_state_manager->AddPlayerState(new PlayerInsideBubble(message_system));
 	m_player_state_manager->AddPlayerState(new PlayerHoldObject(physics_engine, message_system));
+	m_player_state_manager->AddPlayerState(new PlayerLeafCollect(message_system));
 	m_player_state_manager->Init();
 	m_player_state_manager->SetPlayerState(m_player_state_manager->GetPlayerState(PLAYER_STATE_FALLING));
 

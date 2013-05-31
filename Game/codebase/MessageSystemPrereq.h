@@ -14,6 +14,7 @@ enum EEventType {
 	EVT_CHANGE_LEVEL,
 	EVT_BUBBLE_REMOVE,
 	EVT_QUEST_ITEM_REMOVE,
+	EVT_LEAF_PICKUP,
 
 	EVT_MAX
 };
@@ -144,6 +145,12 @@ class GameObject;
 struct BubbleEvent : IEvent{
 	BubbleEvent() { m_type = EVT_BUBBLE_REMOVE; }
 	GameObject* bubble;
+};
+
+struct LeafEvent: IEvent{
+	LeafEvent() { m_type = EVT_LEAF_PICKUP; }
+	GameObject* leaf;
+	Ogre::SceneNode* leaf_node;
 };
 
 struct ResizeEvent : IEvent {

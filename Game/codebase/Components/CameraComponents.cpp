@@ -5,6 +5,7 @@
 #include "GameObject.h"
 #include "GameObjectPrereq.h"
 #include "VisualComponents.h"
+#include "..\Managers\VariableManager.h"
 
 #include <iostream> //for debugging, wohoo
 
@@ -83,6 +84,9 @@ void FollowCameraComponent::Notify(int type, void* msg){
 	case MSG_CAMERA_ENV_COLLISION:
 		m_env_collision = true;
 		break;
+	case MSG_ON_GROUND:
+		m_on_ground = *static_cast<bool*>(msg);
+		break;
 	default:
 		break;
 	}
@@ -97,6 +101,7 @@ void FollowCameraComponent::Shut(){
 	m_messenger->Unregister(MSG_DEFAULT_CAMERA_POS, this);
 	m_messenger->Unregister(MSG_FOLLOW_CAMERA_GET_ORIENTATION, this);
 	m_messenger->Unregister(MSG_CAMERA_ENV_COLLISION, this);
+	m_messenger->Unregister(MSG_ON_GROUND, this);
 	m_physics_engine->RemoveObjectSimulationStep(this);
 }
 
@@ -106,6 +111,7 @@ void FollowCameraComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_DEFAULT_CAMERA_POS, this);
 	m_messenger->Register(MSG_FOLLOW_CAMERA_GET_ORIENTATION, this);
 	m_messenger->Register(MSG_CAMERA_ENV_COLLISION, this);
+	m_messenger->Register(MSG_ON_GROUND, this);
 }
 
 void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewport* viewport, bool activate, const Ogre::String& camera_id){
@@ -139,6 +145,16 @@ void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewpo
 	m_top_ray.length = btVector3(0, 1, 0);
 	m_bot_ray.origin = btVector3(m_bot_ray.node->getPosition().x, m_bot_ray.node->getPosition().y, m_bot_ray.node->getPosition().z);
 	m_bot_ray.length = btVector3(0, -1, 0);
+
+	m_on_ground = true;
+
+	bool inv_contr = VariableManager::GetSingletonPtr()->GetAsInt("Camera_Inverted_Controller_Sticks");
+	if (inv_contr == 0){
+		m_inverted_controller = false;
+	}
+	else{
+		m_inverted_controller = true;
+	}
 
 	//m_env_coll_Xp = false;
 	//m_env_coll_Xn = false;
@@ -184,10 +200,20 @@ void FollowCameraComponent::Update(float dt){
 	m_messenger->Notify(MSG_NODE_GET_NODE, &node);
 	if (node){
 		//Ogre::Vector3 old_position = m_camera_node->getPosition();
-
-		m_camera_pivot->setPosition(node->getPosition() + Ogre::Vector3::UNIT_Y);
+		
+		//if(m_on_ground){
+		//	m_camera_pivot->setPosition(node->getPosition() + Ogre::Vector3::UNIT_Y);
+		//}
+		//else {
+		Ogre::Vector3 delta_position = m_camera_pivot->getPosition() - node->getPosition();
+		delta_position.y--;
+		m_camera_pivot->setPosition(m_camera_pivot->getPosition().x - delta_position.x * dt * 10.0f, 
+			m_camera_pivot->getPosition().y - delta_position.y * dt * 3.0f, 
+			m_camera_pivot->getPosition().z - delta_position.z * dt * 10.0f);
+		//m_camera_pivot->translate(m_camera_pivot->getPosition() - node->getPosition() * dt * 5.0f);
+		//}
 		Ogre::Vector3 goal_offset = m_camera_goal->_getDerivedPosition() - m_camera_node->getPosition();
-		m_camera_node->translate(goal_offset * dt);
+		m_camera_node->translate(goal_offset * dt * 10.0f);
 		m_camera_node->lookAt(m_camera_pivot->_getDerivedPosition(), Ogre::Node::TS_WORLD);
 		
 		//Ogre::Vector3 new_position = m_camera_node->getPosition();
@@ -215,12 +241,16 @@ void FollowCameraComponent::Update(float dt){
 	QueryRaycast();
 
 	Ogre::Vector3 goal_pos = m_camera_goal->getPosition();
-	if(goal_pos.z < 2) m_camera_goal->setPosition(goal_pos.x, goal_pos.y, 2);
+	if(goal_pos.z < Ogre::Real(2)) m_camera_goal->setPosition(goal_pos.x, goal_pos.y, Ogre::Real(2));
+	//if(goal_pos.z > Ogre::Real(15)) m_camera_goal->setPosition(goal_pos.x, goal_pos.y, Ogre::Real(15));
+	if(m_default_distance > 15.0f) m_default_distance = 15.0f;
 	goal_pos = m_camera_goal->_getDerivedPosition();
-	if(goal_pos.y - m_camera_pivot->getPosition().y < 0) {
-		//m_camera_pivot->pitch(Ogre::Radian(-m_camera_pivot->getOrientation().getPitch()));
-		m_camera_goal->_setDerivedPosition(Ogre::Vector3(goal_pos.x, m_camera_pivot->getPosition().y, goal_pos.z));
-	}
+
+	//if(goal_pos.y - m_camera_pivot->getPosition().y < 0) {		//bugfix, camera n ot clipping ground
+	//	//m_camera_pivot->pitch(Ogre::Radian(-m_camera_pivot->getOrientation().getPitch()));
+	//	m_camera_goal->_setDerivedPosition(Ogre::Vector3(goal_pos.x, m_camera_pivot->getPosition().y, goal_pos.z));
+	//}
+
 	//goal_pos = m_camera_goal->getPosition();
 	//if(m_camera_goal->_getDerivedPosition().y - m_camera_pivot->getPosition().y > Ogre::Math::Tan((Ogre::Radian(0.5f))) * goal_pos.z ) {
 	//	//std::cout << "tan(0.5r) * cam.z: " << Ogre::Math::Tan((Ogre::Radian(0.5f))) * goal_pos.z << "\n";
@@ -237,6 +267,10 @@ void FollowCameraComponent::Update(float dt){
 		Ogre::Ray distance(m_camera_pivot->getPosition(), m_camera_goal->_getDerivedPosition() - m_camera_pivot->getPosition());
 		m_camera_goal->_setDerivedPosition(distance.getPoint(Ogre::Real(2)));
 	}
+	//else if(m_camera_pivot->getPosition().distance(m_camera_goal->_getDerivedPosition()) > Ogre::Real(15)) {
+	//	Ogre::Ray distance(m_camera_pivot->getPosition(), m_camera_goal->_getDerivedPosition() - m_camera_pivot->getPosition());
+	//	m_camera_goal->_setDerivedPosition(distance.getPoint(Ogre::Real(15)));
+	//}
 
 }
 
@@ -284,10 +318,10 @@ void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real de
 	}
 	
 	if (m_getting_input){
-		if (!m_inverted_controller) { m_camera_pivot->yaw(Ogre::Degree(-delta_yaw * m_camera_stick_rotation_acceleration), Ogre::Node::TS_WORLD); }
-		else { m_camera_pivot->yaw(Ogre::Degree(delta_yaw* m_camera_stick_rotation_acceleration), Ogre::Node::TS_WORLD); }
+		if (!m_inverted_controller) { m_camera_pivot->yaw(Ogre::Degree(delta_yaw * m_camera_stick_rotation_acceleration), Ogre::Node::TS_WORLD); }
+		else { m_camera_pivot->yaw(Ogre::Degree(-delta_yaw* m_camera_stick_rotation_acceleration), Ogre::Node::TS_WORLD); }
 	}
-	if (!(m_pivot_pitch + delta_pitch > -15 && delta_pitch > 0) && 
+	if (!(m_pivot_pitch + delta_pitch > 10 && delta_pitch > 0) && 
 		!(m_pivot_pitch + delta_pitch < -35 && delta_pitch < 0)
 		&& m_getting_input){
 			if (!m_inverted_controller) { m_camera_pivot->pitch(Ogre::Degree(delta_pitch * m_camera_stick_rotation_acceleration), Ogre::Node::TS_LOCAL); }
@@ -349,7 +383,7 @@ bool FollowCameraComponent::QueryRaycast(){
 
 	for(int i = -1; i < 2; i++){
 		cam_pos = m_camera_goal->_getDerivedPosition();
-		cam_pos.x += i * 2;
+		cam_pos.x += i;
 		cam_pos.y -= max_y;
 		camera_ray.setOrigin(pivot_pos);
 		camera_ray.setDirection(cam_pos - pivot_pos);

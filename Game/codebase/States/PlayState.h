@@ -24,6 +24,7 @@ public:
 
 	void SecondLoading();
 	void ChangeLevel(IEvent*);
+	void ChangeToWinState();
 
 private:
 	PhysicsEngine*				m_physics_engine;

@@ -17,7 +17,7 @@ public:
 		State* _state;
 	};
 
-	StateManager(Ogre::RenderWindow* render_window, InputListener* input_listener, MessageSystem* message_system, SoundManager* sound_manager);
+	StateManager(Ogre::RenderWindow* render_window, InputListener* input_listener, MessageSystem* message_system);
 	~StateManager(void);
 	void Init(State* state);
 	bool Update(float dt);
@@ -39,7 +39,6 @@ protected:
 	Ogre::RenderWindow*			m_render_window;
 	InputListener*				m_input_listener;
 	MessageSystem*				m_message_system;
-	SoundManager*				m_sound_manager;
 	State*						m_next_state;
 	State*						m_loading;
 	FadeInFadeOut*				m_fade;

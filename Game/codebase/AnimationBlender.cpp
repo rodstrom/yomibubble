@@ -30,6 +30,11 @@ void AnimationBlender::init(const String &animation, bool l)
   if( transition == AnimationBlender::BlendSwitch )
   {
      if( mSource != 0 )
+		 if (mTarget != 0){
+			 mTarget->setEnabled(false);
+			 mTarget->setWeight(1);
+			 mTarget->setTimePosition(0);
+		 }
      mSource->setEnabled(false);
      mSource = mEntity->getAnimationState( animation );
      mSource->setEnabled(true);

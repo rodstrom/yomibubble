@@ -8,7 +8,7 @@ struct IEvent;
 class GameObjectManager;
 class LevelManager {
 public:
-	LevelManager(GameObjectManager* game_object_manager, Ogre::SceneManager* scene_manager, PhysicsEngine* physics_engine);
+	LevelManager(GameObjectManager* game_object_manager, Ogre::SceneManager* scene_manager, PhysicsEngine* physics_engine, std::function<void()> change_state);
 	~LevelManager(void);
 	void AddLevel(const LevelDef& level_def) { m_levels.push_back(level_def); }
 	void ChangeLevel();
@@ -24,6 +24,7 @@ protected:
 	Ogre::SceneManager* m_scene_manager;
 	PhysicsEngine* m_physics_engine;
 	Ogre::String m_str_current_level;
+	std::function<void()> m_change_state;
 };
 
 #endif // _LEVEL_MANAGER_H_

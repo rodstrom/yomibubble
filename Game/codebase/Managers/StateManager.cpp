@@ -7,8 +7,8 @@
 #include "..\Managers\VariableManager.h"
 //#include "boost\thread.hpp"
 
-StateManager::StateManager(Ogre::RenderWindow* render_window, InputListener* input_listener, MessageSystem* message_system, SoundManager* sound_manager) 
-	: m_render_window(render_window), m_input_listener(input_listener), m_message_system(message_system), m_next_state(NULL), m_pop_on_update(false), m_sound_manager(sound_manager), m_fading(false), m_loading_fading(false){
+StateManager::StateManager(Ogre::RenderWindow* render_window, InputListener* input_listener, MessageSystem* message_system) 
+	: m_render_window(render_window), m_input_listener(input_listener), m_message_system(message_system), m_next_state(NULL), m_pop_on_update(false), m_fading(false), m_loading_fading(false){
 		m_fade = new FadeInFadeOut("Overlays/FadeInOut", "Examples/Fade");
 }
 
@@ -71,7 +71,7 @@ bool StateManager::Update(float dt){
 
 void StateManager::ManageState(const Ogre::String& id, State* state){
 	state_info nsi(id, state);
-	nsi._state->Init(m_render_window, m_message_system, m_sound_manager, m_fade);
+	nsi._state->Init(m_render_window, m_message_system, m_fade);
 	m_states.push_back(nsi);
 }
 

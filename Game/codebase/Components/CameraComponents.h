@@ -84,6 +84,8 @@ protected:
 	float				m_camera_stick_rotation_acceleration;
 	float				m_camera_change_angle_after_player;
 
+	bool				m_on_ground;
+
 	//float				m_min_pitch_angle;
 	//float				m_max_pitch_angle;
 

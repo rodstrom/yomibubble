@@ -9,6 +9,7 @@ SoundManager::SoundManager(){
     mSoundDeletesPending = new std::list<OgreOggISound*>;
 
 	m_sound_manager->init();
+
 	/*
 	m_ear_node = scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(0,0,0), Ogre::Quaternion::IDENTITY);
 	m_ear_node->attachObject(m_sound_manager->getListener());
@@ -24,14 +25,19 @@ SoundManager::~SoundManager(){
 	m_sound_manager = NULL;
 }
 
-void SoundManager::Init(Ogre::SceneManager* scene_manager){
+void SoundManager::Init(Ogre::SceneManager* scene_manager, bool play_state){
+	m_sound_manager->setSceneManager(scene_manager);
 	m_scene_manager = scene_manager;
 	m_ear_node = scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(0,0,0), Ogre::Quaternion::IDENTITY);
-	m_ear_node->attachObject(m_sound_manager->getListener());
+	if (play_state == true){
+		m_ear_node->attachObject(m_sound_manager->getListener());
+	}
+	//System::Notify
 }
 
 void SoundManager::Exit(){
 	m_scene_manager = NULL;
+	//m_sound_manager->destroyAllSounds();
 }
 
 void SoundManager::LoadAudio(){
@@ -45,20 +51,59 @@ void SoundManager::LoadAudio(){
 	m_sound_manager->createSound("Bounce_2", "SFX/Yomi/Bounce_2.wav", false, false, true);
 	m_sound_manager->createSound("Bounce_3", "SFX/Yomi/Bounce_3.wav", false, false, true);
 	m_sound_manager->createSound("Bounce_4", "SFX/Yomi/Bounce_4.wav", false, false, true);
+	
+	/////////////////////// YOMI VOICE ACTING //////////////////////
+	m_sound_manager->createSound("Yomi_Balance_1", "SFX/Yomi/Voice/Balance_1.wav", false, false, true);
+	m_sound_manager->createSound("Yomi_Balance_2", "SFX/Yomi/Voice/Balance_2.wav", false, false, true);
+	m_sound_manager->createSound("Yomi_Jump_1", "SFX/Yomi/Voice/Jump_1.wav", false, false, true);
+	m_sound_manager->createSound("Yomi_Jump_2", "SFX/Yomi/Voice/Jump_2.wav", false, false, true);
+	m_sound_manager->createSound("Yomi_Jump_3", "SFX/Yomi/Voice/Jump_3.wav", false, false, true);
+	m_sound_manager->createSound("Yomi_Land_1", "SFX/Yomi/Voice/Land_1.wav", false, false, true);
+	m_sound_manager->createSound("Yomi_Land_2", "SFX/Yomi/Voice/Land2.wav", false, false, true);
+	m_sound_manager->createSound("Yomi_Giggle", "SFX/Yomi/Voice/Take_Leaf_Giggle.wav", false, false, true);
+	
+	//////////////////// HIDEHOG SOUNDS /////////////////////////
+	m_sound_manager->createSound("Hidehog_Excited", "SFX/Tott/Hidehog/Excited.wav", false, false, true);
+	m_sound_manager->createSound("Hidehog_Idle", "SFX/Tott/Hidehog/Idle.wav", false, false, true);
+	m_sound_manager->createSound("Hidehog_React", "SFX/Tott/Hidehog/React.wav", false, false, true);
 
+	//////////////////// KITTYSHROOM SOUNDS /////////////////////////
+	m_sound_manager->createSound("Kittyshroom_Idle", "SFX/Tott/Kittyshroom/Idle.wav", false, false, true);
+	m_sound_manager->createSound("Kittyshroom_React", "SFX/Tott/Kittyshroom/React.wav", false, false, true);
+
+	//////////////////// NIGHTCAP SOUNDS /////////////////////////
+	m_sound_manager->createSound("Nightcap_Idle", "SFX/Tott/Nightcap/Idle.wav", false, false, true);
+	m_sound_manager->createSound("Nightcap_Bubble_Taken", "SFX/Tott/Nightcap/Bubble_Taken.wav", false, false, true);
+	m_sound_manager->createSound("Nightcap_Scared", "SFX/Tott/Nightcap/Scared.wav", false, false, true);
+
+	//////////////////// SHROOMFOX SOUNDS /////////////////////////
+	m_sound_manager->createSound("Shroomfox_Excited", "SFX/Tott/Shroomfox/Excited.wav", false, false, true);
+	m_sound_manager->createSound("Shroomfox_Idle1", "SFX/Tott/Shroomfox/Idle1.wav", false, false, true);
+	m_sound_manager->createSound("Shroomfox_Idle2", "SFX/Tott/Shroomfox/Idle2.wav", false, false, true);
+	m_sound_manager->createSound("Shroomfox_Idle3", "SFX/Tott/Shroomfox/Idle3.wav", false, false, true);
+	
+	//////////////////// MUSIC /////////////////////////
+	m_sound_manager->createSound("Tutorial_Theme", "Music/Menu_theme.wav", false, true, true);
+	m_sound_manager->createSound("Day_Theme", "Music/Day_area_theme.wav", false, true, true);
+	//ChangeVolume("Day_Theme", 0.5f);
+	m_sound_manager->createSound("Night_Theme", "Music/Night_area_theme.wav", false, true, true);
+	//ChangeVolume("Night_Theme", 0.2f);
+	m_sound_manager->createSound("Hidehog_Theme", "Music/Day_area_theme_Hidehog.wav", false, true, true);
+	//setta 3d-properties
+	Init3D("Hidehog_Theme", 0.20f, 1.0f, 0.150f);
+	m_sound_manager->createSound("Shroomfox_Theme", "Music/Day_area_theme_Shroomfox.wav", false, true, true);
+	m_sound_manager->createSound("Nightcap_Theme", "Music/Night_area_theme_Nightcap.wav", false, true, true);
+	m_sound_manager->createSound("Ending_theme", "Music/Ending_theme.wav", false, true, true);
+	m_sound_manager->createSound("Menu_theme", "Music/Menu_theme.wav", false, true, true);
 	m_sound_manager->createSound("Bounce", "SFX/Yomi/Bounce.wav", false, false, true);
 	ChangeVolume("Bounce", 0.5f);
 
-	m_sound_manager->createSound("Dun_Dun", "SFX/Tott/Bristlestick_Zoom_mono.wav", false, false, true);
-	m_sound_manager->getSound("Dun_Dun")->setMinVolume(0.0f);
-	m_sound_manager->getSound("Dun_Dun")->setMaxVolume(1.0f);
+	//m_sound_manager->createSound("Dun_Dun", "SFX/Tott/Bristlestick_Zoom_mono.wav", false, false, true);
+	//m_sound_manager->getSound("Dun_Dun")->setMinVolume(0.0f);
+	//m_sound_manager->getSound("Dun_Dun")->setMaxVolume(1.0f);
 
 	//m_sound_manager->createSound("Main_Theme", "Music/Day_area_theme_mono.wav", false, true, true);
-	m_sound_manager->createSound("Tutorial_Theme", "Music/Menu_theme.wav", false, true, true);
-	m_sound_manager->createSound("Day_Theme", "Music/Day_area_theme.wav", false, true, true);
-	ChangeVolume("Day_Theme", 0.5f);
-	m_sound_manager->createSound("Night_Theme", "Music/Night_area_theme.wav", false, true, true);
-	ChangeVolume("Night_Theme", 0.2f);
+	
 
 	//Init3D("Main_Theme", 10.0f, 10.0f, 150.0f);
 
@@ -153,9 +198,10 @@ void SoundManager::ChangePitch(Ogre::String name, float new_pitch){ //Around 0.0
 
 void SoundManager::Update(Ogre::SceneManager* scene_manager, float dt){
 	m_sound_manager->update(dt);
-
-//	m_ear_node->setPosition(scene_manager->getSceneNode(m_yomi_node_name)->getPosition());
-//	m_ear_node->setOrientation(scene_manager->getSceneNode(m_yomi_node_name)->getOrientation());
+	if (m_ear_node && m_yomi_node_name != ""){
+	m_ear_node->setPosition(scene_manager->getSceneNode(m_yomi_node_name)->getPosition());
+	m_ear_node->setOrientation(scene_manager->getSceneNode(m_yomi_node_name)->getOrientation());
+	}
 
 //	std::cout << "Ear node pos : " << m_ear_node->getPosition() << std::endl;
 	processSoundDeletesPending();

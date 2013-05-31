@@ -8,6 +8,7 @@
 #include "..\Managers\GameObjectManager.h"
 #include "..\Managers\SoundManager.h"
 #include "..\PhysicsPrereq.h"
+#include "..\MessageSystem.h"
 
 void NodeComponent::Init(const Ogre::Vector3& pos, Ogre::SceneManager* scene_manager){
 	m_scene_manager = scene_manager;
@@ -141,7 +142,6 @@ void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* 
 void AnimationComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager, const Ogre::String& node_id, bool remove_weights){
 	MeshRenderComponent::Init(filename, scene_manager, node_id);
 	m_entity->getSkeleton()->setBlendMode(ANIMBLEND_CUMULATIVE);
-	//m_animation_blender = new AnimationBlender(GetEntity());
 	if (remove_weights){
 		FixPlayerWeights();
 	}
@@ -200,7 +200,6 @@ void AnimationComponent::FixPlayerWeights(){
 	Ogre::String line = Ogre::StringUtil::BLANK;
 	Ogre::String anim_id = Ogre::StringUtil::BLANK;
 	Ogre::String base = "Base";
-	Ogre::String blow = "Blow";
 	Ogre::String top = "Top";
 
 	for (int i = 0; i < m_entity->getSkeleton()->getNumAnimations(); i++){
@@ -209,11 +208,6 @@ void AnimationComponent::FixPlayerWeights(){
 		size_t find = anim_id.find(base);
 		if (find  != std::string::npos){
 			RemoveWeights(top_anims, anim);
-			continue;
-		}
-		find = anim_id.find(blow);
-		if (find != std::string::npos){
-			RemoveWeights(base_anims, anim);
 			continue;
 		}
 		find = anim_id.find(top);
@@ -244,52 +238,12 @@ void AnimationComponent::AddAnimationState(const Ogre::String& anim_name, bool l
 
 void AnimationComponent::Update(float dt){
 	for (unsigned int i = 0; i < m_animation_states.size(); i++){
-		//if (m_animation_states[i].anim_state != NULL){
-			//if (m_animation_states[i].anim_state->getEnabled()){
-				//m_animation_states[i].anim_state->addTime(dt);
-			//if (m_animation_states[i].active){
-				m_animation_states[i].animation_blender->addTime(dt);
-			//}
-				/*if (!m_animation_states[i].anim_state->getLoop() && m_animation_states[i].anim_state->hasEnded()){
-					if (m_animation_states[i].wait){
-						m_animation_states[i].wait = false;
-					}
-					if (m_callback){
-						m_callback();
-						m_callback = NULL;
-					}
-					PlayQueued();
-				}*/
-			//}
-		//}
+		m_animation_states[i].animation_blender->addTime(dt);
 	}
 }
 
 void AnimationComponent::PlayQueued(){
-	/*if (!m_queue.empty()){
-		if (m_animation_states[m_queue.front().index].anim_state != NULL){
-			if (m_animation_states[m_queue.front().index].anim_state->getEnabled()){
-				m_animation_states[m_queue.front().index].anim_state->setTimePosition(0);
-				m_animation_states[m_queue.front().index].anim_state->setEnabled(false);
-				m_animation_states[m_queue.front().index].id = Ogre::StringUtil::BLANK;
-			}
-		}
-		if (m_queue.front().full_body){
-			if (m_animation_states[1].anim_state != NULL){
-				if (m_animation_states[1].anim_state->getEnabled()){
-					m_animation_states[1].anim_state->setTimePosition(0);
-					m_animation_states[1].anim_state->setEnabled(false);
-					m_animation_states[1].id = Ogre::StringUtil::BLANK;
-				}
-			}
-		}
-		m_animation_states[m_queue.front().index].anim_state = m_entity->getAnimationState(m_queue.front().id);
-		m_animation_states[m_queue.front().index].anim_state->setEnabled(true);
-		m_animation_states[m_queue.front().index].anim_state->setLoop(m_queue.front().loop);
-		m_animation_states[m_queue.front().index].anim_state->setTimePosition(0);
-		m_animation_states[m_queue.front().index].id = m_queue.front().id;
-		m_queue.pop_front();
-	}*/
+
 }
 
 void AnimationComponent::Notify(int type, void* msg){
@@ -310,10 +264,6 @@ void AnimationComponent::Notify(int type, void* msg){
 	case MSG_ANIMATION_PAUSE:
 		{
 			int index = *static_cast<int*>(msg);
-			//m_animation_states[index].animation_blender->getSource()->setWeight(0);
-			//m_animation_states[index].active = false;
-			//m_animation_states[index].animation_blender->getSource()->setTimePosition(0);
-			//m_animation_states[index].animation_blender->getSource()->setEnabled(false);
 		}
 		break;
 	case MSG_ANIMATION_LOOP:
@@ -342,7 +292,7 @@ void AnimationComponent::Notify(int type, void* msg){
 	case MSG_ANIMATION_SET_WAIT:
 		{
 			int index = *static_cast<int*>(msg);
-			m_animation_states[index].wait = true;
+			//m_animation_states[index].wait = true;
 		}
 		break;
 	case MSG_ANIMATION_GET_CURRENT_NAME:
@@ -703,9 +653,6 @@ void TerrainComponent::Init(Ogre::SceneManager* scene_manager, PhysicsEngine* ph
 	m_physics_engine = physics_engine;
 	m_artifex_loader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_scene_manager->getCamera("MainCamera"), physics_engine, game_object_manager, sound_manager, "../../resources/terrain/");
 
-//mArtifexLoader = new ArtifexLoader(Ogre::Root::getSingletonPtr(), m_scene_manager, NULL, m_camera, m_game_object_manager, m_sound_manager, "../../resources/terrain/");
-
-
 	m_artifex_loader->loadZone(filename, true, true, true, true, true, false);
 	Ogre::Terrain* terrain = m_artifex_loader->mTerrain;
 	size_t w = terrain->getSize();
@@ -755,7 +702,6 @@ void TerrainComponent::Init(Ogre::SceneManager* scene_manager, PhysicsEngine* ph
 	m_collision_def.flag = COLLISION_FLAG_STATIC;
 	m_collision_def.data = m_owner;
 	m_terrain_body->setUserPointer(&m_collision_def);
-	//m_artifex_loader->mTerrain->setPosition(Ogre::Vector3(20000, 0, 20000));
 }
 
 void TerrainComponent::Update(float dt){
@@ -771,8 +717,7 @@ void PlayerStaffComponent::Notify(int type, void* msg){
 }
 
 void PlayerStaffComponent::Update(float dt){
-	Ogre::Bone* bone = m_player_entity->getSkeleton()->getBone("CATRigLArmDigit21");
-	Ogre::Vector3 pos = bone->_getDerivedPosition() * m_node->_getDerivedPosition();
+
 }
 
 void PlayerStaffComponent::Shut(){
@@ -842,12 +787,12 @@ void SpeechBubbleComponent::Update(float dt){
 	
 	if (m_player_collide){
 		//static_cast<MeshRenderComponent*>(m_owner->GetComponent(COMPONENT_MESH_RENDER))->GetEntity()->setMaterialName("SolidColor/Blue");
-		m_messenger->Notify(MSG_MESH_SET_MATERIAL_NAME, &Ogre::String("SpeechCherry"));
+		//m_messenger->Notify(MSG_MESH_SET_MATERIAL_NAME, &Ogre::String("SpeechCherry"));
 		//ScaleUp();
 	}
 	else {
 		//static_cast<MeshRenderComponent*>(m_owner->GetComponent(COMPONENT_MESH_RENDER))->GetEntity()->setMaterialName("SolidColor/Green");
-		m_messenger->Notify(MSG_MESH_SET_MATERIAL_NAME, &Ogre::String("SpeechCherryInvisible"));
+		//m_messenger->Notify(MSG_MESH_SET_MATERIAL_NAME, &Ogre::String("SpeechCherryInvisible"));
 		//ScaleDown();
 	}
 
@@ -864,7 +809,7 @@ void SpeechBubbleComponent::Init(Ogre::SceneNode* node, SceneManager* scene_mana
 	m_node = node;
 	m_player_collide = false;
 	m_current_scale = 1.0f;
-
+	m_messenger->Notify(MSG_MESH_SET_MATERIAL_NAME, &Ogre::String("SpeechCherry"));
 	m_tott = tott;
 
 	//m_messenger->Notify(MSG_NODE_ATTACH_ENTITY, static_cast<MeshRenderComponent*>(m_owner->GetComponent(COMPONENT_MESH_RENDER))->GetEntity());
@@ -957,8 +902,8 @@ void TutorialGraphicsComponent::Update(float dt){
 	if (m_overlay->isVisible()){
 		if (m_first_pic){
 			Ogre::Overlay::Overlay2DElementsIterator it = m_overlay->get2DElementsIterator();
-			Ogre::OverlayContainer* container = it.peekNext();		
-			container->setMaterialName(m_pic_one); 
+			Ogre::OverlayContainer* container = it.peekNext();
+			container->setMaterialName(m_pic_one);
 		}
 		else{
 			Ogre::Overlay::Overlay2DElementsIterator it = m_overlay->get2DElementsIterator();
@@ -967,3 +912,97 @@ void TutorialGraphicsComponent::Update(float dt){
 		}
 	}
 };
+
+void GateControllerComponent::Notify(int type, void* msg){
+	switch (type){
+	case MSG_GATE_OPEN_GET:
+		{
+			if (m_counter <= 0){
+				*static_cast<bool*>(msg) = true;
+			}
+			else {
+				*static_cast<bool*>(msg) = false;
+			}
+		}
+		break;
+	default:
+		break;
+	}
+}
+
+void GateControllerComponent::Shut(){
+	m_messenger->Unregister(MSG_GATE_OPEN_GET, this);
+	m_message_system->Unregister(EVT_LEAF_PICKUP, this);
+}
+
+void GateControllerComponent::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
+	m_messenger->Register(MSG_GATE_OPEN_GET, this);
+}
+
+void GateControllerComponent::Update(float dt){
+	if (!m_can_decrease) {   // ugly hack to prevent double pickup
+		m_timer += dt;
+		if (m_timer >= 1.0f){
+			m_can_decrease = true;
+		}
+	}
+	if (m_rotate){
+		float y_axis = m_left_gate_node->getOrientation().y;
+		if (y_axis >= 0.7f){
+			m_rotate = false;
+		}
+		float rot_speed = 0.1f * dt;
+		m_left_gate_node->rotate(Ogre::Quaternion(1.0f, 0.0f, rot_speed, 0.0f));
+		m_right_gate_node->rotate(Ogre::Quaternion(1.0f, 0.0f, -rot_speed, 0.0f));
+	}
+}
+
+void GateControllerComponent::Init(MessageSystem* message_system, int leaves){
+	m_counter = leaves;
+	m_message_system = message_system;
+	m_message_system->Register(EVT_LEAF_PICKUP, this, &GateControllerComponent::LeafPickup);
+	m_messenger->Notify(MSG_CHILD_NODE_GET_NODE, &m_left_gate_node, "left_gate_node");
+	m_messenger->Notify(MSG_CHILD_NODE_GET_NODE, &m_right_gate_node, "right_gate_node");
+}
+
+void GateControllerComponent::LeafPickup(IEvent* evt){
+	if (evt->m_type == EVT_LEAF_PICKUP){
+		if (m_can_decrease){
+			m_counter--;
+			if (m_counter <= 0){
+				this->OpenGate();
+			}
+			else {
+				m_can_decrease = false;
+				m_timer = 0.0f;
+			}
+		}
+	}
+}
+
+void GateControllerComponent::OpenGate(){
+	m_rotate = true;
+}
+
+void RotationComponent::Notify(int type, void* message){
+
+}
+
+void RotationComponent::Shut(){
+
+}
+
+void RotationComponent::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
+}
+
+void RotationComponent::Update(float dt){
+	float rot_speed = m_rotation_speed * dt;
+	m_node->rotate(Ogre::Quaternion(1.0f, 0.0f, rot_speed, 0.0f));
+}
+
+void RotationComponent::Init(Ogre::SceneNode* node, float rotation_speed){
+	m_node = node;
+	m_rotation_speed = rotation_speed;
+}

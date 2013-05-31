@@ -1,15 +1,16 @@
 #include "stdafx.h"
 #include "InputSystem.h"
 #include "Game.h"
-
+#include "MessageSystem.h"
 #include <iostream>
 
-InputSystem::InputSystem(Game* game, Ogre::RenderWindow* render_window) : 
+InputSystem::InputSystem(Game* game, Ogre::RenderWindow* render_window, MessageSystem* message_system) : 
 m_game(game),
 m_render_window(render_window),
 m_mouse(nullptr),
 m_keyboard(nullptr),
 m_ois_input_manager(nullptr),
+m_message_system(message_system),
 m_last_x(0.0f), m_last_z(0.0f), 
 m_delta_zoom(0.0f),
 m_movement_dead_zone(0.2f),
@@ -26,8 +27,10 @@ void InputSystem::Init(){
 		m_render_window->getCustomAttribute("WINDOW", &windowHnd);
 		windowHndStr << windowHnd;
 		pl.insert(std::make_pair(std::string("WINDOW"), windowHndStr.str()));
+#ifndef NO_CONSOLE
 		pl.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_FOREGROUND")));
 		pl.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_NONEXCLUSIVE")));
+#endif
 		m_ois_input_manager = OIS::InputManager::createInputSystem(pl);
 		
 		if (m_ois_input_manager->getNumberOfDevices(OIS::OISKeyboard) > 0){
@@ -181,7 +184,6 @@ bool InputSystem::keyPressed(const OIS::KeyEvent& e){
 		m_game->InjectPressedButton(BTN_ARROW_LEFT);
 		break;
 	case OIS::KC_W:
-		m_game->InjectRelativeMovementZ(1.0f);
 		break;
 	case OIS::KC_S:
 		break;
@@ -216,16 +218,16 @@ bool InputSystem::keyReleased(const OIS::KeyEvent& e){
 		m_game->InjectReleasedButton(BTN_ARROW_LEFT);
 		break;
 	case OIS::KC_W:
-		//m_game->InjectRelativeMovementZ(0.0f);
+		m_game->InjectRelativeMovementZ(0.0f);
 		break;
 	case OIS::KC_S:
-		//m_game->InjectRelativeMovementZ(0.0f);
+		m_game->InjectRelativeMovementZ(0.0f);
 		break;
 	case OIS::KC_A:
-		//m_game->InjectRelativeMovementX(0.0f);
+		m_game->InjectRelativeMovementX(0.0f);
 		break;
 	case OIS::KC_D:
-		//m_game->InjectRelativeMovementX(0.0f);
+		m_game->InjectRelativeMovementX(0.0f);
 		break;
 	case OIS::KC_SPACE:
 		m_game->InjectReleasedButton(BTN_A);
@@ -287,9 +289,17 @@ bool InputSystem::axisMoved(const OIS::JoyStickEvent& e, int axis){
 	if(e.state.mAxes[0].abs > 16384 || e.state.mAxes[0].abs < -16384) {
 		float movement = e.state.mAxes[0].abs * 0.50000005f;
 		//m_game->InjectRelativeMovementZ(movement);
+		if(e.state.mAxes[0].abs < 0) {
+			m_game->InjectPressedButton(BTN_UP);
+		}
+		else {			
+			m_game->InjectPressedButton(BTN_DOWN);
+		}
 	}
 	else {
 		//m_game->InjectRelativeMovementZ(0.0f);
+		m_game->InjectReleasedButton(BTN_UP);
+		m_game->InjectReleasedButton(BTN_DOWN);
 	}
 
 	if(e.state.mAxes[1].abs > 16384 || e.state.mAxes[1].abs < -16384) {
@@ -357,7 +367,7 @@ bool InputSystem::buttonPressed(const OIS::JoyStickEvent& e, int button){
 		
 		break;
 	case 6: //Back Button
-		
+		m_game->InjectPressedButton(BTN_BACK);
 		break;
 	case 5: //Right Button
 		m_delta_zoom += 30.00005f;
@@ -376,10 +386,11 @@ bool InputSystem::buttonPressed(const OIS::JoyStickEvent& e, int button){
 		m_game->InjectPressedButton(BTN_X);
 		break;
 	case 1: //OIS::MouseButtonID::MB_Right: //or GamePad B
-		m_game->InjectPressedButton(BTN_LEFT_MOUSE);
+		//m_game->InjectPressedButton(BTN_A);
+		//m_game->InjectPressedButton(BTN_LEFT_MOUSE);
 		break;
 	case 0: //OIS::MouseButtonID::MB_Left: //or GamePad A
-		m_game->InjectPressedButton(BTN_START);
+		m_game->InjectPressedButton(BTN_A);
 		break;
 	default:
 		break;
@@ -411,7 +422,7 @@ bool InputSystem::buttonReleased(const OIS::JoyStickEvent& e, int button){
 		
 		break;
 	case 6: //Back Button
-		
+		m_game->InjectReleasedButton(BTN_BACK);
 		break;
 	case 5: //Right Button
 		m_delta_zoom = 0.0f;
@@ -426,10 +437,11 @@ bool InputSystem::buttonReleased(const OIS::JoyStickEvent& e, int button){
 		m_game->InjectReleasedButton(BTN_X);
 		break;
 	case 1: //OIS::MouseButtonID::MB_Right: //or GamePad B
-		m_game->InjectReleasedButton(BTN_LEFT_MOUSE);
+		//m_game->InjectReleasedButton(BTN_A);
+		//m_game->InjectReleasedButton(BTN_LEFT_MOUSE);
 		break;
 	case 0: //OIS::MouseButtonID::MB_Left: //or GamePad A
-		m_game->InjectReleasedButton(BTN_START);
+		m_game->InjectReleasedButton(BTN_A);
 		break;
 	default:
 		break;
@@ -442,5 +454,7 @@ void InputSystem::windowResized(Ogre::RenderWindow* rw){
 }
 
 void InputSystem::windowClosed(Ogre::RenderWindow* rw){
-	
+	IEvent evt;
+	evt.m_type = EVT_QUIT;
+	m_message_system->Notify(&evt);
 }

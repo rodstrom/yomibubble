@@ -88,7 +88,7 @@ void ArtifexLoader::createLight() {
 	if (cfgfile.getSetting("Ambient_Light_R")=="") mAmbientR=0.5f;*/
 
 	float diffuse_default = 1.0f;
-	float specular_default = 0.0f;
+	float specular_default = 1.0f;
 	float specular_r, specular_g, specular_b, specular_a, diffuse_r, diffuse_g, diffuse_b, diffuse_a;
 
 	diffuse_r = strToF(cfgfile.getSetting("Diffuse_Light_R"));

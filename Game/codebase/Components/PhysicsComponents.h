@@ -4,6 +4,7 @@
 #include "ComponentsPrereq.h"
 #include "GameObjectPrereq.h"
 #include "BulletCollision\CollisionDispatch\btGhostObject.h"
+#include "..\Managers\SoundManager.h"
 
 class PhysicsEngine;
 class RigidbodyComponent : public Component, public IComponentObserver{
@@ -12,6 +13,7 @@ public:
 	virtual ~RigidbodyComponent(void){}
 	virtual void Notify(int type, void* message);
 	virtual void Init(const Ogre::Vector3& position, Ogre::Entity* entity, PhysicsEngine* physics_engine, const RigidBodyDef& def);
+	virtual void Init(const Ogre::Vector3& pos, PhysicsEngine* physics_engine, const RigidBodyDef& def);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
 	btRigidBody* GetRigidbody() { return m_rigidbody; }
@@ -91,6 +93,8 @@ public:
 	void SetMaxSpeed(float value) { m_max_speed = value; }
 	void SetDeacceleration(float value) { m_deceleration = value; }
 
+
+
 protected:
 	void ApplyRotation(const Ogre::Vector3& dir, float dt);
 	void ApplyImpulse(const Ogre::Vector3& dir, float dt);
@@ -147,6 +151,12 @@ public:
 	void Happy();
 	
 	TottDef m_def;
+	bool m_quest_done;
+	float m_state_timer_counter;
+	float m_state_timer;
+	bool m_can_change_state;
+
+	SoundData3D m_music;
 	
 protected:
 	TOTT_STATE m_state;
@@ -279,23 +289,29 @@ protected:
 	float m_bounce_power;
 };
 
-class BobbingComponent : public Component, public IComponentUpdateable{
+class BobbingComponent : public Component, public IComponentUpdateable, public IComponentObserver{
 public:
-	BobbingComponent(void){}
+	BobbingComponent(void) : m_player_node(NULL), m_start_moving(false){}
 	virtual ~BobbingComponent(void){}
 
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
+	virtual void Notify(int type, void* msg);
 	virtual void Init(Ogre::SceneNode* node);
 	virtual void Update(float dt);
 
 private:
 	Ogre::SceneNode* m_node;
-
+	Ogre::SceneNode* m_player_node;
 	float m_current_time;
 	float m_bob_timer;
-
+	float m_rotation_speed;
+	bool m_start_moving;	// decides if the leaf should start moving towards the player or not
 	bool m_up;
+	float m_y_distance;
+	float m_move_speed;
+	float m_scale_speed;
+	float m_min_scale;
 };
 
 #endif // _N_PHYSICS_COMPONENTS_H_

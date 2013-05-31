@@ -19,6 +19,9 @@ PlayState::~PlayState(void){}
 void PlayState::Enter(){
 	m_message_system->Register(EVT_CHANGE_LEVEL, this, &PlayState::ChangeLevel);
 	m_scene_manager = Ogre::Root::getSingleton().createSceneManager("OctreeSceneManager");
+	m_sound_manager = new SoundManager;
+	m_sound_manager->Init(m_scene_manager, true);
+	m_sound_manager->LoadAudio();
 	m_physics_engine = new PhysicsEngine;
 	m_physics_engine->Init();
 	m_camera = m_scene_manager->createCamera("MainCamera");
@@ -28,8 +31,8 @@ void PlayState::Enter(){
 	m_viewport = m_render_window->addViewport(m_camera);
 	m_camera->setAspectRatio(Ogre::Real(m_viewport->getActualWidth()) / Ogre::Real(m_viewport->getActualHeight()));
 
-	//Ogre::CompositorManager::getSingleton().addCompositor(m_viewport, "Bloom");
-	//Ogre::CompositorManager::getSingleton().setCompositorEnabled(m_viewport, "Bloom", true);
+	Ogre::CompositorManager::getSingleton().addCompositor(m_viewport, "Bloom");
+	Ogre::CompositorManager::getSingleton().setCompositorEnabled(m_viewport, "Bloom", true);
 
 	m_game_object_manager = new GameObjectManager;
 	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager, m_message_system, NULL);
@@ -41,16 +44,18 @@ void PlayState::SecondLoading(){
 	//Ogre::Plane plane(Ogre::Vector3::UNIT_Y, -10);
 	//Ogre::MeshManager::getSingleton().createPlane("plane", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane, 50, 50, 20, 20, true, 1, 5, 5, Ogre::Vector3::UNIT_Z);
 
-	//m_scene_manager->setShadowUseInfiniteFarPlane(false);
-	//m_scene_manager->setShadowTextureSelfShadow(false);
-	//m_scene_manager->setShadowCasterRenderBackFaces(false);
-	//m_scene_manager->setShadowTextureCount(1);
-	//m_scene_manager->setShadowTextureSize(2048);
-	//m_scene_manager->setShadowColour(Ogre::ColourValue(0.5f,0.5f,0.6f,1.0f));
-	//m_scene_manager->setShadowFarDistance(30.0f);
-	//m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
-
-	m_level_manager = new LevelManager(m_game_object_manager, m_scene_manager, m_physics_engine);
+#ifdef NDEBUG
+	m_scene_manager->setShadowUseInfiniteFarPlane(false);
+	m_scene_manager->setShadowTextureSelfShadow(false);
+	m_scene_manager->setShadowCasterRenderBackFaces(false);
+	m_scene_manager->setShadowTextureCount(1);
+	m_scene_manager->setShadowTextureSize(2048);
+	m_scene_manager->setShadowColour(Ogre::ColourValue(0.5f,0.5f,0.6f,1.0f));
+	m_scene_manager->setShadowFarDistance(30.0f);
+	m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
+#endif
+	std::function<void()> func = [this] { ChangeToWinState(); };
+	m_level_manager = new LevelManager(m_game_object_manager, m_scene_manager, m_physics_engine, func);
 	LevelDef level1;
 	level1.filepath = "try";
 	level1.next_level = "Dayarea";
@@ -78,9 +83,11 @@ void PlayState::Exit(){
 	m_physics_engine->Shut();
 	delete m_physics_engine;
 	m_physics_engine = NULL;
+	m_sound_manager->Exit();
+	delete m_sound_manager;
+	m_sound_manager = NULL;
 	m_render_window->removeAllViewports();
 	Ogre::Root::getSingleton().destroySceneManager(m_scene_manager);
-	m_scene_manager = NULL;
 }
 
 bool PlayState::Update(float dt){
@@ -135,4 +142,8 @@ bool PlayState::Update(float dt){
 
 void PlayState::ChangeLevel(IEvent*) {
 	m_change_level = true;
+}
+
+void PlayState::ChangeToWinState(){
+	ChangeState(FindByName("WinState"));
 }

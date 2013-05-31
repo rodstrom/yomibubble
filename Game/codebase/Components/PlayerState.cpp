@@ -16,6 +16,9 @@
 #include "..\RaycastCollision.h"
 #include "GameObject.h"
 #include "..\Managers\GameObjectManager.h"
+#include "..\ExtraMath.h"
+#include <stdlib.h>     /* srand, rand */
+#include <time.h>       /* time */
 
 ComponentMessenger* PlayerState::s_messenger = NULL;
 AnimationManager* PlayerState::s_animation = NULL;
@@ -71,10 +74,16 @@ void PlayerIdle::Update(float dt){
 	}
 
 	if (s_input_component->GetInputManager()->IsButtonPressed(BTN_A)){
+		if (s_manager->IsBlowingBubbles()){
+			s_manager->BlowBubble(false);
+		}
 		s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_JUMP));
 	}
 	bool on_ground = s_input_component->IsOnGround();
 	if (!on_ground){
+		if (s_manager->IsBlowingBubbles()){
+			s_manager->BlowBubble(false);
+		}
 		s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_FALLING));
 	}
 	if (s_input_component->GetInputManager()->IsButtonPressed(BTN_X) && !s_manager->IsBlowingBubbles() && !s_manager->IsHoldingObject()){
@@ -90,7 +99,6 @@ PlayerStateMove::PlayerStateMove(void){
 
 void PlayerStateMove::Enter(){
 	s_animation->PlayAnimation("Base_Walk");
-	s_messenger->Notify(MSG_SFX2D_PLAY, &m_walk_sound);
 	s_messenger->Notify(MSG_TGRAPH_STOP, &Ogre::String("Stick"));
 }
 
@@ -102,6 +110,7 @@ void PlayerStateMove::PlayTopAnimation(){
 }
 
 void PlayerStateMove::Update(float dt){
+	s_messenger->Notify(MSG_SFX2D_PLAY, &m_walk_sound);
 	Ogre::Vector3 dir = s_input_component->GetDirection();
 	float speed = dir.squaredLength();
 	Ogre::String move_bot = Ogre::StringUtil::BLANK;
@@ -128,10 +137,16 @@ void PlayerStateMove::Update(float dt){
 		}
 	}
 	if (s_input_component->GetInputManager()->IsButtonPressed(BTN_A)){
+		if (s_manager->IsBlowingBubbles()){
+			s_manager->BlowBubble(false);
+		}
 		s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_JUMP));
 	}
 	bool on_ground = s_input_component->IsOnGround();
 	if (!on_ground){
+		if (s_manager->IsBlowingBubbles()){
+			s_manager->BlowBubble(false);
+		}
 		s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_FALLING));
 	}
 	if (dir == Ogre::Vector3::ZERO){
@@ -144,25 +159,43 @@ void PlayerStateMove::Update(float dt){
 	s_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &dir);
 }
 
-PlayerBlowBubble::PlayerBlowBubble(void) : m_bubble(NULL), m_current_scale(0.0f) {
+PlayerBlowBubble::PlayerBlowBubble(PhysicsEngine* physics_engine) : m_bubble(NULL), m_current_scale(0.0f), m_physics_engine(physics_engine) {
 	m_type = PLAYER_STATE_BLOW_BUBBLE;
 	m_bubble_blow_sound = s_sound_manager->Create2DData("Blow_Bubble", false, false, false, false, 1.0f, 1.0f);
 	m_min_bubble_size = VariableManager::GetSingletonPtr()->GetAsFloat("Bubble_Min_Size");
 	m_max_bubble_size = VariableManager::GetSingletonPtr()->GetAsFloat("Bubble_Max_Size");
 	m_bubble_gravity = VariableManager::GetSingletonPtr()->GetAsFloat("BlueBubbleGravity");
+	s_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &m_player_body, "body");
+	s_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &m_trigger_body, "btrig");
+	s_messenger->Notify(MSG_CHILD_NODE_GET_NODE, &m_child_node);
+	s_messenger->Notify(MSG_NODE_GET_NODE, &m_player_node);
 }
 
 void PlayerBlowBubble::Enter(){
+	m_hit_wall = false;
+	Ogre::Vector3 from = m_player_node->getPosition();
+	Ogre::Vector3 to = m_child_node->_getDerivedPosition();
+	from.y += 0.5f;		// player offset in Y from pivot
+	IgnoreBodyCast ray(m_player_body);
+	m_physics_engine->GetDynamicWorld()->rayTest(BtOgre::Convert::toBullet(from), BtOgre::Convert::toBullet(to), ray);
+
+
 	btRigidBody* body = NULL;
 	Ogre::SceneNode* node = NULL;
+	Ogre::SceneNode* child_node = NULL;
 	s_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &body, "btrig");
 	s_messenger->Notify(MSG_CHILD_NODE_GET_NODE, &node);
 	Ogre::Vector3 pos = node->_getDerivedPosition();
 	BubbleDef bubble_def;
 	bubble_def.connection_body = body;
 	bubble_def.start_scale = 0.002f;
-	bubble_def.friction = 1.0f;
+	bubble_def.friction = 0.5f;
 	bubble_def.restitution = 0.2f;
+	if (ray.hasHit()){
+		Ogre::Vector3 lerp = Lerp(from, to, ray.m_closestHitFraction - 0.1f);	// 0.1f is a slight offset to put the target position closer to the player
+		pos = lerp;
+		m_hit_wall = true;
+	}
 	if (s_input_component->GetInputManager()->IsButtonDown(BTN_RIGHT_MOUSE)){
 		m_bubble = s_input_component->GetOwner()->GetGameObjectManager()->CreateGameObject(GAME_OBJECT_PINK_BUBBLE, pos, &bubble_def);
 		m_bubble_type = BUBBLE_TYPE_PINK;
@@ -173,21 +206,54 @@ void PlayerBlowBubble::Enter(){
 		m_bubble_type = BUBBLE_TYPE_BLUE;
 		s_messenger->Notify(MSG_TGRAPH_STOP, &Ogre::String("BlueBubble"));
 	}
+
 	s_messenger->Notify(MSG_RIGIDBODY_POSITION_SET, &pos, "btrig");
 	s_messenger->Notify(MSG_SFX2D_PLAY, &m_bubble_blow_sound);
 	//s_animation->PlayAnimation("Top_Blow_Start");
 }
 
 void PlayerBlowBubble::Exit(){
-	//s_animation->PlayAnimation("Top_Blow_End");
-	//int index = 1;
-	//s_messenger->Notify(MSG_ANIMATION_SET_WAIT, &index);
+	if (m_bubble_type == BUBBLE_TYPE_BLUE){
+		if (m_current_scale < m_min_bubble_size){
+			m_current_scale = m_min_bubble_size;
+			Ogre::Vector3 scale_incr(m_current_scale);
+			m_bubble->GetComponentMessenger()->Notify(MSG_INCREASE_SCALE_BY_VALUE, &scale_incr);
+		}
+		btRigidBody* bubble_body = NULL;
+		m_bubble->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GET_BODY, &bubble_body, "body");
+		bubble_body->setLinearVelocity(btVector3(0,0,0));
+		bubble_body->setLinearFactor(btVector3(0,1,0));
+		m_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_READY, NULL);
+		this->CreateTriggerForBubble();
+		Ogre::Vector3 gravity(0,-m_bubble_gravity,0);
+		m_bubble->RemoveComponent(COMPONENT_POINT2POINT_CONSTRAINT);
+		m_bubble->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GRAVITY_SET, &gravity);
+		m_current_scale = 0.0f;
+		m_bubble = NULL;
+	}
+	else if (m_bubble_type == BUBBLE_TYPE_PINK){
+		if (m_current_scale < m_min_bubble_size){
+			m_current_scale = m_min_bubble_size;
+			Ogre::Vector3 scale_incr(m_current_scale);
+			m_bubble->GetComponentMessenger()->Notify(MSG_INCREASE_SCALE_BY_VALUE, &scale_incr);
+		}
+		m_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_READY, NULL);
+		btRigidBody* bubble_body = NULL;
+		m_bubble->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GET_BODY, &bubble_body, "body");
+		bubble_body->setLinearVelocity(btVector3(0,0,0));
+		bubble_body->setLinearFactor(btVector3(1,0,1));
+		this->CreateTriggerForBubble();
+		m_current_scale = 0.0f;
+		m_bubble->RemoveComponent(COMPONENT_POINT2POINT_CONSTRAINT);
+		m_bubble = NULL;
+	}
+
 	s_messenger->Notify(MSG_SFX2D_STOP, &m_bubble_blow_sound);
 	s_messenger->Notify(MSG_ANIMATION_CLEAR_QUEUE, NULL);
 }
 
 void PlayerBlowBubble::Update(float dt){
-	s_animation->PlayAnimation("Top_Blow_Loop", true, AnimationBlender::BlendThenAnimate);
+	s_animation->PlayAnimation("Top_Blow_Loop");
 
 		const float SCALE = 0.91f * dt;
 		Ogre::Vector3 scale_inc;//(SCALE);
@@ -204,7 +270,7 @@ void PlayerBlowBubble::Update(float dt){
 			if (m_bubble != NULL)
 			{
 				s_input_component->GetOwner()->GetGameObjectManager()->RemoveGameObject(m_bubble);
-				m_bubble = NULL;
+				//m_bubble = NULL;
 				//insert pop sound here
 				SoundData2D pop_sound = s_sound_manager->Create2DData("Bubble_Burst", false, false, false, false, 1.0, 1.0);
 				s_messenger->Notify(MSG_SFX2D_PLAY, &pop_sound);
@@ -213,58 +279,36 @@ void PlayerBlowBubble::Update(float dt){
 			}
 		}
 		if (m_bubble_type == BUBBLE_TYPE_BLUE && s_input_component->GetInputManager()->IsButtonReleased(BTN_LEFT_MOUSE) && m_bubble != NULL){
-			if (m_current_scale < m_min_bubble_size){
-				m_current_scale = m_min_bubble_size;
-				Ogre::Vector3 scale_incr(m_current_scale);
-				m_bubble->GetComponentMessenger()->Notify(MSG_INCREASE_SCALE_BY_VALUE, &scale_incr);
-			}
-			btRigidBody* bubble_body = NULL;
-			m_bubble->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GET_BODY, &bubble_body, "body");
-			bubble_body->setLinearVelocity(btVector3(0,0,0));
-			bubble_body->setLinearFactor(btVector3(0,1,0));
-			m_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_READY, NULL);
-			this->CreateTriggerForBubble();
-			Ogre::Vector3 gravity(0,-m_bubble_gravity,0);
-			m_bubble->RemoveComponent(COMPONENT_POINT2POINT_CONSTRAINT);
-			m_bubble->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GRAVITY_SET, &gravity);
-			m_current_scale = 0.0f;
 			s_manager->BlowBubble(false);
-			m_bubble = NULL;
 		}
 		else if (m_bubble_type == BUBBLE_TYPE_PINK && s_input_component->GetInputManager()->IsButtonReleased(BTN_RIGHT_MOUSE) && m_bubble != NULL){
-			if (m_current_scale < m_min_bubble_size){
-				m_current_scale = m_min_bubble_size;
-				Ogre::Vector3 scale_incr(m_current_scale);
-				m_bubble->GetComponentMessenger()->Notify(MSG_INCREASE_SCALE_BY_VALUE, &scale_incr);
-			}
-			m_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_READY, NULL);
-			btRigidBody* bubble_body = NULL;
-			m_bubble->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GET_BODY, &bubble_body, "body");
-			bubble_body->setLinearVelocity(btVector3(0,0,0));
-			bubble_body->setLinearFactor(btVector3(1,0,1));
-			this->CreateTriggerForBubble();
-			m_current_scale = 0.0f;
 			s_manager->BlowBubble(false);
-			m_bubble->RemoveComponent(COMPONENT_POINT2POINT_CONSTRAINT);
-			m_bubble = NULL;
 		}
 
 		if (s_input_component->GetInputManager()->IsButtonDown(BTN_LEFT_MOUSE) && m_bubble != NULL || s_input_component->GetInputManager()->IsButtonDown(BTN_RIGHT_MOUSE) && m_bubble != NULL){
-			Ogre::SceneNode* player_node = NULL;
-			Ogre::SceneNode* child_node = NULL;
 			Ogre::SceneNode* bubble_node = NULL;
-			s_messenger->Notify(MSG_NODE_GET_NODE, &player_node);
-			s_messenger->Notify(MSG_CHILD_NODE_GET_NODE, &child_node);
 			m_bubble->GetComponentMessenger()->Notify(MSG_NODE_GET_NODE, &bubble_node);
 			if (m_bubble != NULL) {
-				if (child_node && bubble_node && player_node){
-					Ogre::Vector3 child_pos(child_node->_getDerivedPosition());
-					Ogre::Vector3 player_pos(player_node->_getDerivedPosition());
+				if (bubble_node){
+					Ogre::Vector3 child_pos(m_child_node->_getDerivedPosition());
+					Ogre::Vector3 player_pos(m_player_node->_getDerivedPosition());
 					Ogre::Vector3 dir = child_pos - player_pos;
 					dir.normalise();
 					float scale_size = (bubble_node->getScale().length() * 0.3f);
+					if (m_hit_wall){
+						btRigidBody* bubble_body = NULL;
+						m_bubble->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GET_BODY, &bubble_body, "body");
+						Ogre::Vector3 from = m_player_node->getPosition();
+						Ogre::Vector3 to = m_child_node->_getDerivedPosition();
+						from.y += 0.5f;		// player offset in Y from pivot
+						IgnoreBodyAndBubbleCast ray(m_player_body, bubble_body);
+						m_physics_engine->GetDynamicWorld()->rayTest(BtOgre::Convert::toBullet(from), BtOgre::Convert::toBullet(to), ray);
+						if (ray.hasHit()){
+							Ogre::Vector3 lerp = Lerp(from, to, ray.m_closestHitFraction - 0.1f);	// 0.1f is a slight offset to put the target position closer to the player
+							child_pos = lerp;
+						}
+					}
 					child_pos += (dir*scale_size);
-					float y_pos = child_node->_getDerivedPosition().y;
 					Ogre::Vector3 new_dir(child_pos);
 					s_messenger->Notify(MSG_RIGIDBODY_POSITION_SET, &new_dir, "btrig");		// btrig is the ID for the TriggerCompoent
 					m_bubble->GetComponentMessenger()->Notify(MSG_INCREASE_SCALE_BY_VALUE, &scale_inc);
@@ -300,16 +344,41 @@ void PlayerBlowBubble::CreateTriggerForBubble(){
 
 PlayerJump::PlayerJump(void){ 
 	m_type = PLAYER_STATE_JUMP;
+	m_jump_sfx_1 = s_sound_manager->Create2DData("Yomi_Jump_1", false, false, false, false, 1.0f, 1.0f);
+	m_jump_sfx_2 = s_sound_manager->Create2DData("Yomi_Jump_2", false, false, false, false, 1.0f, 1.0f);
+	m_jump_sfx_3 = s_sound_manager->Create2DData("Yomi_Jump_3", false, false, false, false, 1.0f, 1.0f);
 }
 
 void PlayerJump::Enter(){
 	s_messenger->Notify(MSG_TGRAPH_STOP, &Ogre::String("Jump"));
-	int p = 1;
-	s_messenger->Notify(MSG_ANIMATION_PAUSE, &p);
-	//s_animation->PlayAnimation("Base_Jump_Start");
-	s_animation->PlayAnimation("Base_Jump_Loop", true, AnimationBlender::BlendSwitch);
+	//int p = 1;
+	//s_messenger->Notify(MSG_ANIMATION_PAUSE, &p);
+	s_animation->PlayAnimation("Base_Jump_Start", false, AnimationBlender::BlendSwitch);
+	//s_animation->PlayAnimation("Base_Jump_Loop", true, AnimationBlender::BlendSwitch);
 	bool jump = true;
 	s_messenger->Notify(MSG_CHARACTER_CONTROLLER_JUMP, &jump);
+
+	//randomize IF a jump sound should play: if true, randomize a specific jump sound
+	srand (time(NULL));
+	int play_jump_sound = rand() % 10 + 1;
+	if (play_jump_sound < 7){
+		int which_jump_sound = rand() % 3 + 1;
+		switch(which_jump_sound){
+		case 1:
+			s_messenger->Notify(MSG_SFX2D_PLAY, &m_jump_sfx_1);
+			break;
+		case 2:
+			s_messenger->Notify(MSG_SFX2D_PLAY, &m_jump_sfx_2);
+			break;
+		case 3:
+			s_messenger->Notify(MSG_SFX2D_PLAY, &m_jump_sfx_3);
+			break;
+		default:
+			break;
+		}
+	}
+	else{}
+
 }
 
 void PlayerJump::Exit(){
@@ -317,6 +386,7 @@ void PlayerJump::Exit(){
 }
 
 void PlayerJump::Update(float dt){
+	s_animation->PlayAnimation("Base_Jump_Loop");
 	btRigidBody* body = NULL;
 	s_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &body, "body");
 	float y_vel = body->getLinearVelocity().y();
@@ -339,7 +409,7 @@ void PlayerJump::Update(float dt){
 }
 
 void PlayerFalling::Enter(){
-	s_animation->PlayAnimation("Base_Jump_Loop", true, AnimationBlender::BlendSwitch);
+	s_animation->PlayAnimation("Base_Jump_Loop");
 }
 
 void PlayerFalling::Exit(){
@@ -349,10 +419,17 @@ void PlayerFalling::Exit(){
 void PlayerFalling::Update(float dt){
 	bool on_ground = s_input_component->IsOnGround();
 	if (on_ground){
-		s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_LAND));
+		s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_IDLE));
+		std::cout << "Setting Idle FROM Fall\n";
 	}
 	Ogre::Vector3 dir = s_input_component->GetDirection();
 	s_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &dir);
+}
+
+PlayerLand::PlayerLand(){
+	m_type = PLAYER_STATE_LAND;
+	m_land_sfx_1 = s_sound_manager->Create2DData("Yomi_Land_1", false, false, false, false, 1.0f, 1.0f);
+	m_land_sfx_2 = s_sound_manager->Create2DData("Yomi_Land_2", false, false, false, false, 1.0f, 1.0f);
 }
 
 void PlayerLand::Enter(){
@@ -360,6 +437,23 @@ void PlayerLand::Enter(){
 	//s_animation->PlayAnimation("Base_Jump_End");
 	//std::function<void()> func = [this] { Proceed(); };
 	//s_messenger->Notify(MSG_ANIMATION_CALLBACK, &func);
+
+	srand (time(NULL));
+	int play_land_sound = rand() % 10 + 1;
+	if (play_land_sound < 6){
+		int which_land_sound = rand() % 2 + 1;
+		switch(which_land_sound){
+		case 1:
+			s_messenger->Notify(MSG_SFX2D_PLAY, &m_land_sfx_1);
+			break;
+		case 2:
+			s_messenger->Notify(MSG_SFX2D_PLAY, &m_land_sfx_2);
+			break;
+		default:
+			break;
+		}
+	}
+	else{}
 }
 
 void PlayerLand::Exit(){
@@ -386,12 +480,12 @@ void PlayerLand::Update(float dt){
 }
 
 void PlayerLand::Proceed(){
-	Ogre::Vector3 dir = s_input_component->GetDirection();
+	/*Ogre::Vector3 dir = s_input_component->GetDirection();
 	if (dir == Ogre::Vector3::ZERO){
 		int p = 1;
 		s_messenger->Notify(MSG_ANIMATION_PAUSE, &p);
 		s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_IDLE));
-	}
+	}*/
 }
 
 PlayerOnBubble::PlayerOnBubble(MessageSystem* message_system) : m_on_bubble_y_offset(0.0f), m_message_system(message_system),
@@ -434,7 +528,7 @@ void PlayerOnBubble::Enter(){
 	}
 	m_current_idle = "Base_Idle_On_Bubble";
 	m_current_walk = "Base_Walk_On_Bubble";
-	s_animation->PlayAnimation("Base_Idle_On_Bubble");
+	s_animation->PlayAnimation("Base_Jump_End", false);
 }
 
 void PlayerOnBubble::Exit(){
@@ -671,8 +765,7 @@ void PlayerInsideBubble::BubbleRemoved(IEvent* evt){
 }
 
 void PlayerBounce::Enter(){
-	//s_animation->PlayAnimation("Base_Jump_Start");
-	s_animation->PlayAnimation("Base_Jump_Loop", true, AnimationBlender::BlendSwitch);
+	s_animation->PlayAnimation("Base_Jump_Start", false, AnimationBlender::BlendSwitch);
 }
 
 void PlayerBounce::Exit(){
@@ -680,16 +773,19 @@ void PlayerBounce::Exit(){
 }
 
 void PlayerBounce::Update(float dt){
+	Ogre::Vector3 dir = s_input_component->GetDirection();
+	s_animation->PlayAnimation("Base_Jump_Loop");
 	btRigidBody* body = NULL;
 	s_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &body, "body");
-	float y_vel = body->getWorldTransform().getOrigin().y();
-	if (y_vel > 0.0f){
+	float y_vel = body->getLinearVelocity().y();
+	if (y_vel < 0.0f){
 		s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_FALLING));
 	}
 	bool on_ground = s_input_component->IsOnGround();
 	if (on_ground){
 		s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_LAND));
 	}
+	s_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &dir);
 }
 
 PlayerHoldObject::PlayerHoldObject(PhysicsEngine* physics_engine, MessageSystem* message_system) : m_object(NULL), m_physics_engine(physics_engine), m_message_system(message_system) { 
@@ -767,7 +863,7 @@ void PlayerHoldObject::Exit(){
 
 void PlayerHoldObject::Update(float dt){
 	if (m_object){
-		s_animation->PlayAnimation("Top_Blow_Loop", true, AnimationBlender::BlendThenAnimate);
+		s_animation->PlayAnimation("Top_Blow_Loop");
 		btRigidBody* body = NULL;
 		Ogre::SceneNode* node = NULL;
 		s_messenger->Notify(MSG_CHILD_NODE_GET_NODE, &node);
@@ -787,5 +883,57 @@ void PlayerHoldObject::Update(float dt){
 void PlayerHoldObject::ItemRemoved(IEvent* evt){
 	if (evt->m_type == EVT_QUEST_ITEM_REMOVE){
 		s_manager->HoldObject(false);
+	}
+}
+
+PlayerLeafCollect::PlayerLeafCollect(MessageSystem* message_system) : m_message_system(message_system), m_leaf_object(NULL){
+	m_type = PLAYER_STATE_LEAF_COLLECT;
+	m_message_system->Register(EVT_LEAF_PICKUP,this, &PlayerLeafCollect::GetLeaf);
+	s_messenger->Notify(MSG_NODE_GET_NODE, &m_player_node);
+}
+
+PlayerLeafCollect::~PlayerLeafCollect(void){
+	m_message_system->Unregister(EVT_LEAF_PICKUP, this);
+}
+
+void PlayerLeafCollect::Enter(){
+	m_is_dancing = false;
+	bool on_ground = s_input_component->IsOnGround();
+	if (on_ground){
+		m_is_dancing = true;
+		s_animation->PlayAnimation("Base_PickUpLeaf_State");
+		m_leaf_object->GetComponentMessenger()->Notify(MSG_BOBBING_START_MOVING, &m_player_node);
+	}
+}
+
+void PlayerLeafCollect::Exit(){
+	m_leaf_node = NULL;
+	m_leaf_object = NULL;
+}
+
+void PlayerLeafCollect::Update(float dt){
+	Ogre::Vector3 dir = Ogre::Vector3::ZERO;
+	if (!m_is_dancing){
+		bool on_ground = s_input_component->IsOnGround();
+		if (on_ground){
+			m_is_dancing = true;
+			s_animation->PlayAnimation("Base_PickUpLeaf_State");
+			m_leaf_object->GetComponentMessenger()->Notify(MSG_BOBBING_START_MOVING, &m_player_node);
+		}
+	}
+	else {
+		float distance = m_leaf_node->getPosition().distance(m_player_node->getPosition());
+		if (distance <= 0.06f){
+			m_leaf_object->RemoveGameObject(m_leaf_object);
+			s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_IDLE));
+		}
+	}
+	s_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &dir);
+}
+
+void PlayerLeafCollect::GetLeaf(IEvent* evt){
+	if (evt->m_type == EVT_LEAF_PICKUP){
+		m_leaf_object = static_cast<LeafEvent*>(evt)->leaf;
+		m_leaf_node = static_cast<LeafEvent*>(evt)->leaf_node;
 	}
 }

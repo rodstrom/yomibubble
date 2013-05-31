@@ -61,7 +61,7 @@ private:
 
 class PlayerBlowBubble : public PlayerState{
 public:
-	PlayerBlowBubble(void);
+	PlayerBlowBubble(PhysicsEngine* physics_engine);
 	~PlayerBlowBubble(void){}
 	void Enter();
 	void Exit();
@@ -75,10 +75,16 @@ private:
     void CreateTriggerForBubble();
 	GameObject* m_bubble;	// the bubble that we will create
 	SoundData2D m_bubble_blow_sound;
+	bool m_hit_wall;
 	float m_min_bubble_size;
 	float m_max_bubble_size;
 	float m_current_scale;
 	float m_bubble_gravity;
+	Ogre::SceneNode* m_child_node;
+	Ogre::SceneNode* m_player_node;
+	btRigidBody* m_player_body;
+	btRigidBody* m_trigger_body;
+	PhysicsEngine* m_physics_engine;
 };
 
 class PlayerJump : public PlayerState{
@@ -88,6 +94,10 @@ public:
 	void Enter();
 	void Exit();
 	void Update(float dt);
+
+	SoundData2D m_jump_sfx_1;
+	SoundData2D m_jump_sfx_2;
+	SoundData2D m_jump_sfx_3;
 };
 
 class PlayerFalling : public PlayerState{
@@ -101,11 +111,15 @@ public:
 
 class PlayerLand : public PlayerState{
 public:
-	PlayerLand(void){ m_type = PLAYER_STATE_LAND; }
+	PlayerLand(void);
 	~PlayerLand(void){}
 	void Enter();
 	void Exit();
 	void Update(float dt);
+
+	SoundData2D m_land_sfx_1;
+	SoundData2D m_land_sfx_2;
+
 private:
 	void Proceed();
 };
@@ -170,5 +184,22 @@ private:
 	float m_bubble_gravity;
 };
 
+class PlayerLeafCollect : public PlayerState{
+public:
+	PlayerLeafCollect(MessageSystem* message_system);
+	~PlayerLeafCollect(void);
+	void Enter();
+	void Exit();
+	void Update(float dt);
+
+	void GetLeaf(IEvent* evt);
+
+private:
+	bool m_is_dancing;
+	MessageSystem* m_message_system;
+	GameObject* m_leaf_object;
+	Ogre::SceneNode* m_leaf_node;
+	Ogre::SceneNode* m_player_node;
+};
 
 #endif // _PLAYER_STATE_H_
