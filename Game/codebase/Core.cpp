@@ -57,15 +57,17 @@ bool Core::Init(){
 
 	m_render_window = m_root->initialise(true, "Yomi's Bubble Adventure");
 	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
-	Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
-	if (!VariableManager::GetSingletonPtr()->Init())
+	if (!VariableManager::GetSingletonPtr()->Init()){
 		return false;
+	}
+	Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(VariableManager::GetSingletonPtr()->GetAsInt("NumberOfMipmaps", INIFILE_VISUAL_CONFIG, "Mipmaps", 5));
 
 	m_game = new Game;
 	m_game->Init(m_render_window, m_message_system);
 	m_input_system = new InputSystem(m_game, m_render_window, m_message_system);
 	m_input_system->Init();
 	gContactAddedCallback = Collision::ContactCallback;
+
 	return true;
 }
 

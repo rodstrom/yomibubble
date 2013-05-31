@@ -64,6 +64,7 @@ enum EComponentMsg{
 	MSG_CHARACTER_CONTROLLER_GET_FALL_VELOCITY,
 	MSG_CHARACTER_CONTROLLER_APPLY_IMPULSE,
 	MSG_CHARACTER_CONTROLLER_APPLY_ROTATION,
+	MSG_CHARACTER_CONTROLLER_SET_STEP_HEIGHT,
 	MSG_SET_OBJECT_ORIENTATION,
 	MSG_CHARACTER_CONTROLLER_JUMP,
 	MSG_CHARACTER_CONTROLLER_GRAVITY_SET,
@@ -105,6 +106,7 @@ enum EComponentMsg{
 	MSG_BUBBLE_CONTROLLER_ACTIVATE,
 	MSG_BUBBLE_CONTROLLER_READY,
 	MSG_BUBBLE_CONTROLLER_TIMER_RUN,
+	MSG_BUBBLE_CONTROLLER_PROPERTIES_SET,
 	MSG_P2P_GET_CONSTRAINT,
 	MSG_P2P_GET_CONSTRAINT_SET_PIVOTA,
 	MSG_P2P_GET_CONSTRAINT_SET_PIVOTB,
@@ -344,6 +346,16 @@ struct DirDT{
 	DirDT(const Ogre::Vector3& p_dir, float p_dt) : dir(p_dir), dt(p_dt){}
 	Ogre::Vector3 dir;
 	float dt;
+};
+
+struct BubblePropertiesDef{
+	float damping;
+	float friction;
+	float rolling_friction;
+	float restitution;
+	float max_velocity;
+	float velocity;
+	float gravity;		// only for Y, and used only by the blue bubble
 };
 
 #endif // _N_COMPONENTS_PREREQ_H_

@@ -12,6 +12,7 @@
 #include "TreeLoader3D.h"
 #include "WindBatchPage.h"
 #include "ImpostorPage.h"
+#include "..\..\Managers\IniFile.h"
 #include <map>
 
 DBManager::DBManager(ArtifexLoader *artifexloader, PhysicsEngine *physics_engine, GameObjectManager *game_object_manager, SoundManager *sound_manager) {
@@ -50,6 +51,11 @@ int DBManager::Load() {
 	//******** get objects from sqlite file *********
 	string query = "SELECT * FROM objects";
 	
+	IniFile wind_settings("../../resources/config/wind_settings.cfg");
+	if (!wind_settings.parse()){
+		System::Notify("Error opening wind_settings.cfg, this might break...", "File Open Error");
+	}
+
 	CppSQLite3Table t;
 	
 	std::vector<Ogre::String> shadow_map;
@@ -470,8 +476,8 @@ int DBManager::Load() {
 							newModel = mArtifexLoader->mSceneMgr->createEntity((string) entName, (string) meshFile);
 							newModel->setCastShadows(false);
 							m_vegetation[meshFile] = newModel;
-							m_paged_geometry->setCustomParam(newModel->getName(), "windFactorX", 0.4f);
-							m_paged_geometry->setCustomParam(newModel->getName(), "windFactorY", 0.01f);
+							m_paged_geometry->setCustomParam(newModel->getName(), "windFactorX", wind_settings.getValueAsFloat(meshFile, "X", 0.4f));
+							m_paged_geometry->setCustomParam(newModel->getName(), "windFactorY", wind_settings.getValueAsFloat(meshFile, "Y", 0.01f));
 						}
 						else {
 							newModel = it->second;
