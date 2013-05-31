@@ -258,6 +258,8 @@ public:
 
 	GameObject* m_tott;
 
+	bool m_given_leaf;
+
 protected:
 	MeshRenderComponent* m_mesh;
 	Ogre::SceneNode* m_node;

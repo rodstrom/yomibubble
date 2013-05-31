@@ -146,6 +146,9 @@ public:
 	virtual void Update(float dt);
 	virtual void SimulationStep(btScalar time_step);
 
+	void SetSpeechBubble(Ogre::String spbubble){ m_speech_bubble = spbubble; }
+	Ogre::String GetSpeechBubble() { return m_speech_bubble; }
+
 	void Idling();
 	void Curious();
 	void Happy();
@@ -157,10 +160,14 @@ public:
 	bool m_can_change_state;
 
 	SoundData3D m_music;
+
+	
 	
 protected:
 	TOTT_STATE m_state;
 	AnimationMsg m_anim_msg;
+
+	Ogre::String m_speech_bubble;
 
 	Ogre::String m_idle_animation;
 	Ogre::String m_walk_animation;

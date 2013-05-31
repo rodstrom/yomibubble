@@ -69,7 +69,15 @@ void PlayerInputComponent::Notify(int type, void* msg){
 		m_current_bubble = *static_cast<GameObject**>(msg);
 		break;
 	case MSG_PLAYER_INPUT_SET_STATE:
-		m_player_state_manager->SetPlayerState(m_player_state_manager->GetPlayerState(*static_cast<int*>(msg)));
+		{
+			int player_state = *static_cast<int*>(msg);
+			if (player_state == PLAYER_STATE_INSIDE_BUBBLE){
+				m_player_state_manager->GoInsideBubble(true);
+			}
+			else {
+				m_player_state_manager->SetPlayerState(m_player_state_manager->GetPlayerState(player_state));
+			}
+		}
 		break;
 	case MSG_PLAYER_INPUT_STATE_GET:
 		*static_cast<int*>(msg) = m_player_state_manager->GetCurrentType();
@@ -164,6 +172,30 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 	m_player_state_manager = new PlayerStateManager;
 
 	PlayerState::Init(m_owner->GetComponentMessenger(), m_animation_manager, this, m_player_state_manager, sound_manager);
+	BubblePropertiesDef free_blue_def;
+	BubblePropertiesDef stand_on_blue_def;
+	BubblePropertiesDef inside_blue_def;
+	BubblePropertiesDef free_pink_def;
+	BubblePropertiesDef stand_on_pink_def;
+	BubblePropertiesDef inside_pink_def;
+	free_blue_def.damping = VariableManager::GetSingletonPtr()->GetAsFloat("Free_Damping", INIFILE_PLAYER_VARIABLES, "BLUE_BUBBLE");
+	free_blue_def.friction = VariableManager::GetSingletonPtr()->GetAsFloat("Free_Friction", INIFILE_PLAYER_VARIABLES, "BLUE_BUBBLE");
+	free_blue_def.gravity = VariableManager::GetSingletonPtr()->GetAsFloat("Free_Gravity", INIFILE_PLAYER_VARIABLES, "BLUE_BUBBLE");
+	free_blue_def.max_velocity = VariableManager::GetSingletonPtr()->GetAsFloat("Free_Max_Velocity", INIFILE_PLAYER_VARIABLES, "BLUE_BUBBLE");
+	free_blue_def.restitution = VariableManager::GetSingletonPtr()->GetAsFloat("Free_Restitution", INIFILE_PLAYER_VARIABLES, "BLUE_BUBBLE");
+	free_blue_def.rolling_friction = VariableManager::GetSingletonPtr()->GetAsFloat("Free_Rolling_Friction", INIFILE_PLAYER_VARIABLES, "BLUE_BUBBLE");
+	free_blue_def.velocity = VariableManager::GetSingletonPtr()->GetAsFloat("Free_Velocity", INIFILE_PLAYER_VARIABLES, "BLUE_BUBBLE");
+	
+	stand_on_blue_def.damping = VariableManager::GetSingletonPtr()->GetAsFloat("Stand_On_Damping", INIFILE_PLAYER_VARIABLES, "BLUE_BUBBLE");
+	stand_on_blue_def.friction = VariableManager::GetSingletonPtr()->GetAsFloat("Stand_On_Friction", INIFILE_PLAYER_VARIABLES, "BLUE_BUBBLE");
+	stand_on_blue_def.gravity = VariableManager::GetSingletonPtr()->GetAsFloat("Stand_On_Gravity", INIFILE_PLAYER_VARIABLES, "BLUE_BUBBLE");
+	stand_on_blue_def.max_velocity = VariableManager::GetSingletonPtr()->GetAsFloat("Stand_On_Max_Velocity", INIFILE_PLAYER_VARIABLES, "BLUE_BUBBLE");
+	stand_on_blue_def.restitution = VariableManager::GetSingletonPtr()->GetAsFloat("Stand_On_Restitution", INIFILE_PLAYER_VARIABLES, "BLUE_BUBBLE");
+	stand_on_blue_def.rolling_friction = VariableManager::GetSingletonPtr()->GetAsFloat("Stand_On_Rolling_Friction", INIFILE_PLAYER_VARIABLES, "BLUE_BUBBLE");
+	stand_on_blue_def.velocity = VariableManager::GetSingletonPtr()->GetAsFloat("Stand_On_Velocity", INIFILE_PLAYER_VARIABLES, "BLUE_BUBBLE");
+
+
+
 	m_player_state_manager->AddPlayerState(new PlayerIdle);
 	m_player_state_manager->AddPlayerState(new PlayerStateMove);
 	m_player_state_manager->AddPlayerState(new PlayerBlowBubble(m_physics_engine));
@@ -172,7 +204,7 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 	m_player_state_manager->AddPlayerState(new PlayerLand);
 	m_player_state_manager->AddPlayerState(new PlayerBounce);
 	m_player_state_manager->AddPlayerState(new PlayerOnBubble(message_system));
-	m_player_state_manager->AddPlayerState(new PlayerInsideBubble(message_system));
+	m_player_state_manager->AddPlayerState(new PlayerInsideBubble(physics_engine, message_system));
 	m_player_state_manager->AddPlayerState(new PlayerHoldObject(physics_engine, message_system));
 	m_player_state_manager->AddPlayerState(new PlayerLeafCollect(message_system));
 	m_player_state_manager->Init();
@@ -189,6 +221,10 @@ void PlayerInputComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_PLAYER_INPUT_SET_STATE, this);
 	m_messenger->Register(MSG_ON_GROUND, this);
 }
+bool PlayerInputComponent::IsInsideBubble(){
+	return m_player_state_manager->IsInsideBubble();
+}
+
 
 void PlayerInputComponent::Normal(float dt){
 
@@ -218,19 +254,21 @@ void BubbleController::Notify(int type, void* msg){
 	switch (type){
 		case MSG_BUBBLE_CONTROLLER_APPLY_IMPULSE:
 			m_apply_impulse = true;
-			m_impulse = *static_cast<Ogre::Vector3*>(msg);
+			m_impulse_direction = *static_cast<Ogre::Vector3*>(msg);
 			break;
 		case MSG_BUBBLE_CONTROLLER_TIMER_RUN:
 			//m_run_timer = *static_cast<bool*>(msg);
 			break;
 		case MSG_BUBBLE_CONTROLLER_ACTIVATE:
 			{
-				if (m_ready){
-					btRigidBody* body = NULL;
-					m_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &body, "body");
-					if (body){
-						body->setLinearFactor(btVector3(1,1,1));
-						m_messenger->Unregister(MSG_BUBBLE_CONTROLLER_ACTIVATE, this);
+				if (m_owner->GetType() == GAME_OBJECT_BLUE_BUBBLE){
+					if (m_ready){
+						btRigidBody* body = NULL;
+						m_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &body, "body");
+						if (body){
+							body->setLinearFactor(btVector3(1,1,1));
+							m_messenger->Unregister(MSG_BUBBLE_CONTROLLER_ACTIVATE, this);
+						}
 					}
 				}
 			}
@@ -244,6 +282,17 @@ void BubbleController::Notify(int type, void* msg){
 					m_original_scale = node->getScale().y;
 					m_max_scale = m_original_scale * 1.2f;
 				}
+			}
+			break;
+		case MSG_BUBBLE_CONTROLLER_PROPERTIES_SET:
+			{
+				BubblePropertiesDef& def = *static_cast<BubblePropertiesDef*>(msg);
+				m_bubble_body->setFriction(def.friction);
+				m_bubble_body->setRollingFriction(def.rolling_friction);
+				m_bubble_body->setRestitution(def.restitution);
+				m_bubble_body->setDamping(def.damping, btScalar(0.0f));
+				m_velocity = def.velocity;
+				m_max_velocity = def.max_velocity;
 			}
 			break;
 	default:
@@ -263,6 +312,7 @@ void BubbleController::Shut(){
 	m_messenger->Unregister(MSG_BUBBLE_CONTROLLER_ACTIVATE, this);
 	m_messenger->Unregister(MSG_BUBBLE_CONTROLLER_TIMER_RUN, this);
 	m_messenger->Unregister(MSG_BUBBLE_CONTROLLER_READY, this);
+	m_messenger->Unregister(MSG_BUBBLE_CONTROLLER_PROPERTIES_SET, this);
 	m_physics_engine->RemoveObjectSimulationStep(this);
 }
 
@@ -276,6 +326,7 @@ void BubbleController::Init(PhysicsEngine* physics_engine, MessageSystem* messag
 	m_original_scale = scale;
 	m_max_scale = scale * 1.1f;
 	m_scale_increment = 1.4f;
+	m_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &m_bubble_body, "body");
 	physics_engine->AddObjectSimulationStep(this);
 }
 
@@ -285,14 +336,17 @@ void BubbleController::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_BUBBLE_CONTROLLER_TIMER_RUN, this);
 	m_messenger->Register(MSG_BUBBLE_CONTROLLER_ACTIVATE, this);
 	m_messenger->Register(MSG_BUBBLE_CONTROLLER_READY, this);
+	m_messenger->Register(MSG_BUBBLE_CONTROLLER_PROPERTIES_SET, this);
 }
 
 void BubbleController::Update(float dt){
 	if (m_apply_impulse){
-		Ogre::Vector3 impulse = (m_impulse * m_velocity) * dt;
+		Ogre::Vector3 impulse = (m_impulse_direction * m_velocity) * dt;
 		m_messenger->Notify(MSG_RIGIDBODY_APPLY_IMPULSE, &impulse, "body");
 		m_apply_impulse = false;
-		m_distance -= impulse.squaredLength();
+		if (m_owner->GetType() == GAME_OBJECT_PINK_BUBBLE){
+			m_distance -= impulse.squaredLength();
+		}
 	}
 	if (m_owner->GetType() == GAME_OBJECT_PINK_BUBBLE){
 		float percent = m_max_distance * 0.5f;

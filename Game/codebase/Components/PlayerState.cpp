@@ -25,6 +25,12 @@ AnimationManager* PlayerState::s_animation = NULL;
 PlayerInputComponent* PlayerState::s_input_component = NULL;
 PlayerStateManager* PlayerState::s_manager = NULL;
 SoundManager* PlayerState::s_sound_manager = NULL;
+BubblePropertiesDef PlayerState::s_free_blue_bubble_def;
+BubblePropertiesDef PlayerState::s_stand_on_blue_bubble_def;
+BubblePropertiesDef PlayerState::s_inside_blue_bubble_def;
+BubblePropertiesDef PlayerState::s_free_pink_bubble_def;
+BubblePropertiesDef PlayerState::s_stand_on_pink_bubble_def;
+BubblePropertiesDef PlayerState::s_inside_pink_bubble_def;
 
 PlayerIdle::PlayerIdle(void){ 
 	m_type = PLAYER_STATE_IDLE; 
@@ -46,7 +52,7 @@ void PlayerIdle::Update(float dt){
 	if (!s_manager->IsBlowingBubbles() && !s_manager->IsHoldingObject()){
 		s_animation->PlayAnimation(m_current_idle_top);
 		if (s_input_component->GetInputManager()->IsButtonPressed(BTN_LEFT_MOUSE) || (s_input_component->CanBlowPink() && s_input_component->GetInputManager()->IsButtonPressed(BTN_RIGHT_MOUSE))){
-			if (!s_manager->IsHoldingObject()){
+			if (!s_manager->IsHoldingObject() && !s_manager->IsInsideBubble()){
 				s_manager->BlowBubble(true);
 			}
 		}
@@ -77,20 +83,37 @@ void PlayerIdle::Update(float dt){
 		if (s_manager->IsBlowingBubbles()){
 			s_manager->BlowBubble(false);
 		}
+		else if (s_manager->IsInsideBubble()){
+			if (s_manager->GetInsideBubbleState()->GetBubbleObject()->GetType() == GAME_OBJECT_PINK_BUBBLE){
+				s_manager->GoInsideBubble(false);
+				bool on_ground = true;
+				s_messenger->Notify(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_SET, &on_ground);
+			}
+		}
 		s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_JUMP));
 	}
 	bool on_ground = s_input_component->IsOnGround();
+	if (s_manager->IsInsideBubble()){
+		if (s_manager->GetInsideBubbleState()->GetBubbleObject()->GetType() == GAME_OBJECT_PINK_BUBBLE){
+			on_ground = true;
+		}
+	}
 	if (!on_ground){
 		if (s_manager->IsBlowingBubbles()){
 			s_manager->BlowBubble(false);
 		}
 		s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_FALLING));
 	}
-	if (s_input_component->GetInputManager()->IsButtonPressed(BTN_X) && !s_manager->IsBlowingBubbles() && !s_manager->IsHoldingObject()){
+	if (s_input_component->GetInputManager()->IsButtonPressed(BTN_X) && !s_manager->IsBlowingBubbles() && !s_manager->IsHoldingObject() && !s_manager->IsInsideBubble()){
 		s_input_component->GetInputManager()->InjectReleasedButton(BTN_X);
 		s_manager->HoldObject(true);
 	}
-	s_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &dir);
+	else if (s_input_component->GetInputManager()->IsButtonPressed(BTN_X) && s_manager->IsInsideBubble()){
+		s_manager->GoInsideBubble(false);
+	}
+	if (!s_manager->IsInsideBubble()){
+		s_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &dir);
+	}
 }
 PlayerStateMove::PlayerStateMove(void){ 
 	m_type = PLAYER_STATE_MOVE;
@@ -129,9 +152,9 @@ void PlayerStateMove::Update(float dt){
 		s_animation->PlayAnimation(move_top);
 	}
 
-	if (!s_manager->IsBlowingBubbles() && !s_manager->IsHoldingObject()){
+	if (!s_manager->IsBlowingBubbles() && !s_manager->IsHoldingObject() && !s_manager->IsInsideBubble()){
 		if (s_input_component->GetInputManager()->IsButtonPressed(BTN_LEFT_MOUSE) || (s_input_component->CanBlowPink() && s_input_component->GetInputManager()->IsButtonPressed(BTN_RIGHT_MOUSE))){
-			if (!s_manager->IsHoldingObject()){
+			if (!s_manager->IsHoldingObject() && !s_manager->IsInsideBubble()){
 				s_manager->BlowBubble(true);
 			}
 		}
@@ -140,9 +163,21 @@ void PlayerStateMove::Update(float dt){
 		if (s_manager->IsBlowingBubbles()){
 			s_manager->BlowBubble(false);
 		}
+		else if (s_manager->IsInsideBubble()){
+			if (s_manager->GetInsideBubbleState()->GetBubbleObject()->GetType() == GAME_OBJECT_PINK_BUBBLE){
+				s_manager->GoInsideBubble(false);
+				bool on_ground = true;
+				s_messenger->Notify(MSG_CHARACTER_CONTROLLER_IS_ON_GROUND_SET, &on_ground);
+			}
+		}
 		s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_JUMP));
 	}
 	bool on_ground = s_input_component->IsOnGround();
+	if (s_manager->IsInsideBubble()){
+		if (s_manager->GetInsideBubbleState()->GetBubbleObject()->GetType() == GAME_OBJECT_PINK_BUBBLE){
+			on_ground = true;
+		}
+	}
 	if (!on_ground){
 		if (s_manager->IsBlowingBubbles()){
 			s_manager->BlowBubble(false);
@@ -152,11 +187,16 @@ void PlayerStateMove::Update(float dt){
 	if (dir == Ogre::Vector3::ZERO){
 		s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_IDLE));	// if the character is not moving, change to idle
 	}
-	if (s_input_component->GetInputManager()->IsButtonPressed(BTN_X) && !s_manager->IsBlowingBubbles() && !s_manager->IsHoldingObject()){
+	if (s_input_component->GetInputManager()->IsButtonPressed(BTN_X) && !s_manager->IsBlowingBubbles() && !s_manager->IsHoldingObject() && !s_manager->IsInsideBubble()){
 		s_input_component->GetInputManager()->InjectReleasedButton(BTN_X);
 		s_manager->HoldObject(true);
 	}
-	s_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &dir);
+	else if (s_input_component->GetInputManager()->IsButtonPressed(BTN_X) && s_manager->IsInsideBubble()){
+		s_manager->GoInsideBubble(false);
+	}
+	if (!s_manager->IsInsideBubble()){
+		s_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &dir);
+	}
 }
 
 PlayerBlowBubble::PlayerBlowBubble(PhysicsEngine* physics_engine) : m_bubble(NULL), m_current_scale(0.0f), m_physics_engine(physics_engine) {
@@ -404,6 +444,10 @@ void PlayerJump::Update(float dt){
 	if (on_ground){
 		s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_LAND));
 	}
+	if (s_manager->IsInsideBubble() && s_input_component->GetInputManager()->IsButtonPressed(BTN_X)){
+		s_manager->GoInsideBubble(false);
+	}
+
 	Ogre::Vector3 dir = s_input_component->GetDirection();
 	s_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &dir);
 }
@@ -420,7 +464,9 @@ void PlayerFalling::Update(float dt){
 	bool on_ground = s_input_component->IsOnGround();
 	if (on_ground){
 		s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_IDLE));
-		std::cout << "Setting Idle FROM Fall\n";
+	}
+	if (s_manager->IsInsideBubble() && s_input_component->GetInputManager()->IsButtonPressed(BTN_X)){
+		s_manager->GoInsideBubble(false);
 	}
 	Ogre::Vector3 dir = s_input_component->GetDirection();
 	s_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &dir);
@@ -490,7 +536,7 @@ void PlayerLand::Proceed(){
 
 PlayerOnBubble::PlayerOnBubble(MessageSystem* message_system) : m_on_bubble_y_offset(0.0f), m_message_system(message_system),
 	m_timer(0.0f), m_target_time(0.0f) { 
-	m_on_bubble_y_offset = VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleY");
+	m_on_bubble_y_offset = 0.05f;
 	m_type = PLAYER_STATE_ON_BUBBLE; 
 	m_message_system->Register(EVT_BUBBLE_REMOVE, this, &PlayerOnBubble::BubbleRemoved);
 }
@@ -619,7 +665,6 @@ void PlayerOnBubble::BubbleRemoved(IEvent* evt){
 			bool limit = true;
 			s_messenger->Notify(MSG_CHARACTER_CONTROLLER_LIMIT_MAX_SPEED, &limit);
 			s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_FALLING));
-			s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_FALLING));
 		}
 	}
 }
@@ -629,9 +674,9 @@ void PlayerOnBubble::ChangeTargetTime(float low, float high){
 	m_timer = 0.0f;
 }
 
-PlayerInsideBubble::PlayerInsideBubble(MessageSystem* message_system) : m_on_bubble_y_offset(0.0f), m_message_system(message_system) { 
+PlayerInsideBubble::PlayerInsideBubble(PhysicsEngine* physics_engine, MessageSystem* message_system) : m_on_bubble_y_offset(0.0f), m_physics_engine(physics_engine), m_message_system(message_system) { 
 	m_type = PLAYER_STATE_INSIDE_BUBBLE; 
-	m_on_bubble_y_offset = VariableManager::GetSingletonPtr()->GetAsFloat("InsideBubbleY");
+	m_on_bubble_y_offset = 0.5f;
 	m_bubble_gravity = VariableManager::GetSingletonPtr()->GetAsFloat("BlueBubbleGravity");
 	m_message_system->Register(EVT_BUBBLE_REMOVE, this, &PlayerInsideBubble::BubbleRemoved);
 }
@@ -652,50 +697,67 @@ void PlayerInsideBubble::Enter(){
 	if (player_body && bubble_body && bubble_node){
 		float y_scale = bubble_node->getScale().y;
 		y_scale *= 0.5f;
+		float step_height = y_scale + 0.15f;
+		s_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_STEP_HEIGHT, &step_height);
 		y_scale = y_scale - m_on_bubble_y_offset;
 		Generic6DofDef def;
 		def.body_a = bubble_body;
 		def.body_b = player_body;
 		def.pivot_b.setY(m_on_bubble_y_offset);
-		btScalar mass = 0.0f;
-		btVector3 inertia(0,0,0);
 		s_input_component->GetOwner()->CreateComponent(COMPONENT_GENERIC_6DOF_COMPONENT, Ogre::Vector3(0,0,0), &def);
 		bool limit = false;
 		s_messenger->Notify(MSG_CHARACTER_CONTROLLER_LIMIT_MAX_SPEED, &limit);
 	}
-	if (m_bubble->GetType() == GAME_OBJECT_PINK_BUBBLE){
+	/*if (m_bubble->GetType() == GAME_OBJECT_PINK_BUBBLE){
 		bool start = true;
 		m_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_TIMER_RUN, &start);
-	}
+	}*/
 }
 
 void PlayerInsideBubble::Exit(){
-	if (m_bubble->GetType() == GAME_OBJECT_PINK_BUBBLE){
-		bool start = false;
-		m_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_TIMER_RUN, &start);
+	btRigidBody* bubble_body = NULL;	// configuration to avoid that the player falls through the world when exiting a bubble
+	btRigidBody* player_body = NULL;
+	Ogre::SceneNode* bubble_node = NULL;
+	m_bubble->GetComponentMessenger()->Notify(MSG_NODE_GET_NODE, &bubble_node);
+	float step_height = (bubble_node->getScale().y * 0.5f) + 0.25f;
+	m_bubble->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GET_BODY, &bubble_body, "body");
+	s_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &player_body, "body");
+	btVector3 from(player_body->getWorldTransform().getOrigin());
+	btVector3 to(btVector3(from.x(), from.y() - step_height, from.z()));
+	IgnoreBodyAndBubbleCast ray(player_body, bubble_body);	// we will ignore the player body and the bubble when ray testing
+	m_physics_engine->GetDynamicWorld()->rayTest(from, to, ray);
+	if (ray.hasHit() && !s_input_component->GetInputManager()->IsButtonPressed(BTN_A)){  // the ray has hit something on the ground, push the bubble in the direction the player is facing
+		Ogre::SceneNode* child_node = NULL;
+		Ogre::SceneNode* player_node = NULL;
+		s_messenger->Notify(MSG_NODE_GET_NODE, &player_node);
+		s_messenger->Notify(MSG_CHILD_NODE_GET_NODE, &child_node);
+		Ogre::Vector3 child_pos(child_node->_getDerivedPosition());
+		Ogre::Vector3 player_pos(player_node->_getDerivedPosition());
+		Ogre::Vector3 dir = child_pos - player_pos;
+		dir.normalise();
+		dir.y = 1.0f;	// always push the bubble upwards (will not move pink but blue)
+		m_bubble->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GET_BODY, &bubble_body, "body");
+		dir *= 4.0f;
+		bubble_body->applyCentralImpulse(BtOgre::Convert::toBullet(dir));
 	}
+	// if the bubble is not hitting the ground simple drop the player down
+	int coll = btCollisionObject::CF_NO_CONTACT_RESPONSE;
+	s_messenger->Notify(MSG_RIGIDBODY_COLLISION_FLAG_REMOVE, &coll, "body");
+	Ogre::Vector3 gravity(0.0f, -9.8f, 0.0f);
+	s_messenger->Notify(MSG_RIGIDBODY_GRAVITY_SET, &gravity, "body");
+	s_input_component->GetOwner()->RemoveComponent(COMPONENT_GENERIC_6DOF_COMPONENT);
+	bool limit = true;
+	s_messenger->Notify(MSG_CHARACTER_CONTROLLER_LIMIT_MAX_SPEED, &limit);
+	step_height = 0.15f;
+	s_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_STEP_HEIGHT, &step_height);
 	m_bubble = NULL;
 }
 
 void PlayerInsideBubble::Update(float dt){
 	Ogre::Vector3 dir = s_input_component->GetDirection();
-	if (dir == Ogre::Vector3::ZERO){
-		s_animation->PlayAnimation("Base_Idle");
-		s_animation->PlayAnimation("Top_Idle");
-	}
-	else {
-		s_animation->PlayAnimation("Base_Walk");
-		s_animation->PlayAnimation("Top_Walk");
-	}
 	Ogre::SceneNode* bubble_node = NULL;
 	m_bubble->GetComponentMessenger()->Notify(MSG_NODE_GET_NODE, &bubble_node);
-	if (bubble_node){
-		btRigidBody* player_body = NULL;
-		btRigidBody* bubble_body = NULL;
-		s_messenger->Notify(MSG_RIGIDBODY_GET_BODY, &player_body, "body");
-		m_bubble->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GET_BODY, &bubble_body);
-	}
-	if (s_input_component->GetInputManager()->IsButtonPressed(BTN_A)){
+	/*if (s_input_component->GetInputManager()->IsButtonPressed(BTN_A) && m_bubble->GetType() == GAME_OBJECT_PINK_BUBBLE){
 		int coll = btCollisionObject::CF_NO_CONTACT_RESPONSE;
 		s_messenger->Notify(MSG_RIGIDBODY_COLLISION_FLAG_REMOVE, &coll, "body");
 		bool jump = true;
@@ -706,17 +768,22 @@ void PlayerInsideBubble::Update(float dt){
 		s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_JUMP));
 		bool limit = true;
 		s_messenger->Notify(MSG_CHARACTER_CONTROLLER_LIMIT_MAX_SPEED, &limit);
-	}
+	}*/
+
 	if (s_input_component->GetInputManager()->IsButtonPressed(BTN_LEFT_MOUSE) || s_input_component->GetInputManager()->IsButtonPressed(BTN_RIGHT_MOUSE)){
-		this->ChangeBubbleType();
+		if (s_input_component->CanBlowPink()){
+			this->ChangeBubbleType();
+		}
 	}
-	if (bubble_node && m_bubble){
+	if (bubble_node && m_bubble && s_manager->GetCurrentType() != PLAYER_STATE_LEAF_COLLECT){
 		s_messenger->Notify(MSG_FOLLOW_CAMERA_GET_ORIENTATION, &dir);
 		dir.normalise();
 		m_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_APPLY_IMPULSE, &dir);
 		DirDT dirdt(dir, dt);
 		s_messenger->Notify(MSG_CHARACTER_CONTROLLER_APPLY_ROTATION, &dirdt);
 	}
+	Ogre::Vector3 zerodir = Ogre::Vector3::ZERO;
+	s_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &zerodir);
 }
 
 void PlayerInsideBubble::ChangeBubbleType(){
@@ -725,15 +792,19 @@ void PlayerInsideBubble::ChangeBubbleType(){
 	m_bubble->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GET_BODY, &body, "body");
 	if (body){
 		if (m_bubble->GetType() == GAME_OBJECT_BLUE_BUBBLE){
+			btVector3 vel = body->getLinearVelocity();
 			Ogre::Vector3 gravity(0,0,0);
 			m_bubble->SetType(GAME_OBJECT_PINK_BUBBLE);
 			mat_name = "PinkBubble";
 			m_bubble->GetComponentMessenger()->Notify(MSG_MESH_SET_MATERIAL_NAME, &mat_name);
 			m_bubble->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GRAVITY_SET, &gravity);
-			body->clearForces();
+			body->setLinearVelocity(btVector3(vel.x(), 0.0f, vel.z()));
 			body->setLinearFactor(btVector3(1,0,1));
 			bool start = true;
 			m_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_TIMER_RUN, &start);
+			if (s_manager->GetCurrentType() == PLAYER_STATE_FALLING || s_manager->GetCurrentType() == PLAYER_STATE_JUMP){
+				s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_IDLE));
+			}
 		}
 		else if (m_bubble->GetType() == GAME_OBJECT_PINK_BUBBLE){
 			Ogre::Vector3 gravity(0,-m_bubble_gravity,0);
@@ -752,14 +823,7 @@ void PlayerInsideBubble::BubbleRemoved(IEvent* evt){
 	if (evt->m_type == EVT_BUBBLE_REMOVE){
 		GameObject* bubble = static_cast<BubbleEvent*>(evt)->bubble;
 		if (bubble == m_bubble){
-			int coll = btCollisionObject::CF_NO_CONTACT_RESPONSE;
-			s_messenger->Notify(MSG_RIGIDBODY_COLLISION_FLAG_REMOVE, &coll, "body");
-			Ogre::Vector3 gravity(0.0f, -9.8f, 0.0f);
-			s_messenger->Notify(MSG_RIGIDBODY_GRAVITY_SET, &gravity, "body");
-			s_input_component->GetOwner()->RemoveComponent(COMPONENT_GENERIC_6DOF_COMPONENT);
-			bool limit = true;
-			s_messenger->Notify(MSG_CHARACTER_CONTROLLER_LIMIT_MAX_SPEED, &limit);
-			s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_FALLING));
+			s_manager->GoInsideBubble(false);
 		}
 	}
 }
@@ -818,7 +882,7 @@ void PlayerHoldObject::Enter(){
 		CollisionDef* coll_def = static_cast<CollisionDef*>(ray.m_collisionObject->getUserPointer());
 		if (coll_def->flag == COLLISION_FLAG_GAME_OBJECT){
 			GameObject* ob = static_cast<GameObject*>(coll_def->data);
-			if (ob->GetType() == GAME_OBJECT_BLUE_BUBBLE || ob->GetType() == GAME_OBJECT_QUEST_ITEM){
+			if (ob->GetType() == GAME_OBJECT_QUEST_ITEM){
 				m_object = ob;
 				btRigidBody* ob_body = NULL;
 				btRigidBody* player_trigger = NULL;
@@ -842,6 +906,17 @@ void PlayerHoldObject::Enter(){
 					s_input_component->GetOwner()->CreateComponent(COMPONENT_GENERIC_6DOF_COMPONENT, Ogre::Vector3(0,0,0), &def);
 				}
 			}
+			else if (ob->GetType() == GAME_OBJECT_BLUE_BUBBLE || ob->GetType() == GAME_OBJECT_PINK_BUBBLE){
+				Ogre::Vector3 gravity(0,0,0);
+				s_messenger->Notify(MSG_PLAYER_INPUT_SET_BUBBLE, &ob);
+				if (ob->GetType() == GAME_OBJECT_BLUE_BUBBLE){
+					ob->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_ACTIVATE, NULL);
+				}
+				s_messenger->Notify(MSG_CHARACTER_CONTROLLER_GRAVITY_SET, &gravity);
+				s_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &gravity);
+				s_manager->HoldObject(false);
+				s_manager->GoInsideBubble(true);
+			}
 		}
 	}
 }
@@ -849,14 +924,8 @@ void PlayerHoldObject::Enter(){
 void PlayerHoldObject::Exit(){
 	s_input_component->GetOwner()->RemoveComponent(COMPONENT_GENERIC_6DOF_COMPONENT);
 	if (m_object){
-		if (m_object->GetType() == GAME_OBJECT_BLUE_BUBBLE){
-			Ogre::Vector3 gravity(Ogre::Real(0),-m_bubble_gravity,Ogre::Real(0));
-			m_object->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GRAVITY_SET, &gravity);
-		}
-		else {
-			Ogre::Vector3 gravity(Ogre::Real(0),Ogre::Real(-9.8),Ogre::Real(0));
-			m_object->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GRAVITY_SET, &gravity);
-		}
+		Ogre::Vector3 gravity(Ogre::Real(0),Ogre::Real(-9.8),Ogre::Real(0));
+		m_object->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GRAVITY_SET, &gravity);
 	}
 	m_object = NULL;
 }

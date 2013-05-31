@@ -748,8 +748,8 @@ void SpeechBubbleComponent::Notify(int type, void* message){
 	
 	switch(type){
 	case MSG_SP_BUBBLE_SHOW:
-		if (static_cast<AnimationComponent*>(m_owner->GetGameObjectManager()->GetGameObject("TestTott")->GetComponent(COMPONENT_ANIMATION))->m_current_animation != "walk"){
-			m_owner->GetGameObjectManager()->GetGameObject("TestTott")->GetComponentMessenger()->Notify(MSG_ANIMATION_PLAY, &msg);
+		if (static_cast<AnimationComponent*>(m_owner->GetGameObjectManager()->GetGameObject(m_tott->GetId())->GetComponent(COMPONENT_ANIMATION))->m_current_animation != "walk"){
+			m_owner->GetGameObjectManager()->GetGameObject(m_tott->GetId())->GetComponentMessenger()->Notify(MSG_ANIMATION_PLAY, &msg);
 		}
 		m_player_collide = true;
 		break;
@@ -811,7 +811,7 @@ void SpeechBubbleComponent::Init(Ogre::SceneNode* node, SceneManager* scene_mana
 	m_current_scale = 1.0f;
 	m_messenger->Notify(MSG_MESH_SET_MATERIAL_NAME, &Ogre::String("SpeechCherry"));
 	m_tott = tott;
-
+	m_given_leaf = false;
 	//m_messenger->Notify(MSG_NODE_ATTACH_ENTITY, static_cast<MeshRenderComponent*>(m_owner->GetComponent(COMPONENT_MESH_RENDER))->GetEntity());
 
 	//static_cast<MeshRenderComponent*>(speech_bubble->GetComponent(COMPONENT_MESH_RENDER))->GetEntity()->setMaterialName("SolidColor/Blue");
@@ -983,6 +983,7 @@ void GateControllerComponent::LeafPickup(IEvent* evt){
 
 void GateControllerComponent::OpenGate(){
 	m_rotate = true;
+	m_owner->RemoveComponent(COMPONENT_RIGIDBODY);	// remove the collider so we can pass through the gate
 }
 
 void RotationComponent::Notify(int type, void* message){

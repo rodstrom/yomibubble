@@ -22,6 +22,14 @@ public:
 	short GetType() const { return m_type; }
 	static void Init(ComponentMessenger* messenger, AnimationManager* animation, PlayerInputComponent* input_component, PlayerStateManager* manager, SoundManager* sound_manager){ 
 		s_messenger = messenger; s_animation = animation; s_input_component = input_component;  s_manager = manager; s_sound_manager = sound_manager; }
+	static void SetBubbleProperties(const BubblePropertiesDef& free_blue_bubble_def, const BubblePropertiesDef& stand_on_blue_bubble_def, const BubblePropertiesDef& inside_blue_bubble_def, const BubblePropertiesDef& free_pink_bubble_def, const BubblePropertiesDef& stand_on_pink_bubble_def, const BubblePropertiesDef& inside_pink_bubble_def){
+		s_free_blue_bubble_def = free_blue_bubble_def;
+		s_stand_on_blue_bubble_def = stand_on_blue_bubble_def;
+		s_inside_blue_bubble_def = inside_blue_bubble_def;
+		s_free_pink_bubble_def = free_pink_bubble_def;
+		s_stand_on_pink_bubble_def = stand_on_pink_bubble_def;
+		s_inside_pink_bubble_def = inside_pink_bubble_def;
+	}
 protected:
 	short m_type;
 	static ComponentMessenger* s_messenger;
@@ -29,6 +37,12 @@ protected:
 	static PlayerInputComponent* s_input_component;
 	static PlayerStateManager* s_manager;
 	static SoundManager* s_sound_manager;
+	static BubblePropertiesDef s_free_blue_bubble_def;
+	static BubblePropertiesDef s_stand_on_blue_bubble_def;
+	static BubblePropertiesDef s_inside_blue_bubble_def;
+	static BubblePropertiesDef s_free_pink_bubble_def;
+	static BubblePropertiesDef s_stand_on_pink_bubble_def;
+	static BubblePropertiesDef s_inside_pink_bubble_def;
 };
 
 class PlayerIdle : public PlayerState{
@@ -145,14 +159,16 @@ private:
 
 class PlayerInsideBubble : public PlayerState{
 public:
-	PlayerInsideBubble(MessageSystem* message_system);
+	PlayerInsideBubble(PhysicsEngine* physics_engine, MessageSystem* message_system);
 	~PlayerInsideBubble(void);
 	void Enter();
 	void Exit();
 	void Update(float dt);
+	GameObject* GetBubbleObject() const { return m_bubble; }
 private:
 	void ChangeBubbleType();
 	void BubbleRemoved(IEvent* evt);
+	PhysicsEngine* m_physics_engine;
 	MessageSystem* m_message_system;
 	float m_on_bubble_y_offset;
 	float m_bubble_gravity;

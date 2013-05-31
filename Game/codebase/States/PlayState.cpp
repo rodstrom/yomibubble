@@ -31,9 +31,6 @@ void PlayState::Enter(){
 	m_viewport = m_render_window->addViewport(m_camera);
 	m_camera->setAspectRatio(Ogre::Real(m_viewport->getActualWidth()) / Ogre::Real(m_viewport->getActualHeight()));
 
-	Ogre::CompositorManager::getSingleton().addCompositor(m_viewport, "Bloom");
-	Ogre::CompositorManager::getSingleton().setCompositorEnabled(m_viewport, "Bloom", true);
-
 	m_game_object_manager = new GameObjectManager;
 	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager, m_message_system, NULL);
 	//RUN SECONDLOADING
@@ -45,14 +42,20 @@ void PlayState::SecondLoading(){
 	//Ogre::MeshManager::getSingleton().createPlane("plane", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane, 50, 50, 20, 20, true, 1, 5, 5, Ogre::Vector3::UNIT_Z);
 
 #ifdef NDEBUG
-	m_scene_manager->setShadowUseInfiniteFarPlane(false);
-	m_scene_manager->setShadowTextureSelfShadow(false);
-	m_scene_manager->setShadowCasterRenderBackFaces(false);
-	m_scene_manager->setShadowTextureCount(1);
-	m_scene_manager->setShadowTextureSize(2048);
-	m_scene_manager->setShadowColour(Ogre::ColourValue(0.5f,0.5f,0.6f,1.0f));
-	m_scene_manager->setShadowFarDistance(30.0f);
-	m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
+	if (VariableManager::GetSingletonPtr()->GetAsBool("Show", INIFILE_VISUAL_CONFIG, "Shadows", true)){
+		m_scene_manager->setShadowUseInfiniteFarPlane(false);
+		m_scene_manager->setShadowTextureSelfShadow(false);
+		m_scene_manager->setShadowCasterRenderBackFaces(false);
+		m_scene_manager->setShadowTextureCount(1);
+		m_scene_manager->setShadowTextureSize(VariableManager::GetSingletonPtr()->GetAsFloat("TextureSize", INIFILE_VISUAL_CONFIG, "Shadows", 2048));
+		m_scene_manager->setShadowColour(Ogre::ColourValue(0.5f,0.5f,0.6f,1.0f));
+		m_scene_manager->setShadowFarDistance(VariableManager::GetSingletonPtr()->GetAsFloat("FarDistance", INIFILE_VISUAL_CONFIG, "Shadows", 30.0f));
+		m_scene_manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
+	}
+	if (VariableManager::GetSingletonPtr()->GetAsBool("Show", INIFILE_VISUAL_CONFIG, "Bloom", true)){
+		 Ogre::CompositorManager::getSingleton().addCompositor(m_viewport, "Bloom");
+		 Ogre::CompositorManager::getSingleton().setCompositorEnabled(m_viewport, "Bloom", true);
+	}
 #endif
 	std::function<void()> func = [this] { ChangeToWinState(); };
 	m_level_manager = new LevelManager(m_game_object_manager, m_scene_manager, m_physics_engine, func);
@@ -91,6 +94,9 @@ void PlayState::Exit(){
 }
 
 bool PlayState::Update(float dt){
+	m_sound_manager->Update(m_scene_manager, dt);
+	m_game_object_manager->Update(dt);
+	m_physics_engine->Step(dt);
 	if (m_change_level){
 		
 		State* loading = FindByName("LoadingState");
@@ -105,15 +111,15 @@ bool PlayState::Update(float dt){
 		
 		loading->Exit();
 	}
-	m_game_object_manager->Update(dt);
+
 	
 	//if(m_pause){
 	//	//CreatePauseScreen();
 	//	PushState(FindByName("PauseState"));
 	//}
 	//else {
-		m_sound_manager->Update(m_scene_manager, dt);
-		m_physics_engine->Step(dt);
+		
+		
 
 		/*if (m_input_manager->IsButtonDown(BTN_ARROW_UP)){
 			m_physics_engine->ShowDebugDraw(true);

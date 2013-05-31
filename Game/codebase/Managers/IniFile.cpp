@@ -154,6 +154,23 @@ int IniFile::getValueAsInt(const std::string& group, const std::string& key, int
 	return StringToNumber<int>(_options[group][key]);
 }
 
+bool IniFile::getValueAsBool(const std::string& group, const std::string& key, bool defaultValue){
+	m_sm_ss::iterator it = _options.find(group);
+	if (it == _options.end())
+	{
+		std::cerr << "WARNING: group: " + group + " does not exist in " + _filepath << std::endl;
+		return defaultValue;
+	}
+
+	m_ss::iterator it2 = _options[group].find(key);
+	if (it2 == _options[group].end())
+	{
+		std::cerr << "WARNING: key: " + key + " does not exist in group " + group + " " + _filepath << std::endl;
+		return defaultValue;
+	}
+	return StringToBool(_options[group][key]);
+}
+
 void IniFile::cleanString(std::string& line)
 {
 	for (unsigned int i = 0; i < line.length(); i++)

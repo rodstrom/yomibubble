@@ -55,6 +55,7 @@ private:
 	GameObject* CreateQuestItem(const Ogre::Vector3& position, void* data, const Ogre::String& id = Ogre::StringUtil::BLANK);
 	GameObject* CreateSpeechBubble(const Ogre::Vector3& position, void* data, const Ogre::String& id = Ogre::StringUtil::BLANK);
 	GameObject* CreateRockSlide(const Ogre::Vector3& position, void* data, const Ogre::String& id = Ogre::StringUtil::BLANK);
+	GameObject* CreateLevelChange(const Ogre::Vector3& position, void* data, const Ogre::String& id = Ogre::StringUtil::BLANK);
 
 	typedef GameObject* (GameObjectManager::*CreateObjectFptr)(const Ogre::Vector3&, void* data, const Ogre::String& id);
 
@@ -75,6 +76,9 @@ private:
 
 	Ogre::SceneNode*		m_temp_node;
 
+	int m_tott_iterations;
+	int m_speech_bubble_iterations;
+	int m_quest_item_iterations;
 	int m_leaf_iterations;
 	int m_particle_iterations;
 	unsigned int m_max_bubbles;

@@ -49,9 +49,13 @@ void GameObjectManager::Init(PhysicsEngine* physics_engine, Ogre::SceneManager* 
 	m_create_fptr[GAME_OBJECT_QUEST_ITEM]  =    &GameObjectManager::CreateQuestItem;
 	m_create_fptr[GAME_OBJECT_SPEECH_BUBBLE] =  &GameObjectManager::CreateSpeechBubble;
 	m_create_fptr[GAME_OBJECT_ROCK_SLIDE] =		&GameObjectManager::CreateRockSlide;
+	m_create_fptr[GAME_OBJECT_LEVEL_CHANGE] =   &GameObjectManager::CreateLevelChange;
 
 	m_leaf_iterations = 0;
 	m_particle_iterations = 0;
+	m_tott_iterations = 0;
+	m_speech_bubble_iterations = 0;
+	m_quest_item_iterations = 0;
 	m_temp_node = NULL;
 }
 
@@ -276,7 +280,7 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 
 	fcc->SetPhysEngine(m_physics_engine);
 	fcc->SetCustomVariables(
-		VariableManager::GetSingletonPtr()->GetAsInt("Camera_Inverted_Controller_Sticks"), 
+		//VariableManager::GetSingletonPtr()->GetAsInt("Camera_Inverted_Controller_Sticks"), 
 		VariableManager::GetSingletonPtr()->GetAsFloat("Camera_Zoom_Speed"), 
 		VariableManager::GetSingletonPtr()->GetAsFloat("Camera_Stick_Rotation_Acceleration"), 
 		VariableManager::GetSingletonPtr()->GetAsFloat("Camera_Change_Angle_After_Player"),
@@ -310,6 +314,9 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, void* data, const Ogre::String& id){
 	BubbleDef& def = *static_cast<BubbleDef*>(data);
 	GameObject* go = new GameObject(GAME_OBJECT_BLUE_BUBBLE);
+	BubbleController* bc = new BubbleController;
+	go->AddComponent(bc);
+	go->AddUpdateable(bc);
 	NodeComponent* node_comp = new NodeComponent;
 	go->AddComponent(node_comp);
 	MeshRenderComponent* mrc = new MeshRenderComponent;
@@ -318,16 +325,14 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 	go->AddComponent(cons);
 	RigidbodyComponent* rc = new RigidbodyComponent;
 	go->AddComponent(rc);
-	BubbleController* bc = new BubbleController;
-	go->AddComponent(bc);
-	go->AddUpdateable(bc);
+
 
 	node_comp->Init(position, m_scene_manager);
 	mrc->Init("BlueBubble.mesh", m_scene_manager);
 	mrc->GetEntity()->setRenderQueueGroup(60);
 	Ogre::Vector3 scale(def.start_scale);
 	node_comp->GetSceneNode()->setScale(scale);
-	bc->Init(m_physics_engine, m_message_system, VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleImpulse"), VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleMaxVelocity"), def.start_scale);
+	
 	//bc->SetCustomVariables(VariableManager::GetSingletonPtr()->GetAsFloat("Blue_Bubble_Life_Time"));
 
 	RigidBodyDef body_def;
@@ -336,7 +341,7 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 	body_def.friction = def.friction;
 	body_def.mass = 1.0f;
 	body_def.collision_filter.filter = COL_BUBBLE;
-	body_def.collision_filter.mask = COL_PLAYER | COL_TOTT | COL_BUBBLE | COL_WORLD_STATIC;
+	body_def.collision_filter.mask = COL_PLAYER | COL_TOTT | COL_BUBBLE | COL_WORLD_STATIC | COL_QUESTITEM;
 	rc->Init(position,  mrc->GetEntity(), m_physics_engine, body_def);
 	rc->SetId("body");
 	rc->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
@@ -344,6 +349,7 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 	rc->GetRigidbody()->setActivationState(DISABLE_DEACTIVATION);
 	rc->GetRigidbody()->setDamping(VariableManager::GetSingletonPtr()->GetAsFloat("Bubble_Linear_Damping"), VariableManager::GetSingletonPtr()->GetAsFloat("Bubble_Angular_Damping"));
 	cons->Init(m_physics_engine,rc->GetRigidbody(), def.connection_body, btVector3(0,0,0), btVector3(0,0,0));
+	bc->Init(m_physics_engine, m_message_system, VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleImpulse"), VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleMaxVelocity"), def.start_scale);
 	this->CheckBubbleSize();
 	m_bubbles.push_back(go);
 	return go;
@@ -352,15 +358,16 @@ GameObject* GameObjectManager::CreateBlueBubble(const Ogre::Vector3& position, v
 GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, void* data, const Ogre::String& id){
 	BubbleDef& def = *static_cast<BubbleDef*>(data);
 	GameObject* go = new GameObject(GAME_OBJECT_PINK_BUBBLE);
+	BubbleController* bc = new BubbleController;
+	go->AddComponent(bc);
+	go->AddUpdateable(bc);
 	NodeComponent* node_comp = new NodeComponent;
 	go->AddComponent(node_comp);
 	MeshRenderComponent* mrc = new MeshRenderComponent;
 	go->AddComponent(mrc);
 	Point2PointConstraintComponent* cons = new Point2PointConstraintComponent;
 	go->AddComponent(cons);
-	BubbleController* bc = new BubbleController;
-	go->AddComponent(bc);
-	go->AddUpdateable(bc);
+
 	RigidbodyComponent* rc = new RigidbodyComponent;
 	go->AddComponent(rc);
 
@@ -369,7 +376,7 @@ GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, v
 	mrc->GetEntity()->setRenderQueueGroup(60);
 	Ogre::Vector3 scale(def.start_scale);
 	node_comp->GetSceneNode()->setScale(scale);
-	bc->Init(m_physics_engine, m_message_system, VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleImpulse"), VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleMaxVelocity"), def.start_scale);
+	
 	//bc->SetCustomVariables(VariableManager::GetSingletonPtr()->GetAsFloat("Pink_Bubble_Life_Time"));
 
 	//mrc->GetEntity()->setMaterialName("PinkBubble");
@@ -385,17 +392,23 @@ GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, v
 	//rc->GetRigidbody()->setLinearFactor(btVector3(1,0,1));
 	rc->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
 	rc->GetRigidbody()->setActivationState(DISABLE_DEACTIVATION);
-	rc->GetRigidbody()->setDamping(0.5, 0.5);
+	//rc->GetRigidbody()->setDamping(0.5, 0.5);
 	rc->SetId("body");
 	cons->Init(m_physics_engine,rc->GetRigidbody(), def.connection_body, btVector3(0,0,0), btVector3(0,0,0));
+	bc->Init(m_physics_engine, m_message_system, VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleImpulse"), VariableManager::GetSingletonPtr()->GetAsFloat("OnBubbleMaxVelocity"), def.start_scale);
 	this->CheckBubbleSize();
 	m_bubbles.push_back(go);
 	return go;
 }
 
 GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* data, const Ogre::String& id){
+	std::ostringstream stream;
+	stream << "Tott_" << m_tott_iterations;
+	m_tott_iterations++;
+	Ogre::String tott_id = stream.str();
+	
 	TottDef& def = *static_cast<TottDef*>(data);
-	GameObject* go = new GameObject(GAME_OBJECT_TOTT, "TestTott");
+	GameObject* go = new GameObject(GAME_OBJECT_TOTT, tott_id);
 	NodeComponent* node_comp = new NodeComponent;
 	go->AddComponent(node_comp);
 	AnimationComponent* acomp = new AnimationComponent;
@@ -410,13 +423,30 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 	go->AddUpdateable(way_point);
 	//ChildSceneNodeComponent* child_node = new ChildSceneNodeComponent;
 	//go->AddComponent(child_node);
+
+
 	
 	node_comp->Init(position, m_scene_manager);
-	node_comp->SetId("Tott");
+	node_comp->SetId(tott_id);
 	def.node_name = node_comp->GetSceneNode()->getName();
 	//m_temp_node = node_comp->GetSceneNode();
 	acomp->Init(def.mesh_name, m_scene_manager);
-	acomp->AddAnimationState("Run", true);
+	
+	if (def.type_name == "Hidehog"){
+		acomp->AddAnimationState("Run", true);
+	}
+	else if (def.type_name == "Kittyshroom"){
+		acomp->AddAnimationState("walk", true);
+	}
+	else if (def.type_name == "Nightcap"){
+		acomp->AddAnimationState("walk", true);
+	}
+	else if (def.type_name == "Shroomfox"){
+		acomp->AddAnimationState("idle", true);
+	}
+	else{
+		acomp->AddAnimationState("Run", true);
+	}
 	//child_node->Init(position, "TottNode", node_comp->GetSceneNode());
 
 	//acomp->GetEntity()->setMaterialName("SolidColor/Green");
@@ -465,11 +495,18 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 GameObject* GameObjectManager::CreateSpeechBubble(const Ogre::Vector3& position, void* data, const Ogre::String& id){
 	//Ogre::SceneNode* node = *static_cast<Ogre::SceneNode**>(data);
 
+	std::ostringstream stream;
+	stream << "Speech_Bubble_" << m_speech_bubble_iterations;
+	m_speech_bubble_iterations++;
+	Ogre::String spbubble_id = stream.str();
+
 	GameObject* tott = *static_cast<GameObject**>(data);
 	Ogre::SceneNode* node = static_cast<NodeComponent*>(tott->GetComponent(COMPONENT_NODE))->GetSceneNode();
 	TottDef tott_def = static_cast<TottController*>(tott->GetComponent(COMPONENT_CHARACTER_CONTROLLER))->m_def;
 
-	GameObject* go = new GameObject(GAME_OBJECT_SPEECH_BUBBLE, "TestSpeechBubble");
+	static_cast<TottController*>(tott->GetComponent(COMPONENT_CHARACTER_CONTROLLER))->SetSpeechBubble(spbubble_id);
+
+	GameObject* go = new GameObject(GAME_OBJECT_SPEECH_BUBBLE, spbubble_id);
 	NodeComponent* node_comp = new NodeComponent;
 	go->AddComponent(node_comp);
 	MeshRenderComponent* mrc = new MeshRenderComponent;
@@ -480,10 +517,12 @@ GameObject* GameObjectManager::CreateSpeechBubble(const Ogre::Vector3& position,
 	SpeechBubbleComponent* sbcomp = new SpeechBubbleComponent;
 	go->AddComponent(sbcomp);
 	go->AddUpdateable(sbcomp);
-	
+
+
+
 	node_comp->Init(node, m_scene_manager);
-	node_comp->SetId("node_main");
-	mrc->Init("PratBubblaCherry.mesh", m_scene_manager, "node_main");//, node->getName());
+	node_comp->SetId(spbubble_id);
+	mrc->Init("PratBubblaCherry.mesh", m_scene_manager, node_comp->GetSceneNode()->getName());//, node->getName());
 	sbcomp->Init(node, m_scene_manager, tott);
 	
 	/*
@@ -526,7 +565,13 @@ GameObject* GameObjectManager::CreateQuestItem(const Ogre::Vector3& position, vo
 	std::function<void()> func = [&] { IEvent evt; evt.m_type = EVT_QUEST_ITEM_REMOVE; m_message_system->Notify(&evt); };
 	dcc->Init(func);
 
+	std::ostringstream stream;
+	stream << "Quest_Item_" << m_quest_item_iterations;
+	m_quest_item_iterations++;
+	Ogre::String quest_item_id = stream.str();
+
 	node_comp->Init(position, m_scene_manager);
+	node_comp->SetId(quest_item_id);
 	mrc->Init(tott_def.quest_object_mesh_name, m_scene_manager);
 	
 	RigidBodyDef body_def;
@@ -535,14 +580,14 @@ GameObject* GameObjectManager::CreateQuestItem(const Ogre::Vector3& position, vo
 	body_def.friction = 1.0;
 	body_def.mass = 1.0f;
 	body_def.collision_filter.filter = COL_QUESTITEM;
-	body_def.collision_filter.mask = COL_PLAYER | COL_TOTT | COL_WORLD_STATIC;
+	body_def.collision_filter.mask = COL_PLAYER | COL_TOTT | COL_WORLD_STATIC | COL_BUBBLE;
 	body_def.sync_orientation = false;
 	rc->Init(position,  mrc->GetEntity(), m_physics_engine, body_def);
 	rc->GetRigidbody()->setGravity(btVector3(0.0f, -0.3f, 0.0f));
 	rc->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
 	rc->GetRigidbody()->setActivationState(DISABLE_DEACTIVATION);
 	rc->GetRigidbody()->setDamping(0.5, 0.5);
-	rc->SetId("questitem");
+	rc->SetId(quest_item_id);
 	rot_comp->Init(node_comp->GetSceneNode(), VariableManager::GetSingletonPtr()->GetAsFloat("QuestItemRotationSpeed"));
 
 	return go;
@@ -657,7 +702,7 @@ GameObject* GameObjectManager::CreateLeaf(const Ogre::Vector3& position, void* d
 	trdef.body_type = STATIC_BODY;
 	trdef.collider_type = COLLIDER_SPHERE;
 	trdef.mass = 0.0f;
-	trdef.radius = 1.0f;
+	trdef.radius = 0.4f;
 	trdef.collision_filter.filter = COL_WORLD_TRIGGER;
 	trdef.collision_filter.mask = COL_PLAYER;
 	stc->Init(position, m_physics_engine, trdef);
@@ -732,7 +777,7 @@ GameObject* GameObjectManager::CreateGate(const Ogre::Vector3& position, void* d
 	body_def.collider_type = COLLIDER_BOX;
 	body_def.mass = 1.0f;
 	body_def.collision_filter.filter = COL_WORLD_STATIC;
-	body_def.collision_filter.mask = COL_PLAYER | COL_TOTT | COL_BUBBLE;
+	body_def.collision_filter.mask = COL_PLAYER | COL_TOTT | COL_BUBBLE | COL_QUESTITEM;
 	body_def.collider_def.x = 4.0f;
 	body_def.collider_def.y = 6.0f;
 	body_def.collider_def.z = 0.5f;
@@ -794,5 +839,15 @@ GameObject* GameObjectManager::CreateRockSlide(const Ogre::Vector3& position, vo
 	body_def.collision_filter.filter = COL_WORLD_STATIC;
 	body_def.collision_filter.mask = COL_BUBBLE | COL_PLAYER | COL_QUESTITEM | COL_TOTT;
 	
+	return go;
+}
+
+GameObject* GameObjectManager::CreateLevelChange(const Ogre::Vector3& position, void* data, const Ogre::String& id){
+	TriggerDef& def = *static_cast<TriggerDef*>(data);
+	GameObject* go = new GameObject(GAME_OBJECT_LEVEL_CHANGE, id);
+	TriggerComponent* trigger_comp = new TriggerComponent;
+	go->AddComponent(trigger_comp);
+
+	trigger_comp->Init(position, m_physics_engine, def);
 	return go;
 }

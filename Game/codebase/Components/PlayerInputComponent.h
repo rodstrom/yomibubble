@@ -24,7 +24,7 @@ public:
 	virtual void SimulationStep(btScalar time_step);
 	int GetPlayerState() { return m_player_state; }
 	bool CanBlowPink() const { return m_can_blow_pink; }
-
+	bool IsInsideBubble();
 	SoundData2D m_leaf_sfx;
 	SoundData2D m_leaf_giggle_sfx;
 	//AnimationMsg m_anim_msg;
@@ -108,7 +108,7 @@ protected:
 
 class BubbleController : public Component, public IComponentObserver, public IComponentSimulationStep, public IComponentUpdateable{
 public:
-	BubbleController(void) :  m_velocity(0.0f), m_max_velocity(0.0f), m_impulse(Ogre::Vector3::ZERO), m_apply_impulse(false),
+	BubbleController(void) :  m_velocity(0.0f), m_max_velocity(0.0f), m_impulse_direction(Ogre::Vector3::ZERO), m_apply_impulse(false),
 		m_distance(0.0f), m_ready(false), m_scale_state(0)
 	{ m_type = COMPONENT_BUBBLE_CONTROL; m_update = true; }
 	virtual ~BubbleController(void){}
@@ -125,10 +125,11 @@ public:
 protected:
 	MessageSystem* m_message_system;
 	PhysicsEngine* m_physics_engine;
+	btRigidBody* m_bubble_body;		// pointer to the rigid body
 	bool m_apply_impulse;
-	Ogre::Vector3 m_impulse;
-	float m_velocity;
-	float m_max_velocity;
+	Ogre::Vector3 m_impulse_direction;	// the direction of the impulse the bubble will travel
+	float m_velocity;					// the amount of power applied as an impulse to the rigid body upon movement
+	float m_max_velocity;				// max velocity allowed before we limit the rigid body movement speed
 	float m_distance;
 	float m_max_distance;
 	float m_original_scale;
