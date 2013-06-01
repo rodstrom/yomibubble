@@ -189,6 +189,8 @@ void CollisionManager::PlayerQuestItem(GameObject* player, GameObject* quest_ite
 
 void CollisionManager::TottQuestItem(GameObject* tott, GameObject* quest_item){
 	std::cout << "Tott vs QuestItem\n";
+	//This crashes. No fucks are given at the moment.
+	/*
 	TOTT_STATE ts = HAPPY;
 	tott->GetComponentMessenger()->Notify(MSG_TOTT_STATE_CHANGE, &ts);
 	//typ ljudeffekt
@@ -200,6 +202,7 @@ void CollisionManager::TottQuestItem(GameObject* tott, GameObject* quest_item){
 		quest_item->GetGameObjectManager()->RemoveGameObject(quest_item);
 		static_cast<SpeechBubbleComponent*>(tott->GetComponent(COMPONENT_SPEECH_BUBBLE))->m_given_leaf = true;
 	}
+	*/
 };
 
 void CollisionManager::PlayerSpeechBubble(GameObject* player, GameObject* speech_bubble){

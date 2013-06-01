@@ -593,6 +593,21 @@ void CountableResourceGUI::Update(float dt){
 	else{
 		m_can_pick_up = true;
 	}
+
+	if (m_level == "try"){
+		if (m_current_number == 1){
+			//camera zoom
+			m_messenger->Notify(MSG_TGRAPH_STOP, &Ogre::String("ChangeToCameraZoom"));
+		}
+		else if (m_current_number == 2){
+			//get into bubble
+			m_messenger->Notify(MSG_TGRAPH_STOP, &Ogre::String("ChangeToIntoBubble"));
+		}
+		else if (m_current_number == 3){
+			//och här kan man få lära sig gå in i förstapersonsvy :D
+			m_messenger->Notify(MSG_TGRAPH_STOP, &Ogre::String("ChangeIntoCameraClick"));
+		}
+	}
 };
 
 void CountableResourceGUI::SetMessenger(ComponentMessenger* messenger){
@@ -612,6 +627,7 @@ void CountableResourceGUI::Init(const Ogre::String& level_id){
 
 	m_timer_counter = 0.0f;
 	m_pickup_timer = 3.0f;
+	m_level = level_id;
 }
 
 void TerrainComponent::Notify(int type, void* message){
@@ -842,6 +858,7 @@ void TutorialGraphicsComponent::Notify(int type, void* message){
 	
 	switch(type){
 	case MSG_TGRAPH_STOP:
+		if (m_level == "try"){
 		if (msg == "Stick" && m_pic_one == "HUD/Tutorial/Stick_One"){
 			m_pic_one = "HUD/Tutorial/BlueBubble_One";
 			m_pic_two = "HUD/Tutorial/BlueBubble_Two";
@@ -853,8 +870,40 @@ void TutorialGraphicsComponent::Notify(int type, void* message){
 		else if (msg == "Jump" && m_pic_one == "HUD/Tutorial/Jump_One"){
 			m_overlay->hide();
 		}
-		else if(msg == "PinkBubble" && m_pic_one == "HUD/Tutorial/PinkBubble_One"){
+		else if (msg == "ChangeToCameraZoom" && m_pic_one == "HUD/Tutorial/Jump_One"){
+			m_pic_one = "HUD/Tutorial/CameraZoom_One";
+			m_pic_two = "HUD/Tutorial/CameraZoom_Two";
+			m_overlay->show();
+		}
+		else if(msg == "CameraZoom" && m_pic_one == "HUD/Tutorial/CameraZoom_One"){
 			m_overlay->hide();
+		}
+		else if (msg == "ChangeToIntoBubble" && m_pic_one == "HUD/Tutorial/CameraZoom_One"){
+			m_pic_one = "HUD/Tutorial/IntoBubble_One";
+			m_pic_two = "HUD/Tutorial/IntoBubble_Two";
+			m_overlay->show();
+		}
+		else if(msg == "IntoBubble" && m_pic_one == "HUD/Tutorial/IntoBubble_One"){
+			m_overlay->hide();
+		}
+		else if (msg == "ChangeIntoCameraClick" && m_pic_one == "HUD/Tutorial/IntoBubble_One"){
+			m_pic_one = "CleverBugFix";
+			m_pic_one_sec = "HUD/Tutorial/CameraClick_One";
+			m_pic_two_sec = "HUD/Tutorial/CameraClick_Two";
+			m_overlay_sec->show();
+		}
+		else if (msg == "CameraClick" && m_pic_one_sec == "HUD/Tutorial/CameraClick_One"){
+			m_overlay_sec->hide();
+		}
+		else{}
+		} //if level == try
+
+		if(msg == "PinkBubble" && m_pic_one == "HUD/Tutorial/PinkBubble_One"){
+			m_overlay->hide();
+		}
+
+		if (msg == "CameraMove" && m_overlay_sec->isVisible()){
+			m_overlay_sec->hide();
 		}
 		break;
 	default:
@@ -878,6 +927,9 @@ void TutorialGraphicsComponent::Init(const Ogre::String& id, const Ogre::String&
 
 	m_level = level;
 
+	m_pic_one_sec = "";
+	m_pic_two_sec = "";
+
 	m_overlay = Ogre::OverlayManager::getSingleton().getByName(id);
 	
 	if (level == "try" || level == "Dayarea") { m_overlay->show(); }
@@ -885,8 +937,13 @@ void TutorialGraphicsComponent::Init(const Ogre::String& id, const Ogre::String&
 	if (level == "try"){
 		m_pic_one = "HUD/Tutorial/Stick_One";
 		m_pic_two = "HUD/Tutorial/Stick_Two";
+
+		m_pic_one_sec = "HUD/Tutorial/CameraMove_One";
+		m_pic_two_sec = "HUD/Tutorial/CameraMove_Two";
+		m_overlay_sec = Ogre::OverlayManager::getSingleton().getByName("Level1_Add");
+		m_overlay_sec->show();
 	}
-	else{
+	else if (level == "Dayarea"){
 		m_pic_one = "HUD/Tutorial/PinkBubble_One";
 		m_pic_two = "HUD/Tutorial/PinkBubble_Two";
 	}
@@ -908,7 +965,21 @@ void TutorialGraphicsComponent::Update(float dt){
 		else{
 			Ogre::Overlay::Overlay2DElementsIterator it = m_overlay->get2DElementsIterator();
 			Ogre::OverlayContainer* container = it.peekNext();		
-			container->setMaterialName(m_pic_two); 
+			container->setMaterialName(m_pic_two);
+		}
+	}
+	if (m_level == "try"){
+		if (m_overlay_sec->isVisible()){
+			if (m_first_pic){
+				Ogre::Overlay::Overlay2DElementsIterator it = m_overlay_sec->get2DElementsIterator();
+				Ogre::OverlayContainer* container = it.peekNext();
+				container->setMaterialName(m_pic_one_sec);
+			}
+			else{
+				Ogre::Overlay::Overlay2DElementsIterator it = m_overlay_sec->get2DElementsIterator();
+				Ogre::OverlayContainer* container = it.peekNext();
+				container->setMaterialName(m_pic_two_sec);
+			}
 		}
 	}
 };
