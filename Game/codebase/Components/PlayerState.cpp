@@ -1005,7 +1005,7 @@ void PlayerLeafCollect::Update(float dt){
 	}
 	else {
 		float distance = m_leaf_node->getPosition().distance(m_player_node->getPosition());
-		if (distance <= 0.06f){
+		if (distance <= 0.09f){
 			m_leaf_object->RemoveGameObject(m_leaf_object);
 			s_manager->SetPlayerState(s_manager->GetPlayerState(PLAYER_STATE_IDLE));
 		}
