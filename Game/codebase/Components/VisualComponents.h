@@ -181,6 +181,7 @@ protected:
 
 	Ogre::String			m_material_name_active;
 	Ogre::String			m_material_name_inactive;
+	Ogre::String			m_level;
 
 	Ogre::Overlay*			m_overlay;
 	std::vector<Ogre::OverlayContainer*> m_elements;
@@ -258,6 +259,8 @@ public:
 
 	GameObject* m_tott;
 
+	bool m_given_leaf;
+
 protected:
 	MeshRenderComponent* m_mesh;
 	Ogre::SceneNode* m_node;
@@ -282,9 +285,12 @@ protected:
 
 	Ogre::String m_pic_one;
 	Ogre::String m_pic_two;
+	Ogre::String m_pic_one_sec;
+	Ogre::String m_pic_two_sec;
 	Ogre::String m_level;
 
 	Ogre::Overlay* m_overlay;
+	Ogre::Overlay* m_overlay_sec;
 
 };
 

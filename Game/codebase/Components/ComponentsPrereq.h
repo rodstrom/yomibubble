@@ -35,6 +35,7 @@ enum EComponentMsg{
 	MSG_ADD_FORCE = 0,
 	MSG_NODE_GET_NODE,
 	MSG_NODE_ATTACH_ENTITY,
+	MSG_NODE_GET_POSITION,
 	MSG_MESH_RENDERER_GET_ENTITY,
 	MSG_MESH_SET_MATERIAL_NAME,
 	MSG_RIGIDBODY_GET_BODY,
@@ -118,6 +119,8 @@ enum EComponentMsg{
 	MSG_ON_GROUND,
 	MSG_TGRAPH_STOP,
 	MSG_TOTT_STATE_CHANGE,
+	MSG_TOTT_COLLIDING,
+	MSG_AI_PAUSE,
 	MSG_WAYPOINT_PAUSE,
 	MSG_WAYPOINT_START,
 	MSG_CAMERA_CHECK_COLLISION,
@@ -209,7 +212,7 @@ public:
 };
 
 struct AnimationMsg{
-	AnimationMsg(void) : index(0), loop(true), full_body(false), blend(false), wait(false), duration(0.0f), blending_transition(2){}
+	AnimationMsg(void) : index(0), loop(true), full_body(false), blend(false), wait(false), duration(0.2f), blending_transition(2){}
 	int index;
 	int blending_transition;
 	bool blend;

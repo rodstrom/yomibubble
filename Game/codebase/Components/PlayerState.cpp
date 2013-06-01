@@ -929,6 +929,7 @@ void PlayerHoldObject::Enter(){
 				s_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_DIRECTION, &gravity);
 				s_manager->HoldObject(false);
 				s_manager->GoInsideBubble(true);
+				s_messenger->Notify(MSG_TGRAPH_STOP, &Ogre::String("IntoBubble"));
 			}
 		}
 	}

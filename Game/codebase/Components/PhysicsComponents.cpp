@@ -1009,104 +1009,34 @@ void CameraRaycastCollisionComponent::SetMessenger(ComponentMessenger* messenger
 
 
 void TottController::Notify(int type, void* msg){
-	CharacterController::Notify(type, msg);
-	/*
-	TOTT_STATE& new_state = *static_cast<TOTT_STATE*>(msg);
-
-	//switch(type){
-	//case MSG_TOTT_STATE_CHANGE:
-		//new_state = static_cast<TOTT_STATE*>(msg);
-		m_state = new_state;
-
-		if (m_can_change_state){
-
-		switch(m_state){
-		case IDLING:
-			m_messenger->Notify(MSG_WAYPOINT_START, NULL);
-			if (m_anim_msg.id != m_walk_animation){
-				//static_cast<MeshRenderComponent*>(m_owner->GetComponent(COMPONENT_MESH_RENDER))->GetEntity()->setVisible(false); // so this crashes
-				m_anim_msg.id = m_walk_animation;
-				m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
-			}
-			break;
-		case CURIOUS:
-			m_messenger->Notify(MSG_WAYPOINT_PAUSE, NULL);
-			if (m_anim_msg.id != m_react_animation){
-				m_anim_msg.id = m_react_animation;
-				m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
-			}
-			break;
-		case HAPPY:
-			m_messenger->Notify(MSG_WAYPOINT_PAUSE, NULL);
-			if (m_anim_msg.id != m_happy_animation){
-				m_anim_msg.id = m_happy_animation;
-				m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
-			}
-			break;
-		default:
-			break;
-		};
-		m_can_change_state = false;
-		}
-		*/
-		/*
-		break;
+	switch (type)
+	{
+	case MSG_TOTT_COLLIDING:
+		m_colliding = true;
 	default:
 		break;
-	};*/
+	}
 };
 
 void TottController::Shut(){
-	CharacterController::Shut();
-	m_messenger->Register(MSG_TOTT_STATE_CHANGE, this);
+	m_messenger->Register(MSG_TOTT_COLLIDING, this);
+	m_physics_engine->RemoveObjectSimulationStep(this);
 };
 
 void TottController::SetMessenger(ComponentMessenger* messenger){
-	CharacterController::SetMessenger(messenger);
-	m_messenger->Register(MSG_TOTT_STATE_CHANGE, this);
+	m_messenger = messenger;
+	m_messenger->Register(MSG_TOTT_COLLIDING, this);
 };
 
-void TottController::Init(const Ogre::Vector3& position, PhysicsEngine* physics_engine, const TottDef& def){
-	CharacterController::Init(position, physics_engine, def.character_controller);
+void TottController::Init(PhysicsEngine* physics_engine){
+	m_colliding = false;
+
 	
-	m_def = def;
-
-	m_idle_animation = def.idle_animation;
-	m_walk_animation = def.walk_animation;
-	m_run_animation = def.run_animation;
-	m_react_animation = def.react_animation;
-	m_happy_animation = def.happy_animation;
-	
-	//def.theme_music = Ogre::String("Hidehog_Theme");
-
-	m_anim_msg.blend = false;
-	m_anim_msg.full_body = true;
-	m_anim_msg.id = "Idle";
-	m_anim_msg.index = 0;
-	m_anim_msg.loop = true;
-	m_anim_msg.wait = false;
-	m_anim_msg.blending_transition = AnimationBlender::BlendThenAnimate;
-
-	m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
-	m_state = IDLING;
-
-	m_quest_done = false;
-
-	m_state_timer_counter = 0.0f;
-	m_state_timer = 1.0f;
-	m_can_change_state = true;
-
-	m_music.m_attached = false;
-	m_music.m_change_pitch = false;
-	m_music.m_change_volume = false;
-	m_music.m_name = "Hidehog_Theme";
-	m_music.m_node_name = def.node_name;
-	m_music.m_pitch = 1.0f;
-	m_music.m_volume = 1.0f;
+	m_physics_engine = physics_engine;
+	m_physics_engine->AddObjectSimulationStep(this);
 };
 
 void TottController::Idling(){
-	//m_messenger->Notify(MSG_MESH_RENDERER_GET_ENTITY
 	m_anim_msg.id = m_idle_animation;
 	m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
 	
@@ -1126,63 +1056,11 @@ void TottController::Happy(){
 };
 
 void TottController::Update(float dt){
-	CharacterController::Update(dt);
-
-	//m_owner->GetGameObjectManager()->GetGameObject("Player")->GetComponentMessenger()->Notify(MSG_MUSIC3D_PLAY, &m_music);
-
-	//m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
-	/*
-	Ogre::Quaternion rotation;
-	Ogre::Vector3 tott_pos = static_cast<NodeComponent*>(m_owner->GetComponent(COMPONENT_NODE))->GetSceneNode()->getPosition();
-	Ogre::Quaternion tott_ori = static_cast<NodeComponent*>(m_owner->GetComponent(COMPONENT_NODE))->GetSceneNode()->getOrientation();
-
-	Ogre::Vector3 player_pos = static_cast<NodeComponent*>(m_owner->GetGameObjectManager()->GetGameObject("Player")->GetComponent(COMPONENT_NODE))->GetSceneNode()->getPosition();
-	Ogre::Quaternion player_ori = static_cast<NodeComponent*>(m_owner->GetGameObjectManager()->GetGameObject("Player")->GetComponent(COMPONENT_NODE))->GetSceneNode()->getOrientation();
-
-	Ogre::Quaternion quat = Ogre::Quaternion ((Degree(player_ori.getYaw())), Vector3::UNIT_X)*Quaternion ((Degree(player_ori.getPitch())), Vector3::UNIT_Y)*Quaternion ((Degree(player_ori.getRoll())), Vector3::UNIT_Z);
-	Ogre::Quaternion quat_tott = Ogre::Quaternion ((Degree(tott_ori.getYaw())), Vector3::UNIT_X)*Quaternion ((Degree(tott_ori.getPitch())), Vector3::UNIT_Y)*Quaternion ((Degree(tott_ori.getRoll())), Vector3::UNIT_Z);
-
-	if (!m_can_change_state){
-		m_state_timer_counter += dt;
-
-		if (m_state_timer_counter > m_state_timer){
-			m_can_change_state = true;
-			m_state_timer_counter = 0.0f;
-		}
-	}
-
-	switch(m_state){
-	case IDLING:
-		Idling();
-		break;
-	case CURIOUS:
-		//rotation = Ogre::Quaternion(0.5f, player_pos.x, player_pos.y, player_pos.z);
-		//m_messenger->Notify(MSG_SET_OBJECT_ORIENTATION, &quat_tott); //so this made it party hard
-		Curious();
-		break;
-	case HAPPY:
-		Happy();
-		break;
-	default:
-		break;
-	};
-	*/
-
-	//Ogre::SceneNode* test = static_cast<NodeComponent*>(m_owner->GetComponent(COMPONENT_NODE))->GetSceneNode();
-
-	//std::cout << "SB node at " << test->getPosition() << std::endl;
-
-		//if (m_owner->GetId() == "TestSpeechBubble") { std::cout << "Speech Bubble at " << m_node->getPosition() << std::endl; }
-
-	//Ogre::Vector3 bajs = test->getPosition();
-
-	//m_messenger->Notify(MSG_RIGIDBODY_POSITION_SET, &bajs);
-
-	//static_cast<NodeComponent*>(m_owner->GetGameObjectManager()->GetGameObject("TestSpeechBubble")->GetComponent(COMPONENT_NODE))->GetSceneNode()->setPosition(static_cast<NodeComponent*>(m_owner->GetComponent(COMPONENT_NODE))->GetSceneNode()->getPosition());
-	//static_cast<TriggerComponent*>(m_owner->GetGameObjectManager()->GetGameObject("TestSpeechBubble")->GetComponent(COMPONENT_TRIGGER))->
-	//m_owner->GetGameObjectManager()->GetGameObject("TestSpeechBubble")->GetComponentMessenger()->Notify(MSG_SET_OBJECT_POSITION, &static_cast<NodeComponent*>(m_owner->GetComponent(COMPONENT_NODE))->GetSceneNode()->getPosition());
+	m_messenger->Notify(MSG_AI_PAUSE, &m_colliding);
+	std::cout << "Update Loop\n";
 };
 
 void TottController::SimulationStep(btScalar time_step){
-	CharacterController::SimulationStep(time_step);
+	m_colliding = false;
+	std::cout << "Colliding = FALSE;\n";
 };

@@ -52,6 +52,8 @@ private:
 	void QuestItemTott(GameObject* quest_item, GameObject* tott) {  } // TottQuestItem(tott, quest_item);
 	void PlayerSpeechBubble(GameObject* player, GameObject* speech_bubble);
 	void SpeechBubblePlayer(GameObject* speech_bubble, GameObject* player) { PlayerSpeechBubble(player, speech_bubble); }
+	void QuestTottPlayer(GameObject* quest_tott, GameObject* player);
+	void PlayerQuestTott(GameObject* player, GameObject* quest_tott) { QuestTottPlayer(quest_tott, player); }
 
 	void CameraTerrain(GameObject* camera, GameObject* terrain);
 	void TerrainCamera(GameObject* terrain, GameObject* camera) { CameraTerrain(camera, terrain); }

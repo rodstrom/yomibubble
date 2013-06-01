@@ -50,9 +50,13 @@ void GameObjectManager::Init(PhysicsEngine* physics_engine, Ogre::SceneManager* 
 	m_create_fptr[GAME_OBJECT_SPEECH_BUBBLE] =  &GameObjectManager::CreateSpeechBubble;
 	m_create_fptr[GAME_OBJECT_ROCK_SLIDE] =		&GameObjectManager::CreateRockSlide;
 	m_create_fptr[GAME_OBJECT_LEVEL_CHANGE] =   &GameObjectManager::CreateLevelChange;
+	m_create_fptr[GAME_OBJECT_QUEST_TOTT] =		&GameObjectManager::CreateQuestTott;
 
 	m_leaf_iterations = 0;
 	m_particle_iterations = 0;
+	m_tott_iterations = 0;
+	m_speech_bubble_iterations = 0;
+	m_quest_item_iterations = 0;
 	m_temp_node = NULL;
 }
 
@@ -399,82 +403,143 @@ GameObject* GameObjectManager::CreatePinkBubble(const Ogre::Vector3& position, v
 }
 
 GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* data, const Ogre::String& id){
+	static int tott_counter = 0;
+	Ogre::String tott_id = "Tott" + NumberToString(tott_counter);
 	TottDef& def = *static_cast<TottDef*>(data);
-	GameObject* go = new GameObject(GAME_OBJECT_TOTT, "TestTott");
+	GameObject* go = new GameObject(GAME_OBJECT_TOTT, tott_id);
 	NodeComponent* node_comp = new NodeComponent;
 	go->AddComponent(node_comp);
+	TottAIComponent* ai_comp = new TottAIComponent;
+	go->AddComponent(ai_comp);
+	go->AddUpdateable(ai_comp);
 	AnimationComponent* acomp = new AnimationComponent;
 	go->AddComponent(acomp);
 	go->AddUpdateable(acomp);
-	//CharacterController* contr = new CharacterController;
-	TottController* contr = new TottController;
+	CharacterController* contr = new CharacterController;
 	go->AddComponent(contr);
 	go->AddUpdateable(contr);
-	WayPointComponent* way_point = new WayPointComponent;
-	go->AddComponent(way_point);
-	go->AddUpdateable(way_point);
-	//ChildSceneNodeComponent* child_node = new ChildSceneNodeComponent;
-	//go->AddComponent(child_node);
 	
 	node_comp->Init(position, m_scene_manager);
-	node_comp->SetId("Tott");
+	node_comp->SetId(tott_id);
 	def.node_name = node_comp->GetSceneNode()->getName();
-	//m_temp_node = node_comp->GetSceneNode();
 	acomp->Init(def.mesh_name, m_scene_manager);
-	acomp->AddAnimationState("Run", true);
-	//child_node->Init(position, "TottNode", node_comp->GetSceneNode());
+	
 
-	//acomp->GetEntity()->setMaterialName("SolidColor/Green");
+	
+	if (def.type_name == "Hidehog"){
+		acomp->AddAnimationState("Run", true);
+	}
+	else if (def.type_name == "Kittyshroom"){
+		acomp->AddAnimationState("walk", true);
+	}
+	else if (def.type_name == "Nightcap"){
+		acomp->AddAnimationState("walk", true);
+	}
+	else if (def.type_name == "Shroomfox"){
+		acomp->AddAnimationState("idle", true);
+	}
+	else{
+		acomp->AddAnimationState("Run", true);
+	}
+	ai_comp->Init(def.ai_states);
 	m_sound_manager->GetTottNode(node_comp->GetSceneNode()->getName());
-	way_point->Init(node_comp->GetSceneNode(), 2.140005f);
-	//way_point->AddWayPoint(Ogre::Vector3(161, 72, 252));
-	//way_point->AddWayPoint(Ogre::Vector3(161, 72, 258));
-	way_point->SetLoopable("true");
-
-	//way_point->AddWayPoint(Ogre::Vector3(15.0f, -10.0f, 21.0f));
-
-	contr->Init(position, m_physics_engine, def);
-	contr->SetTurnSpeed(def.character_controller.turn_speed);
-	contr->SetVelocity(def.character_controller.velocity);
-	contr->GetRigidbody()->setRestitution(def.character_controller.restitution);
-	contr->GetRigidbody()->setFriction(def.character_controller.friction);
-	//contr->GetRigidbody()->setCollisionFlags(def.collision_filter.mask);
+	contr->Init(position, m_physics_engine, def.character_controller);
 	contr->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
 	contr->GetRigidbody()->setActivationState(DISABLE_DEACTIVATION);
-	contr->GetRigidbody()->setDamping(0.5, 0.5);
 
-	/*
-	RigidBodyDef body_def;
-	body_def.body_type = DYNAMIC_BODY;
-	body_def.collider_type = COLLIDER_SPHERE;
-	body_def.friction = 1.0;
-	body_def.mass = 1.0f;
-	body_def.collision_filter.filter = COL_QUESTITEM;
-	body_def.collision_filter.mask = COL_PLAYER | COL_TOTT | COL_WORLD_STATIC;
-	rc->Init(position,  mrc->GetEntity(), m_physics_engine, body_def);
-	rc->GetRigidbody()->setGravity(btVector3(0.0f, -0.2f, 0.0f));
-	rc->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
-	rc->GetRigidbody()->setActivationState(DISABLE_DEACTIVATION);
-	rc->GetRigidbody()->setDamping(0.5, 0.5);
-	rc->SetId("questitem");
-	*/
-
-
-	//DEBUGGING GRAVITY
-	//contr->GetRigidbody()->setGravity(btVector3(0,0,0));
-
-
+	tott_counter++;
 	return go;
 }
 
+GameObject* GameObjectManager::CreateQuestTott(const Ogre::Vector3& position, void* data, const Ogre::String& id){
+	static int quest_tott_counter = 0;
+	Ogre::String tott_id = "Tott" + NumberToString(quest_tott_counter);
+	TottDef& def = *static_cast<TottDef*>(data);
+	GameObject* go = new GameObject(GAME_OBJECT_QUEST_TOTT, tott_id);
+	NodeComponent* node_comp = new NodeComponent;
+	go->AddComponent(node_comp);
+	TottAIComponent* ai_comp = new TottAIComponent;
+	go->AddComponent(ai_comp);
+	go->AddUpdateable(ai_comp);
+	AnimationComponent* acomp = new AnimationComponent;
+	go->AddComponent(acomp);
+	go->AddUpdateable(acomp);
+	CharacterController* contr = new CharacterController;
+	go->AddComponent(contr);
+	go->AddUpdateable(contr);
+	ChildSceneNodeComponent* child_node = new ChildSceneNodeComponent;
+	go->AddComponent(child_node);
+	MeshRenderComponent* spbubble = new MeshRenderComponent;
+	go->AddComponent(spbubble);
+	SyncedTriggerComponent* trcomp = new SyncedTriggerComponent;
+	go->AddComponent(trcomp);
+	go->AddUpdateable(trcomp);
+	TottController* tott_contr = new TottController;
+	go->AddComponent(tott_contr);
+	go->AddUpdateable(tott_contr);
+	
+	node_comp->Init(position, m_scene_manager);
+	node_comp->SetId(tott_id);
+	def.node_name = node_comp->GetSceneNode()->getName();
+	acomp->Init(def.mesh_name, m_scene_manager);
+	
+	child_node->Init(Ogre::Vector3(0,1,0), "speech_bubble", node_comp->GetSceneNode());
+	child_node->SetId("speech_bubble");
+	spbubble->Init("PratBubblaCherry.mesh", m_scene_manager, "speech_bubble");
+	child_node->GetNode()->attachObject(spbubble->GetEntity());
+
+	if (def.type_name == "Hidehog"){
+		acomp->AddAnimationState("Run", true);
+	}
+	else if (def.type_name == "Kittyshroom"){
+		acomp->AddAnimationState("walk", true);
+	}
+	else if (def.type_name == "Nightcap"){
+		acomp->AddAnimationState("walk", true);
+	}
+	else if (def.type_name == "Shroomfox"){
+		acomp->AddAnimationState("idle", true);
+	}
+	else{
+		acomp->AddAnimationState("Run", true);
+	}
+	ai_comp->Init(def.ai_states);
+	m_sound_manager->GetTottNode(node_comp->GetSceneNode()->getName());
+	contr->Init(position, m_physics_engine, def.character_controller);
+	contr->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
+	contr->GetRigidbody()->setActivationState(DISABLE_DEACTIVATION);
+
+	tott_contr->Init(m_physics_engine);
+
+	TriggerDef trdef;
+	trdef.body_type = STATIC_BODY;
+	trdef.collider_type = COLLIDER_SPHERE;
+	trdef.collision_filter.filter = COL_WORLD_TRIGGER;
+	trdef.collision_filter.mask = COL_PLAYER;
+	trdef.mass = 1.0f;
+	trdef.radius = 4.0f;
+
+	trcomp->Init(position, m_physics_engine, &trdef);
+
+	quest_tott_counter++;
+	return go;
+};
+
 GameObject* GameObjectManager::CreateSpeechBubble(const Ogre::Vector3& position, void* data, const Ogre::String& id){
 	//Ogre::SceneNode* node = *static_cast<Ogre::SceneNode**>(data);
+
+	std::ostringstream stream;
+	stream << "Speech_Bubble_" << m_speech_bubble_iterations;
+	m_speech_bubble_iterations++;
+	Ogre::String spbubble_id = stream.str();
 
 	GameObject* tott = *static_cast<GameObject**>(data);
 	Ogre::SceneNode* node = static_cast<NodeComponent*>(tott->GetComponent(COMPONENT_NODE))->GetSceneNode();
 	TottDef tott_def = static_cast<TottController*>(tott->GetComponent(COMPONENT_CHARACTER_CONTROLLER))->m_def;
 
-	GameObject* go = new GameObject(GAME_OBJECT_SPEECH_BUBBLE, "TestSpeechBubble");
+	static_cast<TottController*>(tott->GetComponent(COMPONENT_CHARACTER_CONTROLLER))->SetSpeechBubble(spbubble_id);
+
+	GameObject* go = new GameObject(GAME_OBJECT_SPEECH_BUBBLE, spbubble_id);
 	NodeComponent* node_comp = new NodeComponent;
 	go->AddComponent(node_comp);
 	MeshRenderComponent* mrc = new MeshRenderComponent;
@@ -485,10 +550,12 @@ GameObject* GameObjectManager::CreateSpeechBubble(const Ogre::Vector3& position,
 	SpeechBubbleComponent* sbcomp = new SpeechBubbleComponent;
 	go->AddComponent(sbcomp);
 	go->AddUpdateable(sbcomp);
-	
+
+
+
 	node_comp->Init(node, m_scene_manager);
-	node_comp->SetId("node_main");
-	mrc->Init("PratBubblaCherry.mesh", m_scene_manager, "node_main");//, node->getName());
+	node_comp->SetId(spbubble_id);
+	mrc->Init("PratBubblaCherry.mesh", m_scene_manager, node_comp->GetSceneNode()->getName());//, node->getName());
 	sbcomp->Init(node, m_scene_manager, tott);
 	
 	/*
@@ -531,7 +598,13 @@ GameObject* GameObjectManager::CreateQuestItem(const Ogre::Vector3& position, vo
 	std::function<void()> func = [&] { IEvent evt; evt.m_type = EVT_QUEST_ITEM_REMOVE; m_message_system->Notify(&evt); };
 	dcc->Init(func);
 
+	std::ostringstream stream;
+	stream << "Quest_Item_" << m_quest_item_iterations;
+	m_quest_item_iterations++;
+	Ogre::String quest_item_id = stream.str();
+
 	node_comp->Init(position, m_scene_manager);
+	node_comp->SetId(quest_item_id);
 	mrc->Init(tott_def.quest_object_mesh_name, m_scene_manager);
 	
 	RigidBodyDef body_def;
@@ -547,7 +620,7 @@ GameObject* GameObjectManager::CreateQuestItem(const Ogre::Vector3& position, vo
 	rc->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
 	rc->GetRigidbody()->setActivationState(DISABLE_DEACTIVATION);
 	rc->GetRigidbody()->setDamping(0.5, 0.5);
-	rc->SetId("questitem");
+	rc->SetId(quest_item_id);
 	rot_comp->Init(node_comp->GetSceneNode(), VariableManager::GetSingletonPtr()->GetAsFloat("QuestItemRotationSpeed"));
 
 	return go;

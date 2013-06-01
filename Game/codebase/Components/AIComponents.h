@@ -25,4 +25,23 @@ private:
 	bool m_pause;
 };
 
+class AIState;
+class TottAIComponent : public Component, public IComponentUpdateable, public IComponentObserver {
+public:
+	TottAIComponent(void) : m_current_index(0){}
+	virtual ~TottAIComponent(void){}
+
+	virtual void Notify(int type, void* message);
+	virtual void Shut();
+	virtual void Init(const std::vector<AIState*>& ai_states);
+	virtual void SetMessenger(ComponentMessenger* messenger);
+	virtual void Update(float dt);
+
+protected:
+	bool m_pause;
+	int m_current_index;
+	AIState*	m_current_ai_state;
+	std::vector<AIState*> m_ai_states;
+};
+
 #endif //AI_COMPONENTS_H

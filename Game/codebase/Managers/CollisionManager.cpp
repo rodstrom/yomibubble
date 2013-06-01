@@ -11,6 +11,7 @@
 #include "OgreAxisAlignedBox.h"
 #include "..\MessageSystem.h"
 #include "..\Components\VisualComponents.h"
+#include "..\AI\AIPrereq.h"
 
 CollisionManager* CollisionManager::m_instance = NULL;
 
@@ -63,6 +64,8 @@ void CollisionManager::Init(){
 	m_collision[MakeIntPair(GAME_OBJECT_BLUE_BUBBLE, GAME_OBJECT_PLAYER)] = &CollisionManager::BlueBubblePlayer;
 	m_collision[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_LEVEL_CHANGE)] = &CollisionManager::PlayerLevelChange;
 	m_collision[MakeIntPair(GAME_OBJECT_LEVEL_CHANGE, GAME_OBJECT_PLAYER)] = &CollisionManager::LevelChangePlayer;
+	m_collision[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_QUEST_TOTT)] = &CollisionManager::PlayerQuestTott;
+	m_collision[MakeIntPair(GAME_OBJECT_QUEST_TOTT, GAME_OBJECT_PLAYER)] = &CollisionManager::QuestTottPlayer;
 
 	m_raycast_map[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_PINK_BUBBLE)] = &CollisionManager::PlayerPinkBubble;
 	m_raycast_map[MakeIntPair(GAME_OBJECT_PINK_BUBBLE, GAME_OBJECT_PLAYER)] = &CollisionManager::PinkBubblePlayer;
@@ -177,7 +180,7 @@ void CollisionManager::PlayerQuestItem(GameObject* player, GameObject* quest_ite
 };
 
 void CollisionManager::TottQuestItem(GameObject* tott, GameObject* quest_item){
-	std::cout << "Tott vs QuestItem\n";
+	/*std::cout << "Tott vs QuestItem\n";
 	TOTT_STATE ts = HAPPY;
 	tott->GetComponentMessenger()->Notify(MSG_TOTT_STATE_CHANGE, &ts);
 	//typ ljudeffekt
@@ -187,7 +190,7 @@ void CollisionManager::TottQuestItem(GameObject* tott, GameObject* quest_item){
 	quest_item->GetGameObjectManager()->RemoveGameObject(quest_item);
 	quest_item->GetGameObjectManager()->RemoveGameObject(quest_item->GetGameObjectManager()->GetGameObject("TestSpeechBubble"));
 	RigidbodyComponent* quest_body = static_cast<RigidbodyComponent*>(quest_item->GetComponent(COMPONENT_RIGIDBODY));
-	quest_item->GetGameObjectManager()->GetPhysicsEngine()->GetDynamicWorld()->removeRigidBody(quest_body->GetRigidbody());
+	quest_item->GetGameObjectManager()->GetPhysicsEngine()->GetDynamicWorld()->removeRigidBody(quest_body->GetRigidbody());*/
 };
 
 void CollisionManager::PlayerSpeechBubble(GameObject* player, GameObject* speech_bubble){
@@ -219,4 +222,11 @@ void CollisionManager::PlayerLevelChange(GameObject* player, GameObject* level_c
 	IEvent evt;
 	evt.m_type = EVT_CHANGE_LEVEL;
 	m_message_system->Notify(&evt);
+}
+
+void CollisionManager::QuestTottPlayer(GameObject* quest_tott, GameObject* player){
+	std::cout << "quest tott vs player\n"; //Great success! :D
+	//skicka in int och notifya //EAIState
+	//EAIState state = AI_STATE_WAIT;
+	quest_tott->GetComponentMessenger()->Notify(MSG_TOTT_COLLIDING, NULL);
 }

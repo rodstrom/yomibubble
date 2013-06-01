@@ -77,6 +77,8 @@ public:
 	MeshList m_vegetation;		// we will page vegetation like grass, bushes and shrooms.
 
 protected:
+	void CreateTottAIState(std::vector<class AIState*>& vector, const Ogre::String& id, const Ogre::String& line);
+
 	void InitShadowList(std::vector<Ogre::String>& shadow_map);
 
 };

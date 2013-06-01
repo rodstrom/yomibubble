@@ -1,9 +1,12 @@
 #ifndef _N_GAME_OBJECT_PREREQ_H_
 #define _N_GAME_OBJECT_PREREQ_H_
 
+#include "ComponentsPrereq.h"
+
 enum EGameObject{
 	GAME_OBJECT_PLAYER = 0,
 	GAME_OBJECT_TOTT,
+	GAME_OBJECT_QUEST_TOTT,
 	GAME_OBJECT_PINK_BUBBLE,
 	GAME_OBJECT_BLUE_BUBBLE,
 	GAME_OBJECT_OVERLAY,
@@ -112,6 +115,7 @@ struct TottDef{
 	Ogre::String			happy_animation;
 	Ogre::String			mesh;
 	Ogre::String			node_name;
+	std::vector<class AIState*>	ai_states;
 };
 
 struct PlayerDef{

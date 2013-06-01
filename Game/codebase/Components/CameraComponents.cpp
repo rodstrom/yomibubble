@@ -198,7 +198,10 @@ void FollowCameraComponent::Update(float dt){
 		if (input){
 			if(input->IsButtonPressed(BTN_INVERT_VERTICAL)) m_vertical_coefficient *= -1;
 			if(input->IsButtonPressed(BTN_INVERT_HORIZONTAL)) m_horizontal_coefficient *= -1;
-			if(input->IsButtonPressed(BTN_FIRST_PERSON)) m_first_person = !m_first_person;
+			if(input->IsButtonPressed(BTN_FIRST_PERSON)) { 
+				m_first_person = !m_first_person; 
+				m_messenger->Notify(MSG_TGRAPH_STOP, &Ogre::String("CameraClick")); 
+			}
 			CameraAxis axis = input->GetCameraAxis();
 			//UpdateCameraGoal(-0.1f * axis.x, -0.1f * axis.y, -0.0005f * axis.z);
 			Ogre::Real speed = 20;
@@ -346,6 +349,7 @@ void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real de
 	
 	if (m_getting_input){
 		m_camera_pivot->yaw(Ogre::Degree(delta_yaw * m_camera_stick_rotation_acceleration), Ogre::Node::TS_WORLD);
+		m_messenger->Notify(MSG_TGRAPH_STOP, &Ogre::String("CameraMove"));
 	}
 	// << m_pivot_pitch << "\n";
 	if (!(m_pivot_pitch + delta_pitch > 10 && delta_pitch > 0) && 
@@ -364,6 +368,9 @@ void FollowCameraComponent::UpdateCameraGoal(Ogre::Real delta_yaw, Ogre::Real de
 		if (!(dist + dist_change < 2 && dist_change < 0) &&
 		!(dist + dist_change > 25 && dist_change > 0)){
 			m_camera_goal->translate(0, dist_change * 0.2, dist_change, Ogre::Node::TS_LOCAL);
+			if (m_getting_input && delta_zoom != 0.0f){
+				m_messenger->Notify(MSG_TGRAPH_STOP, &Ogre::String("CameraZoom"));
+			}
 		}
 	//}
 	

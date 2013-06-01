@@ -134,7 +134,7 @@ enum TOTT_STATE{
 	HAPPY
 };
 
-class TottController : public CharacterController {
+class TottController : public Component, public IComponentObserver, public IComponentSimulationStep, public IComponentUpdateable {
 public:
 	TottController(void) { m_type = COMPONENT_CHARACTER_CONTROLLER; }
 	virtual ~TottController(void) {}
@@ -142,9 +142,12 @@ public:
 	virtual void Notify(int type, void* msg);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
-	virtual void Init(const Ogre::Vector3& position, PhysicsEngine* physics_engine, const TottDef& def);
+	virtual void Init(PhysicsEngine* physics_engine);
 	virtual void Update(float dt);
 	virtual void SimulationStep(btScalar time_step);
+
+	void SetSpeechBubble(Ogre::String spbubble){ m_speech_bubble = spbubble; }
+	Ogre::String GetSpeechBubble() { return m_speech_bubble; }
 
 	void Idling();
 	void Curious();
@@ -156,11 +159,17 @@ public:
 	float m_state_timer;
 	bool m_can_change_state;
 
+	bool m_colliding;
+	PhysicsEngine* m_physics_engine;
 	SoundData3D m_music;
+
+	
 	
 protected:
 	TOTT_STATE m_state;
 	AnimationMsg m_anim_msg;
+
+	Ogre::String m_speech_bubble;
 
 	Ogre::String m_idle_animation;
 	Ogre::String m_walk_animation;
