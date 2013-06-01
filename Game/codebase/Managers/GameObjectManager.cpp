@@ -272,7 +272,7 @@ GameObject* GameObjectManager::CreatePlayer(const Ogre::Vector3& position, void*
 	prcc->SetCustomVariables(VariableManager::GetSingletonPtr()->GetAsFloat("Bounce_Jump_Mod"));
 
 	fcc->SetNode(node_comp->GetSceneNode());
-	fcc->Init(m_scene_manager, m_viewport, true);
+	fcc->Init(position, m_scene_manager, m_viewport, true);
 	fcc->SetMovementSpeed(2.5f);
 
 	fcc->SetPhysEngine(m_physics_engine);

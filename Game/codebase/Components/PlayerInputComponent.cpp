@@ -194,8 +194,40 @@ void PlayerInputComponent::Init(InputManager* input_manager, SoundManager* sound
 	stand_on_blue_def.rolling_friction = VariableManager::GetSingletonPtr()->GetAsFloat("Stand_On_Rolling_Friction", INIFILE_PLAYER_VARIABLES, "BLUE_BUBBLE");
 	stand_on_blue_def.velocity = VariableManager::GetSingletonPtr()->GetAsFloat("Stand_On_Velocity", INIFILE_PLAYER_VARIABLES, "BLUE_BUBBLE");
 
+	inside_blue_def.damping = VariableManager::GetSingletonPtr()->GetAsFloat("Inside_Damping", INIFILE_PLAYER_VARIABLES, "BLUE_BUBBLE");
+	inside_blue_def.friction = VariableManager::GetSingletonPtr()->GetAsFloat("Inside_Friction", INIFILE_PLAYER_VARIABLES, "BLUE_BUBBLE");
+	inside_blue_def.gravity = VariableManager::GetSingletonPtr()->GetAsFloat("Inside_Gravity", INIFILE_PLAYER_VARIABLES, "BLUE_BUBBLE");
+	inside_blue_def.max_velocity = VariableManager::GetSingletonPtr()->GetAsFloat("Inside_Max_Velocity", INIFILE_PLAYER_VARIABLES, "BLUE_BUBBLE");
+	inside_blue_def.restitution = VariableManager::GetSingletonPtr()->GetAsFloat("Inside_Restitution", INIFILE_PLAYER_VARIABLES, "BLUE_BUBBLE");
+	inside_blue_def.rolling_friction = VariableManager::GetSingletonPtr()->GetAsFloat("Inside_Rolling_Friction", INIFILE_PLAYER_VARIABLES, "BLUE_BUBBLE");
+	inside_blue_def.velocity = VariableManager::GetSingletonPtr()->GetAsFloat("Inside_Velocity", INIFILE_PLAYER_VARIABLES, "BLUE_BUBBLE");
 
+	// Pink definitions
+	free_pink_def.damping = VariableManager::GetSingletonPtr()->GetAsFloat("Free_Damping", INIFILE_PLAYER_VARIABLES, "PINK_BUBBLE");
+	free_pink_def.friction = VariableManager::GetSingletonPtr()->GetAsFloat("Free_Friction", INIFILE_PLAYER_VARIABLES, "PINK_BUBBLE");
+	free_pink_def.gravity = VariableManager::GetSingletonPtr()->GetAsFloat("Free_Gravity", INIFILE_PLAYER_VARIABLES, "PINK_BUBBLE");
+	free_pink_def.max_velocity = VariableManager::GetSingletonPtr()->GetAsFloat("Free_Max_Velocity", INIFILE_PLAYER_VARIABLES, "PINK_BUBBLE");
+	free_pink_def.restitution = VariableManager::GetSingletonPtr()->GetAsFloat("Free_Restitution", INIFILE_PLAYER_VARIABLES, "BPINK_BUBBLE");
+	free_pink_def.rolling_friction = VariableManager::GetSingletonPtr()->GetAsFloat("Free_Rolling_Friction", INIFILE_PLAYER_VARIABLES, "PINK_BUBBLE");
+	free_pink_def.velocity = VariableManager::GetSingletonPtr()->GetAsFloat("Free_Velocity", INIFILE_PLAYER_VARIABLES, "PINK_BUBBLE");
+	
+	stand_on_pink_def.damping = VariableManager::GetSingletonPtr()->GetAsFloat("Stand_On_Damping", INIFILE_PLAYER_VARIABLES, "PINK_BUBBLE");
+	stand_on_pink_def.friction = VariableManager::GetSingletonPtr()->GetAsFloat("Stand_On_Friction", INIFILE_PLAYER_VARIABLES, "PINK_BUBBLE");
+	stand_on_pink_def.gravity = VariableManager::GetSingletonPtr()->GetAsFloat("Stand_On_Gravity", INIFILE_PLAYER_VARIABLES, "PINK_BUBBLE");
+	stand_on_pink_def.max_velocity = VariableManager::GetSingletonPtr()->GetAsFloat("Stand_On_Max_Velocity", INIFILE_PLAYER_VARIABLES, "PINK_BUBBLE");
+	stand_on_pink_def.restitution = VariableManager::GetSingletonPtr()->GetAsFloat("Stand_On_Restitution", INIFILE_PLAYER_VARIABLES, "PINK_BUBBLE");
+	stand_on_pink_def.rolling_friction = VariableManager::GetSingletonPtr()->GetAsFloat("Stand_On_Rolling_Friction", INIFILE_PLAYER_VARIABLES, "PINK_BUBBLE");
+	stand_on_pink_def.velocity = VariableManager::GetSingletonPtr()->GetAsFloat("Stand_On_Velocity", INIFILE_PLAYER_VARIABLES, "PINK_BUBBLE");
 
+	inside_pink_def.damping = VariableManager::GetSingletonPtr()->GetAsFloat("Inside_Damping", INIFILE_PLAYER_VARIABLES, "PINK_BUBBLE");
+	inside_pink_def.friction = VariableManager::GetSingletonPtr()->GetAsFloat("Inside_Friction", INIFILE_PLAYER_VARIABLES, "PINK_BUBBLE");
+	inside_pink_def.gravity = VariableManager::GetSingletonPtr()->GetAsFloat("Inside_Gravity", INIFILE_PLAYER_VARIABLES, "PINK_BUBBLE");
+	inside_pink_def.max_velocity = VariableManager::GetSingletonPtr()->GetAsFloat("Inside_Max_Velocity", INIFILE_PLAYER_VARIABLES, "PINK_BUBBLE");
+	inside_pink_def.restitution = VariableManager::GetSingletonPtr()->GetAsFloat("Inside_Restitution", INIFILE_PLAYER_VARIABLES, "PINK_BUBBLE");
+	inside_pink_def.rolling_friction = VariableManager::GetSingletonPtr()->GetAsFloat("Inside_Rolling_Friction", INIFILE_PLAYER_VARIABLES, "PINK_BUBBLE");
+	inside_pink_def.velocity = VariableManager::GetSingletonPtr()->GetAsFloat("Inside_Velocity", INIFILE_PLAYER_VARIABLES, "PINK_BUBBLE");
+
+	PlayerState::SetBubbleProperties(free_blue_def, stand_on_blue_def, inside_blue_def, free_pink_def, stand_on_pink_def, inside_pink_def);
 	m_player_state_manager->AddPlayerState(new PlayerIdle);
 	m_player_state_manager->AddPlayerState(new PlayerStateMove);
 	m_player_state_manager->AddPlayerState(new PlayerBlowBubble(m_physics_engine));
@@ -291,6 +323,7 @@ void BubbleController::Notify(int type, void* msg){
 				m_bubble_body->setRollingFriction(def.rolling_friction);
 				m_bubble_body->setRestitution(def.restitution);
 				m_bubble_body->setDamping(def.damping, btScalar(0.0f));
+				m_bubble_body->setGravity(btVector3(0.0f, -def.gravity, 0.0f));
 				m_velocity = def.velocity;
 				m_max_velocity = def.max_velocity;
 			}

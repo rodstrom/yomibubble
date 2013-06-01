@@ -114,7 +114,7 @@ void FollowCameraComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_ON_GROUND, this);
 }
 
-void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewport* viewport, bool activate, const Ogre::String& camera_id){
+void FollowCameraComponent::Init(const Ogre::Vector3& position, Ogre::SceneManager* scene_manager, Ogre::Viewport* viewport, bool activate, const Ogre::String& camera_id){
 	CameraComponent::Init(scene_manager, viewport, activate, camera_id);
 	m_camera_pivot = m_camera->getSceneManager()->getRootSceneNode()->createChildSceneNode();
 	m_camera_goal = m_camera_pivot->createChildSceneNode(Ogre::Vector3(0,0,2));
@@ -129,8 +129,10 @@ void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewpo
 	m_env_collision = false;
 	m_player_direction = Ogre::Vector3::ZERO;
 	
-	m_camera_pivot->setPosition(Ogre::Real(158.070892),Ogre::Real(72.4587402),Ogre::Real(252.214386));
-	m_camera_node->setPosition(Ogre::Real(160.070892),Ogre::Real(73.4587402),Ogre::Real(255.214386));
+	//m_camera_pivot->setPosition(Ogre::Real(158.070892),Ogre::Real(72.4587402),Ogre::Real(252.214386));
+	//m_camera_node->setPosition(Ogre::Real(160.070892),Ogre::Real(73.4587402),Ogre::Real(255.214386));
+	m_camera_pivot->setPosition(position);
+	m_camera_node->setPosition(position);
 
 	//m_camera->lookAt(Ogre::Vector3(145.872f,73.6166f,244.42f));
 	//m_camera->rotate(Ogre::Vector3(0.0491129,0.92081,0.123328), Ogre::Degree(-0.366698));

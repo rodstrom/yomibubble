@@ -265,9 +265,9 @@ void PlayerBlowBubble::Exit(){
 		bubble_body->setLinearFactor(btVector3(0,1,0));
 		m_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_READY, NULL);
 		this->CreateTriggerForBubble();
-		Ogre::Vector3 gravity(0,-m_bubble_gravity,0);
 		m_bubble->RemoveComponent(COMPONENT_POINT2POINT_CONSTRAINT);
-		m_bubble->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GRAVITY_SET, &gravity);
+		m_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_PROPERTIES_SET, &s_free_blue_bubble_def);
+		//m_bubble->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GRAVITY_SET, &gravity);
 		m_current_scale = 0.0f;
 		m_bubble = NULL;
 	}
@@ -285,6 +285,7 @@ void PlayerBlowBubble::Exit(){
 		this->CreateTriggerForBubble();
 		m_current_scale = 0.0f;
 		m_bubble->RemoveComponent(COMPONENT_POINT2POINT_CONSTRAINT);
+		m_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_PROPERTIES_SET, &s_free_pink_bubble_def);
 		m_bubble = NULL;
 	}
 
@@ -569,8 +570,10 @@ void PlayerOnBubble::Enter(){
 		s_messenger->Notify(MSG_CHARACTER_CONTROLLER_LIMIT_MAX_SPEED, &limit);
 	}
 	if (m_bubble->GetType() == GAME_OBJECT_PINK_BUBBLE){
-		bool start = true;
-		m_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_TIMER_RUN, &start);
+		m_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_PROPERTIES_SET, &s_stand_on_pink_bubble_def);
+	}
+	else if (m_bubble->GetType() == GAME_OBJECT_BLUE_BUBBLE){
+		m_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_PROPERTIES_SET, &s_stand_on_blue_bubble_def);
 	}
 	m_current_idle = "Base_Idle_On_Bubble";
 	m_current_walk = "Base_Walk_On_Bubble";
@@ -579,8 +582,10 @@ void PlayerOnBubble::Enter(){
 
 void PlayerOnBubble::Exit(){
 	if (m_bubble->GetType() == GAME_OBJECT_PINK_BUBBLE){
-		bool start = false;
-		m_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_TIMER_RUN, &start);
+		m_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_PROPERTIES_SET, &s_free_pink_bubble_def);
+	}
+	else if (m_bubble->GetType() == GAME_OBJECT_BLUE_BUBBLE){
+		m_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_PROPERTIES_SET, &s_free_blue_bubble_def);
 	}
 	m_bubble = NULL;
 }
@@ -708,10 +713,12 @@ void PlayerInsideBubble::Enter(){
 		bool limit = false;
 		s_messenger->Notify(MSG_CHARACTER_CONTROLLER_LIMIT_MAX_SPEED, &limit);
 	}
-	/*if (m_bubble->GetType() == GAME_OBJECT_PINK_BUBBLE){
-		bool start = true;
-		m_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_TIMER_RUN, &start);
-	}*/
+	if (m_bubble->GetType() == GAME_OBJECT_PINK_BUBBLE){
+		m_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_PROPERTIES_SET, &s_inside_pink_bubble_def);
+	}
+	else if (m_bubble->GetType() == GAME_OBJECT_BLUE_BUBBLE){
+		m_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_PROPERTIES_SET, &s_inside_blue_bubble_def);
+	}
 }
 
 void PlayerInsideBubble::Exit(){
@@ -750,6 +757,12 @@ void PlayerInsideBubble::Exit(){
 	s_messenger->Notify(MSG_CHARACTER_CONTROLLER_LIMIT_MAX_SPEED, &limit);
 	step_height = 0.15f;
 	s_messenger->Notify(MSG_CHARACTER_CONTROLLER_SET_STEP_HEIGHT, &step_height);
+	if (m_bubble->GetType() == GAME_OBJECT_PINK_BUBBLE){
+		m_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_PROPERTIES_SET, &s_free_pink_bubble_def);
+	}
+	else if (m_bubble->GetType() == GAME_OBJECT_BLUE_BUBBLE){
+		m_bubble->GetComponentMessenger()->Notify(MSG_BUBBLE_CONTROLLER_PROPERTIES_SET, &s_free_blue_bubble_def);
+	}
 	m_bubble = NULL;
 }
 

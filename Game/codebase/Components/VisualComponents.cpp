@@ -559,23 +559,17 @@ void CountableResourceGUI::Notify(int type, void* message){
 		if (m_can_pick_up){
 			m_timer_counter = 0.0f;
 			m_can_pick_up = false;
-		if (m_current_number < m_total_number)
-		{
-			Ogre::Overlay::Overlay2DElementsIterator it = m_overlay->get2DElementsIterator();
-			int i = 0;
-			while (i < m_current_number){
-				it.moveNext();
-				i++;
-			}
+			if (m_current_number < m_total_number) {
+				Ogre::Overlay::Overlay2DElementsIterator it = m_overlay->get2DElementsIterator();
+				int i = 0;
+				while (i < m_current_number){
+					it.moveNext();
+					i++;
+				}
 			Ogre::OverlayContainer* container = it.peekNext();
-			if (i == 0){ 
-				container->setMaterialName("HUD/Leaf/FilledFront"); }
-			else if (i == m_total_number-1){
-			container->setMaterialName("HUD/Leaf/FilledEnd"); }
-			else{
-			container->setMaterialName("HUD/Leaf/FilledMiddle"); }
+			container->setMaterialName("HUD/Leaf/Filled");
 			m_current_number++;
-		}
+			}
 		}
 	}
 };
@@ -606,7 +600,8 @@ void CountableResourceGUI::Init(const Ogre::String& level_id){
 	Ogre::Overlay::Overlay2DElementsIterator it = m_overlay->get2DElementsIterator();
 	while (it.hasMoreElements()){
 		m_total_number++;		// Search the overlay for X amount of containers so we know how many leaves the level has.
-		it.moveNext();
+		Ogre::OverlayContainer* container = it.getNext();
+		container->setMaterialName("HUD/Leaf/Empty");
 	}
 	m_overlay->show();
 

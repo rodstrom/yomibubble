@@ -349,6 +349,14 @@ struct DirDT{
 };
 
 struct BubblePropertiesDef{
+	BubblePropertiesDef(void) :
+		damping(0.0f),
+		friction(0.0f),
+		rolling_friction(0.0f),
+		restitution(0.0f),
+		max_velocity(0.0f),
+		velocity(0.0f),
+		gravity(0.0f) {}
 	float damping;
 	float friction;
 	float rolling_friction;
