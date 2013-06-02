@@ -50,6 +50,11 @@ void NodeComponent::Notify(int type, void* msg){
 			}
 		}
 		break;
+	case MSG_NODE_GET_POSITION:
+		{
+			*static_cast<Ogre::Vector3*>(msg) = m_node->getPosition();
+		}
+		break;
 	default:
 		break;
 	}
@@ -62,6 +67,7 @@ void NodeComponent::Shut(){
 		m_messenger->Unregister(MSG_SET_OBJECT_POSITION, this);
 		m_messenger->Unregister(MSG_NODE_ATTACH_ENTITY, this);
 		m_messenger->Unregister(MSG_SET_OBJECT_ORIENTATION, this);
+		m_messenger->Unregister(MSG_NODE_GET_POSITION, this);
 	}
 	if (m_node){
 		m_scene_manager->destroySceneNode(m_node);
@@ -76,6 +82,7 @@ void NodeComponent::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_SET_OBJECT_POSITION, this);
 	m_messenger->Register(MSG_NODE_ATTACH_ENTITY, this);
 	m_messenger->Register(MSG_SET_OBJECT_ORIENTATION, this);
+	m_messenger->Register(MSG_NODE_GET_POSITION, this);
 }
 
 void MeshRenderComponent::Init(const Ogre::String& filename, Ogre::SceneManager* scene_manager){
@@ -559,23 +566,17 @@ void CountableResourceGUI::Notify(int type, void* message){
 		if (m_can_pick_up){
 			m_timer_counter = 0.0f;
 			m_can_pick_up = false;
-		if (m_current_number < m_total_number)
-		{
-			Ogre::Overlay::Overlay2DElementsIterator it = m_overlay->get2DElementsIterator();
-			int i = 0;
-			while (i < m_current_number){
-				it.moveNext();
-				i++;
-			}
+			if (m_current_number < m_total_number) {
+				Ogre::Overlay::Overlay2DElementsIterator it = m_overlay->get2DElementsIterator();
+				int i = 0;
+				while (i < m_current_number){
+					it.moveNext();
+					i++;
+				}
 			Ogre::OverlayContainer* container = it.peekNext();
-			if (i == 0){ 
-				container->setMaterialName("HUD/Leaf/FilledFront"); }
-			else if (i == m_total_number-1){
-			container->setMaterialName("HUD/Leaf/FilledEnd"); }
-			else{
-			container->setMaterialName("HUD/Leaf/FilledMiddle"); }
+			container->setMaterialName("HUD/Leaf/Filled");
 			m_current_number++;
-		}
+			}
 		}
 	}
 };
@@ -621,7 +622,8 @@ void CountableResourceGUI::Init(const Ogre::String& level_id){
 	Ogre::Overlay::Overlay2DElementsIterator it = m_overlay->get2DElementsIterator();
 	while (it.hasMoreElements()){
 		m_total_number++;		// Search the overlay for X amount of containers so we know how many leaves the level has.
-		it.moveNext();
+		Ogre::OverlayContainer* container = it.getNext();
+		container->setMaterialName("HUD/Leaf/Empty");
 	}
 	m_overlay->show();
 
@@ -931,6 +933,7 @@ void TutorialGraphicsComponent::Init(const Ogre::String& id, const Ogre::String&
 	m_pic_two_sec = "";
 
 	m_overlay = Ogre::OverlayManager::getSingleton().getByName(id);
+	m_overlay_sec = Ogre::OverlayManager::getSingleton().getByName(id);
 	
 	if (level == "try" || level == "Dayarea") { m_overlay->show(); }
 
@@ -942,8 +945,11 @@ void TutorialGraphicsComponent::Init(const Ogre::String& id, const Ogre::String&
 		m_pic_two_sec = "HUD/Tutorial/CameraMove_Two";
 		m_overlay_sec = Ogre::OverlayManager::getSingleton().getByName("Level1_Add");
 		m_overlay_sec->show();
+		m_overlay->show();
 	}
 	else if (level == "Dayarea"){
+		m_overlay_sec->show();
+		m_overlay->hide();
 		m_pic_one = "HUD/Tutorial/PinkBubble_One";
 		m_pic_two = "HUD/Tutorial/PinkBubble_Two";
 	}

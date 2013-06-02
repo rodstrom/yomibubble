@@ -33,7 +33,7 @@ public:
 	virtual void Notify(int type, void* msg);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
-	virtual void Init(Ogre::SceneManager* scene_manager, Ogre::Viewport* viewport, bool activate = false, const Ogre::String& camera_id = Ogre::StringUtil::BLANK);
+	virtual void Init(const Ogre::Vector3& position, Ogre::SceneManager* scene_manager, Ogre::Viewport* viewport, bool activate = false, const Ogre::String& camera_id = Ogre::StringUtil::BLANK);
 	virtual void Update(float dt);
 	virtual void SimulationStep(btScalar time_step);
 	void SetTrigger(TriggerComponent* trigger) { m_trigger = trigger; }
