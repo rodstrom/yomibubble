@@ -25,6 +25,7 @@ void PlayState::Enter(){
 	m_physics_engine = new PhysicsEngine;
 	m_physics_engine->Init();
 	m_camera = m_scene_manager->createCamera("MainCamera");
+	m_camera->setPosition(0,0,0);
 
 	m_camera->setFarClipDistance(5000.0f);
 	m_camera->setNearClipDistance(1.0f);
@@ -105,7 +106,7 @@ bool PlayState::Update(float dt){
 		static_cast<LoadingState*>(loading)->SetLevel(m_level_manager->GetCurrentLevel());
 		loading->Enter();
 		loading->Update(1.0f);
-
+		m_camera->setPosition(0,0,0);
 		m_level_manager->ChangeLevel();
 		m_change_level = false;
 

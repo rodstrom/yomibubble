@@ -239,8 +239,49 @@ int DBManager::Load() {
 							interactive = true;
 							continue;
 						}
-						
 						else if (i->second == "kittyshroom") {
+							TottDef tott_def;
+							tott_def.character_controller.friction = 0.1f;
+							tott_def.character_controller.velocity = 20.1f;
+							tott_def.character_controller.max_speed = 10.0f;
+							tott_def.character_controller.jump_power = 200.0f;
+							tott_def.character_controller.restitution = 0.0f;
+							tott_def.character_controller.step_height = 0.35f;
+							tott_def.character_controller.turn_speed = 100.0f;
+							tott_def.character_controller.max_jump_height = 10.0f;
+							tott_def.character_controller.mass = 1.0f;
+							tott_def.character_controller.max_fall_speed = 0.1f;
+							tott_def.character_controller.fall_acceleration = 0.1f;
+							tott_def.character_controller.air_deceleration = 0.5f;
+							tott_def.character_controller.deceleration = 0.5f;
+							tott_def.character_controller.collision_filter.filter = COL_TOTT;
+							tott_def.character_controller.collision_filter.mask = COL_PLAYER | COL_WORLD_STATIC | COL_BUBBLE | COL_TOTT | COL_QUESTITEM;
+							tott_def.character_controller.radius = 0.5f;
+							tott_def.character_controller.height = 0.1f;
+							tott_def.character_controller.offset.y = 0.4f;
+							tott_def.happy_animation = "excited";
+							tott_def.idle_animation = "walk";
+							tott_def.mesh_name = "kittyshroom.mesh";
+							tott_def.play_music = false;
+							tott_def.quest_object_mesh_name = "Questitem_Cherry.mesh";
+							tott_def.react_animation = "react";
+							tott_def.run_animation = "walk";
+							tott_def.sb_node_name = "node_main";
+							tott_def.sfx_curious = "";
+							tott_def.sfx_happy = "";
+							tott_def.theme_music = "";
+							tott_def.type_name = "Kittyshroom";
+							tott_def.walk_animation = "walk";
+							attributemap::iterator j = i;
+							j++;
+							for (; j != spawn.attributes.end(); j++){
+								this->CreateTottAIState(tott_def.ai_states, j->first, j->second);
+							}
+							GameObject* tott = m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y,z), &tott_def);
+							interactive = true;
+							continue;
+						}
+						else if (i->second == "questkittyshroom") {
 							TottDef tott_def;
 							tott_def.character_controller.friction = 0.1f;
 							tott_def.character_controller.velocity = 20.1f;
@@ -367,7 +408,6 @@ int DBManager::Load() {
 							interactive = true;
 							continue;
 						}
-						}
 						else if (i->second == "leaf") {
 							ParticleDef particleDef;
 							particleDef.particle_name = "Particle/Smoke";
@@ -386,10 +426,11 @@ int DBManager::Load() {
 							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_GATE, Ogre::Vector3(x,y,z), &gate_def);
 							Ogre::Quaternion quat = Ogre::Quaternion ((Degree(spawn.rx)), Vector3::UNIT_X)*Quaternion ((Degree(spawn.ry)), Vector3::UNIT_Y)*Quaternion ((Degree(spawn.rz)), Vector3::UNIT_Z);
 							temp->GetComponentMessenger()->Notify(MSG_SET_OBJECT_ORIENTATION, &quat);
-							/*if (mArtifexLoader->mZoneName == "try"){
-								Ogre::Quaternion quat = Ogre::Quaternion ((Degree(spawn.rx + 180)), Vector3::UNIT_X)*Quaternion ((Degree(spawn.ry + 180)), Vector3::UNIT_Y)*Quaternion ((Degree(spawn.rz + 180)), Vector3::UNIT_Z);
-								temp->GetComponentMessenger()->Notify(MSG_SET_OBJECT_ORIENTATION, &quat);
-							}*/
+							Ogre::SceneNode* gate_node = NULL;
+							temp->GetComponentMessenger()->Notify(MSG_NODE_GET_NODE, &gate_node);
+							if (gate_node){
+								gate_node->setScale(spawn.sx, spawn.sy, spawn.sz);
+							}
 						}
 						else if (i->second == "levelchange"){
 							TriggerDef def;
@@ -407,7 +448,7 @@ int DBManager::Load() {
 						}
 						interactive = true;
 					} //if interactive == true
-				//}
+				}
 
 				for ( attributemap::iterator i = spawn.attributes.begin(); i != spawn.attributes.end(); i++ )
 				{
