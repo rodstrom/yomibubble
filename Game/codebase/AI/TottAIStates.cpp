@@ -22,6 +22,10 @@ void TottAIStateMove::Exit(){
 }
 
 bool TottAIStateMove::Update(float dt){
+	AnimationMsg anim_msg;
+	anim_msg.id = m_animation;
+	anim_msg.loop = true;
+	m_messenger->Notify(MSG_ANIMATION_PLAY, &anim_msg);
 	m_messenger->Notify(MSG_NODE_GET_POSITION, &m_current_position);
 	Ogre::Vector2 pos(m_current_position.x, m_current_position.z);
 	float distance = pos.distance(m_target_position);
@@ -54,6 +58,10 @@ void TottAIStateWait::Exit(){
 }
 
 bool TottAIStateWait::Update(float dt){
+	AnimationMsg anim_msg;
+	anim_msg.id = m_animation;
+	anim_msg.loop = true;
+	m_messenger->Notify(MSG_ANIMATION_PLAY, &anim_msg);
 	m_timer += dt;
 	if (m_timer >= m_target_time){
 		return true;

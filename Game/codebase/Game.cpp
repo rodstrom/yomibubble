@@ -26,7 +26,7 @@ bool Game::Init(Ogre::RenderWindow* render_window, MessageSystem* message_system
 	//IntroLogoState::Create<IntroLogoState>(m_state_manager, "LogoState");
 	IntroMovieState::Create<IntroMovieState>(m_state_manager, "IntroMovieState");
 	WinState::Create<WinState>(m_state_manager, "WinState");
-	m_state_manager->ChangeState(m_state_manager->FindById("PlayState"));
+	m_state_manager->ChangeState(m_state_manager->FindById("IntroLogoState"));
 
 	//ShowCursor(false); // NO WINDOWS SPECIFIC CALLS!
 

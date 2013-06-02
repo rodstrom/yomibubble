@@ -23,7 +23,7 @@ using namespace Artifex;
 void ArtifexLoader::createSkye()
 {
 	try {
-		mSceneMgr->setSkyBox(true, mSkyBoxName , mSkyRadius);
+		mSceneMgr->setSkyDome(true, "Examples/CloudySky" , 5, 20, 2000, true);
 	} catch (Exception &e) {
 
 	};

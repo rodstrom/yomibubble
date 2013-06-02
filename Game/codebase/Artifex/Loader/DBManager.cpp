@@ -42,7 +42,7 @@ int DBManager::Load() {
 	mArtifexLoader->mObjectFile.clear();
 	m_paged_geometry = new Forests::PagedGeometry;
 	m_paged_geometry->setCamera(mArtifexLoader->mCamera);
-	m_paged_geometry->setPageSize(60);
+	m_paged_geometry->setPageSize(40);
 	m_paged_geometry->setInfinite();
 	m_paged_geometry->addDetailLevel<Forests::WindBatchPage>(40,10);
 	m_paged_geometry->addDetailLevel<Forests::ImpostorPage>(100, 10);
@@ -150,40 +150,33 @@ int DBManager::Load() {
 							player_def.camera_speed = 2.5f;
 							temp = m_game_object_manager->CreateGameObject(GAME_OBJECT_PLAYER, Ogre::Vector3(x,y,z), &player_def);
 						}
-						else if (i->second == "tott" || i->second == "hidehog") {
+						else if (i->second == "hidehog") {
 							TottDef tott_def;
-							tott_def.character_controller.friction = 0.3f;
-							tott_def.character_controller.velocity = 5.1f;
-							tott_def.character_controller.max_speed = 4.0f;
-							tott_def.character_controller.jump_power = 200.0f;
+							tott_def.character_controller.friction = VariableManager::GetSingletonPtr()->GetAsFloat("Friction", INIFILE_PLAYER_VARIABLES, "HIDEHOG");
+							tott_def.character_controller.velocity = VariableManager::GetSingletonPtr()->GetAsFloat("Speed", INIFILE_PLAYER_VARIABLES, "HIDEHOG");
+							tott_def.character_controller.max_speed = VariableManager::GetSingletonPtr()->GetAsFloat("Max_Speed", INIFILE_PLAYER_VARIABLES, "HIDEHOG");
+							tott_def.character_controller.jump_power = VariableManager::GetSingletonPtr()->GetAsFloat("Jump_Power", INIFILE_PLAYER_VARIABLES, "HIDEHOG");
 							tott_def.character_controller.restitution = 0.0f;
-							tott_def.character_controller.step_height = 0.25f;
-							tott_def.character_controller.turn_speed = 500.0f;
-							tott_def.character_controller.max_jump_height = 10.0f;
-							tott_def.character_controller.mass = 1.0f;
-							tott_def.character_controller.max_fall_speed = 0.1f;
-							tott_def.character_controller.fall_acceleration = 0.1f;
+							tott_def.character_controller.step_height = 2.25f;
+							tott_def.character_controller.turn_speed = VariableManager::GetSingletonPtr()->GetAsFloat("TurnSpeed", INIFILE_PLAYER_VARIABLES, "HIDEHOG");
+							tott_def.character_controller.max_jump_height = VariableManager::GetSingletonPtr()->GetAsFloat("Max_Jump_Height", INIFILE_PLAYER_VARIABLES, "HIDEHOG");
+							tott_def.character_controller.mass = VariableManager::GetSingletonPtr()->GetAsFloat("Mass", INIFILE_PLAYER_VARIABLES, "HIDEHOG");
+							tott_def.character_controller.max_fall_speed = VariableManager::GetSingletonPtr()->GetAsFloat("Max_Fall_Speed", INIFILE_PLAYER_VARIABLES, "HIDEHOG");
+							tott_def.character_controller.fall_acceleration = VariableManager::GetSingletonPtr()->GetAsFloat("Fall_Acceleration", INIFILE_PLAYER_VARIABLES, "HIDEHOG");
 							tott_def.character_controller.air_deceleration = 0.5f;
-							tott_def.character_controller.deceleration = 2.0f;
+							tott_def.character_controller.deceleration = VariableManager::GetSingletonPtr()->GetAsFloat("Deceleration", INIFILE_PLAYER_VARIABLES, "HIDEHOG");
 							tott_def.character_controller.collision_filter.filter = COL_TOTT;
 							tott_def.character_controller.collision_filter.mask = COL_PLAYER | COL_WORLD_STATIC | COL_BUBBLE | COL_TOTT | COL_QUESTITEM;
-							tott_def.character_controller.radius = 0.5f;
-							tott_def.character_controller.height = 0.1f;
+							tott_def.character_controller.radius = VariableManager::GetSingletonPtr()->GetAsFloat("Radius", INIFILE_PLAYER_VARIABLES, "HIDEHOG");
+							tott_def.character_controller.height = VariableManager::GetSingletonPtr()->GetAsFloat("Height", INIFILE_PLAYER_VARIABLES, "HIDEHOG");
 							tott_def.character_controller.offset.y = 0.4f;
-							tott_def.happy_animation = "Excited";
-							tott_def.idle_animation = "Idle";
 							tott_def.mesh_name = "Hidehog.mesh";
 							tott_def.play_music = true;
 							tott_def.quest_object_mesh_name = "Questitem_Cherry.mesh";
-							tott_def.react_animation = "Respond";
-							tott_def.run_animation = "Run";
 							tott_def.sb_node_name = "node_main";
-							tott_def.sfx_curious = "";
-							tott_def.sfx_happy = "";
 							tott_def.theme_music = "Hidehog_Theme";
 							tott_def.node_name = "";
 							tott_def.type_name = "Hidehog";
-							tott_def.walk_animation = "walk";
 							attributemap::iterator j = i;
 							j++;
 							for (; j != spawn.attributes.end(); j++){
@@ -197,42 +190,50 @@ int DBManager::Load() {
 
 						else if (i->second == "questhidehog") {
 							TottDef tott_def;
-							tott_def.character_controller.friction = 0.3f;
-							tott_def.character_controller.velocity = 5.1f;
-							tott_def.character_controller.max_speed = 4.0f;
-							tott_def.character_controller.jump_power = 200.0f;
+							tott_def.character_controller.friction = VariableManager::GetSingletonPtr()->GetAsFloat("Friction", INIFILE_PLAYER_VARIABLES, "HIDEHOG");
+							tott_def.character_controller.velocity = VariableManager::GetSingletonPtr()->GetAsFloat("Speed", INIFILE_PLAYER_VARIABLES, "HIDEHOG");
+							tott_def.character_controller.max_speed = VariableManager::GetSingletonPtr()->GetAsFloat("Max_Speed", INIFILE_PLAYER_VARIABLES, "HIDEHOG");
+							tott_def.character_controller.jump_power = VariableManager::GetSingletonPtr()->GetAsFloat("Jump_Power", INIFILE_PLAYER_VARIABLES, "HIDEHOG");
 							tott_def.character_controller.restitution = 0.0f;
-							tott_def.character_controller.step_height = 0.25f;
-							tott_def.character_controller.turn_speed = 500.0f;
-							tott_def.character_controller.max_jump_height = 10.0f;
-							tott_def.character_controller.mass = 1.0f;
-							tott_def.character_controller.max_fall_speed = 0.1f;
-							tott_def.character_controller.fall_acceleration = 0.1f;
+							tott_def.character_controller.step_height = 2.25f;
+							tott_def.character_controller.turn_speed = VariableManager::GetSingletonPtr()->GetAsFloat("TurnSpeed", INIFILE_PLAYER_VARIABLES, "HIDEHOG");
+							tott_def.character_controller.max_jump_height = VariableManager::GetSingletonPtr()->GetAsFloat("Max_Jump_Height", INIFILE_PLAYER_VARIABLES, "HIDEHOG");
+							tott_def.character_controller.mass = VariableManager::GetSingletonPtr()->GetAsFloat("Mass", INIFILE_PLAYER_VARIABLES, "HIDEHOG");
+							tott_def.character_controller.max_fall_speed = VariableManager::GetSingletonPtr()->GetAsFloat("Max_Fall_Speed", INIFILE_PLAYER_VARIABLES, "HIDEHOG");
+							tott_def.character_controller.fall_acceleration = VariableManager::GetSingletonPtr()->GetAsFloat("Fall_Acceleration", INIFILE_PLAYER_VARIABLES, "HIDEHOG");
 							tott_def.character_controller.air_deceleration = 0.5f;
-							tott_def.character_controller.deceleration = 2.0f;
+							tott_def.character_controller.deceleration = VariableManager::GetSingletonPtr()->GetAsFloat("Deceleration", INIFILE_PLAYER_VARIABLES, "HIDEHOG");
 							tott_def.character_controller.collision_filter.filter = COL_TOTT;
 							tott_def.character_controller.collision_filter.mask = COL_PLAYER | COL_WORLD_STATIC | COL_BUBBLE | COL_TOTT | COL_QUESTITEM;
-							tott_def.character_controller.radius = 0.5f;
-							tott_def.character_controller.height = 0.1f;
+							tott_def.character_controller.radius = VariableManager::GetSingletonPtr()->GetAsFloat("Radius", INIFILE_PLAYER_VARIABLES, "HIDEHOG");
+							tott_def.character_controller.height = VariableManager::GetSingletonPtr()->GetAsFloat("Height", INIFILE_PLAYER_VARIABLES, "HIDEHOG");
 							tott_def.character_controller.offset.y = 0.4f;
-							tott_def.happy_animation = "Excited";
-							tott_def.idle_animation = "Idle";
 							tott_def.mesh_name = "Hidehog.mesh";
 							tott_def.play_music = true;
 							tott_def.quest_object_mesh_name = "Questitem_Cherry.mesh";
-							tott_def.react_animation = "Respond";
-							tott_def.run_animation = "Run";
 							tott_def.sb_node_name = "node_main";
-							tott_def.sfx_curious = "";
-							tott_def.sfx_happy = "";
 							tott_def.theme_music = "Hidehog_Theme";
 							tott_def.node_name = "";
 							tott_def.type_name = "Hidehog";
-							tott_def.walk_animation = "walk";
+							tott_def.idle_anim = "Idle";
+							tott_def.excited_anim = "Excited";
+							tott_def.speech_bubble_y = 1.5f;
 							attributemap::iterator j = i;
 							j++;
 							for (; j != spawn.attributes.end(); j++){
-								this->CreateTottAIState(tott_def.ai_states, j->first, j->second);
+								size_t find_quest_item = j->first.find("item");
+								if (find_quest_item != std::string::npos){
+									tott_def.quest_item = j->second;
+									if (tott_def.quest_item == "cherry"){
+										tott_def.quest_item_mesh_name = "PratBubblaCherry.mesh";
+									}
+									else if (tott_def.quest_item == "berry"){
+										tott_def.quest_item_mesh_name = "PratBubblaBlueBerry.mesh";
+									}
+								}
+								else {
+									this->CreateTottAIState(tott_def.ai_states, j->first, j->second);
+								}
 							}
 							GameObject* tott = m_game_object_manager->CreateGameObject(GAME_OBJECT_QUEST_TOTT, Ogre::Vector3(x,y,z), &tott_def);
 							//m_game_object_manager->CreateGameObject(GAME_OBJECT_SPEECH_BUBBLE, Ogre::Vector3(x,y,z), &tott);
@@ -241,37 +242,30 @@ int DBManager::Load() {
 						}
 						else if (i->second == "kittyshroom") {
 							TottDef tott_def;
-							tott_def.character_controller.friction = 0.1f;
-							tott_def.character_controller.velocity = 20.1f;
-							tott_def.character_controller.max_speed = 10.0f;
-							tott_def.character_controller.jump_power = 200.0f;
+							tott_def.character_controller.friction = VariableManager::GetSingletonPtr()->GetAsFloat("Friction", INIFILE_PLAYER_VARIABLES, "KITTYSHROOM");
+							tott_def.character_controller.velocity = VariableManager::GetSingletonPtr()->GetAsFloat("Speed", INIFILE_PLAYER_VARIABLES, "KITTYSHROOM");
+							tott_def.character_controller.max_speed = VariableManager::GetSingletonPtr()->GetAsFloat("Max_Speed", INIFILE_PLAYER_VARIABLES, "KITTYSHROOM");
+							tott_def.character_controller.jump_power = VariableManager::GetSingletonPtr()->GetAsFloat("Jump_Power", INIFILE_PLAYER_VARIABLES, "KITTYSHROOM");
 							tott_def.character_controller.restitution = 0.0f;
-							tott_def.character_controller.step_height = 0.35f;
-							tott_def.character_controller.turn_speed = 100.0f;
-							tott_def.character_controller.max_jump_height = 10.0f;
-							tott_def.character_controller.mass = 1.0f;
-							tott_def.character_controller.max_fall_speed = 0.1f;
-							tott_def.character_controller.fall_acceleration = 0.1f;
+							tott_def.character_controller.step_height = 0.25f;
+							tott_def.character_controller.turn_speed = VariableManager::GetSingletonPtr()->GetAsFloat("TurnSpeed", INIFILE_PLAYER_VARIABLES, "KITTYSHROOM");
+							tott_def.character_controller.max_jump_height = VariableManager::GetSingletonPtr()->GetAsFloat("Max_Jump_Height", INIFILE_PLAYER_VARIABLES, "KITTYSHROOM");
+							tott_def.character_controller.mass = VariableManager::GetSingletonPtr()->GetAsFloat("Mass", INIFILE_PLAYER_VARIABLES, "KITTYSHROOM");
+							tott_def.character_controller.max_fall_speed = VariableManager::GetSingletonPtr()->GetAsFloat("Max_Fall_Speed", INIFILE_PLAYER_VARIABLES, "KITTYSHROOM");
+							tott_def.character_controller.fall_acceleration = VariableManager::GetSingletonPtr()->GetAsFloat("Fall_Acceleration", INIFILE_PLAYER_VARIABLES, "KITTYSHROOM");
 							tott_def.character_controller.air_deceleration = 0.5f;
-							tott_def.character_controller.deceleration = 0.5f;
+							tott_def.character_controller.deceleration = VariableManager::GetSingletonPtr()->GetAsFloat("Deceleration", INIFILE_PLAYER_VARIABLES, "KITTYSHROOM");
 							tott_def.character_controller.collision_filter.filter = COL_TOTT;
 							tott_def.character_controller.collision_filter.mask = COL_PLAYER | COL_WORLD_STATIC | COL_BUBBLE | COL_TOTT | COL_QUESTITEM;
-							tott_def.character_controller.radius = 0.5f;
-							tott_def.character_controller.height = 0.1f;
+							tott_def.character_controller.radius = VariableManager::GetSingletonPtr()->GetAsFloat("Radius", INIFILE_PLAYER_VARIABLES, "KITTYSHROOM");
+							tott_def.character_controller.height = VariableManager::GetSingletonPtr()->GetAsFloat("Height", INIFILE_PLAYER_VARIABLES, "KITTYSHROOM");
 							tott_def.character_controller.offset.y = 0.4f;
-							tott_def.happy_animation = "excited";
-							tott_def.idle_animation = "walk";
 							tott_def.mesh_name = "kittyshroom.mesh";
 							tott_def.play_music = false;
 							tott_def.quest_object_mesh_name = "Questitem_Cherry.mesh";
-							tott_def.react_animation = "react";
-							tott_def.run_animation = "walk";
 							tott_def.sb_node_name = "node_main";
-							tott_def.sfx_curious = "";
-							tott_def.sfx_happy = "";
 							tott_def.theme_music = "";
 							tott_def.type_name = "Kittyshroom";
-							tott_def.walk_animation = "walk";
 							attributemap::iterator j = i;
 							j++;
 							for (; j != spawn.attributes.end(); j++){
@@ -283,79 +277,80 @@ int DBManager::Load() {
 						}
 						else if (i->second == "questkittyshroom") {
 							TottDef tott_def;
-							tott_def.character_controller.friction = 0.1f;
-							tott_def.character_controller.velocity = 20.1f;
-							tott_def.character_controller.max_speed = 10.0f;
-							tott_def.character_controller.jump_power = 200.0f;
+							tott_def.character_controller.friction = VariableManager::GetSingletonPtr()->GetAsFloat("Friction", INIFILE_PLAYER_VARIABLES, "KITTYSHROOM");
+							tott_def.character_controller.velocity = VariableManager::GetSingletonPtr()->GetAsFloat("Speed", INIFILE_PLAYER_VARIABLES, "KITTYSHROOM");
+							tott_def.character_controller.max_speed = VariableManager::GetSingletonPtr()->GetAsFloat("Max_Speed", INIFILE_PLAYER_VARIABLES, "KITTYSHROOM");
+							tott_def.character_controller.jump_power = VariableManager::GetSingletonPtr()->GetAsFloat("Jump_Power", INIFILE_PLAYER_VARIABLES, "KITTYSHROOM");
 							tott_def.character_controller.restitution = 0.0f;
-							tott_def.character_controller.step_height = 0.35f;
-							tott_def.character_controller.turn_speed = 100.0f;
-							tott_def.character_controller.max_jump_height = 10.0f;
-							tott_def.character_controller.mass = 1.0f;
-							tott_def.character_controller.max_fall_speed = 0.1f;
-							tott_def.character_controller.fall_acceleration = 0.1f;
+							tott_def.character_controller.step_height = 0.25f;
+							tott_def.character_controller.turn_speed = VariableManager::GetSingletonPtr()->GetAsFloat("TurnSpeed", INIFILE_PLAYER_VARIABLES, "KITTYSHROOM");
+							tott_def.character_controller.max_jump_height = VariableManager::GetSingletonPtr()->GetAsFloat("Max_Jump_Height", INIFILE_PLAYER_VARIABLES, "KITTYSHROOM");
+							tott_def.character_controller.mass = VariableManager::GetSingletonPtr()->GetAsFloat("Mass", INIFILE_PLAYER_VARIABLES, "KITTYSHROOM");
+							tott_def.character_controller.max_fall_speed = VariableManager::GetSingletonPtr()->GetAsFloat("Max_Fall_Speed", INIFILE_PLAYER_VARIABLES, "KITTYSHROOM");
+							tott_def.character_controller.fall_acceleration = VariableManager::GetSingletonPtr()->GetAsFloat("Fall_Acceleration", INIFILE_PLAYER_VARIABLES, "KITTYSHROOM");
 							tott_def.character_controller.air_deceleration = 0.5f;
-							tott_def.character_controller.deceleration = 0.5f;
+							tott_def.character_controller.deceleration = VariableManager::GetSingletonPtr()->GetAsFloat("Deceleration", INIFILE_PLAYER_VARIABLES, "KITTYSHROOM");
 							tott_def.character_controller.collision_filter.filter = COL_TOTT;
 							tott_def.character_controller.collision_filter.mask = COL_PLAYER | COL_WORLD_STATIC | COL_BUBBLE | COL_TOTT | COL_QUESTITEM;
-							tott_def.character_controller.radius = 0.5f;
-							tott_def.character_controller.height = 0.1f;
+							tott_def.character_controller.radius = VariableManager::GetSingletonPtr()->GetAsFloat("Radius", INIFILE_PLAYER_VARIABLES, "KITTYSHROOM");
+							tott_def.character_controller.height = VariableManager::GetSingletonPtr()->GetAsFloat("Height", INIFILE_PLAYER_VARIABLES, "KITTYSHROOM");
 							tott_def.character_controller.offset.y = 0.4f;
-							tott_def.happy_animation = "excited";
-							tott_def.idle_animation = "walk";
+							tott_def.speech_bubble_y = 1.5f;
 							tott_def.mesh_name = "kittyshroom.mesh";
 							tott_def.play_music = false;
 							tott_def.quest_object_mesh_name = "Questitem_Cherry.mesh";
-							tott_def.react_animation = "react";
-							tott_def.run_animation = "walk";
 							tott_def.sb_node_name = "node_main";
-							tott_def.sfx_curious = "";
-							tott_def.sfx_happy = "";
 							tott_def.theme_music = "";
 							tott_def.type_name = "Kittyshroom";
-							tott_def.walk_animation = "walk";
+							tott_def.idle_anim = "idle";
+							tott_def.excited_anim = "excited";
 							attributemap::iterator j = i;
 							j++;
 							for (; j != spawn.attributes.end(); j++){
-								this->CreateTottAIState(tott_def.ai_states, j->first, j->second);
+								size_t find_quest_item = j->first.find("item");
+								if (find_quest_item != std::string::npos){
+									tott_def.quest_item = j->second;
+									if (tott_def.quest_item == "cherry"){
+										tott_def.quest_item_mesh_name = "PratBubblaCherry.mesh";
+									}
+									else if (tott_def.quest_item == "berry"){
+										tott_def.quest_item_mesh_name = "PratBubblaBlueBerry.mesh";
+									}
+								}
+								else {
+									this->CreateTottAIState(tott_def.ai_states, j->first, j->second);
+								}
 							}
-							GameObject* tott = m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y,z), &tott_def);
+							GameObject* tott = m_game_object_manager->CreateGameObject(GAME_OBJECT_QUEST_TOTT, Ogre::Vector3(x,y,z), &tott_def);
 							interactive = true;
 							continue;
 						}
 						else if (i->second == "shroomfox") {
 							TottDef tott_def;
-							tott_def.character_controller.friction = 0.1f;
-							tott_def.character_controller.velocity = 20.1f;
-							tott_def.character_controller.max_speed = 10.0f;
-							tott_def.character_controller.jump_power = 200.0f;
+							tott_def.character_controller.friction = VariableManager::GetSingletonPtr()->GetAsFloat("Friction", INIFILE_PLAYER_VARIABLES, "SHROOMFOX");
+							tott_def.character_controller.velocity = VariableManager::GetSingletonPtr()->GetAsFloat("Speed", INIFILE_PLAYER_VARIABLES, "SHROOMFOX");
+							tott_def.character_controller.max_speed = VariableManager::GetSingletonPtr()->GetAsFloat("Max_Speed", INIFILE_PLAYER_VARIABLES, "SHROOMFOX");
+							tott_def.character_controller.jump_power = VariableManager::GetSingletonPtr()->GetAsFloat("Jump_Power", INIFILE_PLAYER_VARIABLES, "SHROOMFOX");
 							tott_def.character_controller.restitution = 0.0f;
-							tott_def.character_controller.step_height = 0.35f;
-							tott_def.character_controller.turn_speed = 100.0f;
-							tott_def.character_controller.max_jump_height = 10.0f;
-							tott_def.character_controller.mass = 1.0f;
-							tott_def.character_controller.max_fall_speed = 0.1f;
-							tott_def.character_controller.fall_acceleration = 0.1f;
+							tott_def.character_controller.step_height = 2.0f;
+							tott_def.character_controller.turn_speed = VariableManager::GetSingletonPtr()->GetAsFloat("TurnSpeed", INIFILE_PLAYER_VARIABLES, "SHROOMFOX");
+							tott_def.character_controller.max_jump_height = VariableManager::GetSingletonPtr()->GetAsFloat("Max_Jump_Height", INIFILE_PLAYER_VARIABLES, "SHROOMFOX");
+							tott_def.character_controller.mass = VariableManager::GetSingletonPtr()->GetAsFloat("Mass", INIFILE_PLAYER_VARIABLES, "SHROOMFOX");
+							tott_def.character_controller.max_fall_speed = VariableManager::GetSingletonPtr()->GetAsFloat("Max_Fall_Speed", INIFILE_PLAYER_VARIABLES, "SHROOMFOX");
+							tott_def.character_controller.fall_acceleration = VariableManager::GetSingletonPtr()->GetAsFloat("Fall_Acceleration", INIFILE_PLAYER_VARIABLES, "SHROOMFOX");
 							tott_def.character_controller.air_deceleration = 0.5f;
-							tott_def.character_controller.deceleration = 0.5f;
+							tott_def.character_controller.deceleration = VariableManager::GetSingletonPtr()->GetAsFloat("Deceleration", INIFILE_PLAYER_VARIABLES, "SHROOMFOX");
 							tott_def.character_controller.collision_filter.filter = COL_TOTT;
 							tott_def.character_controller.collision_filter.mask = COL_PLAYER | COL_WORLD_STATIC | COL_BUBBLE | COL_TOTT | COL_QUESTITEM;
-							tott_def.character_controller.radius = 0.5f;
-							tott_def.character_controller.height = 0.1f;
+							tott_def.character_controller.radius = VariableManager::GetSingletonPtr()->GetAsFloat("Radius", INIFILE_PLAYER_VARIABLES, "SHROOMFOX");
+							tott_def.character_controller.height = VariableManager::GetSingletonPtr()->GetAsFloat("Height", INIFILE_PLAYER_VARIABLES, "SHROOMFOX");
 							tott_def.character_controller.offset.y = 0.4f;
-							tott_def.happy_animation = "Excited";
-							tott_def.idle_animation = "Idle";
 							tott_def.mesh_name = "Shroomfox.mesh";
 							tott_def.play_music = false;
 							tott_def.quest_object_mesh_name = "Questitem_Cherry.mesh";
-							tott_def.react_animation = "Creep";
-							tott_def.run_animation = "Walk";
 							tott_def.sb_node_name = "node_main";
-							tott_def.sfx_curious = "";
-							tott_def.sfx_happy = "";
 							tott_def.theme_music = "";
 							tott_def.type_name = "Shroomfox";
-							tott_def.walk_animation = "Walk";
 							attributemap::iterator j = i;
 							j++;
 							for (; j != spawn.attributes.end(); j++){
@@ -365,40 +360,82 @@ int DBManager::Load() {
 							interactive = true;
 							continue;
 						}
-						
-						else if (i->second == "nightcap") {
+						else if (i->second == "questshroomfox") {
 							TottDef tott_def;
-							tott_def.character_controller.friction = 0.1f;
-							tott_def.character_controller.velocity = 20.1f;
-							tott_def.character_controller.max_speed = 10.0f;
-							tott_def.character_controller.jump_power = 200.0f;
+							tott_def.character_controller.friction = VariableManager::GetSingletonPtr()->GetAsFloat("Friction", INIFILE_PLAYER_VARIABLES, "SHROOMFOX");
+							tott_def.character_controller.velocity = VariableManager::GetSingletonPtr()->GetAsFloat("Speed", INIFILE_PLAYER_VARIABLES, "SHROOMFOX");
+							tott_def.character_controller.max_speed = VariableManager::GetSingletonPtr()->GetAsFloat("Max_Speed", INIFILE_PLAYER_VARIABLES, "SHROOMFOX");
+							tott_def.character_controller.jump_power = VariableManager::GetSingletonPtr()->GetAsFloat("Jump_Power", INIFILE_PLAYER_VARIABLES, "SHROOMFOX");
 							tott_def.character_controller.restitution = 0.0f;
-							tott_def.character_controller.step_height = 0.35f;
-							tott_def.character_controller.turn_speed = 100.0f;
-							tott_def.character_controller.max_jump_height = 10.0f;
-							tott_def.character_controller.mass = 1.0f;
-							tott_def.character_controller.max_fall_speed = 0.1f;
-							tott_def.character_controller.fall_acceleration = 0.1f;
+							tott_def.character_controller.step_height = 2.0f;
+							tott_def.character_controller.turn_speed = VariableManager::GetSingletonPtr()->GetAsFloat("TurnSpeed", INIFILE_PLAYER_VARIABLES, "SHROOMFOX");
+							tott_def.character_controller.max_jump_height = VariableManager::GetSingletonPtr()->GetAsFloat("Max_Jump_Height", INIFILE_PLAYER_VARIABLES, "SHROOMFOX");
+							tott_def.character_controller.mass = VariableManager::GetSingletonPtr()->GetAsFloat("Mass", INIFILE_PLAYER_VARIABLES, "SHROOMFOX");
+							tott_def.character_controller.max_fall_speed = VariableManager::GetSingletonPtr()->GetAsFloat("Max_Fall_Speed", INIFILE_PLAYER_VARIABLES, "SHROOMFOX");
+							tott_def.character_controller.fall_acceleration = VariableManager::GetSingletonPtr()->GetAsFloat("Fall_Acceleration", INIFILE_PLAYER_VARIABLES, "SHROOMFOX");
 							tott_def.character_controller.air_deceleration = 0.5f;
-							tott_def.character_controller.deceleration = 0.5f;
+							tott_def.character_controller.deceleration = VariableManager::GetSingletonPtr()->GetAsFloat("Deceleration", INIFILE_PLAYER_VARIABLES, "SHROOMFOX");
 							tott_def.character_controller.collision_filter.filter = COL_TOTT;
 							tott_def.character_controller.collision_filter.mask = COL_PLAYER | COL_WORLD_STATIC | COL_BUBBLE | COL_TOTT | COL_QUESTITEM;
-							tott_def.character_controller.radius = 0.5f;
-							tott_def.character_controller.height = 0.1f;
+							tott_def.character_controller.radius = VariableManager::GetSingletonPtr()->GetAsFloat("Radius", INIFILE_PLAYER_VARIABLES, "SHROOMFOX");
+							tott_def.character_controller.height = VariableManager::GetSingletonPtr()->GetAsFloat("Height", INIFILE_PLAYER_VARIABLES, "SHROOMFOX");
 							tott_def.character_controller.offset.y = 0.4f;
-							tott_def.happy_animation = "excited";
-							tott_def.idle_animation = "idle";
+							tott_def.speech_bubble_y = 1.5f;
+							tott_def.mesh_name = "Shroomfox.mesh";
+							tott_def.play_music = false;
+							tott_def.quest_object_mesh_name = "Questitem_Cherry.mesh";
+							tott_def.sb_node_name = "node_main";
+							tott_def.theme_music = "";
+							tott_def.type_name = "Shroomfox";
+							tott_def.idle_anim = "idle";
+							tott_def.excited_anim = "pedo";
+							attributemap::iterator j = i;
+							j++;
+							for (; j != spawn.attributes.end(); j++){
+								size_t find_quest_item = j->first.find("item");
+								if (find_quest_item != std::string::npos){
+									tott_def.quest_item = j->second;
+									if (tott_def.quest_item == "cherry"){
+										tott_def.quest_item_mesh_name = "PratBubblaCherry.mesh";
+									}
+									else if (tott_def.quest_item == "berry"){
+										tott_def.quest_item_mesh_name = "PratBubblaBlueBerry.mesh";
+									}
+								}
+								else {
+									this->CreateTottAIState(tott_def.ai_states, j->first, j->second);
+								}
+							}
+							GameObject* tott = m_game_object_manager->CreateGameObject(GAME_OBJECT_QUEST_TOTT, Ogre::Vector3(x,y,z), &tott_def);
+							interactive = true;
+							continue;
+						}
+						else if (i->second == "nightcap") {
+							TottDef tott_def;
+							tott_def.character_controller.friction = VariableManager::GetSingletonPtr()->GetAsFloat("Friction", INIFILE_PLAYER_VARIABLES, "NIGHTCAP");
+							tott_def.character_controller.velocity = VariableManager::GetSingletonPtr()->GetAsFloat("Speed", INIFILE_PLAYER_VARIABLES, "NIGHTCAP");
+							tott_def.character_controller.max_speed = VariableManager::GetSingletonPtr()->GetAsFloat("Max_Speed", INIFILE_PLAYER_VARIABLES, "NIGHTCAP");
+							tott_def.character_controller.jump_power = VariableManager::GetSingletonPtr()->GetAsFloat("Jump_Power", INIFILE_PLAYER_VARIABLES, "NIGHTCAP");
+							tott_def.character_controller.restitution = 0.0f;
+							tott_def.character_controller.step_height = 2.0f;
+							tott_def.character_controller.turn_speed = VariableManager::GetSingletonPtr()->GetAsFloat("TurnSpeed", INIFILE_PLAYER_VARIABLES, "NIGHTCAP");
+							tott_def.character_controller.max_jump_height = VariableManager::GetSingletonPtr()->GetAsFloat("Max_Jump_Height", INIFILE_PLAYER_VARIABLES, "NIGHTCAP");
+							tott_def.character_controller.mass = VariableManager::GetSingletonPtr()->GetAsFloat("Mass", INIFILE_PLAYER_VARIABLES, "NIGHTCAP");
+							tott_def.character_controller.max_fall_speed = VariableManager::GetSingletonPtr()->GetAsFloat("Max_Fall_Speed", INIFILE_PLAYER_VARIABLES, "NIGHTCAP");
+							tott_def.character_controller.fall_acceleration = VariableManager::GetSingletonPtr()->GetAsFloat("Fall_Acceleration", INIFILE_PLAYER_VARIABLES, "NIGHTCAP");
+							tott_def.character_controller.air_deceleration = 0.5f;
+							tott_def.character_controller.deceleration = VariableManager::GetSingletonPtr()->GetAsFloat("Deceleration", INIFILE_PLAYER_VARIABLES, "NIGHTCAP");
+							tott_def.character_controller.collision_filter.filter = COL_TOTT;
+							tott_def.character_controller.collision_filter.mask = COL_PLAYER | COL_WORLD_STATIC | COL_BUBBLE | COL_TOTT | COL_QUESTITEM;
+							tott_def.character_controller.radius = VariableManager::GetSingletonPtr()->GetAsFloat("Radius", INIFILE_PLAYER_VARIABLES, "NIGHTCAP");
+							tott_def.character_controller.height = VariableManager::GetSingletonPtr()->GetAsFloat("Height", INIFILE_PLAYER_VARIABLES, "NIGHTCAP");
+							tott_def.character_controller.offset.y = 0.4f;
 							tott_def.mesh_name = "nightcap.mesh";
 							tott_def.play_music = false;
 							tott_def.quest_object_mesh_name = "Questitem_Cherry.mesh";
-							tott_def.react_animation = "idle2";
-							tott_def.run_animation = "Run";
 							tott_def.sb_node_name = "node_main";
-							tott_def.sfx_curious = "";
-							tott_def.sfx_happy = "";
 							tott_def.theme_music = "";
 							tott_def.type_name = "Nightcap";
-							tott_def.walk_animation = "walk";
 							attributemap::iterator j = i;
 							j++;
 							for (; j != spawn.attributes.end(); j++){
@@ -407,6 +444,68 @@ int DBManager::Load() {
 							GameObject* tott = m_game_object_manager->CreateGameObject(GAME_OBJECT_TOTT, Ogre::Vector3(x,y,z), &tott_def);
 							interactive = true;
 							continue;
+						}
+						else if (i->second == "questnightcap") {
+							TottDef tott_def;
+							tott_def.character_controller.friction = VariableManager::GetSingletonPtr()->GetAsFloat("Friction", INIFILE_PLAYER_VARIABLES, "NIGHTCAP");
+							tott_def.character_controller.velocity = VariableManager::GetSingletonPtr()->GetAsFloat("Speed", INIFILE_PLAYER_VARIABLES, "NIGHTCAP");
+							tott_def.character_controller.max_speed = VariableManager::GetSingletonPtr()->GetAsFloat("Max_Speed", INIFILE_PLAYER_VARIABLES, "NIGHTCAP");
+							tott_def.character_controller.jump_power = VariableManager::GetSingletonPtr()->GetAsFloat("Jump_Power", INIFILE_PLAYER_VARIABLES, "NIGHTCAP");
+							tott_def.character_controller.restitution = 0.0f;
+							tott_def.character_controller.step_height = 2.0f;
+							tott_def.character_controller.turn_speed = VariableManager::GetSingletonPtr()->GetAsFloat("TurnSpeed", INIFILE_PLAYER_VARIABLES, "NIGHTCAP");
+							tott_def.character_controller.max_jump_height = VariableManager::GetSingletonPtr()->GetAsFloat("Max_Jump_Height", INIFILE_PLAYER_VARIABLES, "NIGHTCAP");
+							tott_def.character_controller.mass = VariableManager::GetSingletonPtr()->GetAsFloat("Mass", INIFILE_PLAYER_VARIABLES, "NIGHTCAP");
+							tott_def.character_controller.max_fall_speed = VariableManager::GetSingletonPtr()->GetAsFloat("Max_Fall_Speed", INIFILE_PLAYER_VARIABLES, "NIGHTCAP");
+							tott_def.character_controller.fall_acceleration = VariableManager::GetSingletonPtr()->GetAsFloat("Fall_Acceleration", INIFILE_PLAYER_VARIABLES, "NIGHTCAP");
+							tott_def.character_controller.air_deceleration = 0.5f;
+							tott_def.character_controller.deceleration = VariableManager::GetSingletonPtr()->GetAsFloat("Deceleration", INIFILE_PLAYER_VARIABLES, "NIGHTCAP");
+							tott_def.character_controller.collision_filter.filter = COL_TOTT;
+							tott_def.character_controller.collision_filter.mask = COL_PLAYER | COL_WORLD_STATIC | COL_BUBBLE | COL_TOTT | COL_QUESTITEM;
+							tott_def.character_controller.radius = VariableManager::GetSingletonPtr()->GetAsFloat("Radius", INIFILE_PLAYER_VARIABLES, "NIGHTCAP");
+							tott_def.character_controller.height = VariableManager::GetSingletonPtr()->GetAsFloat("Height", INIFILE_PLAYER_VARIABLES, "NIGHTCAP");
+							tott_def.character_controller.offset.y = 0.4f;
+							tott_def.speech_bubble_y = 1.5f;
+							tott_def.mesh_name = "nightcap.mesh";
+							tott_def.play_music = false;
+							tott_def.quest_object_mesh_name = "Questitem_Cherry.mesh";
+							tott_def.sb_node_name = "node_main";
+							tott_def.theme_music = "";
+							tott_def.type_name = "Nightcap";
+							tott_def.idle_anim = "idle";
+							tott_def.excited_anim = "excited";
+							attributemap::iterator j = i;
+							j++;
+							for (; j != spawn.attributes.end(); j++){
+								size_t find_quest_item = j->first.find("item");
+								if (find_quest_item != std::string::npos){
+									tott_def.quest_item = j->second;
+									if (tott_def.quest_item == "cherry"){
+										tott_def.quest_item_mesh_name = "PratBubblaCherry.mesh";
+									}
+									else if (tott_def.quest_item == "berry"){
+										tott_def.quest_item_mesh_name = "PratBubblaBlueBerry.mesh";
+									}
+								}
+								else {
+									this->CreateTottAIState(tott_def.ai_states, j->first, j->second);
+								}
+							}
+							GameObject* tott = m_game_object_manager->CreateGameObject(GAME_OBJECT_QUEST_TOTT, Ogre::Vector3(x,y,z), &tott_def);
+							interactive = true;
+							continue;
+						}
+						else if (i->second == "berry"){
+							QuestItemDef quest_item_def;
+							quest_item_def.mesh_name = "Questitem_Blueberry.mesh";
+							quest_item_def.id = "berry";
+							m_game_object_manager->CreateGameObject(GAME_OBJECT_QUEST_ITEM, Ogre::Vector3(spawn.x, spawn.y, spawn.z), &quest_item_def);
+						}
+						else if (i->second == "cherry"){
+							QuestItemDef quest_item_def;
+							quest_item_def.mesh_name = "Questitem_Cherry.mesh";
+							quest_item_def.id = "cherry";
+							m_game_object_manager->CreateGameObject(GAME_OBJECT_QUEST_ITEM, Ogre::Vector3(spawn.x, spawn.y, spawn.z), &quest_item_def);
 						}
 						else if (i->second == "leaf") {
 							ParticleDef particleDef;
@@ -560,9 +659,16 @@ int DBManager::Load() {
 						mNode->setOrientation(quat);
 						
 						// Create collision shape and set position if desired
-						//newModel->setRenderingDistance(80.0f);
-						BtOgre::StaticMeshToShapeConverter converter(newModel);
-						btCollisionShape* shape = converter.createTrimesh();
+						newModel->setRenderingDistance(100.0f);
+						btCollisionShape* shape = NULL;
+						if (meshFile == "Gate.mesh"){
+							shape = new btBoxShape(btVector3(10.0f, 12.0f, 0.5f));
+						}
+						else {
+							BtOgre::StaticMeshToShapeConverter converter(newModel);
+							shape = converter.createTrimesh();
+						}
+						
 						m_shapes.push_back(shape);
 						btMotionState* motion_state = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)));
 						m_motion_states.push_back(motion_state);
@@ -581,7 +687,7 @@ int DBManager::Load() {
 						body->setRestitution(1.0f);
 						body->setFriction(1.0f);
 						m_collision_defs.push_back(collision_def);
-						int mask = COL_TOTT | COL_BUBBLE | COL_PLAYER;
+						int mask = COL_TOTT | COL_BUBBLE | COL_PLAYER | COL_QUESTITEM;
 						m_physics_engine->GetDynamicWorld()->addRigidBody(body, COL_WORLD_STATIC, mask);
 					}
 
@@ -870,36 +976,4 @@ void DBManager::CreateTottAIState(std::vector<AIState*>& vector, const Ogre::Str
 		def.target_time = time;
 		vector.push_back(new TottAIStateWait(def));
 	}
-	/*
-
-	size_t find = line.find_first_of(id);
-	std::string x = line.substr(0, find);
-	std::string y = line.substr(x.length() + 1, line.length() - x.length());
-
-	if (id == "move"){
-
-	}
-	else if (id == "wait"){
-		size_t find = line.find_first_of(",");
-		size_t find2 = line.find(",", find + 1);
-		Ogre::String anim = line.substr(0, find);
-		size_t find_type = line.find("random");
-		if (find_type != std::string::npos){
-			size_t find3 = line.find(id, find2 + 1);
-
-		}
-		else {
-
-		}
-	}*/
 }
-
-/*
-		size_t find = line.find_first_of(id);
-		size_t find2 = line.find(id, find + 1);
-		size_t find3 = line.find(id, find2 + 1);
-		std::string x = line.substr(0, find);
-		std::string y = line.substr(find + 1, find2 - (find + 1));
-		std::string w = line.substr(find2 + 1, find3 - (find2 + 1));
-		std::string h = line.substr(find3 + 1, line.length() - find3);
-		*/

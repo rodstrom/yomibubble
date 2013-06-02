@@ -28,6 +28,8 @@ enum EComponentType{
 	COMPONENT_TERRAIN,
 	COMPONENT_PLAYER_STAFF,
 	COMPONENT_SPEECH_BUBBLE,
+	COMPONENT_TOTT_CONTROLLER,
+	COMPONENT_STRING,
 	COMPONENT_SIZE
 };
 
@@ -121,6 +123,7 @@ enum EComponentMsg{
 	MSG_TOTT_STATE_CHANGE,
 	MSG_TOTT_COLLIDING,
 	MSG_TOTT_ROTATION_TARGET_SET,
+	MSG_TOTT_QUEST_ITEM_COLLISION,
 	MSG_AI_PAUSE,
 	MSG_WAYPOINT_PAUSE,
 	MSG_WAYPOINT_START,
@@ -213,7 +216,7 @@ public:
 };
 
 struct AnimationMsg{
-	AnimationMsg(void) : index(0), loop(true), full_body(false), blend(false), wait(false), duration(0.2f), blending_transition(2){}
+	AnimationMsg(void) : index(0), loop(true), full_body(false), blend(false), wait(false), duration(0.4f), blending_transition(2){}
 	int index;
 	int blending_transition;
 	bool blend;
@@ -368,6 +371,11 @@ struct BubblePropertiesDef{
 	float max_velocity;
 	float velocity;
 	float gravity;		// only for Y, and used only by the blue bubble
+};
+
+struct QuestItemMsg{
+	Ogre::String id;
+	GameObject* quest_item;
 };
 
 #endif // _N_COMPONENTS_PREREQ_H_

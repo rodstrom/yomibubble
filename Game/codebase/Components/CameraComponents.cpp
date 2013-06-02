@@ -150,8 +150,8 @@ void FollowCameraComponent::Init(const Ogre::Vector3& position, Ogre::SceneManag
 
 	m_on_ground = true;
 
-	m_vertical_coefficient = 1;
-	m_horizontal_coefficient = 1;
+	m_vertical_coefficient = -1;
+	m_horizontal_coefficient = -1;
 
 	m_first_person = false;
 

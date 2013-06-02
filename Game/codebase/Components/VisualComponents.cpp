@@ -1084,3 +1084,14 @@ void RotationComponent::Init(Ogre::SceneNode* node, float rotation_speed){
 	m_node = node;
 	m_rotation_speed = rotation_speed;
 }
+
+void StringComponent::Notify(int type, void* message){
+
+}
+void StringComponent::Shut(){
+
+}
+
+void StringComponent::SetMessenger(ComponentMessenger* messenger){
+	m_messenger = messenger;
+}

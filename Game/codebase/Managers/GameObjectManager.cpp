@@ -446,7 +446,7 @@ GameObject* GameObjectManager::CreateTott(const Ogre::Vector3& position, void* d
 	contr->Init(position, m_physics_engine, def.character_controller);
 	contr->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
 	contr->GetRigidbody()->setActivationState(DISABLE_DEACTIVATION);
-
+	acomp->GetEntity()->setRenderingDistance(100.0f);
 	tott_counter++;
 	return go;
 }
@@ -483,10 +483,12 @@ GameObject* GameObjectManager::CreateQuestTott(const Ogre::Vector3& position, vo
 	def.node_name = node_comp->GetSceneNode()->getName();
 	acomp->Init(def.mesh_name, m_scene_manager);
 	
-	child_node->Init(Ogre::Vector3(0,1,0), "speech_bubble", node_comp->GetSceneNode());
+	child_node->Init(Ogre::Vector3(0,def.speech_bubble_y,0), "speech_bubble", node_comp->GetSceneNode());
 	child_node->SetId("speech_bubble");
-	spbubble->Init("PratBubblaCherry.mesh", m_scene_manager, "speech_bubble");
+	spbubble->Init(def.quest_item_mesh_name, m_scene_manager, "speech_bubble");
 	child_node->GetNode()->attachObject(spbubble->GetEntity());
+	spbubble->GetEntity()->setCastShadows(false);
+	child_node->GetNode()->setScale(0,0,0);
 
 	if (def.type_name == "Hidehog"){
 		acomp->AddAnimationState("Run", true);
@@ -509,7 +511,7 @@ GameObject* GameObjectManager::CreateQuestTott(const Ogre::Vector3& position, vo
 	contr->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
 	contr->GetRigidbody()->setActivationState(DISABLE_DEACTIVATION);
 
-	tott_contr->Init(m_physics_engine);
+	tott_contr->Init(m_physics_engine, def.idle_anim, def.excited_anim, def.quest_item);
 
 	TriggerDef trdef;
 	trdef.body_type = STATIC_BODY;
@@ -520,7 +522,7 @@ GameObject* GameObjectManager::CreateQuestTott(const Ogre::Vector3& position, vo
 	trdef.radius = 4.0f;
 
 	trcomp->Init(position, m_physics_engine, &trdef);
-
+	acomp->GetEntity()->setRenderingDistance(100.0f);
 	quest_tott_counter++;
 	return go;
 };
@@ -580,8 +582,8 @@ GameObject* GameObjectManager::CreateQuestItem(const Ogre::Vector3& position, vo
 	
 	GameObject* tott = *static_cast<GameObject**>(data);
 	//Ogre::SceneNode* node = static_cast<NodeComponent*>(tott->GetComponent(COMPONENT_NODE))->GetSceneNode();
-	TottDef tott_def = static_cast<TottController*>(tott->GetComponent(COMPONENT_CHARACTER_CONTROLLER))->m_def;
-	
+	//TottDef tott_def = static_cast<TottController*>(tott->GetComponent(COMPONENT_CHARACTER_CONTROLLER))->m_def;
+	QuestItemDef& quest_item_def = *static_cast<QuestItemDef*>(data);
 	GameObject* go = new GameObject(GAME_OBJECT_QUEST_ITEM);
 	DestroyCallbackComponent* dcc = new DestroyCallbackComponent;
 	go->AddComponent(dcc);
@@ -594,7 +596,11 @@ GameObject* GameObjectManager::CreateQuestItem(const Ogre::Vector3& position, vo
 	RotationComponent* rot_comp = new RotationComponent;
 	go->AddComponent(rot_comp);
 	go->AddUpdateable(rot_comp);
+	StringComponent* string_comp = new StringComponent;
+	go->AddComponent(string_comp);
 
+
+	string_comp->Init(quest_item_def.id);
 	std::function<void()> func = [&] { IEvent evt; evt.m_type = EVT_QUEST_ITEM_REMOVE; m_message_system->Notify(&evt); };
 	dcc->Init(func);
 
@@ -605,7 +611,7 @@ GameObject* GameObjectManager::CreateQuestItem(const Ogre::Vector3& position, vo
 
 	node_comp->Init(position, m_scene_manager);
 	node_comp->SetId(quest_item_id);
-	mrc->Init(tott_def.quest_object_mesh_name, m_scene_manager);
+	mrc->Init(quest_item_def.mesh_name, m_scene_manager);
 	
 	RigidBodyDef body_def;
 	body_def.body_type = DYNAMIC_BODY;
@@ -811,8 +817,8 @@ GameObject* GameObjectManager::CreateGate(const Ogre::Vector3& position, void* d
 	body_def.mass = 1.0f;
 	body_def.collision_filter.filter = COL_WORLD_STATIC;
 	body_def.collision_filter.mask = COL_PLAYER | COL_TOTT | COL_BUBBLE | COL_QUESTITEM;
-	body_def.collider_def.x = 4.0f;
-	body_def.collider_def.y = 6.0f;
+	body_def.collider_def.x = 10.0f;
+	body_def.collider_def.y = 12.0f;
 	body_def.collider_def.z = 0.5f;
 
 	rc->Init(position, m_physics_engine, body_def);

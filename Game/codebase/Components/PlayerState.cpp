@@ -784,8 +784,16 @@ void PlayerInsideBubble::Update(float dt){
 	}*/
 
 	if (s_input_component->GetInputManager()->IsButtonPressed(BTN_LEFT_MOUSE) || s_input_component->GetInputManager()->IsButtonPressed(BTN_RIGHT_MOUSE)){
-		if (s_input_component->CanBlowPink()){
+		if (s_input_component->CanBlowPink() && s_manager->GetCurrentType() != PLAYER_STATE_LEAF_COLLECT){
 			this->ChangeBubbleType();
+		}
+	}
+	if (s_manager->GetCurrentType() == PLAYER_STATE_LEAF_COLLECT){
+		btRigidBody* bubble_body = NULL;
+		m_bubble->GetComponentMessenger()->Notify(MSG_RIGIDBODY_GET_BODY, &bubble_body, "body");
+		if (bubble_body){
+			btVector3 vel = bubble_body->getLinearVelocity();
+			bubble_body->setLinearVelocity(btVector3(0.0f, vel.y(), 0.0f));
 		}
 	}
 	if (bubble_node && m_bubble && s_manager->GetCurrentType() != PLAYER_STATE_LEAF_COLLECT){
@@ -998,7 +1006,7 @@ void PlayerLeafCollect::Update(float dt){
 	Ogre::Vector3 dir = Ogre::Vector3::ZERO;
 	if (!m_is_dancing){
 		bool on_ground = s_input_component->IsOnGround();
-		if (on_ground){
+		if (on_ground || s_manager->IsInsideBubble()){
 			m_is_dancing = true;
 			s_animation->PlayAnimation("Base_PickUpLeaf_State");
 			m_leaf_object->GetComponentMessenger()->Notify(MSG_BOBBING_START_MOVING, &m_player_node);

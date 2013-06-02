@@ -350,4 +350,18 @@ protected:
 	float m_rotation_speed;
 };
 
+class StringComponent : public Component, public IComponentObserver{
+public:
+	StringComponent(void){ m_type = COMPONENT_STRING; }
+	virtual ~StringComponent(void){}
+
+	virtual void Notify(int type, void* message);
+	virtual void Shut();
+	virtual void SetMessenger(ComponentMessenger* messenger);
+	virtual void Init(const Ogre::String& line){ m_string = line; }
+	const Ogre::String& GetString() const { return m_string; }
+protected:
+	Ogre::String m_string;
+};
+
 #endif // _N_VISUAL_COMPONENTS_H_

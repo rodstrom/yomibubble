@@ -95,10 +95,14 @@ struct CharacterControllerDef{
 	CollisionFilter collision_filter;
 };
 
+struct QuestItemDef {
+	Ogre::String mesh_name;
+	Ogre::String id;
+};
+
 struct TottDef{
 	TottDef(void) : mesh_name(""), quest_object_mesh_name(""), type_name(""), sb_node_name(""), theme_music(""), play_music(false),
-					sfx_happy(""), sfx_curious(""), idle_animation(""), walk_animation(""), run_animation(""), react_animation(""),
-					happy_animation(""), node_name(""){}
+					node_name(""), speech_bubble_y(0.0f){}
 	CharacterControllerDef	character_controller;
 	Ogre::String			mesh_name;
 	Ogre::String			quest_object_mesh_name;
@@ -106,15 +110,13 @@ struct TottDef{
 	Ogre::String			sb_node_name;
 	Ogre::String			theme_music;
 	bool					play_music;
-	Ogre::String			sfx_happy;
-	Ogre::String			sfx_curious;
-	Ogre::String			idle_animation;
-	Ogre::String			walk_animation;
-	Ogre::String			run_animation;
-	Ogre::String			react_animation;
-	Ogre::String			happy_animation;
 	Ogre::String			mesh;
 	Ogre::String			node_name;
+	Ogre::String			idle_anim;
+	Ogre::String			excited_anim;
+	Ogre::String			quest_item;
+	Ogre::String			quest_item_mesh_name;
+	float					speech_bubble_y;
 	std::vector<class AIState*>	ai_states;
 };
 

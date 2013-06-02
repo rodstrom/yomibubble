@@ -136,13 +136,13 @@ enum TOTT_STATE{
 
 class TottController : public Component, public IComponentObserver, public IComponentSimulationStep, public IComponentUpdateable {
 public:
-	TottController(void) : m_quest_complete(false), m_rotation_target(Ogre::Vector3::ZERO) { m_type = COMPONENT_CHARACTER_CONTROLLER; }
+	TottController(void) : m_quest_complete(false), m_rotation_target(Ogre::Vector3::ZERO), m_resize_bubble(false), m_speech_transition_state(0), m_quest_started(false), m_excited(false), m_exited_timer(0.0f), m_active(true) { m_type = COMPONENT_TOTT_CONTROLLER; }
 	virtual ~TottController(void) {}
 	
 	virtual void Notify(int type, void* msg);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
-	virtual void Init(PhysicsEngine* physics_engine);
+	virtual void Init(PhysicsEngine* physics_engine, const Ogre::String& idle_anim_id, const Ogre::String& excited_anim_id, const Ogre::String& quest_item);
 	virtual void Update(float dt);
 	virtual void SimulationStep(btScalar time_step);
 
@@ -160,11 +160,18 @@ public:
 	bool m_can_change_state;
 	Ogre::Vector3 m_rotation_target;
 	bool m_quest_complete;
+	bool m_resize_bubble;
+	bool m_quest_started;
+	short m_speech_transition_state;
 	bool m_colliding;
+	bool m_excited;
+	bool m_active;
+	float m_exited_timer;
 	PhysicsEngine* m_physics_engine;
 	SoundData3D m_music;
-
-	
+	Ogre::String m_idle_anim_id;
+	Ogre::String m_excited_anim_id;
+	Ogre::String m_quest_item;
 	
 protected:
 	TOTT_STATE m_state;

@@ -66,6 +66,8 @@ void CollisionManager::Init(){
 	m_collision[MakeIntPair(GAME_OBJECT_LEVEL_CHANGE, GAME_OBJECT_PLAYER)] = &CollisionManager::LevelChangePlayer;
 	m_collision[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_QUEST_TOTT)] = &CollisionManager::PlayerQuestTott;
 	m_collision[MakeIntPair(GAME_OBJECT_QUEST_TOTT, GAME_OBJECT_PLAYER)] = &CollisionManager::QuestTottPlayer;
+	m_collision[MakeIntPair(GAME_OBJECT_QUEST_TOTT, GAME_OBJECT_QUEST_ITEM)] = &CollisionManager::QuestTottQuestItem;
+	m_collision[MakeIntPair(GAME_OBJECT_QUEST_ITEM, GAME_OBJECT_QUEST_TOTT)] = &CollisionManager::QuestItemQuestTott;
 
 	m_raycast_map[MakeIntPair(GAME_OBJECT_PLAYER, GAME_OBJECT_PINK_BUBBLE)] = &CollisionManager::PlayerPinkBubble;
 	m_raycast_map[MakeIntPair(GAME_OBJECT_PINK_BUBBLE, GAME_OBJECT_PLAYER)] = &CollisionManager::PinkBubblePlayer;
@@ -180,17 +182,8 @@ void CollisionManager::PlayerQuestItem(GameObject* player, GameObject* quest_ite
 };
 
 void CollisionManager::TottQuestItem(GameObject* tott, GameObject* quest_item){
-	/*std::cout << "Tott vs QuestItem\n";
-	TOTT_STATE ts = HAPPY;
-	tott->GetComponentMessenger()->Notify(MSG_TOTT_STATE_CHANGE, &ts);
-	//typ ljudeffekt
-	ParticleDef particleDef;
-	particleDef.particle_name = "Particle/Smoke";
-	quest_item->GetGameObjectManager()->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(static_cast<NodeComponent*>(quest_item->GetComponent(COMPONENT_NODE))->GetSceneNode()->getPosition().x, static_cast<NodeComponent*>(quest_item->GetComponent(COMPONENT_NODE))->GetSceneNode()->getPosition().y + 2, static_cast<NodeComponent*>(quest_item->GetComponent(COMPONENT_NODE))->GetSceneNode()->getPosition().z), &particleDef);
-	quest_item->GetGameObjectManager()->RemoveGameObject(quest_item);
-	quest_item->GetGameObjectManager()->RemoveGameObject(quest_item->GetGameObjectManager()->GetGameObject("TestSpeechBubble"));
-	RigidbodyComponent* quest_body = static_cast<RigidbodyComponent*>(quest_item->GetComponent(COMPONENT_RIGIDBODY));
-	quest_item->GetGameObjectManager()->GetPhysicsEngine()->GetDynamicWorld()->removeRigidBody(quest_body->GetRigidbody());*/
+	Ogre::String quest_item_id = static_cast<StringComponent*>(quest_item->GetComponent(COMPONENT_STRING))->GetString();
+	tott->GetComponentMessenger()->Notify(MSG_TOTT_QUEST_ITEM_COLLISION, &quest_item_id);
 };
 
 void CollisionManager::PlayerSpeechBubble(GameObject* player, GameObject* speech_bubble){
@@ -225,8 +218,18 @@ void CollisionManager::PlayerLevelChange(GameObject* player, GameObject* level_c
 }
 
 void CollisionManager::QuestTottPlayer(GameObject* quest_tott, GameObject* player){
-	std::cout << "quest tott vs player\n"; //Great success! :D
-	//skicka in int och notifya //EAIState
-	//EAIState state = AI_STATE_WAIT;
 	quest_tott->GetComponentMessenger()->Notify(MSG_TOTT_COLLIDING, NULL);
+	Ogre::SceneNode* player_node = NULL;
+	player->GetComponentMessenger()->Notify(MSG_NODE_GET_NODE, &player_node);
+	if (player_node){
+		Ogre::Vector3 pos = player_node->getPosition();
+		quest_tott->GetComponentMessenger()->Notify(MSG_TOTT_ROTATION_TARGET_SET, &pos);
+	}
+}
+
+void CollisionManager::QuestTottQuestItem(GameObject* quest_tott, GameObject* item){
+	QuestItemMsg msg;
+	msg.id = static_cast<StringComponent*>(item->GetComponent(COMPONENT_STRING))->GetString();
+	msg.quest_item = item;
+	quest_tott->GetComponentMessenger()->Notify(MSG_TOTT_QUEST_ITEM_COLLISION, &msg);
 }

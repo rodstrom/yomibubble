@@ -992,8 +992,7 @@ void CameraRaycastCollisionComponent::Shut(){
 };
 
 void CameraRaycastCollisionComponent::Notify(int type, void* msg){
-	switch(type)
-	{
+	switch(type) {
 		case MSG_CAMERA_RAYCAST_COLLISION_STATIC_ENVIRONMENT:
 			m_messenger->Notify(MSG_CAMERA_ENV_COLLISION, NULL);
 			break;
@@ -1011,47 +1010,87 @@ void CameraRaycastCollisionComponent::SetMessenger(ComponentMessenger* messenger
 void TottController::Notify(int type, void* msg){
 	switch (type)
 	{
+	case MSG_TOTT_QUEST_ITEM_COLLISION:
+		{
+			QuestItemMsg& quest_item_msg = *static_cast<QuestItemMsg*>(msg);
+			if (m_quest_item == quest_item_msg.id){
+				if (!m_excited){
+					m_excited = true;
+					Ogre::SceneNode* node = NULL;
+					m_messenger->Notify(MSG_CHILD_NODE_GET_NODE, &node);
+					if (node){
+						node->setScale(0,0,0);
+						ParticleDef particleDef;
+						particleDef.particle_name = "Particle/Smoke";
+						m_owner->GetGameObjectManager()->CreateGameObject(GAME_OBJECT_LEAF, node->_getDerivedPosition(), &particleDef);
+						m_owner->RemoveComponent(COMPONENT_SYNCED_TRIGGER);
+						quest_item_msg.quest_item->RemoveGameObject(quest_item_msg.quest_item);
+					}
+				}
+			}
+		}
 	case MSG_TOTT_COLLIDING:
-		m_colliding = true;
+		{
+			m_colliding = true;
+			if (!m_resize_bubble && !m_quest_started){
+				m_resize_bubble = true;
+				m_quest_started = true;
+				Ogre::SceneNode* node = NULL;
+				m_messenger->Notify(MSG_CHILD_NODE_GET_NODE, &node);
+				if (node){
+					node->setScale(0.01f, 0.01f, 0.01f);
+				}
+			}
+		}
 		break;
 	case MSG_TOTT_ROTATION_TARGET_SET:
-		
+		{
+			Ogre::SceneNode* tott_node = NULL;
+			m_messenger->Notify(MSG_NODE_GET_NODE, &tott_node);
+			if (tott_node){
+				m_rotation_target = *static_cast<Ogre::Vector3*>(msg) - tott_node->getPosition();
+				m_rotation_target.normalise();
+			}
+		}
 		break;
 	default:
 		break;
 	}
-};
+}
 
 void TottController::Shut(){
 	m_messenger->Unregister(MSG_TOTT_COLLIDING, this);
 	m_messenger->Unregister(MSG_TOTT_ROTATION_TARGET_SET, this);
+	m_messenger->Unregister(MSG_TOTT_QUEST_ITEM_COLLISION, this);
 	m_physics_engine->RemoveObjectSimulationStep(this);
-};
+}
 
 void TottController::SetMessenger(ComponentMessenger* messenger){
 	m_messenger = messenger;
 	m_messenger->Register(MSG_TOTT_COLLIDING, this);
 	m_messenger->Register(MSG_TOTT_ROTATION_TARGET_SET, this);
-};
+	m_messenger->Register(MSG_TOTT_QUEST_ITEM_COLLISION, this);
+}
 
-void TottController::Init(PhysicsEngine* physics_engine){
+void TottController::Init(PhysicsEngine* physics_engine, const Ogre::String& idle_anim_id, const Ogre::String& excited_anim_id, const Ogre::String& quest_item){
 	m_colliding = false;
+	m_idle_anim_id = idle_anim_id;
+	m_excited_anim_id = excited_anim_id;
+	m_quest_item = quest_item;
 
-	
 	m_physics_engine = physics_engine;
 	m_physics_engine->AddObjectSimulationStep(this);
-};
+}
 
 void TottController::Idling(){
 	m_anim_msg.id = m_idle_animation;
 	m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
-	
-};
+}
 	
 void TottController::Curious(){
 	m_anim_msg.id = m_react_animation;
 	m_messenger->Notify(MSG_ANIMATION_PLAY, &m_anim_msg);
-};
+}
 	
 void TottController::Happy(){
 	m_anim_msg.id = m_happy_animation;
@@ -1059,15 +1098,69 @@ void TottController::Happy(){
 	if (!m_quest_done){
 		//m_owner->GetGameObjectManager()->RemoveGameObject(m_speech_bubble); //or something like that
 	}
-};
+}
 
 void TottController::Update(float dt){
-	m_messenger->Notify(MSG_AI_PAUSE, &m_colliding);
-	if (m_colliding){
-		int p = 0;
+	if (m_active){
+		if (!m_excited){
+			m_messenger->Notify(MSG_AI_PAUSE, &m_colliding);
+		}
+		else {
+			bool pause = true;
+			m_messenger->Notify(MSG_AI_PAUSE, &pause);
+			AnimationMsg anim_msg;
+			anim_msg.id = m_excited_anim_id;
+			anim_msg.loop = true;
+			m_messenger->Notify(MSG_ANIMATION_PLAY, &anim_msg);
+			m_exited_timer += dt;
+			if (m_exited_timer >= 3.0f){
+				pause = false;
+				m_messenger->Notify(MSG_AI_PAUSE, &pause);
+				m_active = false;
+				//m_owner->RemoveComponent(COMPONENT_TOTT_CONTROLLER);
+				return;
+			}
+		}
+		if (m_colliding){
+			if (!m_excited){
+				AnimationMsg anim_msg;
+				anim_msg.id = m_idle_anim_id;
+				anim_msg.loop = true;
+				m_messenger->Notify(MSG_ANIMATION_PLAY, &anim_msg);
+			}
+			DirDT dir_dt;
+			dir_dt.dir = m_rotation_target;
+			dir_dt.dt = dt;
+			m_messenger->Notify(MSG_CHARACTER_CONTROLLER_APPLY_ROTATION, &dir_dt);
+		}
+		if (m_quest_started){
+			if (m_resize_bubble){
+				Ogre::SceneNode* node = NULL;
+				m_messenger->Notify(MSG_CHILD_NODE_GET_NODE, &node);
+				if (node){
+					float scale = 5.0f * dt;
+					float curr_scale = node->getScale().y;
+					if (m_speech_transition_state == 0){   // make the bubble larger
+						node->setScale(curr_scale + scale, curr_scale + scale, curr_scale + scale);
+						float y_scale = node->getScale().y;
+						if (y_scale >= 1.2f){
+							m_speech_transition_state = 1;
+						}
+					}
+					else if (m_speech_transition_state == 1){
+						node->setScale(curr_scale - scale, curr_scale - scale, curr_scale - scale);
+						float y_scale = node->getScale().y;
+						if (y_scale <= 1.0f){
+							node->setScale(1.0f,1.0f,1.0f);
+							m_resize_bubble = false;
+						}
+					}
+				}
+			}
+		}
 	}
-};
+}
 
 void TottController::SimulationStep(btScalar time_step){
 	m_colliding = false;
-};
+}
