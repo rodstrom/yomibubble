@@ -22,6 +22,7 @@ void PlayState::Enter(){
 	m_physics_engine = new PhysicsEngine;
 	m_physics_engine->Init();
 	m_camera = m_scene_manager->createCamera("MainCamera");
+	m_camera->setPosition(0,0,0);
 
 	m_camera->setFarClipDistance(5000.0f);
 	m_camera->setNearClipDistance(1.0f);
@@ -96,7 +97,7 @@ void PlayState::Exit(){
 }
 
 bool PlayState::Update(float dt){
-	m_sound_manager->Update(m_scene_manager, dt);
+	//m_sound_manager->Update(m_scene_manager, dt);
 	m_game_object_manager->Update(dt);
 	m_physics_engine->Step(dt);
 	if (m_change_level){
@@ -107,11 +108,16 @@ bool PlayState::Update(float dt){
 		static_cast<LoadingState*>(loading)->SetLevel(m_level_manager->GetCurrentLevel());
 		loading->Enter();
 		loading->Update(1.0f);
-
+		m_camera->setPosition(0,0,0);
 		m_level_manager->ChangeLevel();
 		m_change_level = false;
 
 		loading->Exit();
+		/*
+		m_sound_manager = new SoundManager;
+		m_sound_manager->Init(m_scene_manager, m_camera, true);
+		m_sound_manager->LoadAudio();
+		*/
 	}
 
 	

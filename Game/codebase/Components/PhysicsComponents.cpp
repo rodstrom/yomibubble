@@ -1013,19 +1013,25 @@ void TottController::Notify(int type, void* msg){
 	{
 	case MSG_TOTT_COLLIDING:
 		m_colliding = true;
+		break;
+	case MSG_TOTT_ROTATION_TARGET_SET:
+		
+		break;
 	default:
 		break;
 	}
 };
 
 void TottController::Shut(){
-	m_messenger->Register(MSG_TOTT_COLLIDING, this);
+	m_messenger->Unregister(MSG_TOTT_COLLIDING, this);
+	m_messenger->Unregister(MSG_TOTT_ROTATION_TARGET_SET, this);
 	m_physics_engine->RemoveObjectSimulationStep(this);
 };
 
 void TottController::SetMessenger(ComponentMessenger* messenger){
 	m_messenger = messenger;
 	m_messenger->Register(MSG_TOTT_COLLIDING, this);
+	m_messenger->Register(MSG_TOTT_ROTATION_TARGET_SET, this);
 };
 
 void TottController::Init(PhysicsEngine* physics_engine){
@@ -1084,7 +1090,9 @@ void TottController::Happy(){
 
 void TottController::Update(float dt){
 	m_messenger->Notify(MSG_AI_PAUSE, &m_colliding);
-	std::cout << "Update Loop\n";
+	if (m_colliding){
+		int p = 0;
+	}
 	/*
 	if (m_def.play_music){
 		m_owner->GetGameObjectManager()->GetGameObject("Player")->GetComponentMessenger()->Notify(MSG_MUSIC3D_PLAY, &m_music);
@@ -1094,5 +1102,4 @@ void TottController::Update(float dt){
 
 void TottController::SimulationStep(btScalar time_step){
 	m_colliding = false;
-	std::cout << "Colliding = FALSE;\n";
 };

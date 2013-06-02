@@ -136,7 +136,7 @@ enum TOTT_STATE{
 
 class TottController : public Component, public IComponentObserver, public IComponentSimulationStep, public IComponentUpdateable {
 public:
-	TottController(void) { m_type = COMPONENT_CHARACTER_CONTROLLER; }
+	TottController(void) : m_quest_complete(false), m_rotation_target(Ogre::Vector3::ZERO) { m_type = COMPONENT_CHARACTER_CONTROLLER; }
 	virtual ~TottController(void) {}
 	
 	virtual void Notify(int type, void* msg);
@@ -158,7 +158,8 @@ public:
 	float m_state_timer_counter;
 	float m_state_timer;
 	bool m_can_change_state;
-
+	Ogre::Vector3 m_rotation_target;
+	bool m_quest_complete;
 	bool m_colliding;
 	PhysicsEngine* m_physics_engine;
 	SoundData3D m_music;

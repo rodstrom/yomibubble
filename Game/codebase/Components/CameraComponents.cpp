@@ -200,7 +200,7 @@ void FollowCameraComponent::Update(float dt){
 			if(input->IsButtonPressed(BTN_INVERT_HORIZONTAL)) m_horizontal_coefficient *= -1;
 			if(input->IsButtonPressed(BTN_FIRST_PERSON)) { 
 				m_first_person = !m_first_person; 
-				m_messenger->Notify(MSG_TGRAPH_STOP, &Ogre::String("CameraClick")); 
+				m_messenger->Notify(MSG_TGRAPH_STOP, &Ogre::String("CameraClick")); //this gives a callback even if you just move the stick :( //not anymore! :D
 			}
 			CameraAxis axis = input->GetCameraAxis();
 			//UpdateCameraGoal(-0.1f * axis.x, -0.1f * axis.y, -0.0005f * axis.z);
