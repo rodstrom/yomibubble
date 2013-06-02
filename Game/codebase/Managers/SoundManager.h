@@ -42,7 +42,7 @@ public:
 	SoundManager();
 	~SoundManager();
 
-	void Init(Ogre::SceneManager* scene_manager, bool play_state = false);
+	void Init(Ogre::SceneManager* scene_manager, Ogre::Camera* camera = NULL, bool play_state = false);
 	void Exit();
 
     void deleteSoundInstance(OgreOggISound* sound);
@@ -76,14 +76,19 @@ public:
 	void GetTottNode(Ogre::String node_name);
 	void Update(Ogre::SceneManager* scene_manager, float dt); 
 
+	void Unload3D();
+
 	std::vector<Ogre::String> m_scene_nodes;
 	std::vector<Ogre::String> m_music_playlist;
 
 	Ogre::String m_yomi_node_name;
+	Ogre::Camera* m_camera;
 
 private:
     Ogre::SceneNode* m_ear_node;
 	Ogre::SceneManager* m_scene_manager;
+
+	std::vector<Ogre::String> m_3D_sounds;
 
 	void processSoundDeletesPending();
 

@@ -25,12 +25,21 @@ SoundManager::~SoundManager(){
 	m_sound_manager = NULL;
 }
 
-void SoundManager::Init(Ogre::SceneManager* scene_manager, bool play_state){
+void SoundManager::Init(Ogre::SceneManager* scene_manager, Ogre::Camera* camera, bool play_state){
 	m_sound_manager->setSceneManager(scene_manager);
 	m_scene_manager = scene_manager;
 	m_ear_node = scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(0,0,0), Ogre::Quaternion::IDENTITY);
+	m_sound_manager->setDistanceModel(AL_LINEAR_DISTANCE_CLAMPED);
+	/*
+	earNode->setPosition(mCamera->getPosition());
+	earNode->setOrientation(mCamera->getOrientation());
+	earNode->attachObject(mSoundManager->getListener());
+	*/
 	if (play_state == true){
-		//m_ear_node->attachObject(m_sound_manager->getListener());
+		m_camera = camera;
+		m_ear_node->setPosition(camera->getPosition());
+		m_ear_node->setOrientation(camera->getOrientation());
+		m_ear_node->attachObject(m_sound_manager->getListener());
 	}
 	//System::Notify
 }
@@ -91,7 +100,8 @@ void SoundManager::LoadAudio(){
 	m_sound_manager->createSound("Hidehog_Theme", "Music/Day_area_theme_Hidehog.wav", false, true, true);
 	//setta 3d-properties
 	Init3D("Hidehog_Theme", 0.20f, 1.0f, 0.150f);
-	m_sound_manager->createSound("Shroomfox_Theme", "Music/Day_area_theme_Shroomfox.wav", false, true, true);
+	//m_sound_manager->createSound("Shroomfox_Theme", "Music/Day_area_theme_Shroomfox_mono.wav", false, true, true);
+	//Init3D("Shroomfox_Theme", 10.0f, 10.0f, 15.0f);
 	m_sound_manager->createSound("Nightcap_Theme", "Music/Night_area_theme_Nightcap.wav", false, true, true);
 
 	m_sound_manager->createSound("Bounce", "SFX/Yomi/Bounce.wav", false, false, true);
@@ -101,10 +111,13 @@ void SoundManager::LoadAudio(){
 	//m_sound_manager->getSound("Dun_Dun")->setMinVolume(0.0f);
 	//m_sound_manager->getSound("Dun_Dun")->setMaxVolume(1.0f);
 
-	//m_sound_manager->createSound("Main_Theme", "Music/Day_area_theme_mono.wav", false, true, true);
+	m_sound_manager->createSound("Shroomfox_Theme", "Music/Day_area_theme_mono.wav", false, true, true);
 	
 
-	//Init3D("Main_Theme", 10.0f, 10.0f, 150.0f);
+	Init3D("Shroomfox_Theme", 10.0f, 10.0f, 150.0f);
+	m_sound_manager->getSound("Shroomfox_Theme")->setMinVolume(0.1f);
+	m_sound_manager->getSound("Shroomfox_Theme")->setMaxVolume(1.0f);
+	
 
 	//bool bajs = m_sound_manager->createEFXSlot(); //tiny was here
 	//bajs; //tiny was here
@@ -140,11 +153,20 @@ void SoundManager::Play3DSound(Ogre::String name, Ogre::String node_name, bool a
 	{ node = m_scene_manager->getSceneNode(node_name); }
 
 	if (!attached)
-	{ node->attachObject(m_sound_manager->getSound(name)); }
+	{ 
+		node->attachObject(m_sound_manager->getSound(name)); 
+		m_3D_sounds.push_back(name);
+	}
 	m_sound_manager->getSound(name)->play();
 
 	node = NULL;
 }
+
+void SoundManager::Unload3D(){
+	for (int i = 0; i < m_3D_sounds.size(); i++){
+		m_sound_manager->getSound(m_3D_sounds[i])->detachFromParent();
+	}
+};
 
 void SoundManager::Stop3DSound(Ogre::String name){
 	m_sound_manager->getSound(name)->stop();
@@ -156,12 +178,18 @@ void SoundManager::Play3DMusic(Ogre::String name, Ogre::String node_name, bool a
 	if (node_name == "")
 	{ node = m_scene_manager->getSceneNode(m_scene_nodes[0]); }
 	else
-	{ node = m_scene_manager->getSceneNode(node_name); }
+	{ 
+		node = m_scene_manager->getSceneNode(node_name); 
+	}
 
 	if (!attached)
-	{ node->attachObject(m_sound_manager->getSound(name)); }
+	{ 
+		node->attachObject(m_sound_manager->getSound(name));
+		m_3D_sounds.push_back(name);
+	}
+	m_sound_manager->getSound(name)->setPosition(node->getPosition());
 	m_sound_manager->getSound(name)->play();
-
+	
 	//std::cout << "tott pos: " << node->getPosition() << std::endl;
 
 	node = NULL;
@@ -198,11 +226,12 @@ void SoundManager::ChangePitch(Ogre::String name, float new_pitch){ //Around 0.0
 void SoundManager::Update(Ogre::SceneManager* scene_manager, float dt){
 	m_sound_manager->update(dt);
 	if (m_ear_node && m_yomi_node_name != ""){
-	m_ear_node->setPosition(scene_manager->getSceneNode(m_yomi_node_name)->getPosition());
-	m_ear_node->setOrientation(scene_manager->getSceneNode(m_yomi_node_name)->getOrientation());
+	//	m_ear_node->setPosition(scene_manager->getSceneNode(m_yomi_node_name)->getPosition());
+	//	m_ear_node->setOrientation(scene_manager->getSceneNode(m_yomi_node_name)->getOrientation());
 	}
 
-//	std::cout << "Ear node pos : " << m_ear_node->getPosition() << std::endl;
+	//std::cout << "Ear node pos : " << m_ear_node->getPosition() << std::endl;
+	//m_sound_manager->getSound("Shroomfox_Theme")->update(dt);
 	processSoundDeletesPending();
 }
 

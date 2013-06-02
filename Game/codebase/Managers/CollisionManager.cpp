@@ -189,7 +189,6 @@ void CollisionManager::PlayerQuestItem(GameObject* player, GameObject* quest_ite
 
 void CollisionManager::TottQuestItem(GameObject* tott, GameObject* quest_item){
 	std::cout << "Tott vs QuestItem\n";
-	//This crashes. No fucks are given at the moment.
 	/*
 	TOTT_STATE ts = HAPPY;
 	tott->GetComponentMessenger()->Notify(MSG_TOTT_STATE_CHANGE, &ts);
@@ -197,11 +196,10 @@ void CollisionManager::TottQuestItem(GameObject* tott, GameObject* quest_item){
 	ParticleDef particleDef;
 	particleDef.particle_name = "Particle/Smoke";
 	quest_item->GetGameObjectManager()->CreateGameObject(GAME_OBJECT_LEAF, Ogre::Vector3(static_cast<NodeComponent*>(quest_item->GetComponent(COMPONENT_NODE))->GetSceneNode()->getPosition().x, static_cast<NodeComponent*>(quest_item->GetComponent(COMPONENT_NODE))->GetSceneNode()->getPosition().y + 2, static_cast<NodeComponent*>(quest_item->GetComponent(COMPONENT_NODE))->GetSceneNode()->getPosition().z), &particleDef);
-	if (static_cast<SpeechBubbleComponent*>(tott->GetComponent(COMPONENT_SPEECH_BUBBLE))->m_given_leaf == false){
-		//quest_item->GetGameObjectManager()->RemoveGameObject(quest_item->GetGameObjectManager()->GetGameObject(static_cast<TottController*>(tott->GetComponent(COMPONENT_CHARACTER_CONTROLLER))->GetSpeechBubble()));
-		quest_item->GetGameObjectManager()->RemoveGameObject(quest_item);
-		static_cast<SpeechBubbleComponent*>(tott->GetComponent(COMPONENT_SPEECH_BUBBLE))->m_given_leaf = true;
-	}
+	quest_item->GetGameObjectManager()->RemoveGameObject(quest_item);
+	quest_item->GetGameObjectManager()->RemoveGameObject(quest_item->GetGameObjectManager()->GetGameObject("Speech_Bubble_0"));
+	RigidbodyComponent* quest_body = static_cast<RigidbodyComponent*>(quest_item->GetComponent(COMPONENT_RIGIDBODY));
+	quest_item->GetGameObjectManager()->GetPhysicsEngine()->GetDynamicWorld()->removeRigidBody(quest_body->GetRigidbody());
 	*/
 };
 

@@ -518,10 +518,8 @@ GameObject* GameObjectManager::CreateSpeechBubble(const Ogre::Vector3& position,
 	go->AddComponent(sbcomp);
 	go->AddUpdateable(sbcomp);
 
-
-
 	node_comp->Init(node, m_scene_manager);
-	node_comp->SetId(spbubble_id);
+	node_comp->SetId("bajs");
 	mrc->Init("PratBubblaCherry.mesh", m_scene_manager, node_comp->GetSceneNode()->getName());//, node->getName());
 	sbcomp->Init(node, m_scene_manager, tott);
 	

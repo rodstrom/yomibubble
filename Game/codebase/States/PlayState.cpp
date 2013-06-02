@@ -19,9 +19,6 @@ PlayState::~PlayState(void){}
 void PlayState::Enter(){
 	m_message_system->Register(EVT_CHANGE_LEVEL, this, &PlayState::ChangeLevel);
 	m_scene_manager = Ogre::Root::getSingleton().createSceneManager("OctreeSceneManager");
-	m_sound_manager = new SoundManager;
-	m_sound_manager->Init(m_scene_manager, true);
-	m_sound_manager->LoadAudio();
 	m_physics_engine = new PhysicsEngine;
 	m_physics_engine->Init();
 	m_camera = m_scene_manager->createCamera("MainCamera");
@@ -30,6 +27,10 @@ void PlayState::Enter(){
 	m_camera->setNearClipDistance(1.0f);
 	m_viewport = m_render_window->addViewport(m_camera);
 	m_camera->setAspectRatio(Ogre::Real(m_viewport->getActualWidth()) / Ogre::Real(m_viewport->getActualHeight()));
+
+	m_sound_manager = new SoundManager;
+	m_sound_manager->Init(m_scene_manager, m_camera, true);
+	m_sound_manager->LoadAudio();
 
 	m_game_object_manager = new GameObjectManager;
 	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager, m_message_system, NULL);
@@ -86,6 +87,7 @@ void PlayState::Exit(){
 	m_physics_engine->Shut();
 	delete m_physics_engine;
 	m_physics_engine = NULL;
+	//m_sound_manager->Unload3D();
 	m_sound_manager->Exit();
 	delete m_sound_manager;
 	m_sound_manager = NULL;
