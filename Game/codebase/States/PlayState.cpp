@@ -26,6 +26,11 @@ void PlayState::Enter(){
 	m_physics_engine->Init();
 	m_camera = m_scene_manager->createCamera("MainCamera");
 
+
+	m_fade->SetFadeInCallBack(NULL);
+	m_fade->FadeIn(VariableManager::GetSingletonPtr()->GetAsFloat("Fade_in_timer"));
+
+
 	m_camera->setFarClipDistance(5000.0f);
 	m_camera->setNearClipDistance(1.0f);
 	m_viewport = m_render_window->addViewport(m_camera);
@@ -98,7 +103,7 @@ bool PlayState::Update(float dt){
 	m_game_object_manager->Update(dt);
 	m_physics_engine->Step(dt);
 	if (m_change_level){
-		
+		//m_fade->FadeIn(VariableManager::GetSingletonPtr()->GetAsFloat("Fade_in_timer"));
 		State* loading = FindByName("LoadingState");
 		m_parent->Init(loading);
 		static_cast<LoadingState*>(loading)->SetLevel(m_level_manager->GetCurrentLevel());
@@ -147,9 +152,16 @@ bool PlayState::Update(float dt){
 }
 
 void PlayState::ChangeLevel(IEvent*) {
-	m_change_level = true;
+	//m_change_level = true;
+	std::function<void()> func = [this] { m_change_level = true; };
+	m_fade->SetFadeOutCallBack(func);
+	m_fade->FadeOut(VariableManager::GetSingletonPtr()->GetAsFloat("Fade_out_timer"));
 }
 
 void PlayState::ChangeToWinState(){
 	ChangeState(FindByName("WinState"));
+}
+
+void PlayState::Test(){
+	
 }

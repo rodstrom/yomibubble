@@ -39,15 +39,15 @@ void PauseState::Enter(){
 	ButtonDef buttonDef;
 	buttonDef.overlay_name = "Pause";
 	buttonDef.cont_name = "Pause/Start";
-	buttonDef.mat_start_hover = "Menu/StartHover";
-	buttonDef.mat_start = "Menu/Start";
+	buttonDef.mat_start_hover = "Pause/StartHover";
+	buttonDef.mat_start = "Pause/Start";
 	buttonDef.func = [this] { ResumeGame(); };
 	m_buttons[0] = m_game_object_manager->CreateGameObject(GAME_OBJECT_BUTTON, Ogre::Vector3(0,0,0), &buttonDef);
 
 	buttonDef.overlay_name = "Pause";
 	buttonDef.cont_name = "Pause/Quit";
-	buttonDef.mat_start_hover = "Menu/QuitHover";
-	buttonDef.mat_start = "Menu/Quit";
+	buttonDef.mat_start_hover = "Pause/QuitHover";
+	buttonDef.mat_start = "Pause/Quit";
 	buttonDef.func = [this] { ToMainMenu(); };
 	m_buttons[1] = m_game_object_manager->CreateGameObject(GAME_OBJECT_BUTTON, Ogre::Vector3(0,0,0), &buttonDef);
 }

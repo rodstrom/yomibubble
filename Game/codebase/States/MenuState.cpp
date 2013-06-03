@@ -10,6 +10,7 @@
 #include "TreeLoader3D.h"
 #include "WindBatchPage.h"
 #include "ImpostorPage.h"
+#include "..\Waypoint.h"
 
 MenuState::MenuState(void) : m_quit(false), m_current_selected_button(0) {} 
 MenuState::~MenuState(void){}
@@ -28,6 +29,10 @@ void MenuState::Enter(){
 	dir_y = -1.0f;
 	dir_z = 0.0f;
 	m_scene_manager->setSkyBox(true, "_MySky", 2300.0f);
+	m_way_point = new WayPoint();
+	
+	m_fade->SetFadeInCallBack(NULL);
+	m_fade->FadeIn(VariableManager::GetSingletonPtr()->GetAsFloat("Fade_in_timer"));
 	
 	m_target_time = (float)Ogre::Math::RangeRandom(Ogre::Real(1.0f), Ogre::Real(3.0f));
 	m_anim_timer = 0.0f;
@@ -36,7 +41,8 @@ void MenuState::Enter(){
 	m_camera->setNearClipDistance(1.0f);
 	m_viewport = m_render_window->addViewport(m_camera);
 	m_camera->setAspectRatio(Ogre::Real(m_viewport->getActualWidth()) / Ogre::Real(m_viewport->getActualHeight()));
-	m_camera->setPosition(0.0f, -1.5f, 0.0f);
+	m_camera->setPosition(-1.0f, -1.0f, 2.0f);
+	//m_camera->pitch(Ogre::Degree(-3.0f));
 
 	m_paged_geometry = new Forests::PagedGeometry;
 	m_paged_geometry->setCamera(m_camera);
@@ -80,18 +86,15 @@ void MenuState::Enter(){
 	m_yomi_ent->attachObjectToBone("CATRigLArmDigit21", yomi_staff, Ogre::Quaternion(1.0f, 1.0f, 0.7f, 0.0f), Ogre::Vector3(0.01f, -0.02f, 0.0f));
 	Ogre::Entity* menu_grass = m_scene_manager->createEntity("MainMenyGrass.mesh");
 	Ogre::Entity* menu_bush = m_scene_manager->createEntity("MenuBushes.mesh");
-	
-	/////////////////////////////////////////////////////////////////////////////////77
-	m_walk_speed = 35.0f;
-	m_direction = Ogre::Vector3::ZERO;
-	m_destination = Ogre::Vector3::ZERO;
-	
-	m_old_destination = Ogre::Vector3::ZERO; //node->getPosition();
-	m_loop_waypoints = true;
+	Ogre::Entity* blue_bubble = m_scene_manager->createEntity("BlueBubble.mesh");
+	Ogre::Entity* blue_bubble1 = m_scene_manager->createEntity("BlueBubble.mesh");
+	Ogre::Entity* pink_bubble = m_scene_manager->createEntity("PinkBubble.mesh");
 
-	m_walk_list.push_back(Ogre::Vector3(0.3f, -2.0f, -2.0f));
-	m_walk_list.push_back(Ogre::Vector3(0.3f, -2.0f, -10.0f));
+	blue_bubble->setRenderQueueGroup(60);
+	blue_bubble1->setRenderQueueGroup(60);
+	pink_bubble->setRenderQueueGroup(60);
 	
+
 	m_paged_geometry->setCustomParam(menu_grass->getName(), "windFactorX", 0.175f);
 	m_paged_geometry->setCustomParam(menu_grass->getName(), "windFactorY", 0.001f);
 	m_paged_geometry->setCustomParam(menu_bush->getName(), "windFactorX", 0.125f);
@@ -103,16 +106,23 @@ void MenuState::Enter(){
 	FixYomiWeights();
 	m_yomi_node = m_scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(0.3f, -2.0f, -2.0f));
 	m_yomi_node->attachObject(m_yomi_ent);
+	m_yomi_node->yaw(Ogre::Degree(-10.0f));
 
 	m_scene_node = m_scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(0.0f, -2.0f, -3.0f));
 	m_scene_node->attachObject(menu_scene);
+	m_blue_bubble_node = m_scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(0.0f, -1.5f, -5.0f));
+	m_blue_bubble_node->attachObject(blue_bubble);
+	m_blue_bubble_node1 = m_scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(-4.0f, -1.5f, -10.0f));
+	m_blue_bubble_node1->attachObject(blue_bubble1);
+	m_pink_bubble_node = m_scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(3.0f, -1.5f, -7.0f));
+	m_pink_bubble_node->attachObject(pink_bubble);
+
+
 
 	m_tott_node = m_scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(0.0f, -2.0f, -10.0f));
 	m_tott_node->yaw(Radian(4));
 	m_tott_node->attachObject(m_tott);
-	m_follow_node = m_tott_node;
-
-
+	
 	m_menu_grass = m_scene_manager->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(m_scene_node->getPosition()));
 	m_menu_grass->attachObject(menu_grass);
 	
@@ -198,12 +208,10 @@ bool MenuState::Update(float dt){
 	//m_game_object_manager->LateUpdate(dt);
 	if (m_input_manager->IsButtonPressed(BTN_BACK))
 		return false;
-	
+	m_direction = m_destination - m_yomi_node->getPosition();
 	m_yomi_base->addTime(dt);
 	m_yomi_top->addTime(dt);
 	m_tott_animation->addTime(dt);
-
-
 	
 	if(m_anim_timer >= m_target_time){
 		if(m_yomi_base == m_yomi_ent->getAnimationState("Base_Idle")){
@@ -248,7 +256,7 @@ bool MenuState::Update(float dt){
 	if(m_input_manager->IsButtonPressed(BTN_A))
 	{
 		m_buttons[m_current_selected_button]->GetComponentMessenger()->Notify(MSG_OVERLAY_CALLBACK, NULL);
-		m_buttons[m_current_selected_button]->GetComponentMessenger()->Notify(MSG_OVERLAY_HIDE, NULL);
+		//m_buttons[m_current_selected_button]->GetComponentMessenger()->Notify(MSG_OVERLAY_HIDE, NULL);
 	}
 
 	return !m_quit;
@@ -355,31 +363,3 @@ void MenuState::RemoveWeights(std::vector<std::string>& list, Ogre::Animation* a
 	}
 }
 
-bool MenuState::NextLocation(){
-
-	if ( m_walk_list.empty() ) { 
-		m_direction = Ogre::Vector3::ZERO; return false; 
-	}
-	
-	m_destination = m_walk_list.front();  // this gets the front of the deque
-	if (m_loop_waypoints) m_walk_list.push_back(m_walk_list.front()); //if looping keep the list rotating so that it never ends
-	m_walk_list.pop_front();             // this removes the front of the deque
- 
-	m_direction = m_destination - m_yomi_node->getPosition();
-	//m_direction.normalise();
-
-	return true;
-}
-
-bool MenuState::WithinDistance(float meters){
-	if (m_yomi_node->getPosition().x >= m_destination.x - meters
-		&& m_yomi_node->getPosition().x <= m_destination.x + meters)
-	{
-		if (m_yomi_node->getPosition().z >= m_destination.z - meters
-		&& m_yomi_node->getPosition().z <= m_destination.z + meters)
-		{
-			return true;
-		}
-	}
-	return false;
-}

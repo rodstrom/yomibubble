@@ -103,7 +103,8 @@ void WayPoint::Update(float dt){
         if (NextLocation()) { }
     }
 	else {
-		UpdateGoal();
+		m_direction = m_destination - m_node->getPosition();
+		//UpdateGoal();
 		//do naaathing
 		//std::cout << "Deque empty: " << m_walk_list.empty() << std::endl;
 	}

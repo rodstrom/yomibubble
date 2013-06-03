@@ -5,6 +5,7 @@
 
 #include "..\Components\GameObject.h"
 #include "PagedGeometry.h"
+#include "..\Waypoint.h"
 
 class FadeInFadeOut;
 class MenuState : public State
@@ -28,6 +29,7 @@ public:
 	//DECLARE_STATE_CLASS(MenuState);
 
 private:
+	WayPoint*					m_way_point;
 	GameObjectManager*			m_game_object_manager;
 	PhysicsEngine*				m_physics_engine;
 	SoundManager*				m_sound_manager;
@@ -41,6 +43,9 @@ private:
 	Ogre::SceneNode*			m_menu_grass;
 	Ogre::SceneNode*			m_menu_bush;
 	Ogre::SceneNode*			m_follow_node;
+	Ogre::SceneNode*			m_blue_bubble_node;
+	Ogre::SceneNode*			m_blue_bubble_node1;
+	Ogre::SceneNode*			m_pink_bubble_node;
 	Ogre::AnimationState*		m_animation_state;
 	Ogre::Entity*				m_yomi_ent;
 	Ogre::Entity*				m_tott;
@@ -49,17 +54,10 @@ private:
 	Ogre::AnimationState*		m_tott_animation;
 	float						m_anim_timer;
 	float						m_target_time;
-	Ogre::String				m_current_idle_base;
-	Ogre::String				m_current_idle_top;
 	Forests::PagedGeometry*		m_paged_geometry;
-	std::deque<Ogre::Vector3>	m_walk_list;
-	Ogre::Vector3				m_direction;
-	Ogre::Real					m_walk_speed;
-	Ogre::Real					m_distance;
 	Ogre::Vector3				m_destination;
-	Ogre::Real					m_move;
-	Ogre::Vector3				m_old_destination;
-	bool						m_loop_waypoints;
+	Ogre::Vector3				m_direction;
+	float						m_speed;
 
 };
 

@@ -10,16 +10,10 @@ enum FadeState{
 	FADE_OUT
 };
 
-class FaderCallBack{
-public:
-	virtual void FadeInCallBack(void){}
-	virtual void FadeOutCallBack(void){}
-};
-
 class FadeInFadeOut
 {
 public:
-	FadeInFadeOut(const Ogre::String& p_overlay_name, const Ogre::String& p_material_name, FaderCallBack* instance = 0);
+	FadeInFadeOut(const Ogre::String& p_overlay_name, const Ogre::String& p_material_name);
 	virtual ~FadeInFadeOut(void);
 
 	void Update(float dt);

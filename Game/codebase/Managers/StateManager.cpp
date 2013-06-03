@@ -10,6 +10,9 @@
 StateManager::StateManager(Ogre::RenderWindow* render_window, InputListener* input_listener, MessageSystem* message_system) 
 	: m_render_window(render_window), m_input_listener(input_listener), m_message_system(message_system), m_next_state(NULL), m_pop_on_update(false), m_fading(false), m_loading_fading(false){
 		m_fade = new FadeInFadeOut("Overlays/FadeInOut", "Examples/Fade");
+		
+		
+		
 }
 
 StateManager::~StateManager(void){}
@@ -35,7 +38,7 @@ bool StateManager::Update(float dt){
 	}
 
 	if (m_next_state){
-		
+		//m_fade->FadeIn(VariableManager::GetSingletonPtr()->GetAsFloat("Fade_in_timer"));
 		if (!m_state_stack.empty()){
 			Cleanup(m_state_stack.back());
 			m_state_stack.back()->Exit();
@@ -46,12 +49,12 @@ bool StateManager::Update(float dt){
 		Init(m_next_state);
 		m_state_stack.back()->Enter();
 		m_next_state = NULL;
+		//m_fade->FadeIn(VariableManager::GetSingletonPtr()->GetAsFloat("Fade_in_timer"));
 		if(m_state_stack.back() == FindById("PlayState")){
-			
 			Init(m_loading);
 			m_loading->Enter();
 			m_loading->Update(1.0f);
-			m_fade->FadeIn(VariableManager::GetSingletonPtr()->GetAsFloat("Fade_in_timer"));			
+			m_fade->FadeIn(VariableManager::GetSingletonPtr()->GetAsFloat("Fade_in_timer"));
 		}
 	}
 	
@@ -135,8 +138,9 @@ void StateManager::Shut(){
 }
 
 void StateManager::SecondLoading(){
-	static_cast<PlayState*>(m_state_stack.back())->SecondLoading();
 	m_fade->FadeOut(VariableManager::GetSingletonPtr()->GetAsFloat("Fade_out_timer"));
+	static_cast<PlayState*>(m_state_stack.back())->SecondLoading();
+	
 	
 }
 

@@ -6,7 +6,7 @@
 #include "OgreBlendMode.h"
 
 
-FadeInFadeOut::FadeInFadeOut(const Ogre::String& p_overlay_name, const Ogre::String& p_material_name, FaderCallBack* instance){
+FadeInFadeOut::FadeInFadeOut(const Ogre::String& p_overlay_name, const Ogre::String& p_material_name){
 	m_current_dur = 0.0;
 	m_is_fading = false;
 	m_fade_state = FADE_NONE;
@@ -60,6 +60,7 @@ void FadeInFadeOut::Update(float dt){
          // If fading out, increase the _alpha until it reaches 1.0
 		 else if( m_fade_state == FADE_OUT )
          {
+
 			 	if( dt < 0.0 )
 					dt = -dt;
 				if( dt < 0.000001 )
@@ -69,8 +70,8 @@ void FadeInFadeOut::Update(float dt){
              m_alpha = m_current_dur / m_total_dur;
              if( m_alpha > 1.0 )
              {
-                 m_fade_state = FADE_NONE;
 				 m_is_fading = true;
+                 m_fade_state = FADE_NONE;
 				 if(m_fade_out_callback != NULL ){
 					 m_fade_out_callback();
 					 m_fade_out_callback = NULL;
@@ -81,20 +82,28 @@ void FadeInFadeOut::Update(float dt){
 }
 
 void FadeInFadeOut::FadeIn(float duration){
+	if(m_fade_state == FADE_IN)
+		return;
 	m_is_fading = true;
 	 m_alpha = 1.0f;
 	 m_total_dur = duration;
+	 m_current_dur = duration;
      m_fade_state = FADE_IN;
 	 m_overlay->show();
-	 m_current_dur = duration;
+	 
 }
 
 
 void FadeInFadeOut::FadeOut(float duration){
+	if(m_fade_state == FADE_OUT)
+		return;
+
 	m_is_fading = true;
      m_alpha = 0.0;
 	 m_total_dur = duration;
+	  //m_current_dur = duration;
 	 m_current_dur = 0.0;
      m_fade_state = FADE_OUT;
      m_overlay->show();
+	
 }
