@@ -1008,8 +1008,7 @@ void CameraRaycastCollisionComponent::SetMessenger(ComponentMessenger* messenger
 
 
 void TottController::Notify(int type, void* msg){
-	switch (type)
-	{
+	switch (type) {
 	case MSG_TOTT_QUEST_ITEM_COLLISION:
 		{
 			QuestItemMsg& quest_item_msg = *static_cast<QuestItemMsg*>(msg);
@@ -1072,7 +1071,7 @@ void TottController::SetMessenger(ComponentMessenger* messenger){
 	m_messenger->Register(MSG_TOTT_QUEST_ITEM_COLLISION, this);
 }
 
-void TottController::Init(PhysicsEngine* physics_engine, const Ogre::String& idle_anim_id, const Ogre::String& excited_anim_id, const Ogre::String& quest_item){
+void TottController::Init(PhysicsEngine* physics_engine, Ogre::SceneManager* scene_manager, const Ogre::String& idle_anim_id, const Ogre::String& excited_anim_id, const Ogre::String& quest_item){
 	m_colliding = false;
 	m_idle_anim_id = idle_anim_id;
 	m_excited_anim_id = excited_anim_id;
@@ -1080,6 +1079,7 @@ void TottController::Init(PhysicsEngine* physics_engine, const Ogre::String& idl
 
 	m_physics_engine = physics_engine;
 	m_physics_engine->AddObjectSimulationStep(this);
+	m_camera = scene_manager->getCamera("MainCamera");
 }
 
 void TottController::Idling(){

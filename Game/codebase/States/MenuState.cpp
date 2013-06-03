@@ -144,8 +144,7 @@ bool MenuState::Update(float dt){
 		}
 	}
 
-	if(m_input_manager->IsButtonPressed(BTN_A))
-	{
+	if(m_input_manager->IsButtonPressed(BTN_A)){
 		m_buttons[m_current_selected_button]->GetComponentMessenger()->Notify(MSG_OVERLAY_CALLBACK, NULL);
 		m_buttons[m_current_selected_button]->GetComponentMessenger()->Notify(MSG_OVERLAY_HIDE, NULL);
 	}
@@ -155,7 +154,11 @@ bool MenuState::Update(float dt){
 
 void MenuState::ChangeStateToPlayState()
 {
-	ChangeState(FindByName("PlayState"));
+	m_parent->ShowLoadingScreen("LoadingFirst");
+	m_parent->PauseUpdate(true);
+	std::function<void()> func = [this] { m_parent->PauseUpdate(false); ChangeState(FindByName("PlayState")); };
+	m_fade->SetFadeInCallBack(func);
+	m_fade->FadeIn(VariableManager::GetSingletonPtr()->GetAsFloat("Fade_in_timer"));
 }
 
 void MenuState::ChangeStateToOptions(){}

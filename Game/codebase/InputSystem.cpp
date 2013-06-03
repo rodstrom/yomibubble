@@ -191,6 +191,9 @@ bool InputSystem::keyPressed(const OIS::KeyEvent& e){
 		break;
 	case OIS::KC_D:
 		break;
+	case OIS::KC_E:
+		m_game->InjectPressedButton(BTN_X);
+		break;
 	case OIS::KC_SPACE:
 		m_game->InjectPressedButton(BTN_A);
 		break;
@@ -237,6 +240,9 @@ bool InputSystem::keyReleased(const OIS::KeyEvent& e){
 		break;
 	case OIS::KC_D:
 		m_game->InjectRelativeMovementX(0.0f);
+		break;
+	case OIS::KC_E:
+		m_game->InjectReleasedButton(BTN_X);
 		break;
 	case OIS::KC_SPACE:
 		m_game->InjectReleasedButton(BTN_A);

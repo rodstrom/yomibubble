@@ -25,8 +25,10 @@ public:
 	bool Pause() { return m_pause; }
 
 	void SecondLoading();
-	void ChangeLevel(IEvent*);
+	void ChangeLevel(IEvent*);	// called by the message system to inform play state that it should get ready to change level
 	void ChangeToWinState();
+	void _ReadyNextLevel();	// will create a lambda for _LoadNextLevel
+	void _LoadNextLevel();	// will delete the old level and load the new. This method is called by a lambda function. Do not call directly
 
 private:
 	PhysicsEngine*				m_physics_engine;

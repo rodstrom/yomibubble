@@ -511,7 +511,7 @@ GameObject* GameObjectManager::CreateQuestTott(const Ogre::Vector3& position, vo
 	contr->GetRigidbody()->setContactProcessingThreshold(btScalar(0));
 	contr->GetRigidbody()->setActivationState(DISABLE_DEACTIVATION);
 
-	tott_contr->Init(m_physics_engine, def.idle_anim, def.excited_anim, def.quest_item);
+	tott_contr->Init(m_physics_engine, m_scene_manager, def.idle_anim, def.excited_anim, def.quest_item);
 
 	TriggerDef trdef;
 	trdef.body_type = STATIC_BODY;
@@ -849,7 +849,6 @@ GameObject* GameObjectManager::CreateParticleEffect(const Ogre::Vector3& positio
 	go->AddComponent(particle);
 	NodeComponent* node_comp = new NodeComponent;
 	go->AddComponent(node_comp);
-
 	node_comp->Init(position, m_scene_manager);
 	node_comp->GetSceneNode()->setPosition(Ogre::Vector3(position));
 

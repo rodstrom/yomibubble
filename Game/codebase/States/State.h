@@ -19,9 +19,11 @@ public:
 	virtual bool PushState(State* state) = 0;
 	virtual void PopState() = 0;
 	virtual void Init(State* state) = 0;
+	virtual void ShowLoadingScreen(const Ogre::String& overlay_name) = 0;
+	virtual void HideLoadingScreen() = 0;
+	virtual void PauseUpdate(bool) = 0;
 };
 
-//class State : public Ogre::FrameListener
 class State
 {
 public:

@@ -198,8 +198,8 @@ void SoundManager::ChangePitch(Ogre::String name, float new_pitch){ //Around 0.0
 void SoundManager::Update(Ogre::SceneManager* scene_manager, float dt){
 	m_sound_manager->update(dt);
 	if (m_ear_node && m_yomi_node_name != ""){
-	m_ear_node->setPosition(scene_manager->getSceneNode(m_yomi_node_name)->getPosition());
-	m_ear_node->setOrientation(scene_manager->getSceneNode(m_yomi_node_name)->getOrientation());
+	//m_ear_node->setPosition(scene_manager->getSceneNode(m_yomi_node_name)->getPosition());
+	//m_ear_node->setOrientation(scene_manager->getSceneNode(m_yomi_node_name)->getOrientation());
 	}
 
 //	std::cout << "Ear node pos : " << m_ear_node->getPosition() << std::endl;

@@ -889,23 +889,25 @@ void TutorialGraphicsComponent::Notify(int type, void* message){
 			m_overlay->hide();
 		}
 		else if (msg == "ChangeIntoCameraClick" && m_pic_one == "HUD/Tutorial/IntoBubble_One"){
-			m_pic_one = "CleverBugFix";
+			m_pic_one = "HUD/Tutorial/CameraClick_Two";
 			m_pic_one_sec = "HUD/Tutorial/CameraClick_One";
 			m_pic_two_sec = "HUD/Tutorial/CameraClick_Two";
+			m_overlay->hide();
 			m_overlay_sec->show();
 		}
 		else if (msg == "CameraClick" && m_pic_one_sec == "HUD/Tutorial/CameraClick_One"){
 			m_overlay_sec->hide();
 		}
 		else{}
+
+		if (msg == "CameraMove" && m_overlay_sec->isVisible() && m_pic_one_sec == "HUD/Tutorial/CameraMove_One"){
+			m_overlay_sec->hide();
+		}
+
 		} //if level == try
 
 		if(msg == "PinkBubble" && m_pic_one == "HUD/Tutorial/PinkBubble_One"){
 			m_overlay->hide();
-		}
-
-		if (msg == "CameraMove" && m_overlay_sec->isVisible()){
-			m_overlay_sec->hide();
 		}
 		break;
 	default:

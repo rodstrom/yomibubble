@@ -81,17 +81,22 @@ void FadeInFadeOut::Update(float dt){
 }
 
 void FadeInFadeOut::FadeIn(float duration){
+	if(m_fade_state == FADE_IN)
+	  return;
 	m_is_fading = true;
 	 m_alpha = 1.0f;
 	 m_total_dur = duration;
      m_fade_state = FADE_IN;
+	 std::cout << "showing overlay\n";
 	 m_overlay->show();
 	 m_current_dur = duration;
 }
 
 
 void FadeInFadeOut::FadeOut(float duration){
-	m_is_fading = true;
+	 if(m_fade_state == FADE_OUT)
+		return;
+	 m_is_fading = true;
      m_alpha = 0.0;
 	 m_total_dur = duration;
 	 m_current_dur = 0.0;

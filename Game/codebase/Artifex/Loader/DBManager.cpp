@@ -47,7 +47,7 @@ int DBManager::Load() {
 	m_paged_geometry->addDetailLevel<Forests::WindBatchPage>(40,10);
 	m_paged_geometry->addDetailLevel<Forests::ImpostorPage>(100, 10);
 
-	Forests::TreeLoader3D* tree_loader = new Forests::TreeLoader3D(m_paged_geometry, Forests::TBounds(0,0,500,500));
+	Forests::TreeLoader3D* tree_loader = new Forests::TreeLoader3D(m_paged_geometry, Forests::TBounds(0,0,1500,1500));
 	m_paged_geometry->setPageLoader(tree_loader);
 	//******** get objects from sqlite file *********
 	string query = "SELECT * FROM objects";
@@ -704,7 +704,7 @@ int DBManager::Load() {
 		static_cast<WayPointComponent*>(goIter->first->GetComponent(COMPONENT_AI))->AddWayPoint(followables[goIter->second]);
 	}
 	followers.clear();
-	m_paged_geometry->preloadGeometry(Forests::TBounds(0,0,500,500));
+	m_paged_geometry->preloadGeometry(Forests::TBounds(0,0,1500,1500));
 	t.finalize();
 	return 0;	
 };

@@ -34,13 +34,6 @@ void PlayState::Enter(){
 
 	m_game_object_manager = new GameObjectManager;
 	m_game_object_manager->Init(m_physics_engine, m_scene_manager, m_input_manager, m_viewport, m_sound_manager, m_message_system, NULL);
-	//RUN SECONDLOADING
-}
-
-void PlayState::SecondLoading(){	
-	// Create plane mesh
-	//Ogre::Plane plane(Ogre::Vector3::UNIT_Y, -10);
-	//Ogre::MeshManager::getSingleton().createPlane("plane", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane, 50, 50, 20, 20, true, 1, 5, 5, Ogre::Vector3::UNIT_Z);
 
 #ifdef NDEBUG
 	if (VariableManager::GetSingletonPtr()->GetAsBool("Show", INIFILE_VISUAL_CONFIG, "Shadows", true)){
@@ -58,22 +51,32 @@ void PlayState::SecondLoading(){
 		 Ogre::CompositorManager::getSingleton().setCompositorEnabled(m_viewport, "Bloom", true);
 	}
 #endif
+
 	std::function<void()> func = [this] { ChangeToWinState(); };
 	m_level_manager = new LevelManager(m_game_object_manager, m_scene_manager, m_physics_engine, func);
 	LevelDef level1;
 	level1.filepath = "try";
 	level1.next_level = "Dayarea";
+	level1.loading_screen_name = "LoadingDay";
 	LevelDef level2;
 	level2.filepath = "Dayarea";
 	level2.next_level = "NightArea";
+	level2.loading_screen_name = "LoadingNight";
 	LevelDef level3;
 	level3.filepath = "NightArea";
 	level3.next_level = Ogre::StringUtil::BLANK;
+	level3.loading_screen_name = "LoadingNight";
 	m_level_manager->AddLevel(level1);
 	m_level_manager->AddLevel(level2);
 	m_level_manager->AddLevel(level3);
 	m_level_manager->LoadLevel(VariableManager::GetSingletonPtr()->GetAsString("StartLevel"));
+	func = [this] { m_fade->FadeIn(VariableManager::GetSingletonPtr()->GetAsFloat("Fade_in_timer")); m_parent->PauseUpdate(false); m_parent->HideLoadingScreen(); };
+	m_fade->SetFadeOutCallBack(func);
+	m_fade->SetFadeInCallBack(NULL);
+	m_fade->FadeOut(VariableManager::GetSingletonPtr()->GetAsFloat("Fade_out_timer"));
+}
 
+void PlayState::SecondLoading(){
 }
 
 void PlayState::Exit(){
@@ -98,36 +101,24 @@ bool PlayState::Update(float dt){
 	m_sound_manager->Update(m_scene_manager, dt);
 	m_game_object_manager->Update(dt);
 	m_physics_engine->Step(dt);
+	if(m_input_manager->IsButtonPressed(BTN_ARROW_UP)){
+		ChangeLevel(NULL);
+	}
 	if (m_change_level){
     
-		State* loading = FindByName("LoadingState");
-		m_parent->Init(loading);
+		//State* loading = FindByName("LoadingState");
+		//m_parent->Init(loading);
 
-		static_cast<LoadingState*>(loading)->SetLevel(m_level_manager->GetCurrentLevel());
-		loading->Enter();
-		loading->Update(1.0f);
-		m_camera->setPosition(0,0,0);
-		m_level_manager->ChangeLevel();
-		m_change_level = false;
+		//static_cast<LoadingState*>(loading)->SetLevel(m_level_manager->GetCurrentLevel());
+		//loading->Enter();
+		//loading->Update(1.0f);
+		//m_camera->setPosition(0,0,0);
+		//m_level_manager->ChangeLevel();
+		//m_change_level = false;
 
-		loading->Exit();
+		//loading->Exit();
 	}
 
-	
-	//if(m_pause){
-	//	//CreatePauseScreen();
-	//	PushState(FindByName("PauseState"));
-	//}
-	//else {
-		
-		
-
-		/*if (m_input_manager->IsButtonDown(BTN_ARROW_UP)){
-			m_physics_engine->ShowDebugDraw(true);
-		}
-		else{
-			m_physics_engine->ShowDebugDraw(false);
-		}*/
 
 		if (m_input_manager->IsButtonPressed(BTN_BACK)){
 			m_pause = true;
@@ -143,7 +134,33 @@ bool PlayState::Update(float dt){
 }
 
 void PlayState::ChangeLevel(IEvent*) {
-	m_change_level = true;
+	std::function<void()> func = [this] { 
+		m_parent->ShowLoadingScreen(m_level_manager->GetLoadingScreen()); 
+		m_parent->PauseUpdate(true);
+		_ReadyNextLevel();
+	};
+	m_fade->SetFadeOutCallBack(func);
+	m_fade->FadeOut(VariableManager::GetSingletonPtr()->GetAsFloat("Fade_out_timer"));
+}
+
+void PlayState::_ReadyNextLevel(){
+	std::function<void()> func = [this] { _LoadNextLevel(); };
+	m_fade->SetFadeInCallBack(func);
+	m_fade->FadeIn(VariableManager::GetSingletonPtr()->GetAsFloat("Fade_in_timer"));
+}
+
+void PlayState::_LoadNextLevel(){
+	m_camera->setPosition(0,0,0);
+	if (m_level_manager->ChangeLevel()){
+		std::function<void()> func = [this] { m_parent->PauseUpdate(false); m_parent->HideLoadingScreen(); m_fade->FadeIn(VariableManager::GetSingletonPtr()->GetAsFloat("Fade_in_timer")); };
+		m_fade->SetFadeOutCallBack(func);
+		m_fade->FadeOut(VariableManager::GetSingletonPtr()->GetAsFloat("Fade_out_timer"));
+	}
+	else {
+		std::function<void()> func = [this] { m_parent->PauseUpdate(false); m_parent->HideLoadingScreen(); ChangeToWinState(); };
+		m_fade->SetFadeOutCallBack(func);
+		m_fade->FadeOut(VariableManager::GetSingletonPtr()->GetAsFloat("Fade_out_timer"));
+	}
 }
 
 void PlayState::ChangeToWinState(){

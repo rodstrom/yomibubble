@@ -30,6 +30,9 @@ public:
 	void Shut();
 	void SecondLoading();
 	void ExitTest();
+	void ShowLoadingScreen(const Ogre::String& overlay_name);
+	void HideLoadingScreen();
+	void PauseUpdate(bool value) { m_pause_update = value; }
 
 protected:
 	void Cleanup(State* state);
@@ -46,8 +49,10 @@ protected:
 	bool						m_pop_on_update;
 	bool						m_fading;
 	bool						m_loading_fading;
+	bool						m_pause_update;
 	std::function<void()>		func;
 	std::function<void()>		func2;
+	Ogre::Overlay*				m_loading_overlay;		// an overlay that we will display while the level is loading
 };
 
 #endif // _STATE_MANAGER_H_

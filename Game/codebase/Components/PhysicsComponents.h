@@ -142,7 +142,7 @@ public:
 	virtual void Notify(int type, void* msg);
 	virtual void Shut();
 	virtual void SetMessenger(ComponentMessenger* messenger);
-	virtual void Init(PhysicsEngine* physics_engine, const Ogre::String& idle_anim_id, const Ogre::String& excited_anim_id, const Ogre::String& quest_item);
+	virtual void Init(PhysicsEngine* physics_engine, Ogre::SceneManager* scene_manager, const Ogre::String& idle_anim_id, const Ogre::String& excited_anim_id, const Ogre::String& quest_item);
 	virtual void Update(float dt);
 	virtual void SimulationStep(btScalar time_step);
 
@@ -172,6 +172,8 @@ public:
 	Ogre::String m_idle_anim_id;
 	Ogre::String m_excited_anim_id;
 	Ogre::String m_quest_item;
+	Ogre::Camera* m_camera;
+	Ogre::SceneNode* m_player_node;
 	
 protected:
 	TOTT_STATE m_state;

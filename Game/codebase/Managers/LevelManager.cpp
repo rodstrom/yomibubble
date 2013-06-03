@@ -11,7 +11,7 @@ LevelManager::LevelManager(GameObjectManager* game_object_manager, Ogre::SceneMa
 }
 LevelManager::~LevelManager(void){}
 
-void LevelManager::ChangeLevel(){	
+bool LevelManager::ChangeLevel(){	
 	Ogre::String next_level = m_levels[m_current_level].next_level;
 	m_game_object_manager->ClearAllGameObjects();
 	m_scene_manager->destroyAllAnimations();
@@ -22,13 +22,15 @@ void LevelManager::ChangeLevel(){
 
 	if (next_level != Ogre::StringUtil::BLANK){
 		LoadLevel(next_level);
+		return true;
 	}
 	else{
-		if (m_change_state){
-			m_change_state();
-		}
+		//if (m_change_state){
+			//m_change_state();
+		return false;
 	}
 }
+
 
 void LevelManager::LoadLevel(const Ogre::String& level_id){
 	m_str_current_level = level_id;

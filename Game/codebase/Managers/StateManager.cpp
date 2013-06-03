@@ -8,11 +8,8 @@
 //#include "boost\thread.hpp"
 
 StateManager::StateManager(Ogre::RenderWindow* render_window, InputListener* input_listener, MessageSystem* message_system) 
-	: m_render_window(render_window), m_input_listener(input_listener), m_message_system(message_system), m_next_state(NULL), m_pop_on_update(false), m_fading(false), m_loading_fading(false){
+	: m_render_window(render_window), m_input_listener(input_listener), m_message_system(message_system), m_next_state(NULL), m_pop_on_update(false), m_fading(false), m_loading_fading(false), m_pause_update(false), m_loading_overlay(NULL){
 		m_fade = new FadeInFadeOut("Overlays/FadeInOut", "Examples/Fade");
-		
-		
-		
 }
 
 StateManager::~StateManager(void){}
@@ -50,27 +47,25 @@ bool StateManager::Update(float dt){
 		m_state_stack.back()->Enter();
 		m_next_state = NULL;
 		//m_fade->FadeIn(VariableManager::GetSingletonPtr()->GetAsFloat("Fade_in_timer"));
-		if(m_state_stack.back() == FindById("PlayState")){
-			
+		/*if(m_state_stack.back() == FindById("PlayState")){
 			Init(m_loading);
 			m_loading->Enter();
 			m_loading->Update(1.0f);
-			m_fade->FadeIn(VariableManager::GetSingletonPtr()->GetAsFloat("Fade_in_timer"));			
-		}
+			static_cast<PlayState*>(m_state_stack.back())->SecondLoading();
+			m_loading->Exit();
+			//m_fade->FadeIn(VariableManager::GetSingletonPtr()->GetAsFloat("Fade_in_timer"));
+		}*/
 	}
 	
 	if(m_fade->IsFading()){
 		m_fade->Update(dt);
 	}
 
-	if (!m_state_stack.empty()){
-		//for(int i = 0; i < m_state_stack.size(); i++){
-		//	if(m_state_stack[i] = FindById("LoadingState"))
-		//}
+	if (!m_state_stack.empty() && !m_pause_update){
 		return m_state_stack.back()->Update(dt);
 	}
 	
-	return false;
+	return true;
 }
 
 void StateManager::ManageState(const Ogre::String& id, State* state){
@@ -115,10 +110,10 @@ void StateManager::Init(State* state){
 	m_input_listener->AddInputManager(state->GetInputManager());
 	m_loading = FindById("LoadingState");
 	
-	func2 = [this] { ExitTest(); };
-	m_fade->SetFadeOutCallBack(func2);
-	func = [this] { SecondLoading(); };
-	m_fade->SetFadeInCallBack(func);	
+	//func2 = [this] { ExitTest(); };
+	//m_fade->SetFadeOutCallBack(func2);
+	//func = [this] { SecondLoading(); };
+	//m_fade->SetFadeInCallBack(func);
 }
 
 void StateManager::Cleanup(State* state){
@@ -139,13 +134,24 @@ void StateManager::Shut(){
 }
 
 void StateManager::SecondLoading(){
-	static_cast<PlayState*>(m_state_stack.back())->SecondLoading();
-	m_fade->FadeOut(VariableManager::GetSingletonPtr()->GetAsFloat("Fade_out_timer"));
-	
+	//static_cast<PlayState*>(m_state_stack.back())->SecondLoading();
+	//m_fade->FadeOut(VariableManager::GetSingletonPtr()->GetAsFloat("Fade_out_timer"));
 }
 
 void StateManager::ExitTest(){
-	
-	m_loading->Exit();
-	m_fade->FadeIn(VariableManager::GetSingletonPtr()->GetAsFloat("Fade_out_timer"));
+	//m_loading->Exit();
+	//m_fade->FadeIn(VariableManager::GetSingletonPtr()->GetAsFloat("Fade_in_timer"));
+}
+
+void StateManager::ShowLoadingScreen(const Ogre::String& overlay_name){
+	m_loading_overlay = Ogre::OverlayManager::getSingleton().getByName(overlay_name);
+	if (m_loading_overlay){
+		m_loading_overlay->show();
+	}
+}
+
+void StateManager::HideLoadingScreen(){
+	if (m_loading_overlay){
+		m_loading_overlay->hide();
+	}
 }
