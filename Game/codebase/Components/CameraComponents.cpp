@@ -129,8 +129,10 @@ void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewpo
 	m_env_collision = false;
 	m_player_direction = Ogre::Vector3::ZERO;
 	
-	m_camera_pivot->setPosition(Ogre::Real(158.070892),Ogre::Real(72.4587402),Ogre::Real(252.214386));
-	m_camera_node->setPosition(Ogre::Real(160.070892),Ogre::Real(73.4587402),Ogre::Real(255.214386));
+	//m_camera_pivot->setPosition(Ogre::Real(158.070892),Ogre::Real(72.4587402),Ogre::Real(252.214386));
+	//m_camera_node->setPosition(Ogre::Real(160.070892),Ogre::Real(73.4587402),Ogre::Real(255.214386));
+	m_camera_pivot->setPosition(Ogre::Vector3(0.0f));
+	m_camera_node->setPosition(Ogre::Vector3(0.0f));
 
 	//m_camera->lookAt(Ogre::Vector3(145.872f,73.6166f,244.42f));
 	//m_camera->rotate(Ogre::Vector3(0.0491129,0.92081,0.123328), Ogre::Degree(-0.366698));
@@ -181,6 +183,15 @@ void FollowCameraComponent::Init(Ogre::SceneManager* scene_manager, Ogre::Viewpo
 
 }
 
+void FollowCameraComponent::ResetCameraPosition() {
+	Ogre::SceneNode* node = NULL;
+	m_messenger->Notify(MSG_NODE_GET_NODE, &node);
+	if (node){
+		m_camera_pivot->setPosition(node->getPosition());
+		m_camera_node->setPosition(node->getPosition());
+	}
+}
+
 void FollowCameraComponent::Update(float dt){
 	//std::cout << "DT: " << dt << std::endl;
 	//m_camera->lookAt(Ogre::Vector3(150.872f,75.6166f,244.42f));
@@ -209,6 +220,9 @@ void FollowCameraComponent::Update(float dt){
 	Ogre::SceneNode* node = NULL;
 	m_messenger->Notify(MSG_NODE_GET_NODE, &node);
 	if (node){
+		if(m_camera_node->getPosition() == Ogre::Vector3(0.0f)) {
+			ResetCameraPosition();
+		}
 		//Ogre::Vector3 old_position = m_camera_node->getPosition();
 		
 		//if(m_on_ground){

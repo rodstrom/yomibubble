@@ -12,6 +12,7 @@
 #include "LoadingState.h"
 #include "..\FadeInFadeOut.h"
 #include "..\CompositorListeners.h"
+#include "..\Components\CameraComponents.h"
 
 PlayState::PlayState(void) : m_physics_engine(NULL), m_game_object_manager(NULL), m_level_manager(NULL), m_pause(false), m_running(true), m_change_level(false){}
 PlayState::~PlayState(void){}
@@ -108,6 +109,8 @@ bool PlayState::Update(float dt){
 		m_change_level = false;
 
 		loading->Exit();
+
+		static_cast<FollowCameraComponent*>(m_game_object_manager->GetGameObject("Player")->GetComponent(COMPONENT_FOLLOW_CAMERA))->ResetCameraPosition();
 	}
 
 	

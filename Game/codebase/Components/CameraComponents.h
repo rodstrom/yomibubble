@@ -43,6 +43,8 @@ public:
 
 	void SetCustomVariables(float camera_zoom_speed, float stick_rotation_acceleration, float change_angle_after_player, float default_distance, float default_pitch);
 
+	void ResetCameraPosition();
+
 	AltRaycastDef		m_left_ray;
 	AltRaycastDef		m_right_ray;
 	AltRaycastDef		m_top_ray;
